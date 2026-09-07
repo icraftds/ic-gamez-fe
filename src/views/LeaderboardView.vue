@@ -4,7 +4,7 @@
     <HomeNavbar />
 
     <div class="container" style="margin-top: 40px">
-      <LeaderboardTable />
+      <LeaderboardTable :is-full-view="true" />
     </div>
   </div>
 </template>
