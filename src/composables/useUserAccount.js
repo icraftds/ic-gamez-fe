@@ -6,7 +6,7 @@ const isPremiumUser = ref(false)
 const isLoggedIn = ref(false)
 
 const userProfile = ref({
-  name: 'Alex Coder',
+  name: 'randi (uo), S.Kom., CWDev.',
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
   level: 12,
   xp: 3450,

@@ -25,15 +25,15 @@
           </tr>
           <tr class="leaderboard-row">
             <td class="rank-2"><i class="fa-solid fa-medal"></i> 2</td>
-            <td style="font-weight: 700; font-size: 1.1rem;">Siti Aisyah</td>
-            <td><span class="school-badge">SMKN 1 Cimahi</span></td>
+            <td style="font-weight: 700; font-size: 1.1rem;">Kanzler</td>
+            <td><span class="school-badge">Kenzia Frozen Food</span></td>
             <td style="color: var(--primary); font-family: 'JetBrains Mono', monospace;">13,200 XP</td>
             <td>38 Tantangan</td>
           </tr>
           <tr class="leaderboard-row">
             <td class="rank-3"><i class="fa-solid fa-medal"></i> 3</td>
-            <td style="font-weight: 700; font-size: 1.1rem;">Reza Rahardian</td>
-            <td><span class="school-badge">SMKN 2 Garut</span></td>
+            <td style="font-weight: 700; font-size: 1.1rem;">Blak</td>
+            <td><span class="school-badge">Ciwastra Boys</span></td>
             <td style="color: var(--primary); font-family: 'JetBrains Mono', monospace;">12,850 XP</td>
             <td>36 Tantangan</td>
           </tr>

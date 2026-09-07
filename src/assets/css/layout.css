@@ -1,0 +1,48 @@
+      /* Navbar */
+      .nav-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px 40px;
+        box-sizing: border-box;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        pointer-events: none;
+      }
+      .nav-btn {
+        pointer-events: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 24px;
+        background: rgba(15, 10, 30, 0.8);
+        border: 1px solid var(--glass-border);
+        border-radius: 999px;
+        color: var(--text-light);
+        text-decoration: none;
+        font-weight: 600;
+        font-family: "Fredoka", sans-serif;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);
+      }
+      .nav-btn:hover {
+        background: rgba(30, 20, 50, 1);
+        transform: translateX(-5px);
+        box-shadow: 0 8px 25px rgba(147, 51, 234, 0.4);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px 100px;
+        position: relative;
+        z-index: 1;
+        perspective: 1500px;
+      }
+
