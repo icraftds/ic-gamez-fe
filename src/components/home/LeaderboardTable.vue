@@ -1,9 +1,12 @@
 <template>
-  <section class="reveal" id="leaderboard" style="scroll-margin-top: 100px; padding: 60px 0; width: 100%; position: relative;">
-    <div class="leaderboard-container iso-leaderboard" :style="{ maxWidth: isFullView ? '1100px' : '1000px', margin: '0 auto', padding: '30px', marginBottom: '50px' }">
-      <div style="text-align: center; margin-bottom: 40px;">
-        <h2 style="font-size: 2.5rem;">Top <span class="gradient-text">CoderZ</span></h2>
-        <p v-if="isFullView" style="color: #94a3b8; margin-top: 10px;">Kumpulkan XP dari latihan pemrograman dan jadilah yang teratas</p>
+  <section class="reveal leaderboard-section" id="leaderboard">
+    <div 
+      class="leaderboard-container" 
+      :class="{ 'full-view-container': isFullView, 'preview-container': !isFullView }"
+    >
+      <div class="leaderboard-header">
+        <h2 class="leaderboard-title">Top <span class="gradient-text">CoderZ</span></h2>
+        <p v-if="isFullView" class="leaderboard-subtitle">Kumpulkan XP dari latihan pemrograman dan jadilah yang teratas</p>
       </div>
 
       <!-- Podium Section (Only for Full View) -->
@@ -68,11 +71,11 @@
               <td>
                 <div class="user-cell">
                   <img v-if="isFullView" :src="user.avatar" class="sm-avatar" alt="Avatar">
-                  <span style="font-weight: 700; font-size: 1.1rem;">{{ user.name }}</span>
+                  <span class="user-name-text">{{ user.name }}</span>
                 </div>
               </td>
               <td><span class="school-badge">{{ user.school }}</span></td>
-              <td style="color: var(--primary); font-family: 'JetBrains Mono', monospace;">{{ formatXP(user.xp) }}</td>
+              <td class="user-xp-cell">{{ formatXP(user.xp) }}</td>
               <td v-if="!isFullView">{{ user.challenges }} Tantangan</td>
             </tr>
           </tbody>
@@ -117,8 +120,6 @@ const leaderboardData = ref([
 ])
 
 const top3 = computed(() => leaderboardData.value.slice(0, 3))
-// Di Full View, kita juga bisa mengecualikan top 3 dari tabel jika mau, 
-// tapi berdasarkan referensi desain (dan untuk UX yang baik), top 3 tetap ada di tabel.
 const displayUsers = computed(() => props.isFullView ? leaderboardData.value : leaderboardData.value.slice(0, 5))
 
 const formatXP = (xp) => {
@@ -127,6 +128,43 @@ const formatXP = (xp) => {
 </script>
 
 <style scoped>
+/* Layout Adjustments */
+.leaderboard-section {
+  scroll-margin-top: 100px;
+  padding: 60px 0;
+  width: 100%;
+  position: relative;
+}
+
+.leaderboard-container {
+  margin: 0 auto;
+  padding: 30px;
+  margin-bottom: 50px;
+}
+
+.full-view-container {
+  max-width: 1100px;
+}
+
+.preview-container {
+  max-width: 1000px;
+}
+
+.leaderboard-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.leaderboard-title {
+  font-size: 2.5rem;
+}
+
+.leaderboard-subtitle {
+  color: #94a3b8;
+  margin-top: 10px;
+}
+
+/* Podium Section */
 .podium-container {
   display: flex;
   justify-content: center;
@@ -258,6 +296,7 @@ const formatXP = (xp) => {
   font-size: 1.1rem;
 }
 
+/* Table Section */
 .table-scroll-container {
   max-height: 500px;
   overflow-y: auto;
@@ -290,6 +329,16 @@ const formatXP = (xp) => {
   border-radius: 50%;
   background: #333;
   border: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-name-text {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.user-xp-cell {
+  color: var(--primary);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 /* Base table adjustments */
