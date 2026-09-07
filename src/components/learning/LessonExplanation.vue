@@ -42,6 +42,42 @@ defineEmits(['next'])
 .explanation-box :deep(h3) {
   color: #c084fc;
   margin-bottom: 15px;
+  margin-top: 25px;
+}
+
+.explanation-box :deep(p) {
+  margin-bottom: 15px;
+}
+
+.explanation-box :deep(ul) {
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
+
+.explanation-box :deep(li) {
+  margin-bottom: 8px;
+}
+
+.explanation-box :deep(pre) {
+  background: #0d0914;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.explanation-box :deep(code) {
+  font-family: 'JetBrains Mono', monospace;
+  color: #00f0ff;
+  font-size: 0.9rem;
+}
+
+.explanation-box :deep(p > code),
+.explanation-box :deep(li > code) {
+  background: rgba(0, 240, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .action-bar {
