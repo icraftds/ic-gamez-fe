@@ -1,93 +1,92 @@
 <template>
   <section class="reveal leaderboard-section" id="leaderboard">
-    <div 
-      class="leaderboard-container" 
-      :class="{ 'full-view-container': isFullView, 'preview-container': !isFullView }"
-    >
-      <div class="leaderboard-header">
-        <h2 class="leaderboard-title">Top <span class="gradient-text">CoderZ</span></h2>
-        <p v-if="isFullView" class="leaderboard-subtitle">Kumpulkan XP dari latihan pemrograman dan jadilah yang teratas</p>
+    <div class="dash-leaderboard" :class="{ 'preview-mode': !isFullView }">
+      <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="font-size: 2.5rem;">Top <span class="gradient-text">CoderZ</span></h2>
+        <p class="subtitle" style="margin-top: 10px;">Kompetisi IC Game-Z – kumpulkan XP dan jadi yang teratas!</p>
       </div>
 
-      <!-- Podium Section (Only for Full View) -->
-      <div v-if="isFullView" class="podium-container">
-        <!-- Rank 2 -->
-        <div class="podium-item rank-2-podium">
+      <!-- Podium Top 3 -->
+      <div class="podium" v-if="isFullView || showPodiumInPreview">
+        <div class="podium-item second">
           <div class="podium-rank">2</div>
-          <div class="podium-avatar-wrapper">
-            <img :src="top3[1].avatar" alt="Avatar" class="podium-avatar">
-          </div>
-          <div class="podium-info">
-            <h4>{{ top3[1].name }}</h4>
-            <span class="podium-xp">{{ formatXP(top3[1].xp) }}</span>
-          </div>
+          <img :src="topUsers[1].avatar" class="podium-avatar" />
+          <h4>{{ topUsers[1].name }}</h4>
+          <span class="podium-xp">{{ topUsers[1].xp.toLocaleString() }} XP</span>
         </div>
-
-        <!-- Rank 1 -->
-        <div class="podium-item rank-1-podium">
-          <div class="podium-rank winner"><i class="fa-solid fa-crown"></i></div>
-          <div class="podium-avatar-wrapper winner-wrapper">
-            <img :src="top3[0].avatar" alt="Avatar" class="podium-avatar">
-          </div>
-          <div class="podium-info">
-            <h4 class="winner-name">{{ top3[0].name }}</h4>
-            <span class="podium-xp winner-xp">{{ formatXP(top3[0].xp) }}</span>
-          </div>
+        <div class="podium-item first">
+          <div class="podium-rank gold"><i class="fa-solid fa-crown"></i> 1</div>
+          <img :src="topUsers[0].avatar" class="podium-avatar big" />
+          <h4 class="winner-name">{{ topUsers[0].name }}</h4>
+          <span class="podium-xp winner-xp">{{ topUsers[0].xp.toLocaleString() }} XP</span>
         </div>
-
-        <!-- Rank 3 -->
-        <div class="podium-item rank-3-podium">
+        <div class="podium-item third">
           <div class="podium-rank">3</div>
-          <div class="podium-avatar-wrapper">
-            <img :src="top3[2].avatar" alt="Avatar" class="podium-avatar">
-          </div>
-          <div class="podium-info">
-            <h4>{{ top3[2].name }}</h4>
-            <span class="podium-xp">{{ formatXP(top3[2].xp) }}</span>
-          </div>
+          <img :src="topUsers[2].avatar" class="podium-avatar" />
+          <h4>{{ topUsers[2].name }}</h4>
+          <span class="podium-xp">{{ topUsers[2].xp.toLocaleString() }} XP</span>
         </div>
       </div>
 
-      <!-- Table Section -->
-      <div :class="{'table-scroll-container': isFullView}">
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Pengguna</th>
-              <th>Asal Sekolah</th>
-              <th>Poin Total</th>
-              <th v-if="!isFullView">Tantangan Diselesaikan</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(user, index) in displayUsers" :key="user.id" class="leaderboard-row">
-              <td :class="{'rank-1': index === 0, 'rank-2': index === 1, 'rank-3': index === 2}">
-                <i v-if="index === 0" class="fa-solid fa-trophy"></i>
-                <i v-else-if="index === 1 || index === 2" class="fa-solid fa-medal"></i>
-                <span v-if="index > 2">{{ index + 1 }}</span>
-                <span v-else> {{ index + 1 }}</span>
-              </td>
-              <td>
-                <div class="user-cell">
-                  <img v-if="isFullView" :src="user.avatar" class="sm-avatar" alt="Avatar">
-                  <span class="user-name-text">{{ user.name }}</span>
-                </div>
-              </td>
-              <td><span class="school-badge">{{ user.school }}</span></td>
-              <td class="user-xp-cell">{{ formatXP(user.xp) }}</td>
-              <td v-if="!isFullView">{{ user.challenges }} Tantangan</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Your Rank (Only show if logged in and full view) -->
+      <div class="your-rank-grid" v-if="isFullView && isLoggedIn">
+        <div class="your-rank-card">
+          <i class="fa-solid fa-calendar"></i>
+          <span class="yr-label">Peringkat kamu bulan ini</span>
+          <span class="yr-value">—</span>
+        </div>
+        <div class="your-rank-card">
+          <i class="fa-solid fa-infinity"></i>
+          <span class="yr-label">Peringkat kamu sepanjang masa</span>
+          <span class="yr-value text-cyan">#2689</span>
+        </div>
       </div>
 
+      <!-- Leaderboard Tables -->
+      <div class="tables-grid" :class="{'single-column': !isFullView}">
+        <div class="section-card" v-if="isFullView">
+          <h3>Bulan Ini</h3>
+          <p class="table-sub">XP bulan ini<br/>Reset tiap awal bulan - sisa 24 hari</p>
+          <div class="table-scroll-wrapper">
+            <table class="lb-table">
+              <thead><tr><th>RANK</th><th>PENGGUNA</th><th>XP</th><th>LEVEL</th></tr></thead>
+              <tbody>
+                <tr v-for="(user, i) in monthlyRanking" :key="i" :class="{ 'top-3': i < 3 }">
+                  <td><span class="rank-badge" :class="'rank-' + (i+1)">{{ i + 1 }}</span></td>
+                  <td class="user-cell"><img :src="user.avatar" class="table-avatar" /> {{ user.name }}</td>
+                  <td class="xp-text">{{ user.xp.toLocaleString() }}</td>
+                  <td><span class="level-badge">Lvl {{ user.level }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>Sepanjang Masa</h3>
+          <p class="table-sub">Total XP</p>
+          <div class="table-scroll-wrapper" :style="!isFullView ? 'max-height: auto;' : ''">
+            <table class="lb-table">
+              <thead><tr><th>RANK</th><th>PENGGUNA</th><th>XP</th><th>LEVEL</th></tr></thead>
+              <tbody>
+                <tr v-for="(user, i) in (isFullView ? allTimeRanking : allTimeRanking.slice(0, 5))" :key="i" :class="{ 'top-3': i < 3 }">
+                  <td><span class="rank-badge" :class="'rank-' + (i+1)">{{ i + 1 }}</span></td>
+                  <td class="user-cell"><img :src="user.avatar" class="table-avatar" /> <span class="user-name-text">{{ user.name }}</span></td>
+                  <td class="xp-text">{{ user.xp.toLocaleString() }}</td>
+                  <td><span class="level-badge">Lvl {{ user.level }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+import { useUserAccount } from '../../composables/useUserAccount'
 
 const props = defineProps({
   isFullView: {
@@ -96,264 +95,164 @@ const props = defineProps({
   }
 })
 
-const leaderboardData = ref([
-  { id: 1, name: 'Randi Zakaria Putra', school: 'MAN 2 Kota Bandung', xp: 14500, challenges: 42, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Randi' },
-  { id: 2, name: 'Kanzler', school: 'Kenzia Frozen Food', xp: 13200, challenges: 38, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kanzler' },
-  { id: 3, name: 'Blak', school: 'Ciwastra Boys', xp: 12850, challenges: 36, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Blak' },
-  { id: 4, name: 'Nanda Kusuma', school: 'SMK Telkom Purwokerto', xp: 11400, challenges: 31, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Nanda' },
-  { id: 5, name: 'Dika Prayoga', school: 'SMKN 1 Tasikmalaya', xp: 10900, challenges: 29, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dika' },
-  { id: 6, name: 'Siti Aminah', school: 'SMAN 3 Jakarta', xp: 10500, challenges: 27, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Siti' },
-  { id: 7, name: 'Budi Santoso', school: 'SMK 1 Budi Utomo', xp: 9800, challenges: 25, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Budi' },
-  { id: 8, name: 'Arief Rahman', school: 'SMAIT Nurul Fikri', xp: 9200, challenges: 23, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arief' },
-  { id: 9, name: 'Dewi Lestari', school: 'SMAN 1 Bandung', xp: 8700, challenges: 21, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dewi' },
-  { id: 10, name: 'Fajar Nugraha', school: 'SMKN 4 Malang', xp: 8100, challenges: 19, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Fajar' },
-  { id: 11, name: 'Agus Setiawan', school: 'SMAN 5 Surabaya', xp: 7500, challenges: 17, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Agus' },
-  { id: 12, name: 'Rina Melati', school: 'SMK Kesehatan', xp: 7200, challenges: 16, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rina' },
-  { id: 13, name: 'Hendra Saputra', school: 'SMAN 2 Semarang', xp: 6800, challenges: 15, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hendra' },
-  { id: 14, name: 'Diana Putri', school: 'SMA Taruna Nusantara', xp: 6400, challenges: 13, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Diana' },
-  { id: 15, name: 'Rizky Pratama', school: 'SMKN 2 Yogyakarta', xp: 6100, challenges: 12, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rizky' },
-  { id: 16, name: 'Bayu Anggara', school: 'SMAN 1 Depok', xp: 5800, challenges: 10, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bayu' },
-  { id: 17, name: 'Citra Kirana', school: 'SMK 3 Bogor', xp: 5500, challenges: 9, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Citra' },
-  { id: 18, name: 'Dimas Aditya', school: 'SMAN 4 Bekasi', xp: 5200, challenges: 8, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dimas' },
-  { id: 19, name: 'Eka Saputri', school: 'SMK 5 Tangerang', xp: 4900, challenges: 7, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Eka' },
-  { id: 20, name: 'Fikri Haikal', school: 'SMAN 6 Jakarta', xp: 4600, challenges: 6, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Fikri' }
-])
+const { isLoggedIn } = useUserAccount()
 
-const top3 = computed(() => leaderboardData.value.slice(0, 3))
-const displayUsers = computed(() => props.isFullView ? leaderboardData.value : leaderboardData.value.slice(0, 5))
+// Optional: Decide if we want to show podium in preview (Home)
+const showPodiumInPreview = false
 
-const formatXP = (xp) => {
-  return new Intl.NumberFormat('id-ID').format(xp) + ' XP'
-}
+const makeUser = (name, xp, level, seed) => ({
+  name,
+  xp,
+  level,
+  avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`
+})
+
+const topUsers = [
+  makeUser('Anonim', 3875, 39, 'topuser1'),
+  makeUser('Muhammad Daffa U.', 3567, 119, 'topuser2'),
+  makeUser('Irfan Yasin', 2328, 24, 'topuser3')
+]
+
+const monthlyRanking = [
+  makeUser('Anonymous', 3875, 39, 'mu1'),
+  makeUser('Muhammad Daffa U.', 3567, 119, 'mu2'),
+  makeUser('Irfan Yasin', 2328, 24, 'mu3'),
+  makeUser('Raasyid Abdul Ra\'uf', 2085, 28, 'mu4'),
+  makeUser('Riki Winardi Gama', 2009, 23, 'mu5'),
+  makeUser('Arlinda Swandaru', 1865, 19, 'mu6'),
+  makeUser('Ilham', 1855, 55, 'mu7'),
+  makeUser('Athaya Rayassa Insyi...', 1855, 19, 'mu8'),
+  makeUser('Bagas Kara', 1700, 18, 'mu9'),
+  makeUser('Citra Kirana', 1650, 17, 'mu10'),
+  makeUser('Dimas Anggara', 1500, 16, 'mu11'),
+]
+
+const allTimeRanking = [
+  makeUser('Anonymous', 12523, 124, 'au1'),
+  makeUser('Alfa', 12182, 122, 'au2'),
+  makeUser('Muhammad Daffa U.', 11884, 119, 'au3'),
+  makeUser('Dara Mahardika', 11601, 118, 'au4'),
+  makeUser('Ahmad Paqih', 11601, 107, 'au5'),
+  makeUser('Erza', 11438, 115, 'au6'),
+  makeUser('Fuad Hidayat Ardian...', 11224, 113, 'au7'),
+  makeUser('Khairul Rohman', 11000, 111, 'au8'),
+  makeUser('Marco', 10872, 109, 'au9'),
+  makeUser('Nat', 9910, 100, 'au10'),
+  makeUser('Renaldy', 9542, 96, 'au11'),
+  makeUser('Andi Pramono', 9309, 94, 'au12'),
+]
 </script>
 
 <style scoped>
-/* Layout Adjustments */
 .leaderboard-section {
   scroll-margin-top: 100px;
   padding: 60px 0;
   width: 100%;
-  position: relative;
 }
 
-.leaderboard-container {
-  margin: 0 auto;
-  padding: 30px;
-  margin-bottom: 50px;
-}
-
-.full-view-container {
+.dash-leaderboard {
   max-width: 1100px;
+  margin: 0 auto;
 }
 
-.preview-container {
+.dash-leaderboard.preview-mode {
   max-width: 1000px;
 }
 
-.leaderboard-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
+.subtitle { color: #94a3b8; font-size: 1.1rem; }
 
-.leaderboard-title {
-  font-size: 2.5rem;
-}
-
-.leaderboard-subtitle {
-  color: #94a3b8;
-  margin-top: 10px;
-}
-
-/* Podium Section */
-.podium-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 20px;
-  margin-bottom: 60px;
-  margin-top: 40px;
-}
-
-.podium-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(20, 15, 40, 0.6);
-  border: 1px solid rgba(147, 51, 234, 0.3);
+/* Podium styling from dashboard */
+.podium { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-bottom: 50px; }
+.podium-item { 
+  text-align: center; 
+  padding: 20px; 
+  background: rgba(20, 15, 40, 0.4);
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: 16px;
-  padding: 20px;
   position: relative;
   transition: transform 0.3s;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
-
-.podium-item:hover {
-  transform: translateY(-5px);
-}
-
-.rank-1-podium {
-  width: 220px;
-  height: 260px;
-  border-color: #fcd34d;
-  background: linear-gradient(to top, rgba(245, 158, 11, 0.1), rgba(20, 15, 40, 0.6));
-  z-index: 2;
-  box-shadow: 0 10px 40px rgba(245, 158, 11, 0.2);
-}
-
-.rank-2-podium {
-  width: 180px;
-  height: 220px;
-  border-color: #e2e8f0;
-}
-
-.rank-3-podium {
-  width: 180px;
-  height: 200px;
-  border-color: #d97706;
-}
+.podium-item:hover { transform: translateY(-5px); }
+.podium-item.first { order: 2; border-color: rgba(34, 211, 238, 0.4); background: linear-gradient(to top, rgba(34, 211, 238, 0.1), rgba(20, 15, 40, 0.6)); }
+.podium-item.second { order: 1; }
+.podium-item.third { order: 3; }
 
 .podium-rank {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #334155;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #475569; color: white; display: flex; align-items: center; justify-content: center;
+  font-weight: bold; margin: 0 auto 10px; font-size: 0.9rem;
   position: absolute;
   top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
   border: 2px solid var(--bg-color);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
+.podium-rank.gold { background: #22d3ee; color: #0f0a1e; width: 44px; height: 44px; top: -22px; font-size: 1.1rem; }
+.podium-avatar { width: 70px; height: 70px; border-radius: 50%; border: 3px solid #475569; margin-bottom: 10px; background: #222; margin-top: 10px;}
+.podium-avatar.big { width: 90px; height: 90px; border-color: #22d3ee; margin-top: 15px;}
+.podium-item h4 { font-size: 1rem; margin: 0 0 5px 0; color: white; }
+.winner-name { font-size: 1.1rem !important; color: #22d3ee !important; }
+.podium-xp { color: var(--primary); font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.9rem; }
+.winner-xp { font-size: 1rem; }
 
-.rank-1-podium .podium-rank {
-  background: #f59e0b;
-  color: #fff;
-  width: 44px;
-  height: 44px;
-  top: -22px;
-  font-size: 1.2rem;
-  border-color: #fcd34d;
-}
-
-.rank-2-podium .podium-rank { background: #e2e8f0; color: #000; }
-.rank-3-podium .podium-rank { background: #d97706; color: #fff; }
-
-.podium-avatar-wrapper {
-  margin-top: 15px;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  padding: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  margin-bottom: 15px;
-}
-
-.winner-wrapper {
-  width: 100px;
-  height: 100px;
-  background: linear-gradient(135deg, #fcd34d, #f59e0b);
-}
-
-.podium-avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #1e1e2e;
-}
-
-.podium-info {
-  text-align: center;
-  margin-top: auto;
-}
-
-.podium-info h4 {
-  font-size: 1rem;
-  margin-bottom: 5px;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 140px;
-}
-
-.winner-name {
-  font-size: 1.2rem !important;
-  color: #fcd34d !important;
-  max-width: 180px !important;
-}
-
-.podium-xp {
-  color: var(--primary);
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-
-.winner-xp {
-  font-size: 1.1rem;
-}
-
-/* Table Section */
-.table-scroll-container {
-  max-height: 500px;
-  overflow-y: auto;
+/* Your Rank Cards */
+.your-rank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+.your-rank-card {
+  background: rgba(15, 10, 30, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
-  background: rgba(20, 15, 40, 0.4);
-  border: 1px solid rgba(147, 51, 234, 0.2);
-}
-
-.table-scroll-container::-webkit-scrollbar {
-  width: 8px;
-}
-.table-scroll-container::-webkit-scrollbar-thumb {
-  background: rgba(147, 51, 234, 0.5);
-  border-radius: 10px;
-}
-.table-scroll-container::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-}
-
-.user-cell {
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
+}
+.your-rank-card i { font-size: 1.3rem; color: #475569; }
+.yr-label { flex: 1; color: #94a3b8; font-size: 0.9rem; }
+.yr-value { font-size: 1.5rem; font-weight: 900; color: white; }
+.text-cyan { color: #22d3ee; }
+
+/* Tables Grid */
+.tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.tables-grid.single-column { grid-template-columns: 1fr; max-width: 800px; margin: 0 auto; }
+.section-card {
+  background: rgba(15, 10, 30, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 25px;
 }
 
-.sm-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #333;
-  border: 1px solid rgba(255,255,255,0.1);
+.section-card h3 { font-size: 1.3rem; margin-bottom: 5px; }
+.table-sub { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
+
+.table-scroll-wrapper {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 5px;
 }
 
-.user-name-text {
-  font-weight: 700;
-  font-size: 1.1rem;
-}
+.table-scroll-wrapper::-webkit-scrollbar { width: 6px; }
+.table-scroll-wrapper::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.3); border-radius: 10px; }
 
-.user-xp-cell {
-  color: var(--primary);
-  font-family: 'JetBrains Mono', monospace;
+.lb-table { width: 100%; border-collapse: collapse; }
+.lb-table thead th { 
+  text-align: left; padding: 12px; color: #475569; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; 
+  border-bottom: 1px solid rgba(255,255,255,0.1); 
+  position: sticky; top: 0; background: rgba(15, 10, 30, 0.95); z-index: 10;
 }
+.lb-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.95rem; }
+.lb-table tr:hover td { background: rgba(255,255,255,0.03); }
 
-/* Base table adjustments */
-.leaderboard-table {
-  width: 100%;
-  border-collapse: collapse;
+.rank-badge {
+  width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font-weight: bold; font-size: 0.85rem; background: #1e293b; color: #94a3b8;
 }
+.rank-1 { background: #22d3ee; color: #0f0a1e; }
+.rank-2 { background: #94a3b8; color: white; }
+.rank-3 { background: #b45309; color: white; }
 
-/* Sticky Header for scrollable table */
-.table-scroll-container .leaderboard-table thead th {
-  position: sticky;
-  top: 0;
-  background: rgba(15, 10, 30, 0.95);
-  backdrop-filter: blur(10px);
-  z-index: 10;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
+.user-cell { display: flex; align-items: center; gap: 12px; }
+.table-avatar { width: 32px; height: 32px; border-radius: 50%; background: #333; }
+.user-name-text { font-weight: 600; }
+.level-badge { background: rgba(34,211,238,0.15); color: #22d3ee; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
+.xp-text { color: var(--primary); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
 </style>

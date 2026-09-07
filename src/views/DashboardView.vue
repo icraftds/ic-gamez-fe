@@ -44,7 +44,7 @@
       <DashboardHome v-if="activeTab === 'beranda'" />
       <DashboardStats v-else-if="activeTab === 'statistik'" />
       <DashboardMedals v-else-if="activeTab === 'medali'" />
-      <DashboardLeaderboard v-else-if="activeTab === 'leaderboard'" />
+      <LeaderboardTable v-else-if="activeTab === 'leaderboard'" :isFullView="true" />
       <DashboardSubscription v-else-if="activeTab === 'langganan'" />
     </div>
 
@@ -65,7 +65,7 @@ import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import DashboardHome from '../components/dashboard/DashboardHome.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
-import DashboardLeaderboard from '../components/dashboard/DashboardLeaderboard.vue'
+import LeaderboardTable from '../components/home/LeaderboardTable.vue'
 import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 
