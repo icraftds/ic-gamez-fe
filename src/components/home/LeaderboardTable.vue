@@ -3,7 +3,6 @@
     <div class="leaderboard-container iso-leaderboard" style="max-width: 1000px; margin: 0 auto; padding: 30px; margin-bottom: 50px;">
       <div style="text-align: center; margin-bottom: 30px;">
         <h2 style="font-size: 2.5rem;">Top <span class="gradient-text">CoderZ</span></h2>
-        <p style="color: var(--text-muted); font-size: 1.1rem;">Peringkat talenta koding terbaik dari berbagai sekolah binaan iCraft.</p>
       </div>
       <table class="leaderboard-table">
         <thead>
