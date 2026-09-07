@@ -45,6 +45,11 @@ const router = createRouter({
       path: '/encyclopedia',
       name: 'encyclopedia',
       component: () => import('./views/EncyclopediaView.vue')
+    },
+    {
+      path: '/leaderboard',
+      name: 'leaderboard',
+      component: () => import('./views/LeaderboardView.vue')
     }
   ]
 })

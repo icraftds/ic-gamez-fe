@@ -12,6 +12,7 @@
       <router-link to="/learning" class="nav-link" :class="{ active: $route.path.startsWith('/learning') }">Learning Path</router-link>
       <router-link to="/challenges" class="nav-link" :class="{ active: $route.path.startsWith('/challenges') }">Tantangan</router-link>
       <router-link to="/encyclopedia" class="nav-link" :class="{ active: $route.path === '/encyclopedia' }">Ensiklopedia</router-link>
+      <router-link to="/leaderboard" class="nav-link" :class="{ active: $route.path === '/leaderboard' }">Leaderboard</router-link>
     </div>
 
     <div class="nav-right">
