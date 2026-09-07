@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Sum - IC Game-Z | iCraftDS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Cyberpunk Purple Dark Mode */
+            --primary: #00f0ff; 
+            --primary-dark: #9333ea; 
+            --secondary: #ec4899; 
+            --bg-body: #05050f;
+            --bg-card: rgba(20, 15, 40, 0.7);
+            --bg-editor: #0d0914; /* Darker for editor */
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border-light: 1px solid rgba(147, 51, 234, 0.4);
+            --shadow-subtle: 0 15px 30px rgba(0,0,0,0.3);
+            --radius-lg: 24px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Mouse Tracking Neon Orbs & Iso Grid Background */
+        .fixed-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; overflow: hidden; background: var(--bg-body);
+        }
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.3; 
+            transition: transform 0.8s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+        .orb-1 { width: 50vw; height: 50vw; background: var(--primary-dark); top: -20%; left: -10%; }
+        .orb-2 { width: 40vw; height: 40vw; background: var(--secondary); bottom: -10%; right: -10%; }
+        
+        .grid-bg {
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background-image: linear-gradient(to right, rgba(147, 51, 234, 0.1) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(147, 51, 234, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px; transform: rotateX(60deg) rotateZ(25deg); transform-origin: center;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 24px; background: rgba(10, 5, 20, 0.6);
+            backdrop-filter: blur(20px); border-bottom: var(--border-light); flex-shrink: 0;
+            z-index: 10;
+        }
+        .nav-btn {
+            display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px;
+            background: rgba(15, 10, 30, 0.8); border: 1px solid var(--border-light);
+            border-radius: 999px; color: var(--text-main); text-decoration: none; font-weight: 600; 
+            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);
+        }
+        .nav-btn:hover { background: rgba(30, 20, 50, 1); transform: translateX(-5px); border-color: var(--primary); color: var(--primary); }
+
+        .problem-info { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 1.1rem; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);}
+        .badge { background: linear-gradient(135deg, var(--primary-dark), var(--secondary)); color: white; padding: 4px 10px; border-radius: 99px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);}
+        
+        .btn { font-family: 'Fredoka', sans-serif; padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 0.9rem; cursor: pointer; text-decoration: none; border: none; transition: all 0.3s;}
+        .btn-outline { background: rgba(255,255,255,0.1); color: var(--text-main); border: 1px solid rgba(255,255,255,0.2); }
+        .btn-outline:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .btn-primary { background: linear-gradient(90deg, var(--primary-dark), var(--secondary)); color: white; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6); }
+
+        .workspace {
+            display: flex; flex: 1; padding: 16px; gap: 16px;
+            min-height: 0; z-index: 10;
+        }
+
+        .panel {
+            background: var(--bg-card); border-radius: var(--radius-lg);
+            border: var(--border-light); box-shadow: var(--shadow-subtle);
+            backdrop-filter: blur(25px);
+            display: flex; flex-direction: column;
+            min-height: 0;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            border-left: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .panel-left { flex: 1; min-width: 300px; max-width: 45%; }
+        .panel-right { flex: 1.2; display: flex; flex-direction: column; gap: 16px; min-height: 0; background: transparent; border: none; box-shadow: none; backdrop-filter: none; }
+        .panel-editor { flex: 2; min-height: 0; display: flex; flex-direction: column; background: var(--bg-card); border-radius: var(--radius-lg); border: var(--border-light); box-shadow: var(--shadow-subtle); border-top: 1px solid rgba(255,255,255,0.15); border-left: 1px solid rgba(255,255,255,0.15);}
+        .panel-console { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg-card); border-radius: var(--radius-lg); border: var(--border-light); box-shadow: var(--shadow-subtle); border-top: 1px solid rgba(255,255,255,0.15); border-left: 1px solid rgba(255,255,255,0.15);}
+
+        .panel-header {
+            padding: 12px 20px; border-bottom: var(--border-light);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .panel-title { font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--primary);}
+        
+        .tabs { display: flex; gap: 16px; }
+        .tab { font-size: 0.9rem; color: var(--text-sub); cursor: pointer; padding: 6px 0; position: relative; }
+        .tab.active { color: var(--primary); font-weight: 600; text-shadow: 0 0 10px rgba(0,240,255,0.3); }
+        .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--primary); box-shadow: 0 0 8px var(--primary);}
+
+        .panel-content {
+            flex: 1; overflow-y: auto; padding: 24px;
+        }
+        .panel-content::-webkit-scrollbar { width: 6px; }
+        .panel-content::-webkit-scrollbar-track { background: transparent; }
+        .panel-content::-webkit-scrollbar-thumb { background: rgba(147, 51, 234, 0.5); border-radius: 4px; }
+
+        /* Problem Styling */
+        .problem-title { font-size: 1.6rem; margin-bottom: 8px; font-weight: 700; color: var(--text-main); }
+        .diff-easy { color: #10b981; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: inline-block; margin-bottom: 20px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);}
+        .prose { line-height: 1.6; color: var(--text-sub); font-size: 0.95rem; }
+        .prose h3 { color: var(--text-main); margin: 20px 0 10px; font-size: 1.1rem; }
+        .prose p { margin-bottom: 12px; }
+        .prose code { font-family: 'JetBrains Mono', monospace; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; color: var(--primary); }
+        .example-box { background: rgba(0,0,0,0.3); border: var(--border-light); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #cbd5e1; border-left: 3px solid var(--primary-dark);}
+
+        /* Editor */
+        .editor-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .editor-toolbar { display: flex; justify-content: space-between; padding: 8px 16px; background: rgba(0,0,0,0.3); border-bottom: var(--border-light); flex-shrink: 0; }
+        .lang-select { font-family: 'JetBrains Mono', monospace; padding: 4px 8px; border-radius: 6px; border: var(--border-light); font-size: 0.8rem; background: #0f172a; color: var(--text-main); outline: none;}
+        .code-editor { flex: 1; resize: none; border: none; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; line-height: 1.5; outline: none; overflow-y: auto; background: var(--bg-editor); color: #cbd5e1; }
+        .code-editor::-webkit-scrollbar { width: 6px; }
+        .code-editor::-webkit-scrollbar-thumb { background: rgba(147, 51, 234, 0.5); border-radius: 4px; }
+
+        /* Console */
+        .console-output { flex: 1; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-sub); padding: 16px; display: flex; align-items: center; justify-content: center; }
+        .action-bar { padding: 12px 20px; border-top: var(--border-light); display: flex; justify-content: flex-end; gap: 12px; background: rgba(0,0,0,0.2); flex-shrink: 0; align-items: center;}
+        
+        .submission-card { background: rgba(0,0,0,0.3); border: var(--border-light); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .sub-status-success { color: #10b981; font-weight: 600; font-size: 1.1rem; }
+        .sub-status-fail { color: #ef4444; font-weight: 600; font-size: 1.1rem; }
+        .sub-time { color: var(--text-sub); font-size: 0.85rem; }
+        
+        .diff-medium { color: #eab308; background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: inline-block; margin-bottom: 20px; box-shadow: 0 0 10px rgba(234, 179, 8, 0.2);}
+        .diff-hard { color: #ef4444; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: inline-block; margin-bottom: 20px; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);}
+        
+        .token-badge { background: rgba(0,0,0,0.3); padding: 6px 12px; border-radius: 99px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1); font-weight: 600; display: flex; align-items: center; gap: 6px; margin-right: auto;}
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content { background: rgba(20, 15, 40, 0.9); border: 1px solid rgba(147, 51, 234, 0.5); border-radius: 24px; padding: 40px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 30px rgba(147, 51, 234, 0.2); transform: translateY(20px); transition: 0.4s; position: relative;}
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-icon { font-size: 4rem; margin-bottom: 20px; }
+        .modal-success-icon { color: #10b981; text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+        .modal-fail-icon { color: #ef4444; text-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; opacity: 0.6; }
+        .modal-close:hover { opacity: 1; }
+
+    </style>
+</head>
+<body>
+    <div class="fixed-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="grid-bg"></div>
+    </div>
+
+    <div class="top-bar">
+        <a href="icgamez.html" class="nav-btn">
+            <i class="fa-solid fa-arrow-left"></i> Kembali
+        </a>
+        <div class="problem-info">
+            <span id="topBarTitle">Loading...</span>
+            <span class="badge">IC Game-Z</span>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="panel panel-left">
+            <div class="panel-header">
+                <div class="tabs">
+                    <div class="tab active" id="tabDescription">Description</div>
+                    <div class="tab" id="tabSubmissions">Submissions</div>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div id="viewDescription">
+                    <h2 class="problem-title" id="problemTitle">Loading...</h2>
+                    <div id="problemDiff"></div>
+                    
+                    <div class="prose" id="problemProse">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+                <div id="viewSubmissions" style="display: none;">
+                    <h2 class="problem-title">Submission History</h2>
+                    <div class="prose" id="submissionsList">
+                        <!-- Submissions loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="panel-editor">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-code"></i> Code Editor
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <div class="editor-toolbar">
+                        <select class="lang-select">
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                        </select>
+                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                    </div>
+                    <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
+                </div>
+            </div>
+
+            <div class="panel-console">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-terminal"></i> Testcases
+                    </div>
+                </div>
+                <div class="console-output" id="consoleOutput">
+                    Run your code to see the test results here.
+                </div>
+                <div class="action-bar">
+                    <div class="token-badge" id="tokenCounter" title="Kesempatan Submit Tersisa"><i class="fa-solid fa-heart" style="color: #ec4899;"></i> <span>10/10</span></div>
+                    <button class="btn btn-outline" id="runBtn"><i class="fa-solid fa-play"></i> Run Code</button>
+                    <button class="btn btn-primary" id="submitBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-icon" id="modalIcon"></div>
+            <h2 id="modalTitle" style="margin-bottom: 10px;">Title</h2>
+            <p id="modalDesc" style="color: var(--text-sub); margin-bottom: 25px;">Description</p>
+            <button class="btn btn-primary" style="width: 100%;" id="modalBtn">Lanjut</button>
+        </div>
+    </div>
+
+    <script>
+        // Data for Challenges
+        const challenges = [
+            {
+                id: 1,
+                title: "1. Two Sum",
+                diff: "Easy",
+                diffClass: "diff-easy",
+                prose: `
+                    <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers such that they add up to <code>target</code>.</p>
+                    <p>You may assume that each input would have <strong>exactly one solution</strong>, and you may not use the same element twice.</p>
+                    <p>You can return the answer in any order.</p>
+                    <h3>Example 1:</h3>
+                    <div class="example-box"><strong>Input:</strong> nums = [2,7,11,15], target = 9<br><strong>Output:</strong> [0,1]</div>
+                `,
+                template: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar twoSum = function(nums, target) {\n    // Write your code here\n    \n};`
+            },
+            {
+                id: 2,
+                title: "2. Add Two Numbers",
+                diff: "Medium",
+                diffClass: "diff-medium",
+                prose: `
+                    <p>You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit.</p>
+                    <p>Add the two numbers and return the sum as a linked list.</p>
+                    <h3>Example 1:</h3>
+                    <div class="example-box"><strong>Input:</strong> l1 = [2,4,3], l2 = [5,6,4]<br><strong>Output:</strong> [7,0,8]</div>
+                `,
+                template: `/**\n * @param {ListNode} l1\n * @param {ListNode} l2\n * @return {ListNode}\n */\nvar addTwoNumbers = function(l1, l2) {\n    \n};`
+            },
+            {
+                id: 3,
+                title: "3. Merge Intervals",
+                diff: "Medium",
+                diffClass: "diff-medium",
+                prose: `
+                    <p>Given an array of <code>intervals</code> where <code>intervals[i] = [starti, endi]</code>, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.</p>
+                    <h3>Example 1:</h3>
+                    <div class="example-box"><strong>Input:</strong> intervals = [[1,3],[2,6],[8,10],[15,18]]<br><strong>Output:</strong> [[1,6],[8,10],[15,18]]</div>
+                `,
+                template: `/**\n * @param {number[][]} intervals\n * @return {number[][]}\n */\nvar merge = function(intervals) {\n    \n};`
+            },
+            {
+                id: 4,
+                title: "4. Median Arrays",
+                diff: "Hard",
+                diffClass: "diff-hard",
+                prose: `
+                    <p>Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code> respectively, return the median of the two sorted arrays.</p>
+                    <p>The overall run time complexity should be <code>O(log (m+n))</code>.</p>
+                `,
+                template: `/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar findMedianSortedArrays = function(nums1, nums2) {\n    \n};`
+            },
+            {
+                id: 5,
+                title: "5. Valid Parentheses",
+                diff: "Easy",
+                diffClass: "diff-easy",
+                prose: `
+                    <p>Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.</p>
+                `,
+                template: `/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    \n};`
+            },
+            {
+                id: 6,
+                title: "6. LRU Cache",
+                diff: "Hard",
+                diffClass: "diff-hard",
+                prose: `
+                    <p>Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.</p>
+                    <p>Implement the <code>LRUCache</code> class.</p>
+                `,
+                template: `/**\n * @param {number} capacity\n */\nvar LRUCache = function(capacity) {\n    \n};`
+            }
+        ];
+
+        // Initialization
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentStage = parseInt(urlParams.get('stage')) || 1;
+        
+        // Ensure stage is valid (1-6)
+        if (currentStage < 1 || currentStage > 6) currentStage = 1;
+        
+        const stageData = challenges.find(c => c.id === currentStage);
+        
+        // Populate DOM
+        document.getElementById('topBarTitle').textContent = stageData.title.split('. ')[1];
+        document.getElementById('problemTitle').textContent = stageData.title;
+        document.getElementById('problemDiff').innerHTML = `<div class="${stageData.diffClass}">${stageData.diff}</div>`;
+        document.getElementById('problemProse').innerHTML = stageData.prose;
+        document.getElementById('codeEditor').value = stageData.template;
+        
+        // Token Management
+        const tokenKey = `ic_tokens_stage_${currentStage}`;
+        let tokens = localStorage.getItem(tokenKey);
+        if (tokens === null) {
+            tokens = 10;
+            localStorage.setItem(tokenKey, 10);
+        } else {
+            tokens = parseInt(tokens);
+        }
+        
+        const tokenCounterUI = document.querySelector('#tokenCounter span');
+        tokenCounterUI.textContent = `${tokens}/10`;
+        
+        // Modal logic
+        const modal = document.getElementById('resultModal');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalBtn = document.getElementById('modalBtn');
+        
+        function openModal(type, title, desc, btnText, callback) {
+            modalIcon.innerHTML = type === 'success' 
+                ? '<i class="fa-solid fa-circle-check modal-success-icon"></i>' 
+                : '<i class="fa-solid fa-circle-xmark modal-fail-icon"></i>';
+            modalTitle.textContent = title;
+            modalDesc.textContent = desc;
+            modalBtn.textContent = btnText;
+            modalBtn.onclick = () => {
+                closeModal();
+                if (callback) callback();
+            };
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // Tab Switching Logic
+        const tabDesc = document.getElementById('tabDescription');
+        const tabSub = document.getElementById('tabSubmissions');
+        const viewDesc = document.getElementById('viewDescription');
+        const viewSub = document.getElementById('viewSubmissions');
+
+        tabDesc.addEventListener('click', () => {
+            tabDesc.classList.add('active');
+            tabSub.classList.remove('active');
+            viewDesc.style.display = 'block';
+            viewSub.style.display = 'none';
+        });
+
+        tabSub.addEventListener('click', () => {
+            tabSub.classList.add('active');
+            tabDesc.classList.remove('active');
+            viewSub.style.display = 'block';
+            viewDesc.style.display = 'none';
+            renderSubmissions();
+        });
+
+        // Submission Data Management
+        const submissionsKey = `ic_submissions_stage_${currentStage}`;
+        let submissions = JSON.parse(localStorage.getItem(submissionsKey)) || [];
+
+        function renderSubmissions() {
+            const list = document.getElementById('submissionsList');
+            if (submissions.length === 0) {
+                list.innerHTML = '<p>Belum ada submission. Jalankan kode Anda untuk mulai!</p>';
+                return;
+            }
+            list.innerHTML = submissions.map(sub => `
+                <div class="submission-card">
+                    <div>
+                        <div class="${sub.status === 'Accepted' ? 'sub-status-success' : 'sub-status-fail'}">
+                            ${sub.status === 'Accepted' ? '<i class="fa-solid fa-check"></i> Accepted' : '<i class="fa-solid fa-xmark"></i> Wrong Answer'}
+                        </div>
+                        <div class="sub-time">Percobaan ke-${sub.attempt} • ${sub.date}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Run Code
+        document.getElementById('runBtn').addEventListener('click', function() {
+            const out = document.getElementById('consoleOutput');
+            out.innerHTML = '<span style="color: var(--primary); font-weight: 600;"><i class="fa-solid fa-circle-notch fa-spin"></i> Running code...</span>';
+            setTimeout(() => {
+                out.style.justifyContent = 'flex-start';
+                out.style.alignItems = 'flex-start';
+                out.style.textAlign = 'left';
+                out.innerHTML = '<div style="width:100%;"><strong style="color:var(--text-main);">Output:</strong><br><div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; margin: 8px 0; font-family: \'JetBrains Mono\'; color: #cbd5e1; border-left: 2px solid #10b981;">Execution finished.</div><span style="color: #10b981; font-weight: 600;"><i class="fa-solid fa-check"></i> Accepted</span></div>';
+            }, 800);
+        });
+        
+        // Submit Code
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            if (tokens <= 0) {
+                openModal('fail', 'Token Habis!', 'Anda telah menggunakan seluruh 10 kesempatan untuk stage ini.', 'Tutup');
+                return;
+            }
+            
+            const btn = this;
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+            btn.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.style.opacity = '1';
+                
+                // Deduct Token
+                tokens -= 1;
+                localStorage.setItem(tokenKey, tokens);
+                tokenCounterUI.textContent = `${tokens}/10`;
+                
+                // Simulate Submission Check
+                const isSuccess = Math.random() > 0.3; // 70% chance to pass for demo purposes
+                
+                // Save to submissions history
+                submissions.unshift({
+                    attempt: 10 - tokens,
+                    status: isSuccess ? 'Accepted' : 'Wrong Answer',
+                    date: new Date().toLocaleTimeString()
+                });
+                localStorage.setItem(submissionsKey, JSON.stringify(submissions));
+                
+                if (isSuccess) {
+                    // Update Unlocked Stage
+                    let currentUnlocked = parseInt(localStorage.getItem('ic_unlocked_stage')) || 1;
+                    if (currentUnlocked <= currentStage && currentStage < 6) {
+                        localStorage.setItem('ic_unlocked_stage', currentStage + 1);
+                    }
+                    
+                    if (currentStage === 6) {
+                        openModal('success', 'Selamat!', 'Anda telah menyelesaikan seluruh stage IC Game-Z!', 'Lihat Submissions', () => {
+                            tabSub.click();
+                        });
+                    } else {
+                        openModal('success', 'Solusi Benar!', 'Kode Anda lulus semua testcase.', 'Lihat Submissions', () => {
+                            tabSub.click();
+                        });
+                    }
+                } else {
+                    openModal('fail', 'Jawaban Salah!', 'Kode Anda gagal pada beberapa testcase.', 'Lihat Submissions', () => {
+                        tabSub.click();
+                    });
+                }
+            }, 1000);
+        });
+
+        // Mouse Tracking
+        const orbs = document.querySelectorAll('.orb');
+        window.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX / window.innerWidth - 0.5;
+            const mouseY = e.clientY / window.innerHeight - 0.5;
+            orbs.forEach((orb, index) => {
+                const speed = (index + 1) * 20;
+                orb.style.transform = `translate(${mouseX * speed}px, ${mouseY * speed}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
