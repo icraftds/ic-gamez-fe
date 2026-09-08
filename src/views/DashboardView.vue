@@ -65,7 +65,6 @@ import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import DashboardHome from '../components/dashboard/DashboardHome.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
-import LeaderboardTable from '../components/home/LeaderboardTable.vue'
 import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 
@@ -77,7 +76,6 @@ const tabs = [
   { id: 'beranda', label: 'Beranda' },
   { id: 'statistik', label: 'Statistik' },
   { id: 'medali', label: 'Medali' },
-  { id: 'leaderboard', label: 'Leaderboard' },
   { id: 'langganan', label: 'Langganan' }
 ]
 </script>

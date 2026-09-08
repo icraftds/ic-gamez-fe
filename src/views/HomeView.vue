@@ -6,7 +6,7 @@
     <div class="container" style="margin-top: 40px">
       <HeroSection />
       <IntroSection />
-      <ChallengeGrid @open-coffee-modal="showCoffeeModal = true" />
+      <LearningPathStack />
       <LeaderboardTable />
     </div>
 
@@ -21,7 +21,7 @@ import CoffeeModal from '../components/common/CoffeeModal.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import HeroSection from '../components/home/HeroSection.vue'
 import IntroSection from '../components/home/IntroSection.vue'
-import ChallengeGrid from '../components/home/ChallengeGrid.vue'
+import LearningPathStack from '../components/home/LearningPathStack.vue'
 import LeaderboardTable from '../components/home/LeaderboardTable.vue'
 
 const showCoffeeModal = ref(false)

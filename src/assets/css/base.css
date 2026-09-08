@@ -20,7 +20,7 @@
 
       html {
         scroll-behavior: smooth;
-        overflow-x: hidden;
+        overflow-x: clip;
         overflow-y: scroll;
       }
 
@@ -28,7 +28,7 @@
         font-family: "Fredoka", sans-serif;
         background: var(--bg-color);
         color: var(--text-light);
-        overflow-x: hidden;
+        overflow-x: clip;
         position: relative;
       }
 
