@@ -33,11 +33,23 @@
         <button class="icon-btn"><i class="fa-solid fa-moon"></i></button>
         <button class="icon-btn"><i class="fa-solid fa-bell"></i></button>
         <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="upgradeToPremium"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
-        <div class="user-avatar-wrapper">
-          <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" />
+        <div class="user-profile-group">
+          <div class="user-profile-btn">
+            <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" />
+            <span>{{ userProfile.name }}</span>
+          </div>
+          <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
       </div>
     </nav>
+    <ConfirmModal 
+      v-model="showLogoutConfirm"
+      title="Konfirmasi Logout"
+      message="Apakah Anda yakin ingin keluar dari akun Anda?"
+      confirmText="Keluar"
+      type="danger"
+      @confirm="handleLogoutConfirm"
+    />
 
     <!-- Content -->
     <div class="container dash-content" v-if="isLoggedIn">
@@ -66,9 +78,23 @@ import DashboardHome from '../components/dashboard/DashboardHome.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
 import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
+import ConfirmModal from '../components/common/ConfirmModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
+import { useRouter } from 'vue-router'
 
-const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, upgradeToPremium } = useUserAccount()
+const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, upgradeToPremium, logout } = useUserAccount()
+const router = useRouter()
+
+const showLogoutConfirm = ref(false)
+
+const handleLogoutClick = () => {
+  showLogoutConfirm.value = true
+}
+
+const handleLogoutConfirm = () => {
+  logout()
+  router.push('/')
+}
 
 const activeTab = ref('beranda')
 
@@ -219,8 +245,37 @@ const tabs = [
   height: 34px;
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.1);
-  cursor: pointer;
   background: #333;
+}
+
+.user-profile-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: 10px;
+}
+
+.user-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 5px 15px 5px 5px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-logout {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.btn-logout:hover {
+  color: #ef4444;
 }
 
 /* Content */

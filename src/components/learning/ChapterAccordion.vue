@@ -9,29 +9,26 @@
     </div>
     
     <div class="chapter-content" v-show="isOpen">
-      <div 
+      <ChapterLessonItem 
         v-for="lesson in chapter.lessons" 
         :key="lesson.id" 
-        class="lesson-item" 
-        @click="$emit('lesson-click', lesson)"
-      >
-        <div class="lesson-status">
-          <i v-if="lesson.isCompleted" class="fa-regular fa-circle-check completed-icon"></i>
-          <i v-else class="fa-regular fa-circle pending-icon"></i>
-        </div>
-        <div class="lesson-title">
-          {{ lesson.title }}
-          <span v-if="lesson.isPremium" class="premium-badge"><i class="fa-solid fa-lock"></i> PRO</span>
-        </div>
-        <div class="lesson-type" :class="lesson.type">
-          {{ lesson.type === 'text' ? 'Teks' : (lesson.type === 'sql' ? 'SQL' : 'Code') }}
-        </div>
+        :lesson="lesson"
+        :is-open="isLessonOpen(lesson.id)"
+        @toggle="toggleLesson"
+        @step-click="$emit('lesson-click', { lesson, step: $event })"
+      />
+
+      <div v-if="!chapter.lessons || chapter.lessons.length === 0" class="empty-lesson">
+        Belum ada materi.
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import ChapterLessonItem from './ChapterLessonItem.vue'
+
 defineProps({
   chapter: {
     type: Object,
@@ -45,9 +42,22 @@ defineProps({
 
 const emit = defineEmits(['toggle', 'lesson-click'])
 
+const openLessons = ref([])
+
 const toggleChapter = () => {
   emit('toggle')
 }
+
+const toggleLesson = (lessonId) => {
+  const idx = openLessons.value.indexOf(lessonId)
+  if (idx === -1) {
+    openLessons.value.push(lessonId)
+  } else {
+    openLessons.value.splice(idx, 1)
+  }
+}
+
+const isLessonOpen = (lessonId) => openLessons.value.includes(lessonId)
 </script>
 
 <style scoped>
@@ -86,68 +96,10 @@ const toggleChapter = () => {
   padding: 10px 20px 20px;
 }
 
-.lesson-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 15px;
-  border-radius: 8px;
-  margin-top: 10px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.lesson-item:hover {
-  background: rgba(147, 51, 234, 0.2);
-}
-
-.lesson-status {
-  margin-right: 15px;
-  font-size: 1.1rem;
-}
-
-.completed-icon {
-  color: #10b981;
-}
-
-.pending-icon {
-  color: #64748b;
-}
-
-.lesson-title {
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
-
-.premium-badge {
-  font-size: 0.65rem;
-  background: rgba(245, 158, 11, 0.2);
-  color: #fcd34d;
-  border: 1px solid rgba(245, 158, 11, 0.5);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-.lesson-type {
-  padding: 4px 10px;
-  border-radius: 99px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.lesson-type.text {
-  background: rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-}
-
-.lesson-type.sql, .lesson-type.code {
-  background: rgba(56, 189, 248, 0.2);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+.empty-lesson {
+  text-align: center;
+  padding: 20px;
+  color: #94a3b8;
+  font-size: 0.9rem;
 }
 </style>

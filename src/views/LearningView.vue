@@ -4,51 +4,54 @@
     <HomeNavbar />
 
     <div class="container" style="margin-top: 40px">
-      <div class="tree-header">
-        <h2><i class="fa-solid fa-code-branch"></i> Learning <span class="gradient-text">Paths</span></h2>
-        <p>Ikuti roadmap pembelajaran kami dari dasar hingga algoritma tingkat lanjut.</p>
+      <div class="learning-hero">
+        <div class="hero-badge">
+          <i class="fa-solid fa-map"></i> Peta Kurikulum
+        </div>
+        <h1 class="hero-title">Learning <span class="gradient-text">Paths</span></h1>
+        <p class="hero-desc">Ikuti roadmap pembelajaran terstruktur kami dari dasar pemrograman hingga penguasaan algoritma tingkat lanjut.</p>
       </div>
 
       <div class="paths-grid">
         <PathCard 
-          v-for="path in paths" 
+          v-for="(path, index) in paths" 
           :key="path.id" 
-          :path="path" 
+          :path="path"
+          :index="index"
           @click="goToPath(path)" 
         />
       </div>
     </div>
-
-    <!-- Premium Modal -->
-    <PremiumModal 
-      :isOpen="showPremiumModal" 
-      @close="showPremiumModal = false" 
-    />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import PathCard from '../components/learning/PathCard.vue'
-import PremiumModal from '../components/common/PremiumModal.vue'
 import { useLearningPaths } from '../composables/useLearningPaths'
 
 const router = useRouter()
 const { paths } = useLearningPaths()
 
-const showPremiumModal = ref(false)
-
 const goToPath = (path) => {
-  if (path.isPremium) {
-    showPremiumModal.value = true
-    return
+  if (path.isLocked) return
+
+  // Langsung ke lesson pertama dari chapter pertama
+  const firstChapter = path.chapters?.[0]
+  const firstLesson = firstChapter?.lessons?.[0]
+
+  if (firstChapter && firstLesson) {
+    router.push(`/learning/${path.id}/lesson/${firstChapter.id}/${firstLesson.id}`)
+  } else {
+    // Fallback ke PathDetailView jika tidak ada lesson
+    router.push(`/learning/${path.id}`)
   }
-  router.push(`/learning/${path.id}`)
 }
 </script>
+
+
 
 <style scoped>
 .learning-view {
@@ -56,19 +59,43 @@ const goToPath = (path) => {
   padding-bottom: 80px;
 }
 
-.tree-header {
+.learning-hero {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
 }
 
-.tree-header h2 {
-  font-size: 2.5rem;
+.hero-badge {
+  background: rgba(0, 240, 255, 0.1);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
   margin-bottom: 15px;
+  letter-spacing: -0.02em;
 }
 
-.tree-header p {
+.hero-desc {
   color: #94a3b8;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  max-width: 600px;
+  line-height: 1.6;
 }
 
 .paths-grid {

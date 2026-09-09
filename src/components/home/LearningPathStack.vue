@@ -56,7 +56,7 @@ const { paths } = useLearningPaths()
   /* Ensure container is tall enough to allow scrolling through all sticky cards */
   position: relative;
   display: block;
-  padding-bottom: 100px; /* Extra padding at the bottom of the stack */
+  padding-bottom: 0px; 
 }
 
 @media (max-width: 768px) {

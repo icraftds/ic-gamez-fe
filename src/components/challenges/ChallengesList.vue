@@ -9,15 +9,13 @@
     </div>
 
     <div class="filters">
-      <div class="search-bar">
-        <i class="fa-solid fa-search"></i>
-        <input
-          type="text"
-          v-model="searchQuery"
-          placeholder="Cari tantangan..."
-        />
+      <div class="category-filter">
+        <i class="fa-solid fa-filter"></i>
+        <select v-model="selectedCategory">
+          <option value="">Semua Kategori</option>
+          <option v-for="cat in uniqueCategories" :key="cat" :value="cat">{{ cat }}</option>
+        </select>
       </div>
-      <button class="btn-search">Cari</button>
     </div>
 
     <div class="table-container">
@@ -31,41 +29,28 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="challenge in filteredChallenges"
+          <ChallengeTableRow
+            v-for="challenge in paginatedChallenges"
             :key="challenge.id"
+            :challenge="challenge"
+            :isPremiumUser="isPremiumUser"
             @click="openChallenge(challenge)"
-            :class="{
-              'is-premium-row': challenge.isPremium && !isPremiumUser,
-            }"
-          >
-            <td>
-              {{ challenge.title }}
-              <span v-if="challenge.isPremium" class="badge-sm premium"
-                ><i class="fa-solid fa-lock" v-if="!isPremiumUser"></i>
-                Premium</span
-              >
-            </td>
-            <td>{{ challenge.category }}</td>
-            <td>
-              <span
-                class="diff-badge"
-                :class="challenge.difficulty.toLowerCase()"
-                >{{ challenge.difficulty }}</span
-              >
-            </td>
-            <td class="status-cell">
-              <i
-                v-if="challenge.isCompleted"
-                class="fa-solid fa-circle-check completed"
-              ></i>
-              <i v-else class="fa-regular fa-circle pending"></i>
-            </td>
-          </tr>
+          />
         </tbody>
       </table>
       <div v-if="filteredChallenges.length === 0" class="empty-state">
-        Tidak ada tantangan yang cocok dengan pencarian Anda.
+        Tidak ada tantangan dalam kategori ini.
+      </div>
+      
+      <!-- Pagination Controls -->
+      <div class="pagination" v-if="totalPages > 1">
+        <button class="page-btn" @click="currentPage--" :disabled="currentPage === 1">
+          <i class="fa-solid fa-chevron-left"></i> Sebelumnya
+        </button>
+        <span class="page-info">Halaman {{ currentPage }} dari {{ totalPages }}</span>
+        <button class="page-btn" @click="currentPage++" :disabled="currentPage === totalPages">
+          Selanjutnya <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </div>
   </main>
@@ -76,6 +61,7 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useLearningPaths } from "../../composables/useLearningPaths.js";
 import { useUserAccount } from "../../composables/useUserAccount.js";
+import ChallengeTableRow from "./ChallengeTableRow.vue";
 
 const emit = defineEmits(['require-premium']);
 
@@ -83,13 +69,32 @@ const router = useRouter();
 const { allChallenges } = useLearningPaths();
 const { isPremiumUser, deductCredit } = useUserAccount();
 
-const searchQuery = ref("");
+const selectedCategory = ref("");
+const currentPage = ref(1);
+const itemsPerPage = 5;
+
+const uniqueCategories = computed(() => {
+  const categories = new Set(allChallenges.value.map(c => c.category));
+  return Array.from(categories);
+});
 
 const filteredChallenges = computed(() => {
-  if (!searchQuery.value) return allChallenges.value;
-  return allChallenges.value.filter((c) =>
-    c.title.toLowerCase().includes(searchQuery.value.toLowerCase()),
-  );
+  if (!selectedCategory.value) return allChallenges.value;
+  return allChallenges.value.filter((c) => c.category === selectedCategory.value);
+});
+
+const totalPages = computed(() => Math.ceil(filteredChallenges.value.length / itemsPerPage));
+
+const paginatedChallenges = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredChallenges.value.slice(start, end);
+});
+
+// Reset pagination when filter changes
+import { watch } from 'vue';
+watch(selectedCategory, () => {
+  currentPage.value = 1;
 });
 
 const openChallenge = (challenge) => {
@@ -137,37 +142,36 @@ const openChallenge = (challenge) => {
   margin-bottom: 30px;
 }
 
-.search-bar {
-  flex: 1;
+.category-filter {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 15px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 0 15px;
+  gap: 10px;
+  transition: all 0.3s;
 }
-
-.search-bar i {
-  color: #64748b;
+.category-filter:focus-within {
+  border-color: #c084fc;
+  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2);
 }
-
-.search-bar input {
-  flex: 1;
+.category-filter i {
+  color: #94a3b8;
+}
+.category-filter select {
   background: transparent;
   border: none;
-  padding: 12px 15px;
-  color: white;
+  color: #e2e8f0;
+  font-size: 0.95rem;
   outline: none;
-}
-
-.btn-search {
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0 25px;
-  font-weight: 600;
   cursor: pointer;
+  appearance: none;
+  padding-right: 20px;
+}
+.category-filter select option {
+  background: #1e1b4b;
+  color: #e2e8f0;
 }
 
 .table-container {
@@ -193,79 +197,73 @@ const openChallenge = (challenge) => {
   letter-spacing: 1px;
 }
 
-.challenges-table td {
-  padding: 15px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
-}
-
-.challenges-table tr {
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.challenges-table tr:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.challenges-table tr.is-premium-row {
-  opacity: 0.8;
-}
-
-.status-cell {
-  text-align: center;
-}
-
-.status-cell .completed {
-  color: #10b981;
-  font-size: 1.2rem;
-}
-
-.status-cell .pending {
-  color: #475569;
-  font-size: 1.2rem;
-}
-
 .empty-state {
-  padding: 40px;
   text-align: center;
-  color: #64748b;
+  padding: 40px;
+  color: #94a3b8;
+  font-size: 1.1rem;
 }
 
-.badge-sm {
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  border-radius: 10px;
-  margin-left: 10px;
-  vertical-align: middle;
+/* ── Pagination & Filter Tweaks ── */
+.category-filter select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+}
+.category-filter select option {
+  background-color: #1e1b4b; /* Dark background */
+  color: #e2e8f0;
+  padding: 10px;
 }
 
-.badge-sm.premium {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fcd34d;
-  border: 1px solid rgba(245, 158, 11, 0.5);
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(15, 10, 30, 0.5);
 }
 
-.diff-badge {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border: 1px solid transparent;
+.page-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
-.diff-badge.mudah {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.3);
+
+.page-btn:hover:not(:disabled) {
+  background: rgba(147, 51, 234, 0.2);
+  border-color: #c084fc;
+  color: #fff;
 }
-.diff-badge.sedang {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-  border-color: rgba(245, 158, 11, 0.3);
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent;
 }
-.diff-badge.sulit {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.3);
+
+.page-info {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 </style>

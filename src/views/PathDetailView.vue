@@ -38,12 +38,6 @@
         Path tidak ditemukan.
       </div>
     </div>
-
-    <!-- Premium Modal -->
-    <PremiumModal 
-      :isOpen="showPremiumModal" 
-      @close="showPremiumModal = false" 
-    />
   </div>
 </template>
 
@@ -51,23 +45,18 @@
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLearningPaths } from '../composables/useLearningPaths'
-import { useUserAccount } from '../composables/useUserAccount'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ChapterAccordion from '../components/learning/ChapterAccordion.vue'
-import PremiumModal from '../components/common/PremiumModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const { getPathById } = useLearningPaths()
-const { isPremiumUser, deductCredit } = useUserAccount()
 
 const pathId = computed(() => route.params.pathId)
 const path = computed(() => getPathById(pathId.value))
 const openChapters = ref([])
-const showPremiumModal = ref(false)
 
-// Initialize open chapters when path is loaded
 watch(path, (newPath) => {
   if (newPath && newPath.chapters && newPath.chapters.length > 0) {
     if (openChapters.value.length === 0) {
@@ -89,18 +78,20 @@ const isChapterOpen = (chapterId) => {
   return openChapters.value.includes(chapterId)
 }
 
-const goToLesson = (chapterId, lesson) => {
-  if (lesson.isPremium && !isPremiumUser.value) {
-    showPremiumModal.value = true
-    return
-  }
-  
-  if (!lesson.isCompleted && !deductCredit(lesson.costCredit)) {
-    showPremiumModal.value = true
-    return
-  }
+/**
+ * Langsung navigasi ke lesson untuk preview.
+ * payload bisa berupa lesson object langsung (backward compat)
+ * atau { lesson, step } dari ChapterAccordion baru.
+ */
+const goToLesson = (chapterId, payload) => {
+  const lesson = payload?.lesson ?? payload
+  const step = payload?.step ?? 'theory'
 
-  router.push(`/learning/${path.value.id}/lesson/${chapterId}/${lesson.id}`)
+  // Encode step ke query param agar LessonView tahu dari mana masuk
+  router.push({
+    path: `/learning/${path.value.id}/lesson/${chapterId}/${lesson.id}`,
+    query: { step, preview: '1' }
+  })
 }
 </script>
 
@@ -184,3 +175,4 @@ const goToLesson = (chapterId, lesson) => {
   border-radius: 12px;
 }
 </style>
+

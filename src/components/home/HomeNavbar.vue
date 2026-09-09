@@ -32,20 +32,40 @@
           <img :src="userProfile.avatar" alt="User Avatar" class="avatar-sm">
           <span>{{ userProfile.name }}</span>
         </router-link>
-        <button class="btn-logout" @click="logout" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
       </template>
       <template v-else>
         <button class="btn-login" @click="login">Masuk</button>
         <button class="btn-register" @click="login">Daftar</button>
       </template>
     </div>
+    <ConfirmModal 
+      v-model="showLogoutConfirm"
+      title="Konfirmasi Logout"
+      message="Apakah Anda yakin ingin keluar dari akun Anda?"
+      confirmText="Keluar"
+      type="danger"
+      @confirm="handleLogoutConfirm"
+    />
   </nav>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
+import ConfirmModal from '../common/ConfirmModal.vue'
 
 const { credits, maxCredits, isPremiumUser, isLoggedIn, userProfile, login, logout } = useUserAccount()
+
+const showLogoutConfirm = ref(false)
+
+const handleLogoutClick = () => {
+  showLogoutConfirm.value = true
+}
+
+const handleLogoutConfirm = () => {
+  logout()
+}
 </script>
 
 <style scoped>

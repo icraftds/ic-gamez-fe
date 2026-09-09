@@ -9,7 +9,6 @@
       <LearningPathStack />
       <LeaderboardTable />
     </div>
-
     <CoffeeModal v-model="showCoffeeModal" />
   </div>
 </template>
@@ -53,3 +52,6 @@ onUnmounted(() => {
   window.removeEventListener('scroll', revealOnScroll)
 })
 </script>
+
+<style scoped>
+</style>

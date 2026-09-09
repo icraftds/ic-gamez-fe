@@ -1,35 +1,56 @@
 <template>
   <div class="learning-path-card" :style="cardStyle">
     <div class="card-inner">
-      <div class="card-header">
-        <div class="icon-wrapper" :style="{ backgroundColor: themeColor + '20', color: themeColor }">
-          <i :class="path.icon"></i>
+      <div class="card-content-left">
+        <div class="card-header">
+          <div class="icon-wrapper" :style="{ backgroundColor: themeColor + '15', color: themeColor, border: `1px solid ${themeColor}40` }">
+            <i :class="path.icon"></i>
+          </div>
+          <span class="path-title" :style="{ color: themeColor }">{{ path.title }}</span>
         </div>
-        <span class="path-title" :style="{ color: themeColor }">{{ path.title }}</span>
-      </div>
-      
-      <div class="card-body">
+        
         <h3 class="headline">Mulai perjalanan <span class="highlight" :style="{ color: themeColor }">{{ path.title }}</span> Anda.</h3>
         <p class="description">{{ path.description }}</p>
         
-        <ul class="features">
-          <li>
-            <i class="fa-solid fa-check-circle" :style="{ color: themeColor }"></i>
-            <span>{{ path.chapters ? path.chapters.length : 0 }} Modul Terstruktur</span>
-          </li>
-          <li>
-            <i class="fa-solid fa-check-circle" :style="{ color: themeColor }"></i>
-            <span>Materi Interaktif & Praktik Langsung</span>
-          </li>
-          <li>
-            <i class="fa-solid fa-check-circle" :style="{ color: themeColor }"></i>
-            <span>Validasi Kode Otomatis</span>
-          </li>
-        </ul>
-        
-        <router-link :to="`/learning`" class="btn-start" :style="{ backgroundColor: themeColor, boxShadow: `0 4px 15px ${themeColor}40` }">
+        <router-link :to="`/learning`" class="btn-start" :style="{ backgroundColor: themeColor, boxShadow: `0 4px 20px ${themeColor}30` }">
           Mulai Belajar
+          <i class="fa-solid fa-arrow-right btn-icon"></i>
         </router-link>
+      </div>
+      
+      <div class="card-content-right">
+        <div class="features-panel" :style="{ borderTop: `4px solid ${themeColor}` }">
+          <h4 class="features-title">Apa yang akan Anda pelajari?</h4>
+          <ul class="features">
+            <li>
+              <div class="feature-icon" :style="{ color: themeColor, backgroundColor: themeColor + '10' }">
+                <i class="fa-solid fa-book-open"></i>
+              </div>
+              <div class="feature-text">
+                <strong>{{ path.chapters ? path.chapters.length : 0 }} Modul Terstruktur</strong>
+                <span>Materi disusun step-by-step.</span>
+              </div>
+            </li>
+            <li>
+              <div class="feature-icon" :style="{ color: themeColor, backgroundColor: themeColor + '10' }">
+                <i class="fa-solid fa-laptop-code"></i>
+              </div>
+              <div class="feature-text">
+                <strong>Praktik Langsung</strong>
+                <span>Belajar sambil ngoding interaktif.</span>
+              </div>
+            </li>
+            <li>
+              <div class="feature-icon" :style="{ color: themeColor, backgroundColor: themeColor + '10' }">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <div class="feature-text">
+                <strong>Validasi Otomatis</strong>
+                <span>Kode Anda dicek secara real-time.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -49,24 +70,23 @@ const props = defineProps({
   }
 })
 
-// Calculate sticky top offset to create the stacking effect
+// Calculate sticky top offset
 const cardStyle = computed(() => {
-  // Base offset is 120px (to account for navbar and some breathing room)
-  // Each subsequent card overlaps by being 40px lower, so the header peeks out
-  const baseOffset = 120
-  const overlapSpacing = 40
+  // Base offset to clear navbar comfortably
+  const baseOffset = 130
+  // Overlap spacing allows the header of the previous card to peek out
+  const overlapSpacing = 50
   
   return {
     top: `${baseOffset + (props.index * overlapSpacing)}px`,
-    zIndex: props.index + 10 // Ensure lower cards render on top visually as they scroll up
+    zIndex: props.index + 10
   }
 })
 
-// Determine theme color based on index
 const themeColor = computed(() => {
   const colors = [
-    '#00f0ff', // Cyan (primary)
-    '#ec4899', // Hot Pink (secondary)
+    '#00f0ff', // Cyan
+    '#ec4899', // Hot Pink
     '#9333ea', // Neon Purple
     '#10b981'  // Emerald Green
   ]
@@ -76,66 +96,70 @@ const themeColor = computed(() => {
 
 <style scoped>
 .learning-path-card {
-  /* This makes the card sticky */
   position: sticky;
-  
-  /* Large margin bottom is CRITICAL: it gives the user room to scroll and read 
-     the card before the next card comes up and overlaps it. */
-  margin-bottom: 50vh; 
+  /* Use a balanced margin: enough for scrolling, but not a massive empty void */
+  margin-bottom: 25vh; 
   width: 100%;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+  /* Take full width of container */
+  max-width: 100%;
   transition: transform 0.3s ease;
 }
 
-/* Add a slight padding bottom to the last card so it doesn't get cut off abruptly */
+/* The last card has no bottom margin so it flows directly to the next section */
 .learning-path-card:last-child {
-  margin-bottom: 100px;
+  margin-bottom: 0;
 }
 
 .card-inner {
   background: var(--glass-bg, rgba(15, 10, 30, 0.85));
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 28px;
-  padding: 48px 56px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border-radius: 32px;
+  padding: 56px;
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+  
+  /* 2 Column Layout for Desktop */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.card-content-left {
   display: flex;
   flex-direction: column;
-  gap: 24px;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 24px;
 }
 
 .icon-wrapper {
-  width: 54px;
-  height: 54px;
-  border-radius: 14px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
 }
 
 .path-title {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
 }
 
 .headline {
-  font-size: 2.75rem;
+  font-size: 3rem;
   font-weight: 800;
-  line-height: 1.25;
-  margin-bottom: 8px;
+  line-height: 1.2;
+  margin-bottom: 20px;
   color: var(--text-light, #f8fafc);
   letter-spacing: -0.02em;
 }
@@ -144,36 +168,15 @@ const themeColor = computed(() => {
   font-size: 1.15rem;
   color: var(--text-muted, #94a3b8);
   line-height: 1.7;
-  margin-bottom: 24px;
-  max-width: 650px;
-}
-
-.features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 40px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.features li {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #cbd5e1;
-}
-
-.features i {
-  font-size: 1.2rem;
+  margin-bottom: 40px;
+  max-width: 90%;
 }
 
 .btn-start {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   padding: 16px 40px;
   border-radius: 50px;
   color: #05050f;
@@ -184,29 +187,110 @@ const themeColor = computed(() => {
   width: fit-content;
 }
 
+.btn-icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
 .btn-start:hover {
   transform: translateY(-3px);
   filter: brightness(1.15);
-  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1) !important; /* Enhance shadow on hover */
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15) !important;
+}
+
+.btn-start:hover .btn-icon {
+  transform: translateX(4px);
+}
+
+.card-content-right {
+  display: flex;
+  justify-content: center;
+}
+
+.features-panel {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.features-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 24px;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feature-text strong {
+  font-size: 1.15rem;
+  color: white;
+  font-weight: 700;
+}
+
+.feature-text span {
+  font-size: 0.95rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.5;
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .card-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 40px;
+  }
+  .learning-path-card {
+    margin-bottom: 30vh;
+  }
+}
+
 @media (max-width: 768px) {
   .card-inner {
     padding: 32px 24px;
     border-radius: 20px;
   }
   .learning-path-card {
-    margin-bottom: 60vh;
+    margin-bottom: 40vh;
   }
   .headline {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
-  .description {
-    font-size: 1.05rem;
-  }
-  .features li {
-    font-size: 1rem;
+  .features-panel {
+    padding: 24px;
   }
 }
 </style>
