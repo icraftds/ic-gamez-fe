@@ -35,6 +35,16 @@
     <!-- User Indicator -->
     <div class="user-indicator" v-if="isLoggedIn">
       <div class="separator-vertical"></div>
+      
+      <div class="user-stats">
+        <div class="stat-badge level-badge" title="Level Anda">
+          <i class="fa-solid fa-star"></i> Lvl {{ userProfile.level }}
+        </div>
+        <div class="stat-badge xp-badge" title="Total XP Anda">
+          <i class="fa-solid fa-bolt"></i> {{ userProfile.xp }} XP
+        </div>
+      </div>
+
       <img :src="userProfile.avatar" :alt="userProfile.name" class="avatar-sm" :title="'Masuk sebagai ' + userProfile.name">
     </div>
   </header>
@@ -189,5 +199,32 @@ defineEmits(['back'])
 .avatar-sm:hover {
   border-color: #c084fc;
   transform: scale(1.05);
+}
+
+.user-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+.level-badge i {
+  color: #f59e0b;
+}
+
+.xp-badge i {
+  color: #22d3ee;
 }
 </style>

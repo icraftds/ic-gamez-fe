@@ -96,6 +96,7 @@ import { watch } from 'vue';
 watch(selectedCategory, () => {
   currentPage.value = 1;
 });
+  
 
 const openChallenge = (challenge) => {
   if (challenge.isPremium && !isPremiumUser.value) {

@@ -86,6 +86,8 @@ import { computed } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
+import { EditorView } from '@codemirror/view'
+import { basicSetup } from 'codemirror'
 
 const props = defineProps({
   lesson: { type: Object, required: true },
@@ -101,7 +103,37 @@ const instructionLines = computed(() =>
   (props.lesson.practice || '').split('\n').filter((l) => l.trim() !== '')
 )
 
-const editorExtensions = []
+const customTheme = EditorView.theme({
+  "&": {
+    backgroundColor: "#060310 !important"
+  },
+  ".cm-gutters": {
+    backgroundColor: "#060310 !important",
+    color: "#475569",
+    borderRight: "1px solid rgba(147, 51, 234, 0.15)"
+  },
+  ".cm-activeLineGutter": {
+    backgroundColor: "rgba(147, 51, 234, 0.1) !important",
+    color: "#c084fc"
+  },
+  ".cm-activeLine": {
+    backgroundColor: "rgba(147, 51, 234, 0.05) !important"
+  },
+  "&.cm-focused .cm-cursor": {
+    borderLeftColor: "#c084fc !important"
+  },
+  "&.cm-focused .cm-selectionBackground, ::selection": {
+    backgroundColor: "rgba(124, 58, 237, 0.3) !important"
+  }
+}, { dark: true })
+
+const editorExtensions = [
+  basicSetup,
+  javascript(),
+  oneDark,
+  customTheme,
+  EditorView.lineWrapping
+]
 </script>
 
 <style scoped>

@@ -54,10 +54,10 @@
           :output="runner.output.value"
           :is-last-lesson="isLastLesson"
           @update:code="runner.code.value = $event"
-          @run="runner.run()"
+          @run="onPracticeRun"
           @clear-output="runner.clearOutput()"
           @back="activeStep = STEP.QUIZ"
-          @finish="goToNextLesson"
+          @finish="onPracticeFinish"
         />
 
         <!-- Fallback: lesson tidak ditemukan -->
@@ -76,6 +76,13 @@
       @login="goToLogin"
       @register="goToRegister"
     />
+
+    <!-- XP Toast Notification -->
+    <XpToast
+      :amount="toast.xp.value"
+      :label="toast.label.value"
+      :type="toast.type.value"
+    />
   </div>
 </template>
 
@@ -88,6 +95,7 @@ import { useLessonNavigation } from '../composables/useLessonNavigation'
 import { useQuiz } from '../composables/useQuiz'
 import { useCodeRunner } from '../composables/useCodeRunner'
 import { useUserAccount } from '../composables/useUserAccount'
+import { useScoring } from '../composables/useScoring'
 
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import WorkspaceTopbar from '../components/workspace/WorkspaceTopbar.vue'
@@ -96,6 +104,7 @@ import TheoryPanel from '../components/workspace/TheoryPanel.vue'
 import QuizPanel from '../components/workspace/QuizPanel.vue'
 import PracticePanel from '../components/workspace/PracticePanel.vue'
 import AuthRequiredModal from '../components/common/AuthRequiredModal.vue'
+import XpToast from '../components/common/XpToast.vue'
 
 // ── Enums ─────────────────────────────────────────────────────────
 const STEP = Object.freeze({ THEORY: 1, QUIZ: 2, PRACTICE: 3 })
@@ -125,6 +134,25 @@ const { isFirstLesson, isLastLesson, goToPrevLesson, goToNextLesson, goToLesson 
 
 const quiz = useQuiz()
 const runner = useCodeRunner()
+const scoring = useScoring()
+
+// ── Toast State ───────────────────────────────────────────────────
+const toast = {
+  xp: ref(0),
+  label: ref(''),
+  type: ref('quiz'),
+}
+
+/** Tampilkan toast XP. Setiap panggilan me-reset amount agar watcher trigger ulang. */
+const showXpToast = (xp, label, type = 'quiz') => {
+  // Reset dulu agar watcher mendeteksi perubahan meski nilainya sama
+  toast.xp.value = 0
+  setTimeout(() => {
+    toast.xp.value = xp
+    toast.label.value = label
+    toast.type.value = type
+  }, 50)
+}
 
 // ── Local State ───────────────────────────────────────────────────
 const activeStep = ref(STEP.THEORY)
@@ -211,8 +239,43 @@ const onRequestNextFromQuiz = () => {
   if (currentLesson.value) {
     currentLesson.value.quizPassed = true
   }
+
+  // Award XP untuk quiz benar (hanya sekali per lesson)
+  if (currentLesson.value) {
+    const result = scoring.awardXp('quiz', currentLesson.value.id)
+    if (result.awarded) {
+      showXpToast(result.xp, 'Quiz Benar!', 'quiz')
+    }
+  }
+
   runner.resetCode()
   activeStep.value = STEP.PRACTICE
+}
+
+/** Jalankan kode practice dan beri XP jika berhasil tanpa error. */
+const onPracticeRun = () => {
+  runner.run()
+
+  // Cek apakah output mengandung error
+  const hasError = runner.output.value.some(e => e.type === 'error')
+  if (!hasError && runner.output.value.length > 0 && currentLesson.value) {
+    const result = scoring.awardXp('practice', currentLesson.value.id)
+    if (result.awarded) {
+      showXpToast(result.xp, 'Praktik Berhasil!', 'practice')
+    }
+  }
+}
+
+/** Selesai & Lanjut dari practice. Pastikan XP diberikan juga. */
+const onPracticeFinish = () => {
+  if (currentLesson.value) {
+    // Beri XP jika belum pernah (misal user langsung klik finish)
+    const result = scoring.awardXp('practice', currentLesson.value.id)
+    if (result.awarded) {
+      showXpToast(result.xp, 'Praktik Selesai!', 'practice')
+    }
+  }
+  goToNextLesson()
 }
 
 const goToLogin = () => {
