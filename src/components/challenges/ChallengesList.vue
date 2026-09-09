@@ -9,7 +9,7 @@
     </div>
 
     <div class="filters">
-      <div class="category-filter">
+      <div class="filter-select">
         <i class="fa-solid fa-filter"></i>
         <select v-model="selectedCategory">
           <option value="">Semua Kategori</option>
@@ -19,7 +19,7 @@
     </div>
 
     <div class="table-container">
-      <table class="challenges-table">
+      <table class="data-table">
         <thead>
           <tr>
             <th>NAMA TANTANGAN</th>
@@ -141,130 +141,5 @@ const openChallenge = (challenge) => {
   display: flex;
   gap: 15px;
   margin-bottom: 30px;
-}
-
-.category-filter {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 15px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.3s;
-}
-.category-filter:focus-within {
-  border-color: #c084fc;
-  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2);
-}
-.category-filter i {
-  color: #94a3b8;
-}
-.category-filter select {
-  background: transparent;
-  border: none;
-  color: #e2e8f0;
-  font-size: 0.95rem;
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  padding-right: 20px;
-}
-.category-filter select option {
-  background: #1e1b4b;
-  color: #e2e8f0;
-}
-
-.table-container {
-  background: rgba(15, 10, 30, 0.7);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
-
-.challenges-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.challenges-table th {
-  text-align: left;
-  padding: 15px 20px;
-  background: rgba(0, 0, 0, 0.2);
-  color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #94a3b8;
-  font-size: 1.1rem;
-}
-
-/* ── Pagination & Filter Tweaks ── */
-.category-filter select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-color: transparent;
-  border: none;
-  color: #fff;
-  font-size: 0.95rem;
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
-  width: 100%;
-}
-.category-filter select option {
-  background-color: #1e1b4b; /* Dark background */
-  color: #e2e8f0;
-  padding: 10px;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  padding: 20px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(15, 10, 30, 0.5);
-}
-
-.page-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: inherit;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.page-btn:hover:not(:disabled) {
-  background: rgba(147, 51, 234, 0.2);
-  border-color: #c084fc;
-  color: #fff;
-}
-
-.page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background: transparent;
-}
-
-.page-info {
-  color: #94a3b8;
-  font-size: 0.95rem;
-  font-weight: 500;
 }
 </style>
