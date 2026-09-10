@@ -39,32 +39,24 @@
         <button class="btn-register" @click="login">Daftar</button>
       </template>
     </div>
-    <ConfirmModal 
-      v-model="showLogoutConfirm"
-      title="Konfirmasi Logout"
-      message="Apakah Anda yakin ingin keluar dari akun Anda?"
-      confirmText="Keluar"
-      type="danger"
-      @confirm="handleLogoutConfirm"
-    />
   </nav>
+
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserAccount } from '../../composables/useUserAccount'
-import ConfirmModal from '../common/ConfirmModal.vue'
 
 const { credits, maxCredits, isPremiumUser, isLoggedIn, userProfile, login, logout } = useUserAccount()
-
-const showLogoutConfirm = ref(false)
+const router = useRouter()
 
 const handleLogoutClick = () => {
-  showLogoutConfirm.value = true
-}
-
-const handleLogoutConfirm = () => {
-  logout()
+  if (window.confirm('Apakah Anda yakin ingin keluar dari akun Anda?')) {
+    logout()
+    alert('Anda telah berhasil keluar.')
+    router.push('/')
+  }
 }
 </script>
 

@@ -109,7 +109,6 @@ const openChallenge = (challenge) => {
     return;
   }
 
-  // Arahkan ke halaman materi, buka step "Practice" (Tantangan)
   router.push(
     `/learning/${challenge.pathId}/lesson/${challenge.chapterId}/${challenge.id}?step=3`,
   );
@@ -134,6 +133,7 @@ const openChallenge = (challenge) => {
 .gradient-text {
   background: linear-gradient(135deg, #38bdf8, #818cf8);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

@@ -1,21 +1,23 @@
 <template>
-  <div v-if="modelValue" class="modal-overlay" @click.self="cancel">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="icon-wrapper" :class="type">
-          <i :class="iconClass"></i>
+  <Teleport to="body">
+    <div v-if="modelValue" class="modal-overlay" @click.self="cancel">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="icon-wrapper" :class="type">
+            <i :class="iconClass"></i>
+          </div>
+          <h3 class="modal-title">{{ title }}</h3>
         </div>
-        <h3 class="modal-title">{{ title }}</h3>
-      </div>
-      <div class="modal-body">
-        <p>{{ message }}</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" @click="cancel">Batal</button>
-        <button class="btn-confirm" :class="type" @click="confirm">{{ confirmText }}</button>
+        <div class="modal-body">
+          <p>{{ message }}</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" @click="cancel">Batal</button>
+          <button class="btn-confirm" :class="type" @click="confirm">{{ confirmText }}</button>
+        </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup>

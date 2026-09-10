@@ -42,15 +42,6 @@
         </div>
       </div>
     </nav>
-    <ConfirmModal 
-      v-model="showLogoutConfirm"
-      title="Konfirmasi Logout"
-      message="Apakah Anda yakin ingin keluar dari akun Anda?"
-      confirmText="Keluar"
-      type="danger"
-      @confirm="handleLogoutConfirm"
-    />
-
     <!-- Content -->
     <div class="container dash-content" v-if="isLoggedIn">
       <DashboardHome v-if="activeTab === 'beranda'" />
@@ -69,6 +60,7 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script setup>
@@ -78,22 +70,18 @@ import DashboardHome from '../components/dashboard/DashboardHome.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
 import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
-import ConfirmModal from '../components/common/ConfirmModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useRouter } from 'vue-router'
 
 const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, upgradeToPremium, logout } = useUserAccount()
 const router = useRouter()
 
-const showLogoutConfirm = ref(false)
-
 const handleLogoutClick = () => {
-  showLogoutConfirm.value = true
-}
-
-const handleLogoutConfirm = () => {
-  logout()
-  router.push('/')
+  if (window.confirm('Apakah Anda yakin ingin keluar dari akun Anda?')) {
+    logout()
+    alert('Anda telah berhasil keluar.')
+    router.push('/')
+  }
 }
 
 const activeTab = ref('beranda')
