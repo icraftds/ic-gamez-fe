@@ -36,7 +36,7 @@
     <section class="editor-column">
       <div class="editor-topbar">
         <div class="editor-tabs">
-          <span class="editor-tab">solution.js</span>
+          <span class="editor-tab">{{ editorTabName }}</span>
         </div>
         <button class="run-btn" @click="$emit('run')">
           <i class="fa-solid fa-play"></i> Jalankan
@@ -54,13 +54,29 @@
 
       <div class="console-section">
         <div class="console-header">
-          <span><i class="fa-solid fa-terminal"></i> Console Output</span>
+          <div class="output-tabs">
+            <button
+              class="output-tab-btn"
+              :class="{ active: activeOutputTab === 'console' }"
+              @click="activeOutputTab = 'console'"
+            >
+              <i class="fa-solid fa-terminal"></i> Console Output
+            </button>
+            <button
+              v-if="isHtmlMode"
+              class="output-tab-btn"
+              :class="{ active: activeOutputTab === 'preview' }"
+              @click="activeOutputTab = 'preview'"
+            >
+              <i class="fa-solid fa-eye"></i> Preview
+            </button>
+          </div>
           <button class="clear-btn" @click="$emit('clear-output')">
             <i class="fa-solid fa-trash"></i> Clear
           </button>
         </div>
 
-        <div class="console-output" role="log" aria-live="polite">
+        <div v-if="activeOutputTab === 'console'" class="console-output" role="log" aria-live="polite">
           <p v-if="output.length === 0" class="console-empty">
             Tekan <strong>Jalankan</strong> untuk melihat output…
           </p>
@@ -76,27 +92,53 @@
             {{ entry.text }}
           </div>
         </div>
+
+        <div v-if="activeOutputTab === 'preview' && isHtmlMode" class="preview-output">
+          <iframe :srcdoc="code" class="html-preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
       </div>
     </section>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
+import { html } from '@codemirror/lang-html'
+import { sql } from '@codemirror/lang-sql'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
 
 const props = defineProps({
   lesson: { type: Object, required: true },
+  language: { type: String, default: 'javascript' },
   code: { type: String, required: true },
   output: { type: Array, default: () => [] },
   isLastLesson: { type: Boolean, default: false },
 })
 
-defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'])
+const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'])
+
+const activeOutputTab = ref('console')
+const isHtmlMode = computed(() => props.language === 'html' || props.language === 'css')
+
+watch(() => props.output, (newOutput) => {
+  // Pindah ke tab preview secara otomatis jika HTML dirender sukses
+  if (isHtmlMode.value && newOutput.length > 0 && newOutput[0].text.includes('Render HTML berhasil')) {
+    activeOutputTab.value = 'preview'
+  } else {
+    activeOutputTab.value = 'console'
+  }
+})
+
+const editorTabName = computed(() => {
+  if (props.language === 'html') return 'index.html'
+  if (props.language === 'css') return 'style.css'
+  if (props.language === 'sql') return 'query.sql'
+  return 'solution.js'
+})
 
 /** Pecah instruksi multiline menjadi array per baris non-kosong. */
 const instructionLines = computed(() =>
@@ -127,13 +169,20 @@ const customTheme = EditorView.theme({
   }
 }, { dark: true })
 
-const editorExtensions = [
-  basicSetup,
-  javascript(),
-  oneDark,
-  customTheme,
-  EditorView.lineWrapping
-]
+const editorExtensions = computed(() => {
+  let langExtension = javascript()
+  if (props.language === 'html') langExtension = html()
+  else if (props.language === 'css') langExtension = html() // fallback to html for css
+  else if (props.language === 'sql') langExtension = sql()
+
+  return [
+    basicSetup,
+    langExtension,
+    oneDark,
+    customTheme,
+    EditorView.lineWrapping
+  ]
+})
 </script>
 
 <style scoped>
@@ -323,4 +372,39 @@ const editorExtensions = [
 
 .finish-btn { background: linear-gradient(135deg, #10b981, #059669); color: white; }
 .finish-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ── Output Tabs & Preview ── */
+.output-tabs {
+  display: flex;
+  gap: 10px;
+}
+.output-tab-btn {
+  background: transparent;
+  border: none;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.output-tab-btn:hover { color: #94a3b8; background: rgba(255, 255, 255, 0.05); }
+.output-tab-btn.active { color: #c084fc; background: rgba(147, 51, 234, 0.1); }
+
+.preview-output {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: white; /* Preview harus punya background putih agar rendering HTML standar terlihat */
+}
+.html-preview-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+}
 </style>

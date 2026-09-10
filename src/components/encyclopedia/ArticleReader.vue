@@ -1,66 +1,29 @@
 <template>
-  <div class="article-reader">
+  <div class="article-reader" v-if="article">
     <div class="article-header">
       <div class="article-meta">
-        <span class="category"><i class="fa-solid fa-folder"></i> Data Structures</span>
-        <span class="read-time"><i class="fa-regular fa-clock"></i> 5 min read</span>
+        <span class="category"><i class="fa-solid fa-folder"></i> {{ article.category }}</span>
+        <span class="read-time"><i class="fa-regular fa-clock"></i> {{ article.readTime }}</span>
       </div>
-      <h1>Pengenalan Hash Table</h1>
-      <p class="subtitle">Struktur data dengan kompleksitas waktu pencarian O(1).</p>
+      <h1>{{ article.title }}</h1>
+      <p class="subtitle">{{ article.subtitle }}</p>
     </div>
 
-    <div class="article-body markdown-body">
-      <h2>Apa itu Hash Table?</h2>
-      <p>
-        Hash table (atau hash map) adalah struktur data yang mengimplementasikan tipe data abstrak array asosiatif, 
-        struktur yang dapat memetakan kunci (keys) ke nilai (values).
-      </p>
-
-      <h2>Cara Kerja</h2>
-      <p>
-        Hash table menggunakan fungsi hash untuk menghitung indeks ke dalam array array (disebut juga 
-        buckets atau slots), dari mana nilai yang diinginkan dapat ditemukan. Idealnya, fungsi hash 
-        akan menetapkan setiap kunci ke bucket yang unik, tetapi sebagian besar desain hash table 
-        menggunakan fungsi hash yang tidak sempurna, yang dapat menyebabkan hash collision 
-        (tabrakan hash) di mana fungsi hash menghasilkan indeks yang sama untuk lebih dari satu kunci.
-      </p>
-
-      <h3>Contoh Kode (Python)</h3>
-      <div class="code-block">
-        <div class="code-header">python</div>
-        <pre><code># Inisialisasi hash map (dictionary di Python)
-my_map = {}
-
-# Menyisipkan nilai
-my_map["apple"] = 100
-my_map["banana"] = 200
-
-# Mengakses nilai (O(1))
-print(my_map["apple"]) # Output: 100
-
-# Memeriksa apakah kunci ada
-if "orange" in my_map:
-    print("Ada")
-else:
-    print("Tidak ada")
-</code></pre>
-      </div>
-
-      <div class="article-tip">
-        <strong><i class="fa-solid fa-lightbulb"></i> Tip Interview:</strong> 
-        Dalam wawancara coding (seperti soal Two Sum), menggunakan Hash Table/Map seringkali 
-        menjadi solusi optimal untuk menurunkan Time Complexity dari O(N²) menjadi O(N).
-      </div>
+    <div class="article-body markdown-body" v-html="article.content">
     </div>
   </div>
 </template>
 
 <script setup>
-// This is a mockup for the article reader.
-// In a real application, this would fetch markdown content and render it using a library like markdown-it.
+const props = defineProps({
+  article: {
+    type: Object,
+    required: true
+  }
+})
 </script>
 
-<style scoped>
+<style>
 .article-reader {
   background: rgba(15, 10, 30, 0.8);
   border: 1px solid rgba(147, 51, 234, 0.3);

@@ -13,31 +13,16 @@
           </div>
           
           <nav class="topic-nav">
-            <div class="nav-section">
-              <h4>Struktur Data</h4>
+            <div class="nav-section" v-for="section in encyclopediaData" :key="section.section">
+              <h4>{{ section.section }}</h4>
               <ul>
-                <li><a href="#" class="active">Hash Table</a></li>
-                <li><a href="#">Linked List</a></li>
-                <li><a href="#">Stack & Queue</a></li>
-                <li><a href="#">Trees & Graphs</a></li>
-              </ul>
-            </div>
-            
-            <div class="nav-section">
-              <h4>Algoritma Dasar</h4>
-              <ul>
-                <li><a href="#">Binary Search</a></li>
-                <li><a href="#">Two Pointers</a></li>
-                <li><a href="#">Sliding Window</a></li>
-              </ul>
-            </div>
-            
-            <div class="nav-section">
-              <h4>Algoritma Lanjut</h4>
-              <ul>
-                <li><a href="#">Dynamic Programming</a></li>
-                <li><a href="#">Backtracking</a></li>
-                <li><a href="#">Greedy</a></li>
+                <li v-for="topic in section.topics" :key="topic.id">
+                  <a href="#" 
+                     :class="{ active: selectedTopicId === topic.id }"
+                     @click.prevent="selectedTopicId = topic.id">
+                    {{ topic.title }}
+                  </a>
+                </li>
               </ul>
             </div>
           </nav>
@@ -45,7 +30,7 @@
 
         <!-- Main Content -->
         <main class="encyclopedia-content">
-          <ArticleReader />
+          <ArticleReader v-if="selectedTopic" :article="selectedTopic" />
         </main>
       </div>
     </div>
@@ -53,9 +38,21 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ArticleReader from '../components/encyclopedia/ArticleReader.vue'
+import { encyclopediaData } from '../data/encyclopediaData.js'
+
+const selectedTopicId = ref('hash-table')
+
+const selectedTopic = computed(() => {
+  for (const section of encyclopediaData) {
+    const topic = section.topics.find(t => t.id === selectedTopicId.value)
+    if (topic) return topic
+  }
+  return null
+})
 </script>
 
 <style scoped>

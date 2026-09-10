@@ -50,6 +50,7 @@
         <PracticePanel
           v-else-if="activeStep === STEP.PRACTICE && currentLesson"
           :lesson="currentLesson"
+          :language="lessonLanguage"
           :code="runner.code.value"
           :output="runner.output.value"
           :is-last-lesson="isLastLesson"
@@ -135,6 +136,16 @@ const { isFirstLesson, isLastLesson, goToPrevLesson, goToNextLesson, goToLesson 
 const quiz = useQuiz()
 const runner = useCodeRunner()
 const scoring = useScoring()
+
+const lessonLanguage = computed(() => {
+  if (pathId.value === 'database') return 'sql'
+  if (pathId.value === 'frontend') {
+    if (['fe1', 'fe2'].includes(chapterId.value)) return 'html'
+    if (chapterId.value === 'fe3') return 'css'
+    return 'javascript'
+  }
+  return 'javascript'
+})
 
 // ── Toast State ───────────────────────────────────────────────────
 const toast = {
@@ -254,7 +265,7 @@ const onRequestNextFromQuiz = () => {
 
 /** Jalankan kode practice dan beri XP jika berhasil tanpa error. */
 const onPracticeRun = () => {
-  runner.run()
+  runner.run(lessonLanguage.value)
 
   // Cek apakah output mengandung error
   const hasError = runner.output.value.some(e => e.type === 'error')

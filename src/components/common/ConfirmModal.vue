@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div v-if="modelValue" class="modal-overlay" @click.self="cancel">
+    <div v-if="modelValue" class="modal-overlay" @click.self="onCancel">
       <div class="modal-content">
         <div class="modal-header">
           <div class="icon-wrapper" :class="type">
@@ -12,8 +12,8 @@
           <p>{{ message }}</p>
         </div>
         <div class="modal-footer">
-          <button class="btn-cancel" @click="cancel">Batal</button>
-          <button class="btn-confirm" :class="type" @click="confirm">{{ confirmText }}</button>
+          <button class="btn-cancel" @click="onCancel">Batal</button>
+          <button class="btn-confirm" :class="type" @click="onConfirm">{{ confirmText }}</button>
         </div>
       </div>
     </div>
@@ -51,12 +51,12 @@ const iconClass = computed(() => {
   return 'fa-solid fa-circle-info'
 })
 
-const cancel = () => {
+const onCancel = () => {
   emit('update:modelValue', false)
   emit('cancel')
 }
 
-const confirm = () => {
+const onConfirm = () => {
   emit('update:modelValue', false)
   emit('confirm')
 }

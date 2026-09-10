@@ -1,3 +1,38 @@
+<script setup>
+import { ref } from 'vue'
+import BackgroundEffects from '../components/common/BackgroundEffects.vue'
+import DashboardHome from '../components/dashboard/DashboardHome.vue'
+import DashboardStats from '../components/dashboard/DashboardStats.vue'
+import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
+import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
+import ConfirmModal from '../components/common/ConfirmModal.vue'
+import { useUserAccount } from '../composables/useUserAccount'
+import { useRouter } from 'vue-router'
+
+const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, upgradeToPremium, logout } = useUserAccount()
+const router = useRouter()
+
+const showLogoutConfirm = ref(false)
+
+const handleLogoutClick = () => {
+  showLogoutConfirm.value = true
+}
+
+const performLogout = () => {
+  logout()
+  router.push('/')
+}
+
+const activeTab = ref('beranda')
+
+const tabs = [
+  { id: 'beranda', label: 'Beranda' },
+  { id: 'statistik', label: 'Statistik' },
+  { id: 'medali', label: 'Medali' },
+  { id: 'langganan', label: 'Langganan' }
+]
+</script>
+
 <template>
   <div class="dashboard-view">
     <BackgroundEffects :show-orb3="true" />
@@ -59,40 +94,18 @@
         <router-link to="/" class="btn-back">Kembali ke Beranda</router-link>
       </div>
     </div>
+    <ConfirmModal
+      v-model="showLogoutConfirm"
+      title="Konfirmasi Keluar"
+      message="Apakah Anda yakin ingin keluar dari akun Anda?"
+      confirmText="Ya, Keluar"
+      type="warning"
+      @confirm="performLogout"
+    />
   </div>
-
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import BackgroundEffects from '../components/common/BackgroundEffects.vue'
-import DashboardHome from '../components/dashboard/DashboardHome.vue'
-import DashboardStats from '../components/dashboard/DashboardStats.vue'
-import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
-import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
-import { useUserAccount } from '../composables/useUserAccount'
-import { useRouter } from 'vue-router'
 
-const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, upgradeToPremium, logout } = useUserAccount()
-const router = useRouter()
-
-const handleLogoutClick = () => {
-  if (window.confirm('Apakah Anda yakin ingin keluar dari akun Anda?')) {
-    logout()
-    alert('Anda telah berhasil keluar.')
-    router.push('/')
-  }
-}
-
-const activeTab = ref('beranda')
-
-const tabs = [
-  { id: 'beranda', label: 'Beranda' },
-  { id: 'statistik', label: 'Statistik' },
-  { id: 'medali', label: 'Medali' },
-  { id: 'langganan', label: 'Langganan' }
-]
-</script>
 
 <style scoped>
 .dashboard-view {

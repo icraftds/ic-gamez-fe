@@ -27,11 +27,26 @@ export function useCodeRunner() {
       entries.push({ type: 'warn', text: '⚠ ' + args.map(String).join(' ') }),
   })
 
-  /** Jalankan `code.value` di dalam sandbox dan tampung hasilnya ke `output`. */
-  const run = () => {
+  /** 
+   * Jalankan `code.value` berdasarkan bahasa yang dipilih.
+   * @param {string} language - 'javascript', 'html', atau 'sql'
+   */
+  const run = (language = 'javascript') => {
     const entries = []
     try {
-      // new Function() scope-nya terisolasi dari module scope
+      if (language === 'html' || language === 'css') {
+        // Untuk HTML/CSS, kembalikan sinyal sukses agar xp bisa didapat dan UI bisa mere-render preview
+        output.value = [{ type: 'log', text: 'Render HTML berhasil. Periksa tab Preview!' }]
+        return
+      }
+
+      if (language === 'sql') {
+        // Mock eksekusi SQL
+        output.value = [{ type: 'log', text: 'Query SQL berhasil dieksekusi secara simulasi.' }]
+        return
+      }
+
+      // Default: JavaScript execution via sandboxed Function
       const fn = new Function('console', code.value)
       fn(createSandboxConsole(entries))
 
