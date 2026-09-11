@@ -110,4 +110,22 @@ const { isLoggedIn, userProfile } = useUserAccount()
 .hero-actions-logged {
   margin-top: 30px;
 }
+
+@media (max-width: 768px) {
+  .welcome-row {
+    flex-direction: column;
+    text-align: center;
+  }
+  .welcome-text { text-align: center; }
+  .welcome-heading { font-size: 1.8rem; }
+  .welcome-avatar { width: 60px; height: 60px; }
+  .btn-hero { padding: 12px 24px; font-size: 1rem; }
+  .hero-actions-logged { flex-direction: column; align-items: center; gap: 12px; }
+  .hero-actions-logged .btn-start { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .welcome-heading { font-size: 1.5rem; }
+  .btn-hero { padding: 10px 20px; font-size: 0.9rem; }
+}
 </style>

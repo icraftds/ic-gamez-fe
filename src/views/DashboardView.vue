@@ -307,4 +307,41 @@ const tabs = [
   font-weight: 700;
   text-decoration: none;
 }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 1024px) {
+  .dash-navbar { padding: 12px 20px; }
+  .user-profile-btn span { display: none; }
+  .user-profile-btn { padding: 4px; }
+  .dash-tab { padding: 6px 14px; font-size: 0.85rem; }
+}
+
+@media (max-width: 768px) {
+  .dash-navbar {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  .dash-nav-left { width: auto; }
+  .dash-label { display: none; }
+  .dash-nav-center {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .dash-nav-center::-webkit-scrollbar { display: none; }
+  .dash-tab { white-space: nowrap; padding: 6px 12px; font-size: 0.8rem; }
+  .dash-nav-right { gap: 8px; }
+  .btn-upgrade-nav { display: none; }
+  .user-profile-group { gap: 8px; margin-left: 0; }
+  .dash-content { margin-top: 15px; }
+  .card-center { padding: 40px 20px; }
+}
+
+@media (max-width: 480px) {
+  .dash-navbar { padding: 8px 12px; }
+  .logo { font-size: 1.2rem; }
+}
 </style>

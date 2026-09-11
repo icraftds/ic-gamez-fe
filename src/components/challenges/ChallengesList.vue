@@ -142,4 +142,9 @@ const openChallenge = (challenge) => {
   gap: 15px;
   margin-bottom: 30px;
 }
+
+@media (max-width: 768px) {
+  .header h2 { font-size: 1.5rem; }
+  .filters { flex-direction: column; }
+}
 </style>

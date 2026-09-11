@@ -77,4 +77,17 @@ const completedLessons = computed(() => {
   transition: all 0.3s;
 }
 .btn-upgrade-sm:hover { background: rgba(245, 158, 11, 0.1); }
+
+@media (max-width: 768px) {
+  .greeting-card {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+  .greeting-card h1 { font-size: 1.5rem; }
+  .quick-stats { gap: 15px; flex-wrap: wrap; }
+  .qs-value { font-size: 1.2rem; }
+  .btn-upgrade-sm { width: 100%; text-align: center; }
+  .greeting-card:hover { transform: none; }
+}
 </style>

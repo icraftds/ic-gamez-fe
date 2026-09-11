@@ -227,4 +227,24 @@ defineEmits(['back'])
 .xp-badge i {
   color: #22d3ee;
 }
+
+@media (max-width: 1024px) {
+  .step-label { display: none; }
+  .step-connector { width: 20px; margin: 0 4px; }
+  .breadcrumb-chapter { display: none; }
+  .breadcrumb .separator:nth-child(2) { display: none; }
+}
+
+@media (max-width: 768px) {
+  .ws-topbar { padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
+  .topbar-left { flex: 1; min-width: 0; }
+  .breadcrumb-path { display: none; }
+  .breadcrumb .separator:first-of-type { display: none; }
+  .breadcrumb-lesson { font-size: 0.75rem; }
+  .user-indicator { gap: 8px; }
+  .user-stats { display: none; }
+  .separator-vertical { display: none; }
+  .step-dot { width: 18px; height: 18px; font-size: 0.55rem; }
+  .step-connector { width: 14px; }
+}
 </style>

@@ -300,4 +300,10 @@ const completedSulit = computed(() => sulitStats.value.completed);
   background: rgba(255, 255, 255, 0.1);
   color: white;
 }
+
+@media (max-width: 768px) {
+  .sidebar { width: 100%; }
+  .card { padding: 20px; }
+  .progress-circle { width: 100px; }
+}
 </style>

@@ -103,4 +103,10 @@ const { isPremiumUser, upgradeToPremium } = useUserAccount()
 
 .history-empty { text-align: center; padding: 40px; color: #94a3b8; }
 .sub-text { color: #64748b; font-size: 0.85rem; }
+
+@media (max-width: 768px) {
+  .plan-grid { grid-template-columns: 1fr; }
+  .section-card:hover { transform: none; }
+  .current-plan { padding: 20px 15px; }
+}
 </style>

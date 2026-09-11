@@ -6,39 +6,48 @@
         <span>Icraft<span class="text-secondary">DS</span></span>
       </div>
     </div>
-    
-    <div class="nav-center">
-      <router-link to="/" class="nav-link" :class="{ active: $route.path === '/' }">Beranda</router-link>
-      <router-link to="/learning" class="nav-link" :class="{ active: $route.path.startsWith('/learning') }">Learning Path</router-link>
-      <router-link to="/challenges" class="nav-link" :class="{ active: $route.path.startsWith('/challenges') }">Tantangan</router-link>
-      <router-link to="/encyclopedia" class="nav-link" :class="{ active: $route.path === '/encyclopedia' }">Ensiklopedia</router-link>
-      <router-link to="/leaderboard" class="nav-link" :class="{ active: $route.path === '/leaderboard' }">Leaderboard</router-link>
+
+    <!-- Hamburger Button (mobile only) -->
+    <button class="hamburger" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Toggle menu">
+      <i :class="mobileMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" :class="{ open: mobileMenuOpen }" @click="mobileMenuOpen = false"></div>
+
+    <!-- Nav Center + Right wrapped for mobile drawer -->
+    <div class="nav-drawer" :class="{ open: mobileMenuOpen }">
+      <div class="nav-center">
+        <router-link to="/" class="nav-link" :class="{ active: $route.path === '/' }" @click="mobileMenuOpen = false">Beranda</router-link>
+        <router-link to="/learning" class="nav-link" :class="{ active: $route.path.startsWith('/learning') }" @click="mobileMenuOpen = false">Learning Path</router-link>
+        <router-link to="/challenges" class="nav-link" :class="{ active: $route.path.startsWith('/challenges') }" @click="mobileMenuOpen = false">Tantangan</router-link>
+        <router-link to="/encyclopedia" class="nav-link" :class="{ active: $route.path === '/encyclopedia' }" @click="mobileMenuOpen = false">Ensiklopedia</router-link>
+        <router-link to="/leaderboard" class="nav-link" :class="{ active: $route.path === '/leaderboard' }" @click="mobileMenuOpen = false">Leaderboard</router-link>
+      </div>
+
+      <div class="nav-right">
+        <div class="credits-indicator" v-if="!isPremiumUser">
+          <i class="fa-solid fa-bolt text-warning"></i>
+          <span>{{ credits }}/{{ maxCredits }}</span>
+        </div>
+        <div class="premium-badge" v-else>
+          <i class="fa-solid fa-crown"></i> PRO
+        </div>
+
+        <template v-if="isLoggedIn">
+          <router-link to="/dashboard" class="user-profile-btn" @click="mobileMenuOpen = false">
+            <img :src="userProfile.avatar" alt="User Avatar" class="avatar-sm">
+            <span class="user-name">{{ userProfile.name }}</span>
+          </router-link>
+          <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </template>
+        <template v-else>
+          <button class="btn-login" @click="login">Masuk</button>
+          <button class="btn-register" @click="login">Daftar</button>
+        </template>
+      </div>
     </div>
 
-    <div class="nav-right">
-      <div class="credits-indicator" v-if="!isPremiumUser">
-        <i class="fa-solid fa-bolt text-warning"></i>
-        <span>{{ credits }}/{{ maxCredits }}</span>
-      </div>
-      <div class="premium-badge" v-else>
-        <i class="fa-solid fa-crown"></i> PRO
-      </div>
-
-      <button class="icon-btn"><i class="fa-solid fa-moon"></i></button>
-      
-      <template v-if="isLoggedIn">
-        <button class="icon-btn"><i class="fa-solid fa-bell"></i></button>
-        <router-link to="/dashboard" class="user-profile-btn">
-          <img :src="userProfile.avatar" alt="User Avatar" class="avatar-sm">
-          <span>{{ userProfile.name }}</span>
-        </router-link>
-        <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
-      </template>
-      <template v-else>
-        <button class="btn-login" @click="login">Masuk</button>
-        <button class="btn-register" @click="login">Daftar</button>
-      </template>
-    </div>
     <ConfirmModal
       v-model="showLogoutConfirm"
       title="Konfirmasi Keluar"
@@ -60,9 +69,11 @@ const { credits, maxCredits, isPremiumUser, isLoggedIn, userProfile, login, logo
 const router = useRouter()
 
 const showLogoutConfirm = ref(false)
+const mobileMenuOpen = ref(false)
 
 const handleLogoutClick = () => {
   showLogoutConfirm.value = true
+  mobileMenuOpen.value = false
 }
 
 const performLogout = () => {
@@ -96,6 +107,28 @@ const performLogout = () => {
 .text-primary { color: var(--primary); }
 .text-secondary { color: var(--secondary); }
 .text-warning { color: #f59e0b; }
+
+/* Hamburger - hidden on desktop */
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 201;
+}
+
+/* Mobile Overlay */
+.mobile-overlay {
+  display: none;
+}
+
+/* Nav Drawer wrapper */
+.nav-drawer {
+  display: contents; /* On desktop, behaves as if it doesn't exist */
+}
 
 .nav-center {
   display: flex;
@@ -218,4 +251,113 @@ const performLogout = () => {
 .btn-register:hover {
   transform: translateY(-2px);
 }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE: Tablet ≤1024px
+   ═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 12px 24px;
+  }
+  .nav-center {
+    gap: 18px;
+  }
+  .nav-link {
+    font-size: 0.9rem;
+  }
+  .user-name {
+    display: none;
+  }
+  .user-profile-btn {
+    padding: 4px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE: Mobile ≤768px — Hamburger Menu
+   ═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .mobile-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .mobile-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100vh;
+    background: rgba(15, 10, 30, 0.98);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 200;
+    padding: 80px 24px 24px;
+    gap: 30px;
+    overflow-y: auto;
+    transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-drawer.open {
+    right: 0;
+  }
+
+  .nav-center {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .nav-link {
+    padding: 14px 16px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .nav-link:hover, .nav-link.active {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .nav-link.active::after {
+    display: none;
+  }
+
+  .nav-right {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .user-profile-btn {
+    justify-content: flex-start;
+  }
+  .user-name {
+    display: inline;
+  }
+
+  .btn-login, .btn-register {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+  }
+}
 </style>
+

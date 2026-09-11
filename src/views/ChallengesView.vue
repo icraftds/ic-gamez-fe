@@ -39,4 +39,16 @@ const showModal = ref(false);
   margin-top: 40px;
   flex-direction: row-reverse;
 }
+
+@media (max-width: 1024px) {
+  .layout { gap: 20px; }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+  }
+}
 </style>

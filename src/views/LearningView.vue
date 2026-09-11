@@ -105,4 +105,15 @@ const goToPath = (path) => {
   max-width: 1000px;
   margin: 0 auto;
 }
+
+@media (max-width: 768px) {
+  .learning-hero { margin-bottom: 40px; }
+  .hero-title { font-size: 2.2rem; }
+  .hero-desc { font-size: 1rem; }
+  .paths-grid { grid-template-columns: 1fr; gap: 20px; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { font-size: 1.8rem; }
+}
 </style>

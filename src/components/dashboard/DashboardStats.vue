@@ -209,4 +209,15 @@ const heatmapData = computed(() => {
 .rank-xp { color: #94a3b8; font-size: 0.9rem; }
 .link-action { color: #22d3ee; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
 .link-action:hover { text-decoration: underline; }
+
+@media (max-width: 768px) {
+  .top-stats-grid { grid-template-columns: 1fr; }
+  .stat-big-value { font-size: 2.2rem; }
+  .exercise-grid { grid-template-columns: repeat(2, 1fr); }
+  .rank-grid { grid-template-columns: 1fr; }
+  .heatmap-cells { overflow-x: auto; max-height: none; }
+  .heatmap-months { gap: 15px; overflow-x: auto; }
+  .section-card:hover { transform: none; }
+  .stat-big-card:hover { transform: none; }
+}
 </style>
