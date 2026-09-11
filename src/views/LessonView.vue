@@ -313,40 +313,4 @@ initStepFromQuery()
 </script>
 
 
-<style scoped>
-.lesson-workspace {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.workspace-body {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-}
-
-.workspace-main {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-}
-
-.not-found {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: #475569;
-  font-size: 1rem;
-}
-.not-found i { font-size: 2rem; }
-
-@media (max-width: 768px) {
-  .lesson-workspace { height: 100vh; height: -webkit-fill-available; }
-  .workspace-body { flex-direction: column; }
-}
-</style>
+<style src="../../assets/css/pages/LessonView.css" scoped></style>
