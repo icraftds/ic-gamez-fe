@@ -192,6 +192,19 @@ const onSubItemClick = (chapterId, lesson, step) => {
 .chapter-header i { font-size: 0.6rem; flex-shrink: 0; }
 .chapter-title { flex: 1; line-height: 1.3; }
 
+.chapter-header.status-icon.done { color: #10b981; }
 
+@media (max-width: 768px) {
+  .ws-sidebar {
+    position: fixed;
+    top: 55px; /* Adjust according to Topbar height */
+    left: 0;
+    height: calc(100vh - 55px);
+    z-index: 100;
+  }
+  .ws-sidebar:not(.collapsed) {
+    width: 100%;
+    max-width: 320px;
+  }
+}
 </style>
-

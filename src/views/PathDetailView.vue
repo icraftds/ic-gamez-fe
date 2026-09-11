@@ -174,5 +174,12 @@ const goToLesson = (chapterId, payload) => {
   background: rgba(20, 15, 40, 0.7);
   border-radius: 12px;
 }
+
+@media (max-width: 768px) {
+  .path-header { flex-direction: column; text-align: center; gap: 15px; }
+  .path-title h2 { font-size: 1.6rem; }
+  .path-title p { font-size: 0.95rem; }
+  .chapters-container { padding: 0 10px; }
+}
 </style>
 

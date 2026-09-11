@@ -344,4 +344,9 @@ initStepFromQuery()
   font-size: 1rem;
 }
 .not-found i { font-size: 2rem; }
+
+@media (max-width: 768px) {
+  .lesson-workspace { height: 100vh; height: -webkit-fill-available; }
+  .workspace-body { flex-direction: column; }
+}
 </style>
