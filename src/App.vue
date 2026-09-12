@@ -8,12 +8,20 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppFooter from './components/common/AppFooter.vue'
+import { useUserAccount } from './composables/useUserAccount'
 
 const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
+
+const { fetchUser } = useUserAccount()
+
+onMounted(() => {
+  // Fetch user session when app loads
+  fetchUser()
+})
 </script>
 
 <style>

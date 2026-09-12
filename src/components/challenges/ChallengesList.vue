@@ -71,7 +71,7 @@ const { isPremiumUser, deductCredit } = useUserAccount();
 
 const selectedCategory = ref("");
 const currentPage = ref(1);
-const itemsPerPage = 5;
+const itemsPerPage = 10;
 
 const uniqueCategories = computed(() => {
   const categories = new Set(allChallenges.value.map(c => c.category));

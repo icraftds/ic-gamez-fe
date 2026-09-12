@@ -1,77 +1,70 @@
-/**
- * Composable untuk mengelola scoring / pemberian XP
- * saat user menyelesaikan aktivitas belajar (quiz, practice).
- *
- * Skor disimpan di localStorage agar persist antar session.
- */
 import { ref } from 'vue'
 import { useUserAccount } from './useUserAccount'
+import api from '../services/api'
 
-/** Jumlah XP per tipe aktivitas. */
 const XP_REWARDS = Object.freeze({
   QUIZ_CORRECT: 50,
   PRACTICE_COMPLETE: 100,
 })
 
-/**
- * Key localStorage untuk menyimpan Set lesson+type yang sudah diberi skor.
- * Format item: `{lessonId}:{type}` — contoh: `l1:quiz`, `l1:practice`.
- */
-const STORAGE_KEY = 'icgamez_scored'
-
-/** @returns {Set<string>} */
-const loadScored = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? new Set(JSON.parse(raw)) : new Set()
-  } catch {
-    return new Set()
-  }
-}
-
-const saveScored = (/** @type {Set<string>} */ set) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]))
-}
-
-/** Reactive set agar bisa dicek dari luar. */
-const scoredActivities = ref(loadScored())
+const scoredActivities = ref(new Set())
+const isProgressLoaded = ref(false)
 
 export function useScoring() {
-  const { addXp } = useUserAccount()
+  const { refreshStats } = useUserAccount()
 
-  /**
-   * Beri XP untuk sebuah aktivitas.
-   * Duplikat (lesson+tipe yang sama) akan diabaikan agar user
-   * tidak bisa mendapat XP ganda.
-   *
-   * @param {'quiz' | 'practice'} type
-   * @param {string} lessonId
-   * @returns {{ awarded: boolean, xp: number }} awarded = false jika sudah pernah
-   */
-  const awardXp = (type, lessonId) => {
+  const loadProgress = async () => {
+    if (isProgressLoaded.value) return
+    try {
+      const response = await api.get('/progress')
+      const progressList = response.data.data
+      
+      const newSet = new Set()
+      progressList.forEach(p => {
+        if (p.is_completed) newSet.add(`${p.lesson_id}:theory`)
+        if (p.quiz_passed) newSet.add(`${p.lesson_id}:quiz`)
+        if (p.saved_code) newSet.add(`${p.lesson_id}:practice`) // Asumsikan jika ada code = practice disubmit (atau gunakan parameter terpisah)
+      })
+      scoredActivities.value = newSet
+      isProgressLoaded.value = true
+    } catch (error) {
+      console.error('Failed to load user progress', error)
+    }
+  }
+
+  const awardXp = async (type, lessonId) => {
     const key = `${lessonId}:${type}`
 
     if (scoredActivities.value.has(key)) {
       return { awarded: false, xp: 0 }
     }
 
-    const xp = type === 'quiz' ? XP_REWARDS.QUIZ_CORRECT : XP_REWARDS.PRACTICE_COMPLETE
+    try {
+      let endpoint = ''
+      if (type === 'quiz') endpoint = '/progress/quiz-pass'
+      else if (type === 'practice') endpoint = '/progress/practice-complete'
+      else if (type === 'theory') endpoint = '/progress/complete'
+      
+      if (!endpoint) return { awarded: false, xp: 0 }
 
-    // Tandai sudah diambil
-    scoredActivities.value.add(key)
-    saveScored(scoredActivities.value)
+      const response = await api.post(endpoint, { lesson_id: lessonId })
+      
+      // Jika berhasil di backend
+      scoredActivities.value.add(key)
+      
+      // Refresh XP dan Level di profile
+      await refreshStats()
 
-    // Tambahkan ke profil user
-    addXp(xp)
+      // Backend mungkin mereturn info XP di response, jika tidak, kita gunakan const
+      const xp = type === 'quiz' ? XP_REWARDS.QUIZ_CORRECT : XP_REWARDS.PRACTICE_COMPLETE
 
-    return { awarded: true, xp }
+      return { awarded: true, xp }
+    } catch (error) {
+      console.error(`Failed to award XP for ${type}`, error)
+      return { awarded: false, xp: 0 }
+    }
   }
 
-  /**
-   * Cek apakah suatu aktivitas sudah pernah diberi skor.
-   * @param {'quiz' | 'practice'} type
-   * @param {string} lessonId
-   */
   const hasBeenScored = (type, lessonId) => {
     return scoredActivities.value.has(`${lessonId}:${type}`)
   }
@@ -79,6 +72,7 @@ export function useScoring() {
   return {
     awardXp,
     hasBeenScored,
+    loadProgress,
     XP_REWARDS,
   }
 }

@@ -18,8 +18,8 @@
               <ul>
                 <li v-for="topic in section.topics" :key="topic.id">
                   <a href="#" 
-                     :class="{ active: selectedTopicId === topic.id }"
-                     @click.prevent="selectedTopicId = topic.id">
+                     :class="{ active: selectedTopicId === (topic.id || topic.slug) }"
+                     @click.prevent="selectedTopicId = (topic.id || topic.slug)">
                     {{ topic.title }}
                   </a>
                 </li>
@@ -38,17 +38,42 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ArticleReader from '../components/encyclopedia/ArticleReader.vue'
-import { encyclopediaData } from '../data/encyclopediaData.js'
+import api from '../services/api'
 
-const selectedTopicId = ref('hash-table')
+const encyclopediaData = ref([])
+const selectedTopicId = ref(null)
+const isLoading = ref(true)
+
+const fetchEncyclopedia = async () => {
+  try {
+    isLoading.value = true
+    const response = await api.get('/encyclopedia')
+    encyclopediaData.value = response.data.data
+    
+    // Set default selected topic if available
+    if (encyclopediaData.value.length > 0 && encyclopediaData.value[0].topics.length > 0) {
+      selectedTopicId.value = encyclopediaData.value[0].topics[0].id || encyclopediaData.value[0].topics[0].slug
+    }
+  } catch (error) {
+    console.error('Failed to load encyclopedia data', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchEncyclopedia()
+})
 
 const selectedTopic = computed(() => {
-  for (const section of encyclopediaData) {
-    const topic = section.topics.find(t => t.id === selectedTopicId.value)
+  if (!selectedTopicId.value) return null
+  
+  for (const section of encyclopediaData.value) {
+    const topic = section.topics.find(t => t.id === selectedTopicId.value || t.slug === selectedTopicId.value)
     if (topic) return topic
   }
   return null

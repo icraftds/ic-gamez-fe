@@ -313,4 +313,4 @@ initStepFromQuery()
 </script>
 
 
-<style src="../../assets/css/pages/LessonView.css" scoped></style>
+<style src="../assets/css/pages/LessonView.css" scoped></style>

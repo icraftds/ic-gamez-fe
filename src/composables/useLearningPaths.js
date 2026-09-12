@@ -1,87 +1,90 @@
 import { ref, computed } from 'vue'
-import { dasarPemrogramanChapters } from '../data/pathDasarPemrograman'
-import { databaseChapters } from '../data/pathDatabase'
-import { frontendChapters } from '../data/pathFrontend'
-import { backendChapters } from '../data/pathBackend'
+import api from '../services/api'
 
 export function useLearningPaths() {
-  const paths = ref([
-    {
-      id: 'dasar',
-      title: 'Dasar Pemrograman',
-      description: 'Pelajari konsep dasar pemrograman, variabel, tipe data, logika dasar, dan struktur data menggunakan syntax universal.',
-      icon: 'fa-solid fa-code',
-      isPremium: false,
-      isLocked: false,
-      chapters: dasarPemrogramanChapters
-    },
-    {
-      id: 'database',
-      title: 'Dunia Database (SQL)',
-      description: 'Pelajari cara menyimpan, mengambil, dan mengelola data dalam database relasional menggunakan bahasa SQL.',
-      icon: 'fa-solid fa-database',
-      isPremium: false,
-      isLocked: false,
-      chapters: databaseChapters
-    },
-    {
-      id: 'frontend',
-      title: 'Frontend Mastery',
-      description: 'Kuasai keterampilan merancang antarmuka web dengan HTML, CSS, JavaScript dan arsitektur modern yang responsif.',
-      icon: 'fa-brands fa-vuejs',
-      isPremium: false,
-      isLocked: false,
-      chapters: frontendChapters
-    },
-    {
-      id: 'backend',
-      title: 'Backend Development',
-      description: 'Bangun server yang kuat, buat REST API, dan integrasi dengan database relasional menggunakan ekosistem Node.js.',
-      icon: 'fa-brands fa-node-js',
-      isPremium: false,
-      isLocked: false,
-      chapters: backendChapters
+  const paths = ref([])
+  const isLoading = ref(false)
+
+  const fetchPaths = async () => {
+    try {
+      isLoading.value = true
+      const response = await api.get('/paths')
+      paths.value = response.data.data
+    } catch (error) {
+      console.error('Failed to fetch learning paths', error)
+    } finally {
+      isLoading.value = false
     }
-  ])
+  }
+
+  // To get detailed info including chapters and lessons for a specific path
+  const fetchPathDetails = async (slug) => {
+    try {
+      isLoading.value = true
+      const response = await api.get(`/paths/${slug}`)
+      // Update or insert the detailed path into our state
+      const detailedPath = response.data.data
+      const index = paths.value.findIndex(p => p.slug === slug)
+      if (index !== -1) {
+        paths.value[index] = detailedPath
+      } else {
+        paths.value.push(detailedPath)
+      }
+      return detailedPath
+    } catch (error) {
+      console.error('Failed to fetch path details', error)
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
 
   const getPathById = (id) => {
-    return paths.value.find(p => p.id === id)
+    return paths.value.find(p => p.id === id || p.slug === id)
   }
 
   const getChapterById = (pathId, chapterId) => {
     const path = getPathById(pathId)
-    if (!path) return null
-    return path.chapters.find(c => c.id === chapterId)
+    if (!path || !path.chapters) return null
+    return path.chapters.find(c => c.id === chapterId || c.slug === chapterId)
   }
 
   const getLessonById = (pathId, chapterId, lessonId) => {
     const chapter = getChapterById(pathId, chapterId)
-    if (!chapter) return null
-    return chapter.lessons.find(l => l.id === lessonId)
+    if (!chapter || !chapter.lessons) return null
+    return chapter.lessons.find(l => l.id === lessonId || l.slug === lessonId)
   }
 
+  // Jika diperlukan untuk backward compatibility
   const allChallenges = computed(() => {
     const challenges = []
     paths.value.forEach(path => {
-      path.chapters.forEach(chapter => {
-        chapter.lessons.forEach(lesson => {
-          if (lesson.type === 'code') {
-            challenges.push({
-              ...lesson,
-              pathId: path.id,
-              chapterId: chapter.id,
-              category: path.title,
-              difficulty: lesson.isPremium ? 'Hard' : 'Medium' // Mock difficulty
+      if (path.chapters) {
+        path.chapters.forEach(chapter => {
+          if (chapter.lessons) {
+            chapter.lessons.forEach(lesson => {
+              if (lesson.type === 'code') {
+                challenges.push({
+                  ...lesson,
+                  pathId: path.slug || path.id,
+                  chapterId: chapter.slug || chapter.id,
+                  category: path.title,
+                  difficulty: lesson.is_premium ? 'Hard' : 'Medium'
+                })
+              }
             })
           }
         })
-      })
+      }
     })
     return challenges
   })
 
   return {
     paths,
+    isLoading,
+    fetchPaths,
+    fetchPathDetails,
     getPathById,
     getChapterById,
     getLessonById,

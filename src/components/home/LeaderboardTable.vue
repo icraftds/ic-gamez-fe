@@ -63,14 +63,14 @@
           <div class="yr-icon"><i class="fa-solid fa-rocket"></i></div>
           <div class="yr-content">
             <span class="yr-label">Peringkat Bulan Ini</span>
-            <span class="yr-value">—</span>
+            <span class="yr-value">{{ myRankMonthly }}</span>
           </div>
         </div>
         <div class="your-rank-card">
           <div class="yr-icon global"><i class="fa-solid fa-globe"></i></div>
           <div class="yr-content">
             <span class="yr-label">Top Global Rank</span>
-            <span class="yr-value text-cyan">#2689</span>
+            <span class="yr-value text-cyan">#{{ myRankGlobal }}</span>
           </div>
         </div>
       </div>
@@ -160,9 +160,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
-import { topUsers, monthlyRanking, allTimeRanking } from '../../data/leaderboardData'
+import api from '../../services/api'
 
 const props = defineProps({
   isFullView: {
@@ -172,6 +172,51 @@ const props = defineProps({
 })
 
 const { isLoggedIn } = useUserAccount()
+
+const monthlyRanking = ref([])
+const allTimeRanking = ref([])
+const myRankMonthly = ref('—')
+const myRankGlobal = ref('—')
+const isLoading = ref(true)
+
+const topUsers = computed(() => {
+  if (monthlyRanking.value.length >= 3) {
+    return monthlyRanking.value.slice(0, 3)
+  }
+  return [
+    { name: '-', xp: 0, avatar: '' },
+    { name: '-', xp: 0, avatar: '' },
+    { name: '-', xp: 0, avatar: '' }
+  ]
+})
+
+const fetchLeaderboard = async () => {
+  try {
+    isLoading.value = true
+    
+    const [monthlyRes, allTimeRes] = await Promise.all([
+      api.get('/leaderboard/monthly'),
+      api.get('/leaderboard/all-time')
+    ])
+    
+    monthlyRanking.value = monthlyRes.data.data
+    allTimeRanking.value = allTimeRes.data.data
+
+    if (isLoggedIn.value) {
+      const myRankRes = await api.get('/leaderboard/my-rank')
+      myRankMonthly.value = myRankRes.data.data.monthly_rank || '—'
+      myRankGlobal.value = myRankRes.data.data.all_time_rank || '—'
+    }
+  } catch (error) {
+    console.error('Failed to load leaderboard', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchLeaderboard()
+})
 
 const getRankClass = (index) => {
   if (index === 0) return 'row-gold'
