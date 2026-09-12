@@ -18,8 +18,8 @@
               <ul>
                 <li v-for="topic in section.topics" :key="topic.id">
                   <a href="#" 
-                     :class="{ active: selectedTopicId === (topic.id || topic.slug) }"
-                     @click.prevent="selectedTopicId = (topic.id || topic.slug)">
+                     :class="{ active: selectedTopicId === topic.slug }"
+                     @click.prevent="selectedTopicId = topic.slug">
                     {{ topic.title }}
                   </a>
                 </li>
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ArticleReader from '../components/encyclopedia/ArticleReader.vue'
@@ -46,6 +46,7 @@ import api from '../services/api'
 
 const encyclopediaData = ref([])
 const selectedTopicId = ref(null)
+const selectedTopic = ref(null)
 const isLoading = ref(true)
 
 const fetchEncyclopedia = async () => {
@@ -56,7 +57,7 @@ const fetchEncyclopedia = async () => {
     
     // Set default selected topic if available
     if (encyclopediaData.value.length > 0 && encyclopediaData.value[0].topics.length > 0) {
-      selectedTopicId.value = encyclopediaData.value[0].topics[0].id || encyclopediaData.value[0].topics[0].slug
+      selectedTopicId.value = encyclopediaData.value[0].topics[0].slug
     }
   } catch (error) {
     console.error('Failed to load encyclopedia data', error)
@@ -65,18 +66,22 @@ const fetchEncyclopedia = async () => {
   }
 }
 
-onMounted(() => {
-  fetchEncyclopedia()
+const fetchTopicDetails = async (slug) => {
+  if (!slug) return
+  try {
+    const response = await api.get(`/encyclopedia/${slug}`)
+    selectedTopic.value = response.data.data
+  } catch (error) {
+    console.error('Failed to load topic details', error)
+  }
+}
+
+watch(selectedTopicId, (newId) => {
+  fetchTopicDetails(newId)
 })
 
-const selectedTopic = computed(() => {
-  if (!selectedTopicId.value) return null
-  
-  for (const section of encyclopediaData.value) {
-    const topic = section.topics.find(t => t.id === selectedTopicId.value || t.slug === selectedTopicId.value)
-    if (topic) return topic
-  }
-  return null
+onMounted(() => {
+  fetchEncyclopedia()
 })
 </script>
 

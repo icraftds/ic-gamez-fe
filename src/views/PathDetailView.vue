@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
@@ -51,11 +51,17 @@ import ChapterAccordion from '../components/learning/ChapterAccordion.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { getPathById } = useLearningPaths()
+const { getPathById, fetchPathDetails } = useLearningPaths()
 
 const pathId = computed(() => route.params.pathId)
 const path = computed(() => getPathById(pathId.value))
 const openChapters = ref([])
+
+onMounted(async () => {
+  if (!path.value || !path.value.chapters) {
+    await fetchPathDetails(pathId.value)
+  }
+})
 
 watch(path, (newPath) => {
   if (newPath && newPath.chapters && newPath.chapters.length > 0) {
@@ -87,9 +93,10 @@ const goToLesson = (chapterId, payload) => {
   const lesson = payload?.lesson ?? payload
   const step = payload?.step ?? 'theory'
 
-  // Encode step ke query param agar LessonView tahu dari mana masuk
+  const chapter = path.value.chapters.find(c => c.id === chapterId || c.slug === chapterId)
+  
   router.push({
-    path: `/learning/${path.value.id}/lesson/${chapterId}/${lesson.id}`,
+    path: `/learning/${path.value.slug || path.value.id}/lesson/${chapter?.slug || chapterId}/${lesson.slug || lesson.id}`,
     query: { step, preview: '1' }
   })
 }

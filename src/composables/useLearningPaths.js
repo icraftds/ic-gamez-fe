@@ -1,9 +1,12 @@
 import { ref, computed } from 'vue'
 import api from '../services/api'
 
+const globalPaths = ref([])
+const globalIsLoading = ref(false)
+
 export function useLearningPaths() {
-  const paths = ref([])
-  const isLoading = ref(false)
+  const paths = globalPaths
+  const isLoading = globalIsLoading
 
   const fetchPaths = async () => {
     try {

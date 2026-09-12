@@ -144,11 +144,9 @@ watch(() => props.defaultTab, (newVal) => {
 })
 
 const closeModal = () => {
-  if (!isLoading.value) {
-    emit('update:modelValue', false)
-    errorMessage.value = ''
-    validationErrors.value = {}
-  }
+  emit('update:modelValue', false)
+  errorMessage.value = ''
+  validationErrors.value = {}
 }
 
 const handleLogin = async () => {

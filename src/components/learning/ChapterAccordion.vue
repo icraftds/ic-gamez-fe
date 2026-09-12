@@ -13,8 +13,6 @@
         v-for="lesson in chapter.lessons" 
         :key="lesson.id" 
         :lesson="lesson"
-        :is-open="isLessonOpen(lesson.id)"
-        @toggle="toggleLesson"
         @step-click="$emit('lesson-click', { lesson, step: $event })"
       />
 
@@ -26,7 +24,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import ChapterLessonItem from './ChapterLessonItem.vue'
 
 defineProps({
@@ -42,22 +39,9 @@ defineProps({
 
 const emit = defineEmits(['toggle', 'lesson-click'])
 
-const openLessons = ref([])
-
 const toggleChapter = () => {
   emit('toggle')
 }
-
-const toggleLesson = (lessonId) => {
-  const idx = openLessons.value.indexOf(lessonId)
-  if (idx === -1) {
-    openLessons.value.push(lessonId)
-  } else {
-    openLessons.value.splice(idx, 1)
-  }
-}
-
-const isLessonOpen = (lessonId) => openLessons.value.includes(lessonId)
 </script>
 
 <style scoped>

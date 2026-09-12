@@ -12,9 +12,11 @@
         <h3 class="headline">Mulai perjalanan <span class="highlight" :style="{ color: themeColor }">{{ path.title }}</span> Anda.</h3>
         <p class="description">{{ path.description }}</p>
         
-        <router-link :to="`/learning`" class="btn-start" :style="{ backgroundColor: themeColor, boxShadow: `0 4px 20px ${themeColor}30` }">
-          Mulai Belajar
-          <i class="fa-solid fa-arrow-right btn-icon"></i>
+        <router-link to="#" @click.prevent="startLearning" class="btn-start" :style="{ backgroundColor: themeColor, boxShadow: `0 4px 20px ${themeColor}30` }">
+          <span v-if="!isPreparingLesson">Mulai Belajar</span>
+          <span v-else>Menyiapkan Materi...</span>
+          <i v-if="!isPreparingLesson" class="fa-solid fa-arrow-right btn-icon"></i>
+          <div v-else class="btn-spinner"></div>
         </router-link>
       </div>
       
@@ -57,7 +59,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useLearningPaths } from '../../composables/useLearningPaths'
 
 const props = defineProps({
   path: {
@@ -69,6 +73,10 @@ const props = defineProps({
     required: true
   }
 })
+
+const router = useRouter()
+const { fetchPathDetails } = useLearningPaths()
+const isPreparingLesson = ref(false)
 
 // Calculate sticky top offset
 const cardStyle = computed(() => {
@@ -92,6 +100,26 @@ const themeColor = computed(() => {
   ]
   return colors[props.index % colors.length]
 })
+
+const startLearning = async () => {
+  isPreparingLesson.value = true
+  let detailedPath = props.path
+  
+  // Periksa apakah lessons sudah dimuat, jika belum panggil API detail
+  if (!detailedPath.chapters || detailedPath.chapters.length === 0 || !detailedPath.chapters[0].lessons) {
+    const fetched = await fetchPathDetails(props.path.slug || props.path.id)
+    if (fetched) detailedPath = fetched
+  }
+
+  const firstChapter = detailedPath?.chapters?.[0]
+  const firstLesson = firstChapter?.lessons?.[0]
+
+  if (firstChapter && firstLesson) {
+    router.push(`/learning/${detailedPath.slug || detailedPath.id}/lesson/${firstChapter.slug || firstChapter.id}/${firstLesson.slug || firstLesson.id}`)
+  } else {
+    router.push(`/learning/${detailedPath?.slug || detailedPath?.id || props.path.slug || props.path.id}`)
+  }
+}
 </script>
 
 <style scoped>
@@ -292,5 +320,19 @@ const themeColor = computed(() => {
   .features-panel {
     padding: 24px;
   }
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  border-top-color: #05050f;
+  animation: spin 1s linear infinite;
+  margin-left: 4px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

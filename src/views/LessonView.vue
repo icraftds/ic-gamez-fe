@@ -61,6 +61,12 @@
           @finish="onPracticeFinish"
         />
 
+        <!-- Loading State -->
+        <div v-else-if="isLoading" class="loading-state">
+          <div class="spinner-large"></div>
+          <p>Mempersiapkan materi belajar...</p>
+        </div>
+
         <!-- Fallback: lesson tidak ditemukan -->
         <div v-else class="not-found">
           <i class="fa-solid fa-circle-exclamation"></i>
@@ -88,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useLearningPaths } from '../composables/useLearningPaths'
@@ -118,7 +124,7 @@ const STEP_LABEL = {
 // ── Route & Data ──────────────────────────────────────────────────
 const route = useRoute()
 const router = useRouter()
-const { getPathById, getLessonById, getChapterById } = useLearningPaths()
+const { getPathById, getLessonById, getChapterById, fetchPathDetails, isLoading } = useLearningPaths()
 const { isLoggedIn } = useUserAccount()
 
 const pathId = computed(() => route.params.pathId)
@@ -128,6 +134,12 @@ const lessonId = computed(() => route.params.lessonId)
 const path = computed(() => getPathById(pathId.value))
 const currentLesson = computed(() => getLessonById(pathId.value, chapterId.value, lessonId.value))
 const currentChapter = computed(() => getChapterById(pathId.value, chapterId.value))
+
+onMounted(async () => {
+  if (!path.value || !path.value.chapters) {
+    await fetchPathDetails(pathId.value)
+  }
+})
 
 // ── Composables ───────────────────────────────────────────────────
 const { isFirstLesson, isLastLesson, goToPrevLesson, goToNextLesson, goToLesson } =

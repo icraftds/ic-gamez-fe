@@ -199,8 +199,8 @@ const fetchLeaderboard = async () => {
       api.get('/leaderboard/all-time')
     ])
     
-    monthlyRanking.value = monthlyRes.data.data
-    allTimeRanking.value = allTimeRes.data.data
+    monthlyRanking.value = Array.isArray(monthlyRes.data.data) ? monthlyRes.data.data : []
+    allTimeRanking.value = Array.isArray(allTimeRes.data.data) ? allTimeRes.data.data : []
 
     if (isLoggedIn.value) {
       const myRankRes = await api.get('/leaderboard/my-rank')

@@ -53,10 +53,11 @@ const { paths } = useLearningPaths()
 }
 
 .stack-container {
-  /* Ensure container is tall enough to allow scrolling through all sticky cards */
+
   position: relative;
   display: block;
-  padding-bottom: 0px; 
+  padding-bottom: 0vh;
+  min-height: auto;
 }
 
 @media (max-width: 768px) {

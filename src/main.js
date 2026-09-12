@@ -4,6 +4,8 @@ import './style.css'
 import App from './App.vue'
 import router from './router'
 
+import { initCsrf } from './services/api'
+
 const app = createApp(App)
 
 app.config.errorHandler = (err, instance, info) => {
@@ -12,5 +14,8 @@ app.config.errorHandler = (err, instance, info) => {
 
 app.use(createPinia())
 app.use(router)
-app.mount('#app')
+
+initCsrf().then(() => {
+  app.mount('#app')
+})
 

@@ -10,14 +10,7 @@
           <h2 class="lesson-title">{{ lesson.title }}</h2>
         </header>
 
-        <div class="instruction-body">
-          <p
-            v-for="(line, index) in instructionLines"
-            :key="index"
-            class="instruction-line"
-          >
-            {{ line }}
-          </p>
+        <div class="instruction-body markdown-body" v-html="parsedInstruction">
         </div>
       </div>
 
@@ -103,6 +96,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { marked } from 'marked'
 import { Codemirror } from 'vue-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { html } from '@codemirror/lang-html'
@@ -140,10 +134,10 @@ const editorTabName = computed(() => {
   return 'solution.js'
 })
 
-/** Pecah instruksi multiline menjadi array per baris non-kosong. */
-const instructionLines = computed(() =>
-  (props.lesson.practice || '').split('\n').filter((l) => l.trim() !== '')
-)
+const parsedInstruction = computed(() => {
+  const text = props.lesson.explanation || props.lesson.practice || ''
+  return marked.parse(text)
+})
 
 const customTheme = EditorView.theme({
   "&": {

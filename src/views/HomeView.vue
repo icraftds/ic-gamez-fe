@@ -22,8 +22,10 @@ import HeroSection from '../components/home/HeroSection.vue'
 import IntroSection from '../components/home/IntroSection.vue'
 import LearningPathStack from '../components/home/LearningPathStack.vue'
 import LeaderboardTable from '../components/home/LeaderboardTable.vue'
+import { useLearningPaths } from '../composables/useLearningPaths'
 
 const showCoffeeModal = ref(false)
+const { paths, isLoading, fetchPaths } = useLearningPaths()
 
 /**
  * Scroll-based reveal animation.
@@ -43,6 +45,10 @@ function revealOnScroll() {
 }
 
 onMounted(() => {
+  if (paths.value.length === 0) {
+    fetchPaths()
+  }
+
   window.addEventListener('scroll', revealOnScroll)
   // Trigger awal agar hero section langsung muncul
   setTimeout(revealOnScroll, 100)

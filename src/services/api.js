@@ -4,6 +4,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: 'http://localhost:8000/api/v1',
   withCredentials: true, // Wajib untuk Sanctum SPA authentication (menyertakan cookie CORS)
+  withXSRFToken: true, // Wajib untuk Axios versi modern agar mengirim header X-XSRF-TOKEN pada request cross-origin
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'

@@ -17,14 +17,22 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import BackgroundEffects from "../components/common/BackgroundEffects.vue";
 import HomeNavbar from "../components/home/HomeNavbar.vue";
 import PremiumModal from "../components/common/PremiumModal.vue";
 import ChallengesSidebar from "../components/challenges/ChallengesSidebar.vue";
 import ChallengesList from "../components/challenges/ChallengesList.vue";
+import { useLearningPaths } from "../composables/useLearningPaths";
 
 const showModal = ref(false);
+const { paths, fetchPaths } = useLearningPaths();
+
+onMounted(() => {
+  if (paths.value.length === 0) {
+    fetchPaths();
+  }
+});
 </script>
 
 <style scoped>
