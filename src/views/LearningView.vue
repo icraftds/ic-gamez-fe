@@ -42,14 +42,13 @@ import PathCard from '../components/learning/PathCard.vue'
 import { useLearningPaths } from '../composables/useLearningPaths'
 
 const router = useRouter()
-const { paths, fetchPaths, fetchPathDetails, isLoading } = useLearningPaths()
-
-const isPreparingLesson = ref(false)
+const { paths, fetchPaths, fetchPathDetails, isLoading, isPreparingLesson, hasFetchedAllPaths } = useLearningPaths()
 
 onMounted(() => {
-  if (paths.value.length === 0) {
+  if (!hasFetchedAllPaths.value) {
     fetchPaths()
   }
+  isPreparingLesson.value = false
 })
 
 const goToPath = async (path) => {

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isOpen" class="modal-backdrop" @click="close">
+  <div v-if="modelValue" class="modal-backdrop" @click="close">
     <div class="modal-content" @click.stop>
       <div class="modal-icon">
         <i class="fa-solid fa-crown"></i>
@@ -16,22 +16,31 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+import { useUserAccount } from '../../composables/useUserAccount'
+
 defineProps({
-  isOpen: {
+  modelValue: {
     type: Boolean,
     default: false
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['update:modelValue'])
+const router = useRouter()
+const { isLoggedIn } = useUserAccount()
 
 const close = () => {
-  emit('close')
+  emit('update:modelValue', false)
 }
 
 const subscribe = () => {
-  // Sementara hanya menutup modal
-  emit('close')
+  emit('update:modelValue', false)
+  if (isLoggedIn.value) {
+    router.push('/dashboard?tab=langganan')
+  } else {
+    router.push('/?auth=login')
+  }
 }
 </script>
 

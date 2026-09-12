@@ -75,8 +75,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
-const { fetchPathDetails } = useLearningPaths()
-const isPreparingLesson = ref(false)
+const { fetchPathDetails, isPreparingLesson } = useLearningPaths()
 
 // Calculate sticky top offset
 const cardStyle = computed(() => {
@@ -126,7 +125,7 @@ const startLearning = async () => {
 .learning-path-card {
   position: sticky;
   /* Use a balanced margin: enough for scrolling, but not a massive empty void */
-  margin-bottom: 25vh; 
+  margin-bottom: 10vh; 
   width: 100%;
   /* Take full width of container */
   max-width: 100%;
@@ -302,7 +301,7 @@ const startLearning = async () => {
     padding: 40px;
   }
   .learning-path-card {
-    margin-bottom: 30vh;
+    margin-bottom: 12vh;
   }
 }
 
@@ -312,7 +311,7 @@ const startLearning = async () => {
     border-radius: 20px;
   }
   .learning-path-card {
-    margin-bottom: 40vh;
+    margin-bottom: 15vh;
   }
   .headline {
     font-size: 2.2rem;

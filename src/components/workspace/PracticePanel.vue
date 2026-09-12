@@ -10,7 +10,30 @@
           <h2 class="lesson-title">{{ lesson.title }}</h2>
         </header>
 
-        <div class="instruction-body markdown-body" v-html="parsedInstruction">
+        <div class="instruction-body">
+          <div class="practice-cards" v-if="practiceSections">
+            
+            <div class="p-card info-card" v-if="practiceSections.info">
+              <p>{{ practiceSections.info }}</p>
+            </div>
+            
+            <div class="p-card task-card" v-if="practiceSections.task">
+              <h4><i class="fa-solid fa-list-check"></i> Tugas</h4>
+              <p>{{ practiceSections.task }}</p>
+            </div>
+            
+            <div class="p-card example-card" v-if="practiceSections.example">
+              <h4><i class="fa-solid fa-lightbulb"></i> Contoh Format / Input</h4>
+              <pre><code>{{ practiceSections.example }}</code></pre>
+            </div>
+            
+            <div class="p-card output-card" v-if="practiceSections.output">
+              <h4><i class="fa-solid fa-terminal"></i> Harapan Output</h4>
+              <p>{{ practiceSections.output }}</p>
+            </div>
+            
+          </div>
+          <div class="markdown-body" v-html="parsedInstruction" v-else></div>
         </div>
       </div>
 
@@ -46,6 +69,18 @@
       </div>
 
       <div class="console-section">
+        
+        <div v-if="runStatus === 'success'" class="feedback-banner success">
+          <i class="fa-solid fa-circle-check"></i> Kode berhasil dijalankan! Hasil telah divalidasi.
+        </div>
+        
+        <div v-else-if="runStatus === 'warning'" class="feedback-banner warning">
+          <i class="fa-solid fa-triangle-exclamation"></i> Kode berjalan tanpa error, tapi output belum sesuai dengan yang diharapkan.
+        </div>
+        <div v-else-if="runStatus === 'error'" class="feedback-banner error">
+          <i class="fa-solid fa-circle-xmark"></i> Terdapat error saat menjalankan kode. Perbaiki dan coba lagi!
+        </div>
+
         <div class="console-header">
           <div class="output-tabs">
             <button
@@ -111,6 +146,7 @@ const props = defineProps({
   code: { type: String, required: true },
   output: { type: Array, default: () => [] },
   isLastLesson: { type: Boolean, default: false },
+  runStatus: { type: String, default: 'idle' },
 })
 
 const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'])
@@ -134,8 +170,80 @@ const editorTabName = computed(() => {
   return 'solution.js'
 })
 
+const practiceSections = computed(() => {
+  const text = props.lesson.practice
+  
+  if (!text) {
+    return {
+      title: 'Latihan Bebas',
+      info: 'Tidak ada tugas spesifik untuk materi ini. Silakan bereksperimen menggunakan editor di samping!',
+      task: 'Tulis dan jalankan kode JavaScript apa saja untuk menguji pemahaman Anda.',
+      example: '',
+      output: ''
+    }
+  }
+
+  const lines = text.split('\n')
+  let commentLines = []
+  
+  for (let line of lines) {
+    let t = line.trim()
+    // Match //, <!--, /*, or #
+    if (t.startsWith('//') || t.startsWith('<!--') || t.startsWith('/*') || t.startsWith('#')) {
+      let cleaned = t.replace(/^(?:\/\/|<!--|\/\*|#)\s*/, '')
+                     .replace(/(?:-->|\*\/)\s*$/, '')
+      commentLines.push(cleaned.trim())
+    } else if (t !== '') {
+      break
+    }
+  }
+
+  let result = {
+    title: 'Tantangan Praktik',
+    info: '',
+    task: '',
+    example: '',
+    output: ''
+  }
+
+  let currentSection = 'info'
+
+  for (let line of commentLines) {
+    if (line.includes('🎯 TANTANGAN:')) {
+      result.title = line.replace('🎯 TANTANGAN:', '').trim()
+      continue
+    }
+
+    let lowerLine = line.toLowerCase()
+    
+    if (lowerLine.startsWith('tugas:')) {
+      currentSection = 'task'
+      result.task += line.substring(6).trim() + ' '
+      continue
+    } else if (lowerLine.startsWith('contoh:') || lowerLine.startsWith('contoh format:')) {
+      currentSection = 'example'
+      result.example += line.replace(/contoh(?: format)?:/i, '').trim() + '\n'
+      continue
+    } else if (lowerLine.startsWith('harapan:') || lowerLine.startsWith('output:')) {
+      currentSection = 'output'
+      result.output += line.replace(/(?:harapan|output):/i, '').trim() + ' '
+      continue
+    }
+
+    if (line.trim() !== '') {
+      if (currentSection === 'example') {
+         result[currentSection] += line + '\n'
+      } else {
+         result[currentSection] += line + ' '
+      }
+    }
+  }
+
+  return result
+})
+
 const parsedInstruction = computed(() => {
-  const text = props.lesson.explanation || props.lesson.practice || ''
+  const text = props.lesson.explanation || ''
   return marked.parse(text)
 })
 
@@ -166,7 +274,7 @@ const customTheme = EditorView.theme({
 const editorExtensions = computed(() => {
   let langExtension = javascript()
   if (props.language === 'html') langExtension = html()
-  else if (props.language === 'css') langExtension = html() // fallback to html for css
+  else if (props.language === 'css') langExtension = html()
   else if (props.language === 'sql') langExtension = sql()
 
   return [
@@ -401,4 +509,103 @@ const editorExtensions = computed(() => {
   border: none;
   background: white;
 }
+
+/* ── Practice Cards ── */
+.practice-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.p-card {
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.p-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.p-card p {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.p-card pre {
+  margin: 0;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  overflow-x: auto;
+}
+
+.p-card.info-card {
+  background: rgba(56, 189, 248, 0.1);
+  border-left-color: #38bdf8;
+}
+.p-card.info-card p {
+  color: #bae6fd;
+}
+
+.p-card.task-card {
+  background: rgba(147, 51, 234, 0.1);
+  border-left-color: #c084fc;
+}
+.p-card.task-card h4 {
+  color: #c084fc;
+}
+
+.p-card.example-card {
+  background: rgba(245, 158, 11, 0.1);
+  border-left-color: #fbbf24;
+}
+.p-card.example-card h4 {
+  color: #fbbf24;
+}
+
+.p-card.output-card {
+  background: rgba(16, 185, 129, 0.1);
+  border-left-color: #34d399;
+}
+.p-card.output-card h4 {
+  color: #34d399;
+}
+
+.feedback-banner {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feedback-banner.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+}
+.feedback-banner.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+
+.feedback-banner.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+}
+
 </style>

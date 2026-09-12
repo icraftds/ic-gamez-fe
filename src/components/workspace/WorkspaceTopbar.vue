@@ -41,7 +41,7 @@
           <i class="fa-solid fa-star"></i> Lvl {{ userProfile.level }}
         </div>
         <div class="stat-badge xp-badge" title="Total XP Anda">
-          <i class="fa-solid fa-bolt"></i> {{ userProfile.xp }} XP
+          <i class="fa-solid fa-bolt"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
         </div>
       </div>
 

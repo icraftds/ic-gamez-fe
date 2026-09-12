@@ -38,6 +38,7 @@ export function useUserAccount() {
         avatar: data.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + data.name,
         level: data.level,
         xp: data.xp,
+        totalXp: data.total_xp,
         nextLevelXp: data.next_level_xp,
         streak: data.current_streak,
         longest_streak: data.longest_streak,
@@ -106,7 +107,7 @@ export function useUserAccount() {
       isLoggedIn.value = false
       userProfile.value = {
         id: null, name: '', email: '', avatar: '',
-        level: 1, xp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, joinDate: ''
+        level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, joinDate: ''
       }
       credits.value = 5
       isPremiumUser.value = false

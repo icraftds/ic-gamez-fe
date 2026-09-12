@@ -62,8 +62,8 @@ export function useCodeRunner() {
     output.value = []
   }
 
-  const resetCode = () => {
-    code.value = '// Ketik kode Anda di sini\n'
+  const resetCode = (initialCode = null) => {
+    code.value = initialCode || '// Ketik kode Anda di sini\n'
     output.value = []
   }
 

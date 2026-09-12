@@ -1,18 +1,24 @@
 import { ref, computed } from 'vue'
 import api from '../services/api'
 
+// State global agar data tidak hilang saat berpindah komponen
 const globalPaths = ref([])
 const globalIsLoading = ref(false)
+const globalIsPreparingLesson = ref(false)
+const globalHasFetchedAllPaths = ref(false)
 
 export function useLearningPaths() {
   const paths = globalPaths
   const isLoading = globalIsLoading
+  const isPreparingLesson = globalIsPreparingLesson
+  const hasFetchedAllPaths = globalHasFetchedAllPaths
 
   const fetchPaths = async () => {
     try {
       isLoading.value = true
       const response = await api.get('/paths')
       paths.value = response.data.data
+      hasFetchedAllPaths.value = true
     } catch (error) {
       console.error('Failed to fetch learning paths', error)
     } finally {
@@ -27,6 +33,26 @@ export function useLearningPaths() {
       const response = await api.get(`/paths/${slug}`)
       // Update or insert the detailed path into our state
       const detailedPath = response.data.data
+
+      // Normalize progress fields for frontend reactivity
+      if (detailedPath.chapters) {
+        detailedPath.chapters.forEach(chapter => {
+          if (chapter.lessons) {
+            chapter.lessons.forEach(lesson => {
+              if (lesson.progress) {
+                lesson.isCompleted = lesson.progress.is_completed || false;
+                lesson.quizPassed = lesson.progress.quiz_passed || false;
+                lesson.practiceDone = !!lesson.progress.saved_code;
+              } else {
+                lesson.isCompleted = false;
+                lesson.quizPassed = false;
+                lesson.practiceDone = false;
+              }
+            });
+          }
+        });
+      }
+
       const index = paths.value.findIndex(p => p.slug === slug)
       if (index !== -1) {
         paths.value[index] = detailedPath
@@ -86,11 +112,13 @@ export function useLearningPaths() {
   return {
     paths,
     isLoading,
+    isPreparingLesson,
     fetchPaths,
     fetchPathDetails,
     getPathById,
     getChapterById,
     getLessonById,
-    allChallenges
+    allChallenges,
+    hasFetchedAllPaths
   }
 }

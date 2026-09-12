@@ -38,6 +38,8 @@
         Path tidak ditemukan.
       </div>
     </div>
+    
+    <PremiumModal v-model="showPremiumModal" />
   </div>
 </template>
 
@@ -45,22 +47,27 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLearningPaths } from '../composables/useLearningPaths'
+import { useUserAccount } from '../composables/useUserAccount'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ChapterAccordion from '../components/learning/ChapterAccordion.vue'
+import PremiumModal from '../components/common/PremiumModal.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { getPathById, fetchPathDetails } = useLearningPaths()
+const { getPathById, fetchPathDetails, isPreparingLesson } = useLearningPaths()
+const { isPremiumUser } = useUserAccount()
 
 const pathId = computed(() => route.params.pathId)
 const path = computed(() => getPathById(pathId.value))
 const openChapters = ref([])
+const showPremiumModal = ref(false)
 
 onMounted(async () => {
   if (!path.value || !path.value.chapters) {
     await fetchPathDetails(pathId.value)
   }
+  isPreparingLesson.value = false
 })
 
 watch(path, (newPath) => {
@@ -92,6 +99,11 @@ const isChapterOpen = (chapterId) => {
 const goToLesson = (chapterId, payload) => {
   const lesson = payload?.lesson ?? payload
   const step = payload?.step ?? 'theory'
+
+  if (lesson.is_premium && !isPremiumUser.value) {
+    showPremiumModal.value = true
+    return
+  }
 
   const chapter = path.value.chapters.find(c => c.id === chapterId || c.slug === chapterId)
   

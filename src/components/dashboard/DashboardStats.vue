@@ -103,13 +103,15 @@ const xpPercentage = computed(() => Math.round((userProfile.value.xp / userProfi
 
 const getCompletedForPath = (path) => {
   let count = 0
-  path.chapters.forEach(c => c.lessons.forEach(l => { if (l.isCompleted) count++ }))
+  if (path.chapters) {
+    path.chapters.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) count++ }))
+  }
   return count
 }
 
 const totalCompleted = computed(() => {
   let count = 0
-  paths.value.forEach(p => p.chapters.forEach(c => c.lessons.forEach(l => { if (l.isCompleted) count++ })))
+  paths.value.forEach(p => p.chapters?.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) count++ })))
   return count
 })
 

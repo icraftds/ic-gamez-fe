@@ -7,10 +7,20 @@ import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
 import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
 import ConfirmModal from '../components/common/ConfirmModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
-import { useRouter } from 'vue-router'
+import { useLearningPaths } from '../composables/useLearningPaths'
+import { useRoute, useRouter } from 'vue-router'
+import { onMounted } from 'vue'
 
 const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, upgradeToPremium, logout } = useUserAccount()
+const { hasFetchedAllPaths, fetchPaths } = useLearningPaths()
+const route = useRoute()
 const router = useRouter()
+
+onMounted(() => {
+  if (!hasFetchedAllPaths.value) {
+    fetchPaths()
+  }
+})
 
 const showLogoutConfirm = ref(false)
 
@@ -23,7 +33,7 @@ const performLogout = () => {
   router.push('/')
 }
 
-const activeTab = ref('beranda')
+const activeTab = ref(route.query.tab || 'beranda')
 
 const tabs = [
   { id: 'beranda', label: 'Beranda' },

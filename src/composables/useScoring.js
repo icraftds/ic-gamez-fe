@@ -56,9 +56,10 @@ export function useScoring() {
       await refreshStats()
 
       // Backend mungkin mereturn info XP di response, jika tidak, kita gunakan const
-      const xp = type === 'quiz' ? XP_REWARDS.QUIZ_CORRECT : XP_REWARDS.PRACTICE_COMPLETE
+      const awarded = response.data.awarded !== undefined ? response.data.awarded : true;
+      const xp = response.data.xp_earned !== undefined ? response.data.xp_earned : (type === 'quiz' ? XP_REWARDS.QUIZ_CORRECT : XP_REWARDS.PRACTICE_COMPLETE);
 
-      return { awarded: true, xp }
+      return { awarded, xp };
     } catch (error) {
       console.error(`Failed to award XP for ${type}`, error)
       return { awarded: false, xp: 0 }

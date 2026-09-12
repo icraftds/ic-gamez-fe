@@ -7,7 +7,7 @@
       </header>
 
       <!-- Quiz questions -->
-      <div v-if="hasQuestions">
+      <div v-if="hasQuestions" class="quiz-container" @copy.prevent @cut.prevent @paste.prevent>
         <div v-for="(question, qIndex) in quiz" :key="qIndex" class="question-card">
           <p class="question-text">{{ question.question }}</p>
 
@@ -127,6 +127,11 @@ const getOptionClass = (optIndex, correctIndex) => ({
 .quiz-header p { color: #64748b; font-size: 0.9rem; }
 
 /* ── Question card ── */
+.quiz-container {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .question-card { margin-bottom: 28px; }
 .question-text {
   font-size: 1.05rem;

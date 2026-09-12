@@ -35,12 +35,12 @@
         <!-- Step 2: Tes / Kuis -->
         <QuizPanel
           v-else-if="activeStep === STEP.QUIZ && currentLesson"
-          :quiz="currentLesson.quiz"
+          :quiz="currentLesson.quizzes"
           :selected-answer="quiz.selectedAnswer.value"
           :is-submitted="quiz.isSubmitted.value"
           :is-correct="quiz.isCorrect.value"
           @update:selected-answer="quiz.selectedAnswer.value = $event"
-          @submit="quiz.submit(currentLesson.quiz)"
+          @submit="quiz.submit(currentLesson.quizzes)"
           @retry="quiz.reset()"
           @back="activeStep = STEP.THEORY"
           @next="onRequestNextFromQuiz"
@@ -48,13 +48,14 @@
 
         <!-- Step 3: Praktik -->
         <PracticePanel
+          :run-status="practiceStatus"
           v-else-if="activeStep === STEP.PRACTICE && currentLesson"
           :lesson="currentLesson"
           :language="lessonLanguage"
           :code="runner.code.value"
           :output="runner.output.value"
           :is-last-lesson="isLastLesson"
-          @update:code="runner.code.value = $event"
+          @update:code="runner.code.value = $event; practiceStatus = 'idle'"
           @run="onPracticeRun"
           @clear-output="runner.clearOutput()"
           @back="activeStep = STEP.QUIZ"
@@ -62,7 +63,7 @@
         />
 
         <!-- Loading State -->
-        <div v-else-if="isLoading" class="loading-state">
+        <div v-else-if="isLoading || !path?.chapters" class="loading-state">
           <div class="spinner-large"></div>
           <p>Mempersiapkan materi belajar...</p>
         </div>
@@ -70,7 +71,7 @@
         <!-- Fallback: lesson tidak ditemukan -->
         <div v-else class="not-found">
           <i class="fa-solid fa-circle-exclamation"></i>
-          <p>Materi tidak ditemukan.</p>
+          <p>Materi tidak ditemukan. Pastikan URL Anda benar.</p>
         </div>
       </main>
     </div>
@@ -82,6 +83,11 @@
       @close="showAuthModal = false"
       @login="goToLogin"
       @register="goToRegister"
+    />
+
+    <!-- Modal Premium -->
+    <PremiumModal
+      v-model="showPremiumModal"
     />
 
     <!-- XP Toast Notification -->
@@ -111,6 +117,7 @@ import TheoryPanel from '../components/workspace/TheoryPanel.vue'
 import QuizPanel from '../components/workspace/QuizPanel.vue'
 import PracticePanel from '../components/workspace/PracticePanel.vue'
 import AuthRequiredModal from '../components/common/AuthRequiredModal.vue'
+import PremiumModal from '../components/common/PremiumModal.vue'
 import XpToast from '../components/common/XpToast.vue'
 
 // ── Enums ─────────────────────────────────────────────────────────
@@ -124,8 +131,8 @@ const STEP_LABEL = {
 // ── Route & Data ──────────────────────────────────────────────────
 const route = useRoute()
 const router = useRouter()
-const { getPathById, getLessonById, getChapterById, fetchPathDetails, isLoading } = useLearningPaths()
-const { isLoggedIn } = useUserAccount()
+const { getPathById, getLessonById, getChapterById, fetchPathDetails, isLoading, isPreparingLesson } = useLearningPaths()
+const { isLoggedIn, isPremiumUser } = useUserAccount()
 
 const pathId = computed(() => route.params.pathId)
 const chapterId = computed(() => route.params.chapterId)
@@ -139,10 +146,11 @@ onMounted(async () => {
   if (!path.value || !path.value.chapters) {
     await fetchPathDetails(pathId.value)
   }
+  isPreparingLesson.value = false
 })
 
 // ── Composables ───────────────────────────────────────────────────
-const { isFirstLesson, isLastLesson, goToPrevLesson, goToNextLesson, goToLesson } =
+const { isFirstLesson, isLastLesson, goToPrevLesson, goToNextLesson, goToLesson, getNextLesson } =
   useLessonNavigation(path, lessonId, pathId)
 
 const quiz = useQuiz()
@@ -150,10 +158,13 @@ const runner = useCodeRunner()
 const scoring = useScoring()
 
 const lessonLanguage = computed(() => {
-  if (pathId.value === 'database') return 'sql'
-  if (pathId.value === 'frontend') {
-    if (['fe1', 'fe2'].includes(chapterId.value)) return 'html'
-    if (chapterId.value === 'fe3') return 'css'
+  const pSlug = path.value?.slug || pathId.value;
+  const cSlug = currentChapter.value?.slug || chapterId.value;
+  
+  if (pSlug === 'database') return 'sql'
+  if (pSlug === 'frontend' || pSlug === 'frontend-web') {
+    if (['fe1', 'fe2'].includes(cSlug)) return 'html'
+    if (cSlug === 'fe3') return 'css'
     return 'javascript'
   }
   return 'javascript'
@@ -179,8 +190,10 @@ const showXpToast = (xp, label, type = 'quiz') => {
 
 // ── Local State ───────────────────────────────────────────────────
 const activeStep = ref(STEP.THEORY)
+const practiceStatus = ref('idle')
 const sidebarCollapsed = ref(false)
 const showAuthModal = ref(false)
+const showPremiumModal = ref(false)
 const pendingStepLabel = ref('Tes Pertanyaan')
 
 // ── Initialise step from query param (preview navigation) ─────────
@@ -193,6 +206,53 @@ const initStepFromQuery = () => {
   } else {
     activeStep.value = STEP.THEORY
   }
+}
+
+
+const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, currentCode) => {
+  // Pengecekan Universal: Jika masih ada "___" di bagian kode utama (abaikan komentar), berarti belum diisi!
+  if (currentCode) {
+    const codeWithoutComments = currentCode.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    if (codeWithoutComments.includes('___')) return false;
+  }
+
+  if (['html', 'css', 'sql'].includes(lessonLanguage)) return true;
+  if (!lessonPractice) return true;
+  
+  const lines = lessonPractice.split('\n');
+  let expectedOutput = '';
+  let inOutputSection = false;
+  
+  for (let line of lines) {
+    let t = line.trim();
+    if (!t.startsWith('//')) {
+      if (t !== '') break;
+      continue;
+    }
+    let commentText = t.replace(/^\/\/\s*/, '');
+    let lowerLine = commentText.toLowerCase();
+    
+    if (lowerLine.startsWith('harapan:') || lowerLine.startsWith('output:')) {
+      inOutputSection = true;
+      expectedOutput += commentText.replace(/(?:harapan|output):/i, '').trim() + ' ';
+      continue;
+    } else if (lowerLine.match(/^(tugas|contoh|🎯)/i) && inOutputSection) {
+      inOutputSection = false;
+    }
+    
+    if (inOutputSection && commentText.trim() !== '') {
+      expectedOutput += commentText + ' ';
+    }
+  }
+  
+  expectedOutput = expectedOutput.trim();
+  if (!expectedOutput) return true; 
+  
+  const actualOutput = runnerOutputArray.map(o => o.text).join(' ').trim();
+  const looseExpected = expectedOutput.toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');
+  const looseActual = actualOutput.toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');
+  
+  return looseActual.includes(looseExpected) || looseExpected.includes(looseActual);
 }
 
 // ── Auth Guard ────────────────────────────────────────────────────
@@ -209,6 +269,11 @@ const requireAuth = (targetStep) => {
 
 // ── Handlers ─────────────────────────────────────────────────────
 const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
+  if (lesson.is_premium && !isPremiumUser.value) {
+    showPremiumModal.value = true
+    return
+  }
+
   // Jika masih di lesson yang sama, cukup ubah step-nya saja
   if (cId === chapterId.value && lesson.id === lessonId.value) {
     if (step === 'quiz') {
@@ -224,8 +289,9 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
         return
       }
       if (!lesson.quizPassed) return // Ignore click if locked
-      runner.resetCode()
+      runner.resetCode(lesson.practice)
       activeStep.value = STEP.PRACTICE
+      practiceStatus.value = 'idle'
     } else {
       activeStep.value = STEP.THEORY
     }
@@ -241,19 +307,21 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
 }
 
 
-const onRequestNextFromTheory = () => {
+const onRequestNextFromTheory = async () => {
   if (!isLoggedIn.value) {
     requireAuth(STEP.QUIZ)
     return
   }
-  // Simulate progress unlocking
+  
   if (currentLesson.value) {
     currentLesson.value.isCompleted = true
+    // Beritahu backend bahwa theory sudah dibaca agar status tersimpan (persist)
+    await scoring.awardXp('theory', currentLesson.value.id)
   }
   activeStep.value = STEP.QUIZ
 }
 
-const onRequestNextFromQuiz = () => {
+const onRequestNextFromQuiz = async () => {
   if (!isLoggedIn.value) {
     requireAuth(STEP.PRACTICE)
     return
@@ -265,39 +333,59 @@ const onRequestNextFromQuiz = () => {
 
   // Award XP untuk quiz benar (hanya sekali per lesson)
   if (currentLesson.value) {
-    const result = scoring.awardXp('quiz', currentLesson.value.id)
+    const result = await scoring.awardXp('quiz', currentLesson.value.id)
     if (result.awarded) {
       showXpToast(result.xp, 'Quiz Benar!', 'quiz')
     }
   }
 
-  runner.resetCode()
+  runner.resetCode(currentLesson.value?.practice)
   activeStep.value = STEP.PRACTICE
 }
 
 /** Jalankan kode practice dan beri XP jika berhasil tanpa error. */
-const onPracticeRun = () => {
+const onPracticeRun = async () => {
+  practiceStatus.value = 'idle'
   runner.run(lessonLanguage.value)
 
-  // Cek apakah output mengandung error
   const hasError = runner.output.value.some(e => e.type === 'error')
-  if (!hasError && runner.output.value.length > 0 && currentLesson.value) {
-    const result = scoring.awardXp('practice', currentLesson.value.id)
-    if (result.awarded) {
-      showXpToast(result.xp, 'Praktik Berhasil!', 'practice')
+  
+  if (hasError) {
+    practiceStatus.value = 'error'
+  } else {
+    // Validasi kesesuaian output
+    const isMatch = checkOutputMatch(lessonLanguage.value, currentLesson.value?.practice, runner.output.value, runner.code.value);
+    
+    if (isMatch) {
+      practiceStatus.value = 'success'
+      if (currentLesson.value) {
+        const result = await scoring.awardXp('practice', currentLesson.value.id)
+        if (result.awarded) {
+          showXpToast(result.xp, 'Praktik Berhasil!', 'practice')
+        }
+      }
+    } else {
+      practiceStatus.value = 'warning'
     }
   }
 }
 
 /** Selesai & Lanjut dari practice. Pastikan XP diberikan juga. */
-const onPracticeFinish = () => {
+const onPracticeFinish = async () => {
   if (currentLesson.value) {
     // Beri XP jika belum pernah (misal user langsung klik finish)
-    const result = scoring.awardXp('practice', currentLesson.value.id)
+    const result = await scoring.awardXp('practice', currentLesson.value.id)
     if (result.awarded) {
       showXpToast(result.xp, 'Praktik Selesai!', 'practice')
     }
   }
+
+  const next = getNextLesson()
+  if (next && next.is_premium && !isPremiumUser.value) {
+    showPremiumModal.value = true
+    return
+  }
+
   goToNextLesson()
 }
 
@@ -314,14 +402,19 @@ const goToRegister = () => {
 }
 
 // Lesson berubah → reset semua state
-watch(currentLesson, () => {
+watch(currentLesson, (newLesson) => {
+  if (newLesson && newLesson.is_premium && !isPremiumUser.value) {
+    showPremiumModal.value = true
+    router.replace(`/learning/${pathId.value}`)
+    return
+  }
   initStepFromQuery()
   quiz.reset()
-  runner.resetCode()
-})
+  runner.resetCode(newLesson?.practice)
+}, { immediate: true })
 
 // Inisialisasi pertama kali
-initStepFromQuery()
+// (tidak perlu initStepFromQuery() di sini lagi karena sudah via watch { immediate: true })
 </script>
 
 

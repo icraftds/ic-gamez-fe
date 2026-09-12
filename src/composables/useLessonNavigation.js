@@ -34,12 +34,17 @@ export function useLessonNavigation(path, lessonId, pathId) {
     goToLesson(prev.chapterId, prev.id)
   }
 
+  const getNextLesson = () => {
+    if (isLastLesson.value) return null
+    return allLessons.value[currentIndex.value + 1]
+  }
+
   const goToNextLesson = () => {
-    if (isLastLesson.value) {
+    const next = getNextLesson()
+    if (!next) {
       router.push(`/learning/${pathId.value}`)
       return
     }
-    const next = allLessons.value[currentIndex.value + 1]
     goToLesson(next.chapterId, next.id)
   }
 
@@ -48,6 +53,7 @@ export function useLessonNavigation(path, lessonId, pathId) {
     currentIndex,
     isFirstLesson,
     isLastLesson,
+    getNextLesson,
     goToLesson,
     goToPrevLesson,
     goToNextLesson,
