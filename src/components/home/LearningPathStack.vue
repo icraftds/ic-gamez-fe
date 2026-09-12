@@ -43,6 +43,7 @@ const { paths } = useLearningPaths()
   margin-bottom: 20px;
   background: linear-gradient(135deg, #fff, #94a3b8);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
