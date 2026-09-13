@@ -12,7 +12,11 @@
             <input type="text" placeholder="Cari algoritma, teori..." />
           </div>
           
-          <nav class="topic-nav">
+          <div v-if="isLoading" class="sidebar-loading">
+            <div class="spinner-small"></div>
+            <span>Memuat data...</span>
+          </div>
+          <nav v-else class="topic-nav">
             <div class="nav-section" v-for="section in encyclopediaData" :key="section.section">
               <h4>{{ section.section }}</h4>
               <ul>
@@ -30,7 +34,11 @@
 
         <!-- Main Content -->
         <main class="encyclopedia-content">
-          <ArticleReader v-if="selectedTopic" :article="selectedTopic" />
+          <div v-if="isTopicLoading || isLoading" class="article-loading">
+            <div class="spinner"></div>
+            <p>Memuat artikel...</p>
+          </div>
+          <ArticleReader v-else-if="selectedTopic" :article="selectedTopic" />
         </main>
       </div>
     </div>
@@ -48,6 +56,7 @@ const encyclopediaData = ref([])
 const selectedTopicId = ref(null)
 const selectedTopic = ref(null)
 const isLoading = ref(true)
+const isTopicLoading = ref(false)
 
 const fetchEncyclopedia = async () => {
   try {
@@ -69,10 +78,13 @@ const fetchEncyclopedia = async () => {
 const fetchTopicDetails = async (slug) => {
   if (!slug) return
   try {
+    isTopicLoading.value = true
     const response = await api.get(`/encyclopedia/${slug}`)
     selectedTopic.value = response.data.data
   } catch (error) {
     console.error('Failed to load topic details', error)
+  } finally {
+    isTopicLoading.value = false
   }
 }
 
@@ -213,5 +225,47 @@ onMounted(() => {
     height: auto;
     max-height: 400px;
   }
+}
+
+/* Loading Animations */
+.sidebar-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #94a3b8;
+  padding: 30px 0;
+}
+.article-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background: rgba(15, 10, 30, 0.8);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  color: #cbd5e1;
+}
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(192, 132, 252, 0.2);
+  border-top-color: #c084fc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(192, 132, 252, 0.2);
+  border-top-color: #c084fc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

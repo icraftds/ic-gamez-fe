@@ -9,12 +9,25 @@
     </div>
 
     <div class="filters">
-      <div class="filter-select">
-        <i class="fa-solid fa-filter"></i>
-        <select v-model="selectedCategory">
-          <option value="">Semua Kategori</option>
-          <option v-for="cat in uniqueCategories" :key="cat" :value="cat">{{ cat }}</option>
-        </select>
+      <div class="custom-dropdown" ref="dropdownRef">
+        <div class="dropdown-selected" @click="isDropdownOpen = !isDropdownOpen">
+          <div class="selected-content">
+            <i class="fa-solid fa-filter"></i>
+            <span>{{ selectedCategory || 'Semua Kategori' }}</span>
+          </div>
+          <i class="fa-solid fa-chevron-down dropdown-arrow" :class="{ 'open': isDropdownOpen }"></i>
+        </div>
+        <transition name="fade-slide">
+          <div class="dropdown-menu" v-if="isDropdownOpen">
+            <div class="dropdown-item" :class="{ 'active': selectedCategory === '' }" @click="selectCategory('')">
+              Semua Kategori
+            </div>
+            <div class="dropdown-item" v-for="cat in uniqueCategories" :key="cat" 
+                 :class="{ 'active': selectedCategory === cat }" @click="selectCategory(cat)">
+              {{ cat }}
+            </div>
+          </div>
+        </transition>
       </div>
     </div>
 
@@ -60,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useLearningPaths } from "../../composables/useLearningPaths.js";
 import { useUserAccount } from "../../composables/useUserAccount.js";
@@ -78,6 +91,20 @@ const currentPage = ref(1);
 const totalPages = ref(1);
 const challenges = ref([]);
 const isLoading = ref(false);
+
+const isDropdownOpen = ref(false);
+const dropdownRef = ref(null);
+
+const selectCategory = (cat) => {
+  selectedCategory.value = cat;
+  isDropdownOpen.value = false;
+};
+
+const handleClickOutside = (event) => {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
+    isDropdownOpen.value = false;
+  }
+};
 
 const uniqueCategories = computed(() => {
   return paths.value.map(p => p.title);
@@ -133,6 +160,11 @@ const fetchChallenges = async () => {
 
 onMounted(() => {
   fetchChallenges();
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
 });
 
 watch(currentPage, () => {
@@ -192,5 +224,80 @@ const openChallenge = (challenge) => {
 @media (max-width: 768px) {
   .header h2 { font-size: 1.5rem; }
   .filters { flex-direction: column; }
+  .custom-dropdown { width: 100%; }
+}
+
+/* Custom Dropdown Styles */
+.custom-dropdown {
+  position: relative;
+  width: 250px;
+}
+.dropdown-selected {
+  background: rgba(15, 10, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.dropdown-selected:hover {
+  border-color: #c084fc;
+}
+.selected-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+}
+.selected-content i {
+  color: #94a3b8;
+}
+.dropdown-arrow {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  transition: transform 0.3s;
+}
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 100%;
+  background: rgba(20, 15, 40, 0.95);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 50;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+.dropdown-item {
+  padding: 12px 15px;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.dropdown-item.active {
+  background: rgba(192, 132, 252, 0.15);
+  color: #c084fc;
+}
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>
