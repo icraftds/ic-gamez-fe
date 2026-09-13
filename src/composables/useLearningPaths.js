@@ -68,6 +68,14 @@ export function useLearningPaths() {
     }
   }
 
+  const fetchAllPathsDetails = async () => {
+    if (paths.value.length === 0) {
+      await fetchPaths();
+    }
+    const promises = paths.value.map(p => fetchPathDetails(p.slug || p.id));
+    await Promise.all(promises);
+  }
+
   const getPathById = (id) => {
     return paths.value.find(p => p.id === id || p.slug === id)
   }
@@ -115,6 +123,7 @@ export function useLearningPaths() {
     isPreparingLesson,
     fetchPaths,
     fetchPathDetails,
+    fetchAllPathsDetails,
     getPathById,
     getChapterById,
     getLessonById,

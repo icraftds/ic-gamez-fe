@@ -3,133 +3,159 @@
     <h2>Statistik Belajar</h2>
     <p class="subtitle">Pertumbuhan dan pencapaianmu di seluruh tools IC Game-Z.</p>
 
-    <!-- XP & Streak -->
-    <div class="top-stats-grid">
-      <div class="stat-big-card">
-        <span class="stat-big-value text-cyan">{{ userProfile.xp }}</span>
-        <span class="stat-big-label">Total XP</span>
-        <div class="xp-mini">
-          <span>Level {{ userProfile.level }}</span>
-          <span>{{ userProfile.xp }}/{{ userProfile.nextLevelXp }} XP</span>
-        </div>
-        <div class="xp-bar-bg"><div class="xp-bar-fill" :style="{ width: xpPercentage + '%' }"></div></div>
-        <p class="xp-hint">{{ userProfile.nextLevelXp - userProfile.xp }} XP lagi ke Level {{ userProfile.level + 1 }}</p>
-      </div>
-      <div class="stat-big-card">
-        <span class="stat-big-value text-orange">{{ userProfile.streak }}</span>
-        <span class="stat-big-label">Streak Hari Ini</span>
-        <p class="streak-sub">Streak terpanjang: <strong>{{ userProfile.streak }} hari</strong></p>
-      </div>
+    <!-- Loading State Global -->
+    <div v-if="isLoadingStats || isLoadingHeatmap" class="loading-state" style="text-align:center; padding: 40px; color:#94a3b8;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; margin-bottom:10px;"></i>
+      <p>Mengambil data statistik Anda secara real-time...</p>
     </div>
 
-    <!-- Latihan Selesai -->
-    <div class="section-card">
-      <h3>Latihan Selesai</h3>
-      <div class="exercise-grid">
-        <div class="exercise-item" v-for="path in paths" :key="path.id">
-          <span class="ex-value text-cyan">{{ getCompletedForPath(path) }}</span>
-          <span class="ex-label">{{ path.title }}</span>
+    <template v-else-if="statsData">
+      <!-- XP & Streak -->
+      <div class="top-stats-grid">
+        <div class="stat-big-card">
+          <span class="stat-big-value text-cyan">{{ statsData.xp.total }}</span>
+          <span class="stat-big-label">Total XP</span>
+          <div class="xp-mini">
+            <span>Level {{ statsData.xp.level }}</span>
+            <span>{{ userProfile.xp }}/{{ statsData.xp.next_level_xp }} XP</span>
+          </div>
+          <div class="xp-bar-bg"><div class="xp-bar-fill" :style="{ width: xpPercentage + '%' }"></div></div>
+          <p class="xp-hint">{{ statsData.xp.next_level_xp - userProfile.xp }} XP lagi ke Level {{ statsData.xp.level + 1 }}</p>
         </div>
-        <div class="exercise-item">
-          <span class="ex-value">0</span>
-          <span class="ex-label">Proyek</span>
+        <div class="stat-big-card">
+          <span class="stat-big-value text-orange">{{ statsData.streak.current }}</span>
+          <span class="stat-big-label">Streak Hari Ini</span>
+          <p class="streak-sub">Streak terpanjang: <strong>{{ statsData.streak.longest }} hari</strong></p>
         </div>
       </div>
-      <p class="total-text">Total: {{ totalCompleted }} latihan & tantangan.</p>
-    </div>
 
-    <!-- Activity Heatmap -->
-    <div class="section-card">
-      <div class="heatmap-header">
-        <h3>Aktivitas Belajar</h3>
-        <span class="heatmap-info">{{ totalActiveDays }} aktivitas dalam {{ totalActiveDays }} hari</span>
+      <!-- Latihan Selesai -->
+      <div class="section-card">
+        <h3>Latihan Selesai</h3>
+        <div class="exercise-grid">
+          <!-- Breakdown dinamis dari backend -->
+          <div class="exercise-item" v-for="(count, pathSlug) in statsData.completed_exercises.breakdown" :key="pathSlug">
+            <span class="ex-value text-cyan">{{ count }}</span>
+            <span class="ex-label" style="text-transform: capitalize;">{{ pathSlug.replace('-', ' ') }}</span>
+          </div>
+          <!-- Fallback jika kosong -->
+          <div class="exercise-item" v-if="Object.keys(statsData.completed_exercises.breakdown).length === 0">
+            <span class="ex-value text-cyan">0</span>
+            <span class="ex-label">Materi</span>
+          </div>
+        </div>
+        <p class="total-text">Total: {{ statsData.completed_exercises.total }} latihan & tantangan diselesaikan.</p>
       </div>
-      <div class="heatmap-grid">
-        <div class="heatmap-labels">
-          <span>Sen</span><span>Rab</span><span>Jum</span>
-        </div>
-        <div class="heatmap-months">
-          <span v-for="month in months" :key="month">{{ month }}</span>
-        </div>
-        <div class="heatmap-cells">
-          <div
-            v-for="(cell, i) in heatmapData"
-            :key="i"
-            class="heatmap-cell"
-            :class="'level-' + cell"
-            :title="cell + ' aktivitas'"
-          ></div>
-        </div>
-        <div class="heatmap-legend">
-          <span>Kosong</span>
-          <div class="heatmap-cell level-0"></div>
-          <div class="heatmap-cell level-1"></div>
-          <div class="heatmap-cell level-2"></div>
-          <div class="heatmap-cell level-3"></div>
-          <span>5+ / hari</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- Peringkat Leaderboard -->
-    <div class="section-card">
-      <h3>Peringkat Leaderboard</h3>
-      <div class="rank-grid">
-        <div class="rank-card">
-          <span class="rank-period">BULAN INI</span>
-          <p class="rank-empty">Belum ada XP bulan ini</p>
-          <p class="rank-hint">Satu soal selesai sudah cukup buat memulai hitungannya.</p>
+      <!-- Activity Heatmap -->
+      <div class="section-card">
+        <div class="heatmap-header">
+          <h3>Aktivitas Belajar</h3>
+          <span class="heatmap-info" v-if="heatmapData">{{ heatmapData.meta.total_activities }} aktivitas dalam {{ heatmapData.meta.total_active_days }} hari</span>
         </div>
-        <div class="rank-card">
-          <span class="rank-period">SEPANJANG MASA</span>
-          <span class="rank-number">#{{ allTimeRank }}</span>
-          <span class="rank-xp">{{ userProfile.xp }} XP</span>
+        <div class="heatmap-grid">
+          <div class="heatmap-labels">
+            <span>Sen</span><span>Rab</span><span>Jum</span>
+          </div>
+          <!-- Anda bisa menambahkan logika bulan dinamis jika perlu, ini statis sebagai contoh -->
+          <div class="heatmap-months">
+            <span v-for="month in months" :key="month">{{ month }}</span>
+          </div>
+          <div class="heatmap-cells">
+            <!-- Data yang di-render dari database -->
+            <div
+              v-for="cell in generatedHeatmapCells"
+              :key="cell.id"
+              class="heatmap-cell"
+              :class="'level-' + cell.level"
+              :title="cell.date ? (cell.count + ' aktivitas pada ' + cell.date) : 'Belum ada aktivitas'"
+            ></div>
+          </div>
+          <div class="heatmap-legend">
+            <span>Kosong</span>
+            <div class="heatmap-cell level-0"></div>
+            <div class="heatmap-cell level-1"></div>
+            <div class="heatmap-cell level-2"></div>
+            <div class="heatmap-cell level-3"></div>
+            <span>5+ / hari</span>
+          </div>
         </div>
       </div>
-      <router-link to="/dashboard/leaderboard" class="link-action">Lihat Leaderboard Lengkap →</router-link>
-    </div>
+
+      <!-- Peringkat Leaderboard -->
+      <div class="section-card">
+        <h3>Peringkat Leaderboard</h3>
+        <div class="rank-grid">
+          <div class="rank-card">
+            <span class="rank-period">BULAN INI</span>
+            <span class="rank-number" v-if="statsData.rank.this_month">#{{ statsData.rank.this_month }}</span>
+            <p class="rank-empty" v-else>Belum ada XP bulan ini</p>
+          </div>
+          <div class="rank-card">
+            <span class="rank-period">SEPANJANG MASA</span>
+            <span class="rank-number">#{{ statsData.rank.all_time }}</span>
+            <span class="rank-xp">{{ statsData.xp.total }} XP</span>
+          </div>
+        </div>
+        <router-link to="/dashboard/leaderboard" class="link-action">Lihat Leaderboard Lengkap →</router-link>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
-import { useLearningPaths } from '../../composables/useLearningPaths'
+import { useDashboardStats } from '../../composables/useDashboardStats'
 
 const { userProfile } = useUserAccount()
-const { paths } = useLearningPaths()
+const { statsData, heatmapData, isLoadingStats, isLoadingHeatmap, fetchStats, fetchHeatmap } = useDashboardStats()
 
-const xpPercentage = computed(() => Math.round((userProfile.value.xp / userProfile.value.nextLevelXp) * 100))
+onMounted(() => {
+  // Panggil kedua endpoint secara paralel
+  fetchStats()
+  fetchHeatmap()
+})
 
-const getCompletedForPath = (path) => {
-  let count = 0
-  if (path.chapters) {
-    path.chapters.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) count++ }))
-  }
-  return count
-}
-
-const totalCompleted = computed(() => {
-  let count = 0
-  paths.value.forEach(p => p.chapters?.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) count++ })))
-  return count
+// Progress bar logic
+const xpPercentage = computed(() => {
+  if (!statsData.value) return 0
+  return Math.round((userProfile.value.xp / statsData.value.xp.next_level_xp) * 100)
 })
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
-const totalActiveDays = 0
-const allTimeRank = 2689
 
-// Generate heatmap data (mock - mostly empty with a few highlights)
-const heatmapData = computed(() => {
+// Menyiapkan layout 364 kotak (52 minggu) untuk Heatmap GitHub-style
+const generatedHeatmapCells = computed(() => {
   const cells = []
-  for (let i = 0; i < 364; i++) {
-    cells.push(Math.random() > 0.92 ? Math.floor(Math.random() * 3) + 1 : 0)
+  const today = new Date()
+  
+  // Buat dictionary cepat untuk mencari level berdasarkan tanggal (YYYY-MM-DD)
+  const activityMap = {}
+  if (heatmapData.value && heatmapData.value.data) {
+    heatmapData.value.data.forEach(item => {
+      activityMap[item.date] = { level: item.level, count: item.count }
+    })
+  }
+
+  // Berjalan mundur dari 364 hari yang lalu hingga hari ini
+  for (let i = 364; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(d.getDate() - i)
+    const dateStr = d.toISOString().split('T')[0]
+    
+    if (activityMap[dateStr]) {
+      cells.push({ id: i, date: dateStr, level: activityMap[dateStr].level, count: activityMap[dateStr].count })
+    } else {
+      cells.push({ id: i, date: dateStr, level: 0, count: 0 })
+    }
   }
   return cells
 })
 </script>
 
 <style scoped>
+/* CSS tetap dibiarkan sama seperti aslinya karena sudah sangat rapi */
 .dash-stats h2 { font-size: 1.6rem; margin-bottom: 5px; }
 .subtitle { color: #94a3b8; margin-bottom: 25px; }
 
@@ -189,7 +215,7 @@ const heatmapData = computed(() => {
 .heatmap-grid { position: relative; }
 .heatmap-labels { display: flex; flex-direction: column; gap: 8px; position: absolute; left: 0; top: 30px; color: #475569; font-size: 0.7rem; }
 .heatmap-months { display: flex; gap: 28px; margin-left: 40px; margin-bottom: 8px; color: #475569; font-size: 0.75rem; }
-.heatmap-cells { display: flex; flex-wrap: wrap; gap: 3px; margin-left: 40px; max-height: 80px; }
+.heatmap-cells { display: flex; flex-wrap: wrap; flex-direction: column; height: 110px; gap: 3px; margin-left: 40px; overflow-x: auto; }
 .heatmap-cell { width: 12px; height: 12px; border-radius: 2px; }
 .level-0 { background: rgba(255,255,255,0.05); }
 .level-1 { background: #0e4429; }
@@ -217,7 +243,7 @@ const heatmapData = computed(() => {
   .stat-big-value { font-size: 2.2rem; }
   .exercise-grid { grid-template-columns: repeat(2, 1fr); }
   .rank-grid { grid-template-columns: 1fr; }
-  .heatmap-cells { overflow-x: auto; max-height: none; }
+  .heatmap-cells { flex-direction: row; flex-wrap: wrap; height: auto; }
   .heatmap-months { gap: 15px; overflow-x: auto; }
   .section-card:hover { transform: none; }
   .stat-big-card:hover { transform: none; }

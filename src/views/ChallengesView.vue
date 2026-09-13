@@ -26,12 +26,10 @@ import ChallengesList from "../components/challenges/ChallengesList.vue";
 import { useLearningPaths } from "../composables/useLearningPaths";
 
 const showModal = ref(false);
-const { paths, fetchPaths } = useLearningPaths();
+const { paths, fetchAllPathsDetails } = useLearningPaths();
 
 onMounted(() => {
-  if (paths.value.length === 0) {
-    fetchPaths();
-  }
+  fetchAllPathsDetails();
 });
 </script>
 

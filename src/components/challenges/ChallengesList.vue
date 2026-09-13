@@ -30,7 +30,7 @@
         </thead>
         <tbody>
           <ChallengeTableRow
-            v-for="challenge in paginatedChallenges"
+            v-for="challenge in challenges"
             :key="challenge.id"
             :challenge="challenge"
             :isPremiumUser="isPremiumUser"
@@ -38,7 +38,10 @@
           />
         </tbody>
       </table>
-      <div v-if="filteredChallenges.length === 0" class="empty-state">
+      <div v-if="isLoading" class="empty-state">
+        Memuat tantangan...
+      </div>
+      <div v-else-if="challenges.length === 0" class="empty-state">
         Tidak ada tantangan dalam kategori ini.
       </div>
       
@@ -57,46 +60,89 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useLearningPaths } from "../../composables/useLearningPaths.js";
 import { useUserAccount } from "../../composables/useUserAccount.js";
 import ChallengeTableRow from "./ChallengeTableRow.vue";
+import api from "../../services/api.js";
 
 const emit = defineEmits(['require-premium']);
 
 const router = useRouter();
-const { allChallenges } = useLearningPaths();
+const { paths, fetchPaths } = useLearningPaths();
 const { isPremiumUser, deductCredit } = useUserAccount();
 
 const selectedCategory = ref("");
 const currentPage = ref(1);
-const itemsPerPage = 10;
+const totalPages = ref(1);
+const challenges = ref([]);
+const isLoading = ref(false);
 
 const uniqueCategories = computed(() => {
-  const categories = new Set(allChallenges.value.map(c => c.category));
-  return Array.from(categories);
+  return paths.value.map(p => p.title);
 });
 
-const filteredChallenges = computed(() => {
-  if (!selectedCategory.value) return allChallenges.value;
-  return allChallenges.value.filter((c) => c.category === selectedCategory.value);
+const fetchChallenges = async () => {
+  try {
+    isLoading.value = true;
+    if (paths.value.length === 0) {
+      await fetchPaths();
+    }
+    
+    const response = await api.get('/challenges', {
+      params: {
+        page: currentPage.value,
+        category: selectedCategory.value
+      }
+    });
+    
+    totalPages.value = response.data.meta ? response.data.meta.last_page : 1;
+    
+    challenges.value = response.data.data.map(challenge => {
+      let category = 'Lainnya';
+      let pathId = null;
+      let chapterId = challenge.chapter_id;
+      
+      const path = paths.value.find(p => p.chapters && p.chapters.some(c => c.id == challenge.chapter_id));
+      if (path) {
+        category = path.title;
+        pathId = path.slug || path.id;
+        const chapter = path.chapters.find(c => c.id == challenge.chapter_id);
+        if (chapter) chapterId = chapter.slug || chapter.id;
+      }
+      
+      return {
+        ...challenge,
+        category,
+        pathId,
+        chapterId,
+        difficulty: challenge.is_premium ? 'Hard' : 'Medium',
+        isCompleted: challenge.progress ? challenge.progress.is_completed : false,
+        isPremium: challenge.is_premium,
+        costCredit: challenge.cost_credit,
+      };
+    });
+    
+  } catch (error) {
+    console.error('Failed to fetch challenges:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchChallenges();
 });
 
-const totalPages = computed(() => Math.ceil(filteredChallenges.value.length / itemsPerPage));
-
-const paginatedChallenges = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredChallenges.value.slice(start, end);
+watch(currentPage, () => {
+  fetchChallenges();
 });
 
-// Reset pagination when filter changes
-import { watch } from 'vue';
 watch(selectedCategory, () => {
   currentPage.value = 1;
+  fetchChallenges();
 });
-  
 
 const openChallenge = (challenge) => {
   if (challenge.isPremium && !isPremiumUser.value) {
