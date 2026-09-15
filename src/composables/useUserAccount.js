@@ -4,6 +4,7 @@ import api, { initCsrf } from '../services/api'
 const credits = ref(5)
 const maxCredits = 5
 const isPremiumUser = ref(false)
+const currentPlan = ref('free')
 const isLoggedIn = ref(false)
 const isLoading = ref(false)
 
@@ -143,8 +144,46 @@ export function useUserAccount() {
     try {
       await api.post('/subscription/upgrade')
       await fetchUser()
+      alert('Selamat! Akun kamu berhasil di-upgrade ke Premium 🎉')
+      return { success: true }
     } catch (error) {
       console.error('Upgrade failed', error)
+      const message = error.response?.data?.message || 'Upgrade gagal. Silakan coba lagi.'
+      alert(message)
+      return { success: false, message }
+    }
+  }
+
+  const checkoutPlan = async (planId, couponCode = '') => {
+    try {
+      isLoading.value = true
+      
+      // Mock latency
+      await new Promise(resolve => setTimeout(resolve, 800))
+      
+      if (couponCode) {
+        // Mock coupon validation
+        const validCoupons = ['ICRAFTPRO', 'EXPERT100', 'FREEBIE']
+        if (validCoupons.includes(couponCode.toUpperCase())) {
+          // Valid coupon logic
+        } else {
+          throw new Error('Kupon tidak valid, sudah digunakan, atau kadaluarsa.')
+        }
+      }
+      
+      // Mock success update
+      isPremiumUser.value = true
+      currentPlan.value = planId
+      
+      alert(`Selamat! Akun kamu berhasil di-upgrade ke paket ${planId.toUpperCase()} 🎉`)
+      return { success: true }
+    } catch (error) {
+      console.error('Checkout failed', error)
+      const message = error.message || 'Pembayaran gagal. Silakan coba lagi.'
+      alert(message)
+      return { success: false, message }
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -175,8 +214,10 @@ export function useUserAccount() {
     credits,
     maxCredits,
     isPremiumUser,
+    currentPlan,
     deductCredit,
     upgradeToPremium,
+    checkoutPlan,
     resetCredits,
     hasEnoughCredits,
     subscriptionStatus

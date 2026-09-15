@@ -41,10 +41,7 @@
           </router-link>
           <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
         </template>
-        <template v-else>
-          <button class="btn-login" @click="openLogin">Masuk</button>
-          <button class="btn-register" @click="openRegister">Daftar</button>
-        </template>
+          <router-link to="/login" class="btn-login" @click="mobileMenuOpen = false">Masuk / Daftar</router-link>
       </div>
     </div>
 
@@ -56,11 +53,6 @@
       type="warning"
       @confirm="performLogout"
     />
-
-    <AuthModal 
-      v-model="showAuthModal"
-      :defaultTab="authModalTab"
-    />
   </nav>
 </template>
 
@@ -69,7 +61,6 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../../composables/useUserAccount'
 import ConfirmModal from '../common/ConfirmModal.vue'
-import AuthModal from '../common/AuthModal.vue'
 
 const { credits, maxCredits, isPremiumUser, isLoggedIn, userProfile, logout } = useUserAccount()
 const router = useRouter()
@@ -77,28 +68,14 @@ const router = useRouter()
 const showLogoutConfirm = ref(false)
 const mobileMenuOpen = ref(false)
 
-const showAuthModal = ref(false)
-const authModalTab = ref('login')
-
-const openLogin = () => {
-  authModalTab.value = 'login'
-  showAuthModal.value = true
-  mobileMenuOpen.value = false
-}
-
-const openRegister = () => {
-  authModalTab.value = 'register'
-  showAuthModal.value = true
-  mobileMenuOpen.value = false
-}
 
 const handleLogoutClick = () => {
   showLogoutConfirm.value = true
   mobileMenuOpen.value = false
 }
 
-const performLogout = () => {
-  logout()
+const performLogout = async () => {
+  await logout()
   router.push('/')
 }
 </script>

@@ -3,7 +3,7 @@
     <div class="app-content">
       <router-view />
     </div>
-    <AppFooter v-if="!isWorkspacePage" />
+    <AppFooter v-if="!isWorkspacePage && !isAuthPage" />
     
     <!-- Global Loading Overlay -->
     <div v-if="isPreparingLesson" class="global-loading-overlay">
@@ -24,6 +24,7 @@ import { useLearningPaths } from './composables/useLearningPaths'
 
 const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
+const isAuthPage = computed(() => ['login', 'register'].includes(route.name))
 
 const { fetchUser } = useUserAccount()
 const { isPreparingLesson } = useLearningPaths()

@@ -28,8 +28,8 @@ const handleLogoutClick = () => {
   showLogoutConfirm.value = true
 }
 
-const performLogout = () => {
-  logout()
+const performLogout = async () => {
+  await logout()
   router.push('/')
 }
 
@@ -77,7 +77,7 @@ const tabs = [
         </div>
         <button class="icon-btn"><i class="fa-solid fa-moon"></i></button>
         <button class="icon-btn"><i class="fa-solid fa-bell"></i></button>
-        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="upgradeToPremium"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
+        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
         <div class="user-profile-group">
           <div class="user-profile-btn">
             <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" />

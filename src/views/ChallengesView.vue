@@ -12,7 +12,7 @@
     </div>
 
     <!-- Premium / Energy Modal -->
-    <PremiumModal :isOpen="showModal" @close="showModal = false" />
+    <PremiumModal v-model="showModal" />
   </div>
 </template>
 

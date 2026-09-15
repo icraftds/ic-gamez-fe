@@ -20,9 +20,10 @@ api.interceptors.response.use(
       // Jika user tidak terautentikasi (session expired atau belum login)
       // Kita bisa memicu event logout atau mengarahkan ke halaman home
       const currentPath = window.location.pathname;
-      if (currentPath !== '/') {
-        // Redirect ke home dan buka modal login via URL parameter (opsional)
-        window.location.href = '/?auth=login';
+      const isAuthPage = currentPath === '/login' || currentPath === '/register';
+      if (currentPath !== '/' && !isAuthPage) {
+        // Redirect ke halaman login yang baru
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);
