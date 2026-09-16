@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
-import WorkspaceView from './views/WorkspaceView.vue'
-import PathDetailView from './views/PathDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,7 +22,7 @@ const router = createRouter({
     {
       path: '/workspace',
       name: 'workspace',
-      component: WorkspaceView
+      component: () => import('./views/WorkspaceView.vue')
     },
     {
       path: '/learning',
@@ -44,7 +42,7 @@ const router = createRouter({
     {
       path: '/learning/:pathId',
       name: 'path-detail',
-      component: PathDetailView
+      component: () => import('./views/PathDetailView.vue')
     },
     {
       path: '/learning/:pathId/lesson/:chapterId/:lessonId',

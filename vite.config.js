@@ -14,5 +14,8 @@ export default defineConfig({
       '@codemirror/lint',
     ],
   },
+  build: {
+    chunkSizeWarningLimit: 1000,
+  }
 })
 

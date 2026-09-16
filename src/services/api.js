@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Konfigurasi instance Axios
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_BASE_URL,
   withCredentials: true, // Wajib untuk Sanctum SPA authentication (menyertakan cookie CORS)
   withXSRFToken: true, // Wajib untuk Axios versi modern agar mengirim header X-XSRF-TOKEN pada request cross-origin
   headers: {
@@ -50,7 +50,9 @@ api.interceptors.response.use(
  */
 export const initCsrf = async () => {
   try {
-    await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+    // Gunakan VITE_BASE_URL, hilangkan trailing slash jika ada, lalu sambungkan dengan /sanctum/csrf-cookie
+    const baseUrl = import.meta.env.VITE_BASE_URL.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');
+    await axios.get(`${baseUrl}/sanctum/csrf-cookie`, {
       withCredentials: true
     });
   } catch (error) {

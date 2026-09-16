@@ -108,7 +108,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useLearningPaths } from '../composables/useLearningPaths'
@@ -121,11 +121,11 @@ import { useScoring } from '../composables/useScoring'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import WorkspaceTopbar from '../components/workspace/WorkspaceTopbar.vue'
 import WorkspaceSidebar from '../components/workspace/WorkspaceSidebar.vue'
-import TheoryPanel from '../components/workspace/TheoryPanel.vue'
-import QuizPanel from '../components/workspace/QuizPanel.vue'
-import PracticePanel from '../components/workspace/PracticePanel.vue'
-import AuthRequiredModal from '../components/common/AuthRequiredModal.vue'
-import PremiumModal from '../components/common/PremiumModal.vue'
+const TheoryPanel = defineAsyncComponent(() => import('../components/workspace/TheoryPanel.vue'))
+const QuizPanel = defineAsyncComponent(() => import('../components/workspace/QuizPanel.vue'))
+const PracticePanel = defineAsyncComponent(() => import('../components/workspace/PracticePanel.vue'))
+const AuthRequiredModal = defineAsyncComponent(() => import('../components/common/AuthRequiredModal.vue'))
+const PremiumModal = defineAsyncComponent(() => import('../components/common/PremiumModal.vue'))
 import XpToast from '../components/common/XpToast.vue'
 
 // ── Enums ─────────────────────────────────────────────────────────
