@@ -1,6 +1,6 @@
 <template>
   <div class="leaderboard-view">
-    <BackgroundEffects :show-orb3="true" />
+    <SimpleBackground />
     <HomeNavbar />
 
     <div class="container" style="margin-top: 40px">
@@ -11,7 +11,7 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import BackgroundEffects from '../components/common/BackgroundEffects.vue'
+import SimpleBackground from '../components/common/SimpleBackground.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import LeaderboardTable from '../components/home/LeaderboardTable.vue'
 

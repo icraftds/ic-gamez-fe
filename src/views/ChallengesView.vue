@@ -1,6 +1,6 @@
 <template>
   <div class="challenges-view">
-    <BackgroundEffects :show-orb3="true" />
+    <SimpleBackground />
     <HomeNavbar />
 
     <div class="container layout">
@@ -18,7 +18,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import BackgroundEffects from "../components/common/BackgroundEffects.vue";
+import SimpleBackground from "../components/common/SimpleBackground.vue";
 import HomeNavbar from "../components/home/HomeNavbar.vue";
 import PremiumModal from "../components/common/PremiumModal.vue";
 import ChallengesSidebar from "../components/challenges/ChallengesSidebar.vue";

@@ -1,6 +1,6 @@
 <template>
   <div class="path-detail-view">
-    <BackgroundEffects />
+    <SimpleBackground />
     <HomeNavbar />
     
     <div class="container content-area">
@@ -48,7 +48,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useUserAccount } from '../composables/useUserAccount'
-import BackgroundEffects from '../components/common/BackgroundEffects.vue'
+import SimpleBackground from '../components/common/SimpleBackground.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ChapterAccordion from '../components/learning/ChapterAccordion.vue'
 import PremiumModal from '../components/common/PremiumModal.vue'

@@ -36,13 +36,13 @@ const getPathProgress = (path) => {
 
 const getCompletedLessonsForPath = (path) => {
   let count = 0
-  path.chapters.forEach(c => c.lessons.forEach(l => { if (l.isCompleted) count++ }))
+  path?.chapters?.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) count++ }))
   return count
 }
 
 const getTotalLessonsForPath = (path) => {
   let count = 0
-  path.chapters.forEach(c => { count += c.lessons.length })
+  path?.chapters?.forEach(c => { count += (c.lessons?.length || 0) })
   return count
 }
 </script>

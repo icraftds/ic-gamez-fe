@@ -7,6 +7,8 @@ export function useQuiz() {
   const selectedAnswer = ref(null)
   const isSubmitted = ref(false)
   const isCorrect = ref(false)
+  const isChecking = ref(false)
+  const errorMessage = ref('')
 
   /** Submit jawaban dan evaluasi hasilnya. */
   const submit = (quiz) => {
@@ -20,12 +22,16 @@ export function useQuiz() {
     selectedAnswer.value = null
     isSubmitted.value = false
     isCorrect.value = false
+    isChecking.value = false
+    errorMessage.value = ''
   }
 
   return {
     selectedAnswer,
     isSubmitted,
     isCorrect,
+    isChecking,
+    errorMessage,
     submit,
     reset,
   }

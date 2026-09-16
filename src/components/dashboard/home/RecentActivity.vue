@@ -5,7 +5,7 @@
       <i class="fa-solid fa-bolt" style="font-size: 2.5rem; color: #475569; margin-bottom: 15px;"></i>
       <p><strong>Belum ada aktivitas</strong></p>
       <p class="sub-text">Latihan pertamamu bakal muncul di sini begitu kamu selesaikan.</p>
-      <router-link to="/learning" class="btn-accent">Mulai Latihan Pertama</router-link>
+      <button @click="$router.push('/learning')" class="btn-accent">Mulai Latihan Pertama</button>
     </div>
     <div class="activity-list" v-else>
       <div class="activity-item" v-for="(act, i) in recentActivity" :key="i">

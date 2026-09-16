@@ -15,10 +15,24 @@ const api = axios.create({
 api.interceptors.response.use(
   response => response,
   error => {
+    // Tangani error 403 Forbidden secara global (misal: akses konten premium ditolak)
+    if (error.response && error.response.status === 403) {
+      const message = error.response.data?.message || '';
+      if (message.toLowerCase().includes('berlangganan') || message.toLowerCase().includes('premium')) {
+        window.location.href = '/dashboard?tab=langganan';
+        return Promise.reject(error);
+      }
+    }
+
     // Tangani error 401 Unauthorized secara global
     if (error.response && error.response.status === 401) {
-      // Jika user tidak terautentikasi (session expired atau belum login)
-      // Kita bisa memicu event logout atau mengarahkan ke halaman home
+      // Jika error 401 berasal dari '/auth/me', abaikan redirect.
+      // Ini wajar karena user guest (belum login) memang akan mendapat 401 saat dicek status login-nya di awal (App.vue).
+      if (error.config && error.config.url === '/auth/me') {
+        return Promise.reject(error);
+      }
+
+      // Jika user tidak terautentikasi pada request lain (misal mencoba ambil data private)
       const currentPath = window.location.pathname;
       const isAuthPage = currentPath === '/login' || currentPath === '/register';
       if (currentPath !== '/' && !isAuthPage) {

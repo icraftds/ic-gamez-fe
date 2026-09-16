@@ -32,11 +32,13 @@ export function useScoring() {
     }
   }
 
-  const awardXp = async (type, lessonId) => {
+  const awardXp = async (type, lessonId, extraData = {}) => {
     const key = `${lessonId}:${type}`
 
-    if (scoredActivities.value.has(key)) {
-      return { awarded: false, xp: 0 }
+    // JANGAN blokir request jika tipe-nya adalah 'quiz'.
+    // Kita harus selalu mengirim kuis ke backend untuk divalidasi kebenarannya!
+    if (scoredActivities.value.has(key) && type !== 'quiz') {
+      return { success: true, awarded: false, xp: 0 }
     }
 
     try {
@@ -44,25 +46,28 @@ export function useScoring() {
       if (type === 'quiz') endpoint = '/progress/quiz-pass'
       else if (type === 'practice') endpoint = '/progress/practice-complete'
       else if (type === 'theory') endpoint = '/progress/complete'
-      
-      if (!endpoint) return { awarded: false, xp: 0 }
 
-      const response = await api.post(endpoint, { lesson_id: lessonId })
+      if (!endpoint) return { success: false, awarded: false, xp: 0, error: 'Endpoint invalid' }
+
+      const payload = { lesson_id: lessonId, ...extraData }
+      const response = await api.post(endpoint, payload)
       
       // Jika berhasil di backend
       scoredActivities.value.add(key)
-      
-      // Refresh XP dan Level di profile
       await refreshStats()
-
-      // Backend mungkin mereturn info XP di response, jika tidak, kita gunakan const
+      
       const awarded = response.data.awarded !== undefined ? response.data.awarded : true;
       const xp = response.data.xp_earned !== undefined ? response.data.xp_earned : (type === 'quiz' ? XP_REWARDS.QUIZ_CORRECT : XP_REWARDS.PRACTICE_COMPLETE);
-
-      return { awarded, xp };
+      const explanation = response.data.explanation
+      return { success: true, awarded, xp, explanation };
     } catch (error) {
       console.error(`Failed to award XP for ${type}`, error)
-      return { awarded: false, xp: 0 }
+      if (error.response?.status === 400) {
+        // Berjalan di background, tidak memblokir response
+        refreshStats().catch(console.error)
+        return { success: false, awarded: false, xp: 0, error: error.response.data?.message || 'Gagal memproses' }
+      }
+      return { success: false, awarded: false, xp: 0, error: error.response?.data?.message || 'Terjadi kesalahan sistem, coba lagi.' }
     }
   }
 

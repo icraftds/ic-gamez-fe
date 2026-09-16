@@ -41,7 +41,13 @@
           <i class="fa-solid fa-star"></i> Lvl {{ userProfile.level }}
         </div>
         <div class="stat-badge xp-badge" title="Total XP Anda">
-          <i class="fa-solid fa-bolt"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
+          <i class="fa-solid fa-arrow-trend-up"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
+        </div>
+        <div class="stat-badge energy-badge" title="Sisa Energi" v-if="!isPremiumUser">
+          <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
+        </div>
+        <div class="stat-badge premium-badge" title="Akun PRO" v-else>
+          <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
         </div>
       </div>
 
@@ -53,7 +59,7 @@
 <script setup>
 import { useUserAccount } from '../../composables/useUserAccount'
 
-const { isLoggedIn, userProfile } = useUserAccount()
+const { isLoggedIn, userProfile, isPremiumUser, credits } = useUserAccount()
 const STEPS = [
   { number: 1, label: 'Materi' },
   { number: 2, label: 'Tes' },
@@ -227,6 +233,13 @@ defineEmits(['back'])
 .xp-badge i {
   color: #22d3ee;
 }
+
+.energy-badge i,
+.premium-badge i {
+  color: #f59e0b;
+}
+
+.text-warning { color: #f59e0b; }
 
 @media (max-width: 1024px) {
   .step-label { display: none; }

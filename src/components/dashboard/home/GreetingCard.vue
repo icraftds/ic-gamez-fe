@@ -10,7 +10,7 @@
         <div class="qs-item"><span class="qs-value">0</span> <span class="qs-label">sertifikat</span></div>
       </div>
     </div>
-    <button v-if="!isPremiumUser" class="btn-upgrade-sm" @click="upgradeToPremium">Upgrade Premium</button>
+    <button v-if="!isPremiumUser" class="btn-upgrade-sm" @click="$router.push({ path: '/dashboard', query: { tab: 'langganan' } })">Upgrade Premium</button>
   </div>
 </template>
 
@@ -19,12 +19,12 @@ import { computed } from 'vue'
 import { useUserAccount } from '../../../composables/useUserAccount'
 import { useLearningPaths } from '../../../composables/useLearningPaths'
 
-const { userProfile, isPremiumUser, upgradeToPremium } = useUserAccount()
+const { userProfile, isPremiumUser } = useUserAccount()
 const { paths } = useLearningPaths()
 
 const completedLessons = computed(() => {
   let count = 0
-  paths.value.forEach(p => p.chapters.forEach(c => c.lessons.forEach(l => { if (l.isCompleted) count++ })))
+  paths.value?.forEach(p => p.chapters?.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) count++ })))
   return count
 })
 </script>
@@ -52,6 +52,7 @@ const completedLessons = computed(() => {
 .highlight-name {
   background: linear-gradient(135deg, #f59e0b, #fcd34d);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-decoration: underline;
   text-decoration-color: #f59e0b;

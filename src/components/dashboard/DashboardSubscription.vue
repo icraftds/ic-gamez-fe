@@ -3,10 +3,16 @@
     <h2>Pilih Paket Langganan</h2>
     <p class="subtitle">Tingkatkan pengalaman belajarmu dengan akses penuh ke semua materi premium.</p>
 
+    <!-- Loading State -->
+    <div v-if="isLoadingPlans" class="loading-state">
+      <div class="spinner-large"></div>
+      <p>Memuat paket langganan...</p>
+    </div>
+
     <!-- Plan Selection -->
-    <div class="plans-container">
-      <!-- Free Plan -->
-      <div class="plan-card free" :class="{ active: currentPlan === 'free' }">
+    <div v-else class="plans-container">
+      <!-- Free Plan (Hardcoded default) -->
+      <div class="plan-card free" :class="{ active: currentPlan === 'free' || !currentPlan }">
         <div class="plan-header">
           <div class="plan-icon"><i class="fa-solid fa-paper-plane"></i></div>
           <h3>Free Plan</h3>
@@ -20,51 +26,37 @@
           <li class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
         </ul>
         <div class="plan-action">
-          <div v-if="currentPlan === 'free'" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
+          <div v-if="currentPlan === 'free' || !currentPlan" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
           <button v-else disabled class="btn-disabled">Paket Dasar</button>
         </div>
       </div>
 
-      <!-- Pro Plan -->
-      <div class="plan-card pro" :class="{ active: currentPlan === 'pro' }">
-        <div class="badge-popular">Paling Populer</div>
+      <!-- Dynamic Plans from API -->
+      <div v-for="plan in plans" :key="plan.id" class="plan-card" :class="[plan.slug, { active: currentPlan === plan.slug }]">
+        <!-- Optional Badges based on slug -->
+        <div v-if="plan.slug === 'pro'" class="badge-popular">Paling Populer</div>
+        <div v-else-if="plan.slug === 'expert'" class="badge-premium">Premium</div>
+        
         <div class="plan-header">
-          <div class="plan-icon pro-icon"><i class="fa-solid fa-rocket"></i></div>
-          <h3>Pro Plan</h3>
-          <p class="price">Rp 99.000<span>/bulan</span></p>
+          <div class="plan-icon" :class="plan.slug + '-icon'">
+            <i :class="getPlanIcon(plan.slug)"></i>
+          </div>
+          <h3>{{ plan.name }}</h3>
+          <p class="price">Rp {{ formatPrice(plan.price) }}<span>/{{ plan.duration_in_days }} hari</span></p>
         </div>
+        
         <ul class="plan-benefits">
-          <li><i class="fa-solid fa-check"></i> Semua modul dasar & premium</li>
-          <li><i class="fa-solid fa-check"></i> Unlimited Energy</li>
-          <li><i class="fa-solid fa-check"></i> Sertifikat kelulusan</li>
-          <li class="disabled"><i class="fa-solid fa-xmark"></i> Code Review prioritas</li>
-          <li class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
+          <li v-for="(benefit, index) in getPlanBenefits(plan.slug)" :key="index">
+            <i class="fa-solid fa-check"></i> {{ benefit }}
+          </li>
+          <!-- Disabled benefits logic for visual (mocked based on slug) -->
+          <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> Code Review prioritas</li>
+          <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
         </ul>
+        
         <div class="plan-action">
-          <div v-if="currentPlan === 'pro'" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
-          <button v-else-if="currentPlan === 'expert'" disabled class="btn-disabled">Paket Dibawah</button>
-          <button v-else class="btn-upgrade" @click="selectPlan('pro', 99000)">Pilih Pro</button>
-        </div>
-      </div>
-
-      <!-- Expert Plan -->
-      <div class="plan-card expert" :class="{ active: currentPlan === 'expert' }">
-        <div class="badge-premium">Premium</div>
-        <div class="plan-header">
-          <div class="plan-icon expert-icon"><i class="fa-solid fa-crown"></i></div>
-          <h3>Expert Plan</h3>
-          <p class="price">Rp 150.000<span>/bulan</span></p>
-        </div>
-        <ul class="plan-benefits">
-          <li><i class="fa-solid fa-check"></i> Semua fitur Pro Plan</li>
-          <li><i class="fa-solid fa-check"></i> Akses awal ke modul baru</li>
-          <li><i class="fa-solid fa-check"></i> Code Review prioritas</li>
-          <li><i class="fa-solid fa-check"></i> 1-on-1 Mentoring bulanan</li>
-          <li><i class="fa-solid fa-check"></i> Portofolio review</li>
-        </ul>
-        <div class="plan-action">
-          <div v-if="currentPlan === 'expert'" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
-          <button v-else class="btn-upgrade expert-btn" @click="selectPlan('expert', 150000)">Pilih Expert</button>
+          <div v-if="currentPlan === plan.slug" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
+          <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="selectPlan(plan)">Pilih {{ plan.name }}</button>
         </div>
       </div>
     </div>
@@ -74,39 +66,35 @@
       <div v-if="showCheckout" class="checkout-overlay" @click="closeCheckout">
       <div class="checkout-modal" @click.stop>
         <h3>Selesaikan Pembayaran</h3>
-        <p class="checkout-plan-name">Paket: {{ selectedPlan.toUpperCase() }} Plan</p>
+        <p class="checkout-plan-name">Paket: {{ selectedPlan.name }} Plan</p>
         
         <div class="price-summary">
-          <div class="summary-row">
-            <span>Harga Normal</span>
-            <span>Rp {{ formatPrice(selectedPlanPrice) }}</span>
-          </div>
-          <div v-if="discountAmount > 0" class="summary-row discount">
-            <span>Diskon Kupon</span>
-            <span>- Rp {{ formatPrice(discountAmount) }}</span>
-          </div>
-          <hr />
           <div class="summary-row total">
-            <span>Total Bayar</span>
-            <span>Rp {{ formatPrice(finalPrice) }}</span>
+            <span>Harga Paket</span>
+            <span>Rp {{ formatPrice(selectedPlan.price) }}</span>
           </div>
         </div>
 
         <div class="coupon-section">
           <label>Punya Kode Kupon?</label>
           <div class="coupon-input-group">
-            <input type="text" v-model="couponCode" placeholder="Masukkan kupon (misal: ICRAFTPRO)" :disabled="isCouponApplied" />
-            <button v-if="!isCouponApplied" @click="applyCoupon" class="btn-apply-coupon" :disabled="!couponCode">Terapkan</button>
-            <button v-else @click="removeCoupon" class="btn-remove-coupon">Batal</button>
+            <input type="text" v-model="couponCode" placeholder="Masukkan kode kupon" />
           </div>
-          <p v-if="couponMessage" :class="['coupon-msg', isCouponApplied ? 'success' : 'error']">{{ couponMessage }}</p>
+          <p class="coupon-msg info">Diskon atau bonus durasi akan diterapkan secara otomatis saat Anda menekan tombol Bayar.</p>
+        </div>
+        
+        <div v-if="checkoutErrorMessage" class="checkout-error-msg">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ checkoutErrorMessage }}
+        </div>
+        <div v-if="checkoutSuccessMessage" class="checkout-success-msg">
+          <i class="fa-solid fa-circle-check"></i> {{ checkoutSuccessMessage }}
         </div>
 
         <div class="checkout-actions">
-          <button class="btn-cancel" @click="closeCheckout">Batal</button>
+          <button class="btn-cancel" @click="closeCheckout" :disabled="isLoading">Batal</button>
           <button class="btn-pay" @click="processCheckout" :disabled="isLoading">
             <span v-if="isLoading"><i class="fa-solid fa-spinner fa-spin"></i> Memproses...</span>
-            <span v-else>{{ finalPrice === 0 ? 'Tukar Kupon' : 'Bayar Sekarang' }}</span>
+            <span v-else>Bayar Sekarang</span>
           </button>
         </div>
       </div>
@@ -116,84 +104,95 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
+import api from '../../services/api'
 
 const { isPremiumUser, currentPlan, checkoutPlan, isLoading } = useUserAccount()
 
+const plans = ref([])
+const isLoadingPlans = ref(false)
+
 const showCheckout = ref(false)
-const selectedPlan = ref('')
-const selectedPlanPrice = ref(0)
+const selectedPlan = ref(null)
 
 const couponCode = ref('')
-const isCouponApplied = ref(false)
-const discountAmount = ref(0)
-const couponMessage = ref('')
+const checkoutErrorMessage = ref('')
+const checkoutSuccessMessage = ref('')
 
-const finalPrice = computed(() => {
-  return Math.max(0, selectedPlanPrice.value - discountAmount.value)
+onMounted(async () => {
+  try {
+    isLoadingPlans.value = true
+    const response = await api.get('/plans')
+    // Asumsi format respons { data: [ ... ] }
+    plans.value = response.data.data || response.data
+  } catch (error) {
+    console.error('Failed to fetch plans', error)
+  } finally {
+    isLoadingPlans.value = false
+  }
 })
 
-const selectPlan = (plan, price) => {
+const getPlanIcon = (slug) => {
+  if (slug === 'pro') return 'fa-solid fa-rocket'
+  if (slug === 'expert') return 'fa-solid fa-crown'
+  return 'fa-solid fa-star'
+}
+
+const getPlanBenefits = (slug) => {
+  if (slug === 'pro') {
+    return [
+      'Semua modul dasar & premium',
+      'Unlimited Energy',
+      'Sertifikat kelulusan'
+    ]
+  }
+  if (slug === 'expert') {
+    return [
+      'Semua fitur Pro Plan',
+      'Akses awal ke modul baru',
+      'Code Review prioritas',
+      '1-on-1 Mentoring bulanan',
+      'Portofolio review'
+    ]
+  }
+  return ['Akses fitur premium', 'Unlimited Energy', 'Sertifikat kelulusan']
+}
+
+const selectPlan = (plan) => {
   selectedPlan.value = plan
-  selectedPlanPrice.value = price
   showCheckout.value = true
-  // Reset coupon state
   couponCode.value = ''
-  isCouponApplied.value = false
-  discountAmount.value = 0
-  couponMessage.value = ''
+  checkoutErrorMessage.value = ''
 }
 
 const closeCheckout = () => {
   showCheckout.value = false
+  checkoutSuccessMessage.value = ''
 }
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
 }
 
-const applyCoupon = () => {
-  const code = couponCode.value.toUpperCase()
-  
-  if (code === 'ICRAFTPRO') {
-    isCouponApplied.value = true
-    discountAmount.value = selectedPlanPrice.value * 0.2 // 20% discount
-    couponMessage.value = 'Kupon berhasil diterapkan! Diskon 20%.'
-  } else if (code === 'EXPERT100') {
-    isCouponApplied.value = true
-    discountAmount.value = selectedPlanPrice.value // 100% discount
-    couponMessage.value = 'Kupon berhasil diterapkan! Diskon 100%.'
-  } else if (code === 'FREEBIE') {
-    isCouponApplied.value = true
-    discountAmount.value = 50000 // Rp 50.000 discount
-    couponMessage.value = 'Kupon berhasil diterapkan! Potongan Rp 50.000.'
-  } else {
-    isCouponApplied.value = false
-    discountAmount.value = 0
-    couponMessage.value = 'Kupon tidak valid atau kadaluarsa.'
-  }
-}
-
-const removeCoupon = () => {
-  couponCode.value = ''
-  isCouponApplied.value = false
-  discountAmount.value = 0
-  couponMessage.value = ''
-}
-
 const processCheckout = async () => {
-  if (isCouponApplied.value) {
-    const res = await checkoutPlan(selectedPlan.value, couponCode.value)
-    if (res.success) {
+  if (isPremiumUser.value) {
+    const confirm = window.confirm("Perhatian: Sisa waktu dari paket Anda sebelumnya akan hangus jika Anda menyetujui pembelian ini. Lanjutkan?")
+    if (!confirm) return
+  }
+
+  checkoutErrorMessage.value = ''
+  checkoutSuccessMessage.value = ''
+  // Panggil checkout dari composable
+  const res = await checkoutPlan(selectedPlan.value.slug || selectedPlan.value.id, couponCode.value)
+  if (res.success) {
+    checkoutSuccessMessage.value = res.message || 'Pembayaran berhasil!'
+    setTimeout(() => {
       showCheckout.value = false
-    }
+      checkoutSuccessMessage.value = ''
+    }, 2000)
   } else {
-    // Mock normal payment
-    const res = await checkoutPlan(selectedPlan.value)
-    if (res.success) {
-      showCheckout.value = false
-    }
+    checkoutErrorMessage.value = res.message
   }
 }
 </script>
@@ -201,6 +200,25 @@ const processCheckout = async () => {
 <style scoped>
 .dash-subscription h2 { font-size: 1.6rem; margin-bottom: 5px; color: white; }
 .subtitle { color: #94a3b8; margin-bottom: 30px; }
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0;
+  color: #94a3b8;
+}
+.spinner-large {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 .plans-container {
   display: grid;
@@ -447,14 +465,6 @@ const processCheckout = async () => {
   color: #cbd5e1;
 }
 
-.summary-row.discount { color: #10b981; }
-
-.price-summary hr {
-  border: none;
-  border-top: 1px dashed rgba(255,255,255,0.1);
-  margin: 15px 0;
-}
-
 .summary-row.total {
   font-size: 1.2rem;
   font-weight: 700;
@@ -463,7 +473,7 @@ const processCheckout = async () => {
 }
 
 .coupon-section {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .coupon-section label {
@@ -489,35 +499,37 @@ const processCheckout = async () => {
 }
 .coupon-input-group input:focus { border-color: #8b5cf6; }
 
-.btn-apply-coupon {
-  background: #3730a3;
-  color: white;
-  border: none;
-  padding: 0 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-.btn-apply-coupon:hover:not(:disabled) { background: #4338ca; }
-.btn-apply-coupon:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.btn-remove-coupon {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  padding: 0 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.coupon-msg {
+.coupon-msg.info {
   font-size: 0.85rem;
   margin-top: 8px;
+  color: #94a3b8;
 }
-.coupon-msg.success { color: #10b981; }
-.coupon-msg.error { color: #ef4444; }
+
+.checkout-error-msg {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkout-success-msg {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .checkout-actions {
   display: flex;
@@ -534,7 +546,7 @@ const processCheckout = async () => {
   cursor: pointer;
   font-weight: 600;
 }
-.btn-cancel:hover { background: rgba(255,255,255,0.05); }
+.btn-cancel:hover:not(:disabled) { background: rgba(255,255,255,0.05); }
 
 .btn-pay {
   flex: 2;

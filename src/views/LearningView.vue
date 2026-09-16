@@ -1,6 +1,6 @@
 <template>
   <div class="learning-view">
-    <BackgroundEffects :show-orb3="true" />
+    <SimpleBackground />
     <HomeNavbar />
 
     <div class="container" style="margin-top: 40px">
@@ -36,7 +36,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import BackgroundEffects from '../components/common/BackgroundEffects.vue'
+import SimpleBackground from '../components/common/SimpleBackground.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import PathCard from '../components/learning/PathCard.vue'
 import { useLearningPaths } from '../composables/useLearningPaths'

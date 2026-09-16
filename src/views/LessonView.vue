@@ -1,6 +1,6 @@
 <template>
   <div class="lesson-workspace">
-    <BackgroundEffects :show-orb3="true" />
+    <SimpleBackground />
 
     <WorkspaceTopbar
       :path-title="path?.title ?? ''"
@@ -23,56 +23,64 @@
       />
 
       <main class="workspace-main">
-        <!-- Step 1: Materi -->
-        <TheoryPanel
-          v-if="activeStep === STEP.THEORY && currentLesson"
-          :lesson="currentLesson"
-          :is-first-lesson="isFirstLesson"
-          @prev="goToPrevLesson"
-          @next="onRequestNextFromTheory"
-        />
+        <transition name="fade-slide" mode="out-in">
+          <!-- Step 1: Materi -->
+          <TheoryPanel
+            key="theory"
+            v-if="activeStep === STEP.THEORY && currentLesson"
+            :lesson="currentLesson"
+            :is-first-lesson="isFirstLesson"
+            @prev="goToPrevLesson"
+            @next="onRequestNextFromTheory"
+          />
 
-        <!-- Step 2: Tes / Kuis -->
-        <QuizPanel
-          v-else-if="activeStep === STEP.QUIZ && currentLesson"
-          :quiz="currentLesson.quizzes"
-          :selected-answer="quiz.selectedAnswer.value"
-          :is-submitted="quiz.isSubmitted.value"
-          :is-correct="quiz.isCorrect.value"
-          @update:selected-answer="quiz.selectedAnswer.value = $event"
-          @submit="quiz.submit(currentLesson.quizzes)"
-          @retry="quiz.reset()"
-          @back="activeStep = STEP.THEORY"
-          @next="onRequestNextFromQuiz"
-        />
+          <!-- Step 2: Tes / Kuis -->
+          <QuizPanel
+            key="quiz"
+            v-else-if="activeStep === STEP.QUIZ && currentLesson"
+            :lesson="currentLesson"
+            :quiz="currentLesson.quizzes"
+            :selected-answer="quiz.selectedAnswer.value"
+            :is-submitted="quiz.isSubmitted.value"
+            :is-correct="quiz.isCorrect.value"
+            :is-checking="quiz.isChecking.value"
+            :error-message="quiz.errorMessage.value"
+            @update:selected-answer="quiz.selectedAnswer.value = $event"
+            @submit="onQuizSubmit"
+            @retry="quiz.reset()"
+            @back="activeStep = STEP.THEORY"
+            @next="onRequestNextFromQuiz"
+          />
 
-        <!-- Step 3: Praktik -->
-        <PracticePanel
-          :run-status="practiceStatus"
-          v-else-if="activeStep === STEP.PRACTICE && currentLesson"
-          :lesson="currentLesson"
-          :language="lessonLanguage"
-          :code="runner.code.value"
-          :output="runner.output.value"
-          :is-last-lesson="isLastLesson"
-          @update:code="runner.code.value = $event; practiceStatus = 'idle'"
-          @run="onPracticeRun"
-          @clear-output="runner.clearOutput()"
-          @back="activeStep = STEP.QUIZ"
-          @finish="onPracticeFinish"
-        />
+          <!-- Step 3: Praktik -->
+          <PracticePanel
+            key="practice"
+            :run-status="practiceStatus"
+            v-else-if="activeStep === STEP.PRACTICE && currentLesson"
+            :lesson="currentLesson"
+            :language="lessonLanguage"
+            :code="runner.code.value"
+            :output="runner.output.value"
+            :is-last-lesson="isLastLesson"
+            @update:code="runner.code.value = $event; practiceStatus = 'idle'"
+            @run="onPracticeRun"
+            @clear-output="runner.clearOutput()"
+            @back="activeStep = STEP.QUIZ"
+            @finish="onPracticeFinish"
+          />
 
-        <!-- Loading State -->
-        <div v-else-if="isLoading || !path?.chapters" class="loading-state">
-          <div class="spinner-large"></div>
-          <p>Mempersiapkan materi belajar...</p>
-        </div>
+          <!-- Loading State -->
+          <div key="loading" v-else-if="isLoading || !path?.chapters" class="loading-state">
+            <div class="spinner-large"></div>
+            <p>Mempersiapkan materi belajar...</p>
+          </div>
 
-        <!-- Fallback: lesson tidak ditemukan -->
-        <div v-else class="not-found">
-          <i class="fa-solid fa-circle-exclamation"></i>
-          <p>Materi tidak ditemukan. Pastikan URL Anda benar.</p>
-        </div>
+          <!-- Fallback: lesson tidak ditemukan -->
+          <div key="notfound" v-else class="not-found">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <p>Materi tidak ditemukan. Pastikan URL Anda benar.</p>
+          </div>
+        </transition>
       </main>
     </div>
 
@@ -110,7 +118,7 @@ import { useCodeRunner } from '../composables/useCodeRunner'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useScoring } from '../composables/useScoring'
 
-import BackgroundEffects from '../components/common/BackgroundEffects.vue'
+import SimpleBackground from '../components/common/SimpleBackground.vue'
 import WorkspaceTopbar from '../components/workspace/WorkspaceTopbar.vue'
 import WorkspaceSidebar from '../components/workspace/WorkspaceSidebar.vue'
 import TheoryPanel from '../components/workspace/TheoryPanel.vue'
@@ -216,6 +224,11 @@ const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, cur
     if (codeWithoutComments.includes('___')) return false;
   }
 
+  // Anti-cheat: Jika kode sama persis dengan template (belum ada perubahan)
+  if (lessonPractice && currentCode.trim() === lessonPractice.trim()) {
+    return false;
+  }
+
   if (['html', 'css', 'sql'].includes(lessonLanguage)) return true;
   if (!lessonPractice) return true;
   
@@ -307,6 +320,43 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
 }
 
 
+const onQuizSubmit = async () => {
+  if (!isLoggedIn.value) {
+    requireAuth(STEP.PRACTICE)
+    return
+  }
+  quiz.isChecking.value = true
+  
+  // Panggil backend
+  const result = await scoring.awardXp('quiz', currentLesson.value.id, { 
+    answer_index: quiz.selectedAnswer.value 
+  })
+  
+  quiz.isChecking.value = false
+  quiz.isSubmitted.value = true
+  
+  if (quiz.isChecking) quiz.isChecking.value = false;
+  quiz.isSubmitted.value = true;
+  
+  // GUNAKAN RESULT.SUCCESS SEBAGAI PENENTU KEBENARAN
+  if (result.success) {
+    // Jawaban Benar (Backend mengembalikan 200 OK)
+    quiz.isCorrect.value = true
+    if (result.explanation && currentLesson.value.quizzes?.[0]) {
+      currentLesson.value.quizzes[0].explanation = result.explanation
+    }
+    if (result.awarded) {
+      showXpToast(result.xp, 'Quiz Benar!', 'quiz')
+    }
+  } else {
+    // Jawaban Salah (Backend mengembalikan 400 Error)
+    quiz.isCorrect.value = false
+    if (result.error) {
+      quiz.errorMessage.value = result.error
+    }
+  }
+}
+
 const onRequestNextFromTheory = async () => {
   if (!isLoggedIn.value) {
     requireAuth(STEP.QUIZ)
@@ -315,8 +365,8 @@ const onRequestNextFromTheory = async () => {
   
   if (currentLesson.value) {
     currentLesson.value.isCompleted = true
-    // Beritahu backend bahwa theory sudah dibaca agar status tersimpan (persist)
-    await scoring.awardXp('theory', currentLesson.value.id)
+    // Beritahu backend (berjalan di background, tidak memblokir UI)
+    scoring.awardXp('theory', currentLesson.value.id).catch(console.error)
   }
   activeStep.value = STEP.QUIZ
 }
@@ -329,14 +379,6 @@ const onRequestNextFromQuiz = async () => {
   // Simulate progress unlocking
   if (currentLesson.value) {
     currentLesson.value.quizPassed = true
-  }
-
-  // Award XP untuk quiz benar (hanya sekali per lesson)
-  if (currentLesson.value) {
-    const result = await scoring.awardXp('quiz', currentLesson.value.id)
-    if (result.awarded) {
-      showXpToast(result.xp, 'Quiz Benar!', 'quiz')
-    }
   }
 
   runner.resetCode(currentLesson.value?.practice)
@@ -391,14 +433,12 @@ const onPracticeFinish = async () => {
 
 const goToLogin = () => {
   showAuthModal.value = false
-  // Arahkan ke halaman login — sesuaikan route jika sudah ada
-  router.push('/?auth=login')
+  router.push('/login')
 }
 
 const goToRegister = () => {
   showAuthModal.value = false
-  // Arahkan ke halaman daftar — sesuaikan route jika sudah ada
-  router.push('/?auth=register')
+  router.push('/register')
 }
 
 // Lesson berubah → reset semua state
@@ -419,3 +459,19 @@ watch(currentLesson, (newLesson) => {
 
 
 <style src="../assets/css/pages/LessonView.css" scoped></style>
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>

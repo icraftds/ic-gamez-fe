@@ -17,18 +17,38 @@
               :key="optIndex"
               class="option-btn"
               :class="getOptionClass(optIndex, question.answerIndex)"
-              :disabled="isSubmitted"
+              :disabled="isSubmitted || isChecking"
               @click="$emit('update:selectedAnswer', optIndex)"
             >
               <span class="option-letter">{{ String.fromCharCode(65 + optIndex) }}</span>
-              {{ option }}
+              <span style="flex: 1;">{{ option }}</span>
+              <i v-if="isSubmitted && selectedAnswer === optIndex && !isCorrect" class="fa-solid fa-times-circle" style="color: #ef4444; font-size: 1.2rem;"></i>
+              <i v-if="isSubmitted && isCorrect && selectedAnswer === optIndex" class="fa-solid fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>
             </button>
           </div>
 
           <!-- Feedback after submit -->
-          <div v-if="isSubmitted" class="feedback" :class="isCorrect ? 'correct' : 'wrong'">
+          <div v-if="isSubmitted && (question.explanation || (!isCorrect && errorMessage))" class="feedback" :class="isCorrect ? 'correct' : 'wrong'">
             <i :class="isCorrect ? 'fa-solid fa-check-circle' : 'fa-solid fa-times-circle'"></i>
-            {{ question.explanation }}
+            {{ isCorrect ? question.explanation : errorMessage }}
+          </div>
+
+          <!-- Hint Section (Button & Display) right below options/feedback -->
+          <div v-if="!isCorrect && !hintText" style="margin-top: 15px;">
+            <button 
+              class="nav-btn hint-btn" 
+              @click="openHint" 
+              :disabled="isHintLoading"
+              style="width: 100%; justify-content: center;"
+            >
+              <i v-if="isHintLoading" class="fa-solid fa-spinner fa-spin"></i>
+              <i v-else class="fa-solid fa-lightbulb"></i> Buka Hint (⚡1)
+            </button>
+          </div>
+
+          <div v-if="hintText" class="hint-display-inline" style="margin: 15px 0 0 0;">
+            <h4><i class="fa-solid fa-lightbulb"></i> Hint:</h4>
+            <div class="hint-content" v-html="hintText"></div>
           </div>
         </div>
       </div>
@@ -41,18 +61,21 @@
     </section>
 
     <footer class="panel-footer">
-      <button class="nav-btn prev-btn" @click="$emit('back')">
-        <i class="fa-solid fa-arrow-left"></i> Kembali
-      </button>
+      <div class="footer-left">
+        <button class="nav-btn prev-btn" @click="$emit('back')">
+          <i class="fa-solid fa-arrow-left"></i> Kembali
+        </button>
+      </div>
 
-      <!-- State: belum submit, ada soal -->
+      <div class="footer-right">
       <button
         v-if="hasQuestions && !isSubmitted"
         class="nav-btn submit-btn"
-        :disabled="selectedAnswer === null"
+        :disabled="selectedAnswer === null || isChecking"
         @click="$emit('submit')"
       >
-        Cek Jawaban
+        <i v-if="isChecking" class="fa-solid fa-spinner fa-spin"></i>
+        {{ isChecking ? 'Mengecek...' : 'Cek Jawaban' }}
       </button>
 
       <!-- State: sudah submit, salah -->
@@ -72,29 +95,76 @@
       >
         Lanjut ke Praktik <i class="fa-solid fa-arrow-right"></i>
       </button>
+      </div>
     </footer>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import { marked } from 'marked'
+import api from '../../services/api'
+import { useUserAccount } from '../../composables/useUserAccount'
 
 const props = defineProps({
+  lesson: { type: Object, default: () => ({}) },
   quiz: { type: Array, required: true },
   selectedAnswer: { type: Number, default: null },
   isSubmitted: { type: Boolean, default: false },
   isCorrect: { type: Boolean, default: false },
+  isChecking: { type: Boolean, default: false },
+  errorMessage: { type: String, default: '' },
 })
 
 defineEmits(['back', 'submit', 'retry', 'next', 'update:selectedAnswer'])
 
 const hasQuestions = computed(() => props.quiz && props.quiz.length > 0)
 
-const getOptionClass = (optIndex, correctIndex) => ({
-  selected: props.selectedAnswer === optIndex,
-  correct: props.isSubmitted && optIndex === correctIndex,
-  wrong: props.isSubmitted && props.selectedAnswer === optIndex && optIndex !== correctIndex,
-})
+const getOptionClass = (optIndex, correctIndex) => {
+  // Karena backend tidak mengirimkan jawaban benar secara langsung (anti-cheat),
+  // kita menentukan indeks benar dari jawaban pengguna ketika divalidasi berhasil.
+  const actualCorrectIndex = props.isCorrect ? props.selectedAnswer : correctIndex;
+
+  return {
+    selected: props.selectedAnswer === optIndex,
+    correct: props.isSubmitted && optIndex === actualCorrectIndex,
+    wrong: props.isSubmitted && props.selectedAnswer === optIndex && optIndex !== actualCorrectIndex,
+  }
+}
+
+const hintText = ref(null)
+const isHintLoading = ref(false)
+const { credits } = useUserAccount()
+
+const openHint = async () => {
+  const quizId = props.quiz && props.quiz[0] ? props.quiz[0].id : null;
+  if (!quizId) return;
+
+  isHintLoading.value = true
+  try {
+    const res = await api.post(`/hints/quiz/${quizId}`)
+    if (res.data && res.data.hint) {
+      hintText.value = marked.parse(res.data.hint || 'Tidak ada hint tersedia.')
+      
+      // Update saldo hint premium atau energi user
+      if (res.data.remaining_credits !== undefined) {
+        credits.value = res.data.remaining_credits
+      }
+    } else {
+      hintText.value = marked.parse('Tidak ada hint tersedia.')
+    }
+  } catch (error) {
+    if (error.response?.status === 403) {
+      alert(error.response?.data?.message || 'Energi Anda habis. Silakan top-up atau upgrade ke PRO.')
+    } else if (error.response?.status === 400) {
+      alert(error.response?.data?.message || 'Gagal membuka hint.')
+    } else {
+      alert('Gagal mengambil hint.')
+    }
+  } finally {
+    isHintLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -243,4 +313,56 @@ const getOptionClass = (optIndex, correctIndex) => ({
 
 .next-btn { background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; }
 .next-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ── Footer layout & Hint ── */
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hint-btn {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.hint-btn:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.2);
+  color: white;
+}
+
+.hint-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint-display-inline {
+  flex: 1;
+  margin: 0 20px;
+  padding: 8px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 4px solid #fbbf24;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.hint-display-inline h4 {
+  margin: 0 0 4px 0;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.hint-content {
+  color: #cbd5e1;
+  line-height: 1.4;
+}
 </style>

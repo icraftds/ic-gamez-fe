@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import BackgroundEffects from '../components/common/BackgroundEffects.vue'
+import SimpleBackground from '../components/common/SimpleBackground.vue'
 import DashboardHome from '../components/dashboard/DashboardHome.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
@@ -45,7 +45,7 @@ const tabs = [
 
 <template>
   <div class="dashboard-view">
-    <BackgroundEffects :show-orb3="true" />
+    <SimpleBackground />
     
     <!-- Dashboard Navbar -->
     <nav class="dash-navbar">
@@ -70,10 +70,10 @@ const tabs = [
       <div class="dash-nav-right">
         <div class="credits-indicator" v-if="!isPremiumUser">
           <i class="fa-solid fa-bolt text-warning"></i>
-          <span>{{ credits }}/{{ maxCredits }}</span>
+          <span>{{ credits }}</span>
         </div>
         <div class="premium-badge-nav" v-else>
-          <i class="fa-solid fa-crown"></i> PRO
+          <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
         </div>
         <button class="icon-btn"><i class="fa-solid fa-moon"></i></button>
         <button class="icon-btn"><i class="fa-solid fa-bell"></i></button>

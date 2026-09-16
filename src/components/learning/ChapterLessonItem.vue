@@ -10,7 +10,7 @@
       </div>
       <div class="lesson-title">
         {{ lesson.title }}
-        <span v-if="lesson.isPremium" class="premium-badge"><i class="fa-solid fa-lock"></i> PRO</span>
+        <span v-if="lesson.is_premium && !isPremiumUser" class="premium-badge"><i class="fa-solid fa-lock"></i> PRO</span>
       </div>
       <div class="lesson-action-icon">
         <i class="fa-solid fa-arrow-right"></i>
@@ -20,11 +20,15 @@
 </template>
 
 <script setup>
+import { useUserAccount } from '../../composables/useUserAccount'
+
 defineProps({
   lesson: { type: Object, required: true }
 })
 
 defineEmits(['step-click'])
+
+const { isPremiumUser } = useUserAccount()
 </script>
 
 <style scoped>

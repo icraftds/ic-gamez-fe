@@ -38,14 +38,33 @@
       </div>
 
       <footer class="instruction-footer">
-        <button class="nav-btn prev-btn" @click="$emit('back')">
-          <i class="fa-solid fa-arrow-left"></i> Kembali
-        </button>
+        <div class="footer-left">
+          <button class="nav-btn prev-btn" @click="$emit('back')">
+            <i class="fa-solid fa-arrow-left"></i> Kembali
+          </button>
+          
+          <button 
+            v-if="!hintText" 
+            class="nav-btn hint-btn" 
+            @click="openHint" 
+            :disabled="isHintLoading"
+          >
+            <i v-if="isHintLoading" class="fa-solid fa-spinner fa-spin"></i>
+            <i v-else class="fa-solid fa-lightbulb"></i> Buka Hint (⚡1)
+          </button>
+        </div>
+
         <button class="nav-btn finish-btn" @click="$emit('finish')">
           <i class="fa-solid fa-check"></i>
           {{ isLastLesson ? 'Selesai' : 'Selesai & Lanjut' }}
         </button>
       </footer>
+      
+      <!-- Hint Display Section -->
+      <div v-if="hintText" class="hint-display">
+        <h4><i class="fa-solid fa-lightbulb"></i> Hint:</h4>
+        <div class="hint-content" v-html="hintText"></div>
+      </div>
     </section>
 
     <!-- Right: Code Editor + Console -->
@@ -139,6 +158,8 @@ import { sql } from '@codemirror/lang-sql'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
+import { useUserAccount } from '../../composables/useUserAccount'
+import api from '../../services/api'
 
 const props = defineProps({
   lesson: { type: Object, required: true },
@@ -153,6 +174,38 @@ const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'
 
 const activeOutputTab = ref('console')
 const isHtmlMode = computed(() => props.language === 'html' || props.language === 'css')
+
+const hintText = ref(null)
+const isHintLoading = ref(false)
+const { credits } = useUserAccount()
+
+const openHint = async () => {
+  if (!props.lesson || !props.lesson.id) return
+  isHintLoading.value = true
+  try {
+    const res = await api.post(`/hints/lesson/${props.lesson.id}`)
+    
+    // Perbaikan struktur dari res.data.data.hint_text menjadi res.data.hint
+    if (res.data && res.data.hint) {
+      hintText.value = marked.parse(res.data.hint || 'Tidak ada hint tersedia.')
+      if (res.data.remaining_credits !== undefined) {
+        credits.value = res.data.remaining_credits
+      }
+    } else {
+      hintText.value = marked.parse('Tidak ada hint tersedia.')
+    }
+  } catch (error) {
+    if (error.response?.status === 403) {
+      alert(error.response?.data?.message || 'Energi Anda habis. Silakan top-up atau upgrade ke PRO.')
+    } else if (error.response?.status === 400) {
+      alert(error.response?.data?.message || 'Gagal membuka hint.')
+    } else {
+      alert('Gagal mengambil hint.')
+    }
+  } finally {
+    isHintLoading.value = false
+  }
+}
 
 watch(() => props.output, (newOutput) => {
   // Pindah ke tab preview secara otomatis jika HTML dirender sukses
@@ -189,9 +242,9 @@ const practiceSections = computed(() => {
   for (let line of lines) {
     let t = line.trim()
     // Match //, <!--, /*, or #
-    if (t.startsWith('//') || t.startsWith('<!--') || t.startsWith('/*') || t.startsWith('#')) {
-      let cleaned = t.replace(/^(?:\/\/|<!--|\/\*|#)\s*/, '')
-                     .replace(/(?:-->|\*\/)\s*$/, '')
+    if (t.startsWith('//') || t.startsWith('<' + '!--') || t.startsWith('/*') || t.startsWith('#')) {
+      let cleaned = t.replace(/^(?:\/\/|<\!--|\/\*|#)\s*/, '')
+                     .replace(/(?:--\>|\*\/)\s*$/, '')
       commentLines.push(cleaned.trim())
     } else if (t !== '') {
       break
@@ -608,4 +661,48 @@ const editorExtensions = computed(() => {
   border-bottom: 1px solid rgba(245, 158, 11, 0.3);
 }
 
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hint-btn {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.hint-btn:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.2);
+  color: white;
+}
+
+.hint-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint-display {
+  margin: 16px 36px;
+  padding: 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 4px solid #fbbf24;
+  border-radius: 8px;
+}
+
+.hint-display h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hint-content {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
 </style>

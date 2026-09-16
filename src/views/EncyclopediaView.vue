@@ -1,6 +1,6 @@
 <template>
   <div class="encyclopedia-view">
-    <BackgroundEffects :show-orb3="true" />
+    <SimpleBackground />
     <HomeNavbar />
 
     <div class="container" style="margin-top: 40px">
@@ -47,7 +47,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import BackgroundEffects from '../components/common/BackgroundEffects.vue'
+import SimpleBackground from '../components/common/SimpleBackground.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ArticleReader from '../components/encyclopedia/ArticleReader.vue'
 import api from '../services/api'

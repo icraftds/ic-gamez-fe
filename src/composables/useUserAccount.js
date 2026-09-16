@@ -68,6 +68,9 @@ export function useUserAccount() {
       return { success: true }
     } catch (error) {
       console.error('Login failed:', error)
+      if (error.response?.status === 429) {
+        return { success: false, message: 'Terlalu banyak percobaan masuk. Mohon tunggu 1 menit sebelum mencoba lagi.' }
+      }
       const message = error.response?.data?.message || 'Email atau kata sandi salah'
       return { success: false, message }
     } finally {
@@ -87,6 +90,9 @@ export function useUserAccount() {
       return { success: true }
     } catch (error) {
       console.error('Register failed:', error)
+      if (error.response?.status === 429) {
+        return { success: false, message: 'Terlalu banyak percobaan pendaftaran. Mohon tunggu 1 menit sebelum mencoba lagi.' }
+      }
       const message = error.response?.data?.message || 'Pendaftaran gagal'
       const errors = error.response?.data?.errors || {}
       return { success: false, message, errors }
@@ -140,47 +146,27 @@ export function useUserAccount() {
     return false
   }
 
-  const upgradeToPremium = async () => {
-    try {
-      await api.post('/subscription/upgrade')
-      await fetchUser()
-      alert('Selamat! Akun kamu berhasil di-upgrade ke Premium 🎉')
-      return { success: true }
-    } catch (error) {
-      console.error('Upgrade failed', error)
-      const message = error.response?.data?.message || 'Upgrade gagal. Silakan coba lagi.'
-      alert(message)
-      return { success: false, message }
-    }
-  }
+  // upgradeToPremium dihapus sesuai PRD baru, gunakan checkoutPlan.
 
   const checkoutPlan = async (planId, couponCode = '') => {
     try {
       isLoading.value = true
       
-      // Mock latency
-      await new Promise(resolve => setTimeout(resolve, 800))
-      
-      if (couponCode) {
-        // Mock coupon validation
-        const validCoupons = ['ICRAFTPRO', 'EXPERT100', 'FREEBIE']
-        if (validCoupons.includes(couponCode.toUpperCase())) {
-          // Valid coupon logic
-        } else {
-          throw new Error('Kupon tidak valid, sudah digunakan, atau kadaluarsa.')
-        }
+      const payload = {
+        plan_id: planId,
+        coupon_code: couponCode || null
       }
       
-      // Mock success update
-      isPremiumUser.value = true
-      currentPlan.value = planId
+      const response = await api.post('/subscription/checkout', payload)
       
-      alert(`Selamat! Akun kamu berhasil di-upgrade ke paket ${planId.toUpperCase()} 🎉`)
-      return { success: true }
+      // Update state setelah berhasil
+      await fetchUser() // fetch ulang data user untuk mengupdate is_premium dan current_plan
+      
+      return { success: true, message: response.data.message || `Selamat! Pembayaran berhasil.` }
     } catch (error) {
       console.error('Checkout failed', error)
-      const message = error.message || 'Pembayaran gagal. Silakan coba lagi.'
-      alert(message)
+      const message = error.response?.data?.message || 'Pembayaran gagal. Silakan coba lagi.'
+      // alert(message) // Opsional, UI akan menangani error ini
       return { success: false, message }
     } finally {
       isLoading.value = false
@@ -216,7 +202,6 @@ export function useUserAccount() {
     isPremiumUser,
     currentPlan,
     deductCredit,
-    upgradeToPremium,
     checkoutPlan,
     resetCredits,
     hasEnoughCredits,
