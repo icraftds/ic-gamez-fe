@@ -6,7 +6,10 @@
           <div class="icon-wrapper" :style="{ backgroundColor: themeColor + '15', color: themeColor, border: `1px solid ${themeColor}40` }">
             <i :class="path.icon"></i>
           </div>
-          <span class="path-title" :style="{ color: themeColor }">{{ path.title }}</span>
+          <span class="path-title" :style="{ color: themeColor }">
+            {{ path.title }}
+            <i v-if="path.isPremium" class="fa-solid" :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'" style="margin-left: 5px;"></i>
+          </span>
         </div>
         
         <h3 class="headline">Mulai perjalanan <span class="highlight" :style="{ color: themeColor }">{{ path.title }}</span> Anda.</h3>
@@ -62,6 +65,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLearningPaths } from '../../composables/useLearningPaths'
+import { useUserAccount } from '../../composables/useUserAccount'
 
 const props = defineProps({
   path: {
@@ -76,6 +80,7 @@ const props = defineProps({
 
 const router = useRouter()
 const { fetchPathDetails, isPreparingLesson } = useLearningPaths()
+const { isPremiumUser } = useUserAccount()
 
 // Calculate sticky top offset
 const cardStyle = computed(() => {

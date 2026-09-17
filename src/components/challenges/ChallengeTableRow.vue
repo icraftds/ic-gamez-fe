@@ -6,7 +6,7 @@
     <td>
       {{ challenge.title }}
       <span v-if="challenge.isPremium" class="badge badge-premium">
-        <i class="fa-solid fa-lock" v-if="!isPremiumUser"></i> Premium
+        <i class="fa-solid" :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'"></i> Premium
       </span>
     </td>
     <td>{{ challenge.category }}</td>

@@ -32,8 +32,7 @@ const router = createRouter({
     {
       path: '/challenges',
       name: 'challenges',
-      component: () => import('./views/ChallengesView.vue'),
-      meta: { requiresAuth: true }
+      component: () => import('./views/ChallengesView.vue')
     },
     {
       path: '/dashboard',

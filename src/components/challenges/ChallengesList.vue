@@ -80,11 +80,11 @@ import { useUserAccount } from "../../composables/useUserAccount.js";
 import ChallengeTableRow from "./ChallengeTableRow.vue";
 import api from "../../services/api.js";
 
-const emit = defineEmits(['require-premium']);
+const emit = defineEmits(['require-premium', 'require-auth']);
 
 const router = useRouter();
 const { paths, fetchPaths } = useLearningPaths();
-const { isPremiumUser, deductCredit } = useUserAccount();
+const { isPremiumUser, deductCredit, isLoggedIn } = useUserAccount();
 
 const selectedCategory = ref("");
 const currentPage = ref(1);
@@ -177,6 +177,11 @@ watch(selectedCategory, () => {
 });
 
 const openChallenge = (challenge) => {
+  if (!isLoggedIn.value) {
+    emit('require-auth');
+    return;
+  }
+
   if (challenge.isPremium && !isPremiumUser.value) {
     emit('require-premium');
     return;

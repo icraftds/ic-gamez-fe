@@ -14,7 +14,7 @@
           <i class="fa-solid fa-lock"></i> TAHAP MVP
         </div>
         <div v-else-if="path.isPremium" class="premium-badge-float">
-          <i class="fa-solid fa-crown"></i> PRO
+          <i class="fa-solid" :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'"></i> PRO
         </div>
       </div>
       
@@ -41,6 +41,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useUserAccount } from '../../composables/useUserAccount'
 
 const props = defineProps({
   path: {
@@ -54,6 +55,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['click'])
+
+const { isPremiumUser } = useUserAccount()
 
 const handleClick = () => {
   if (!props.path.isLocked) {
