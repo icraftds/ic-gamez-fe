@@ -36,30 +36,26 @@
         <button 
           class="sub-item" 
           :class="{
-            'is-active': isActive && activeStep === 2, 
-            'locked': !lesson.isCompleted
+            'is-active': isActive && activeStep === 2
           }" 
           @click="$emit('step-click', 'quiz')"
         >
           <i class="fa-solid fa-circle-question sub-icon quiz-icon"></i>
           <span class="sub-label">Tes</span>
-          <i v-if="!lesson.isCompleted" class="fa-solid fa-lock sub-status-icon locked"></i>
-          <i v-else-if="lesson.quizPassed" class="fa-solid fa-check sub-status-icon completed"></i>
+          <i v-if="lesson.quizPassed" class="fa-solid fa-check sub-status-icon completed"></i>
         </button>
 
         <!-- Praktik -->
         <button 
           class="sub-item" 
           :class="{
-            'is-active': isActive && activeStep === 3, 
-            'locked': !lesson.quizPassed
+            'is-active': isActive && activeStep === 3
           }" 
           @click="$emit('step-click', 'practice')"
         >
           <i class="fa-solid fa-code sub-icon practice-icon"></i>
           <span class="sub-label">Praktik</span>
-          <i v-if="!lesson.quizPassed" class="fa-solid fa-lock sub-status-icon locked"></i>
-          <i v-else-if="lesson.practiceDone" class="fa-solid fa-check sub-status-icon completed"></i>
+          <i v-if="lesson.practiceDone" class="fa-solid fa-check sub-status-icon completed"></i>
         </button>
       </div>
     </Transition>
