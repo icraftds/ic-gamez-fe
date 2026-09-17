@@ -415,6 +415,7 @@ const onPracticeRun = async () => {
 /** Selesai & Lanjut dari practice. Pastikan XP diberikan juga. */
 const onPracticeFinish = async () => {
   if (currentLesson.value) {
+    currentLesson.value.practiceDone = true
     // Beri XP jika belum pernah (misal user langsung klik finish)
     const result = await scoring.awardXp('practice', currentLesson.value.id)
     if (result.awarded) {

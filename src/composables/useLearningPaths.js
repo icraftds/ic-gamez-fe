@@ -33,6 +33,10 @@ export function useLearningPaths() {
       // Update or insert the detailed path into our state
       const detailedPath = response.data.data
 
+      // Try loading global progress first to fill in missing progress
+      const { loadProgress, hasBeenScored } = (await import('./useScoring')).useScoring();
+      await loadProgress();
+
       // Normalize progress fields for frontend reactivity
       if (detailedPath.chapters) {
         detailedPath.chapters.forEach(chapter => {
@@ -43,9 +47,9 @@ export function useLearningPaths() {
                 lesson.quizPassed = lesson.progress.quiz_passed || false;
                 lesson.practiceDone = !!lesson.progress.saved_code;
               } else {
-                lesson.isCompleted = false;
-                lesson.quizPassed = false;
-                lesson.practiceDone = false;
+                lesson.isCompleted = hasBeenScored('theory', lesson.id) || false;
+                lesson.quizPassed = hasBeenScored('quiz', lesson.id) || false;
+                lesson.practiceDone = hasBeenScored('practice', lesson.id) || false;
               }
             });
           }

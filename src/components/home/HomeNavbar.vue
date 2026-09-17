@@ -41,7 +41,7 @@
           </router-link>
           <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
         </template>
-          <router-link to="/login" class="btn-login" @click="mobileMenuOpen = false">Masuk / Daftar</router-link>
+        <router-link v-else to="/login" class="btn-login" @click="mobileMenuOpen = false">Masuk / Daftar</router-link>
       </div>
     </div>
 
