@@ -3,8 +3,8 @@ import axios from 'axios';
 // Konfigurasi instance Axios
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
-  withCredentials: true, // Wajib untuk Sanctum SPA authentication (menyertakan cookie CORS)
-  withXSRFToken: true, // Wajib untuk Axios versi modern agar mengirim header X-XSRF-TOKEN pada request cross-origin
+  withCredentials: true, 
+  withXSRFToken: true, 
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
