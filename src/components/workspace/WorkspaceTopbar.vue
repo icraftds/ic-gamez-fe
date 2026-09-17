@@ -253,8 +253,10 @@ defineEmits(['back'])
     padding: 10px 12px; 
     flex-wrap: wrap; 
     gap: 8px; 
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    width: 100%;
   }
   .topbar-left { flex: 1; min-width: 0; }
   .breadcrumb-path { display: none; }

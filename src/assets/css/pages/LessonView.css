@@ -52,6 +52,7 @@
   .workspace-body { 
     flex-direction: column; 
     overflow: visible; 
+    padding-top: 56px; /* Offset for fixed topbar */
   }
   .workspace-main { 
     padding-left: 44px; 
