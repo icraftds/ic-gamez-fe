@@ -54,13 +54,7 @@
           </button>
         </div>
 
-        <button 
-          class="nav-btn finish-btn" 
-          @click="$emit('finish')"
-          :disabled="runStatus !== 'success'"
-          :title="runStatus !== 'success' ? 'Jalankan kode dan pastikan berhasil sebelum lanjut' : ''"
-          :class="{ 'disabled-btn': runStatus !== 'success' }"
-        >
+        <button class="nav-btn finish-btn" @click="handleFinishClick">
           <i class="fa-solid fa-check"></i>
           {{ isLastLesson ? 'Selesai' : 'Selesai & Lanjut' }}
         </button>
@@ -179,6 +173,14 @@ const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'
 
 const activeOutputTab = ref('console')
 const isHtmlMode = computed(() => props.language === 'html' || props.language === 'css')
+
+const handleFinishClick = () => {
+  if (props.runStatus !== 'success') {
+    alert('Kerjakan soal terlebih dahulu!')
+    return
+  }
+  emit('finish')
+}
 
 const hintText = ref(null)
 const isHintLoading = ref(false)
