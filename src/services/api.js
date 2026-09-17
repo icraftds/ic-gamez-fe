@@ -42,9 +42,10 @@ api.interceptors.response.use(
 
     // Tangani error 401 Unauthorized secara global
     if (error.response && error.response.status === 401) {
-      // Jika error 401 berasal dari '/auth/me', abaikan redirect.
-      // Ini wajar karena user guest (belum login) memang akan mendapat 401 saat dicek status login-nya di awal (App.vue).
-      if (error.config && error.config.url === '/auth/me') {
+      // Jika error 401 berasal dari '/auth/me' atau '/challenges', abaikan redirect.
+      // Ini wajar karena user guest (belum login) memang akan mendapat 401 saat dicek status login-nya di awal (App.vue),
+      // dan halaman Tantangan (Challenges) bisa dilihat oleh guest tanpa harus di-redirect paksa.
+      if (error.config && (error.config.url === '/auth/me' || error.config.url.includes('/challenges'))) {
         return Promise.reject(error);
       }
 
