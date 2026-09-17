@@ -12,6 +12,7 @@
         <p>Mempersiapkan materi belajar...</p>
       </div>
     </div>
+    <AppToast />
   </div>
 </template>
 
@@ -19,6 +20,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppFooter from './components/common/AppFooter.vue'
+import AppToast from './components/common/AppToast.vue'
 import { useUserAccount } from './composables/useUserAccount'
 import { useLearningPaths } from './composables/useLearningPaths'
 

@@ -158,7 +158,10 @@ import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
 import { useUserAccount } from '../../../composables/useUserAccount'
+import { useToast } from '../../../composables/useToast'
 import api from '../../../services/api'
+
+const { showToast } = useToast()
 
 const props = defineProps({
   lesson: { type: Object, required: true },
@@ -176,7 +179,7 @@ const isHtmlMode = computed(() => props.language === 'html' || props.language ==
 
 const handleFinishClick = () => {
   if (props.runStatus !== 'success') {
-    alert('Kerjakan soal terlebih dahulu!')
+    showToast('Kerjakan soal terlebih dahulu!', 'warning')
     return
   }
   emit('finish')
@@ -203,11 +206,11 @@ const openHint = async () => {
     }
   } catch (error) {
     if (error.response?.status === 403) {
-      alert(error.response?.data?.message || 'Energi Anda habis. Silakan top-up atau upgrade ke PRO.')
+      showToast(error.response?.data?.message || 'Energi Anda habis. Silakan top-up atau upgrade ke PRO.', 'warning')
     } else if (error.response?.status === 400) {
-      alert(error.response?.data?.message || 'Gagal membuka hint.')
+      showToast(error.response?.data?.message || 'Gagal membuka hint.', 'error')
     } else {
-      alert('Gagal mengambil hint.')
+      showToast('Gagal mengambil hint.', 'error')
     }
   } finally {
     isHintLoading.value = false

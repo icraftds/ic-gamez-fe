@@ -90,8 +90,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
+import { useToast } from '../composables/useToast'
 
 const { register, isLoading } = useUserAccount()
+const { showToast } = useToast()
 const router = useRouter()
 
 const errorMessage = ref('')
@@ -120,7 +122,7 @@ const handleRegister = async () => {
 
 const handleGoogleLogin = () => {
   // To be integrated with backend
-  alert('Fitur Daftar dengan Google akan segera hadir!')
+  showToast('Fitur Daftar dengan Google akan segera hadir!', 'info')
 }
 </script>
 

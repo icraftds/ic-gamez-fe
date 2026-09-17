@@ -105,6 +105,9 @@ import { ref, computed } from 'vue'
 import { marked } from 'marked'
 import api from '../../services/api'
 import { useUserAccount } from '../../composables/useUserAccount'
+import { useToast } from '../../composables/useToast'
+
+const { showToast } = useToast()
 
 const props = defineProps({
   lesson: { type: Object, default: () => ({}) },
@@ -155,11 +158,11 @@ const openHint = async () => {
     }
   } catch (error) {
     if (error.response?.status === 403) {
-      alert(error.response?.data?.message || 'Energi Anda habis. Silakan top-up atau upgrade ke PRO.')
+      showToast(error.response?.data?.message || 'Energi Anda habis. Silakan top-up atau upgrade ke PRO.', 'warning')
     } else if (error.response?.status === 400) {
-      alert(error.response?.data?.message || 'Gagal membuka hint.')
+      showToast(error.response?.data?.message || 'Gagal membuka hint.', 'error')
     } else {
-      alert('Gagal mengambil hint.')
+      showToast('Gagal mengambil hint.', 'error')
     }
   } finally {
     isHintLoading.value = false
