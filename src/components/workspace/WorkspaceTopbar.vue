@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <img :src="userProfile.avatar" :alt="userProfile.name" class="avatar-sm" :title="'Masuk sebagai ' + userProfile.name">
+      <img :src="userProfile.avatar" :alt="userProfile.name" class="avatar-sm" :title="'Masuk sebagai ' + userProfile.name" />
     </div>
   </header>
 </template>
