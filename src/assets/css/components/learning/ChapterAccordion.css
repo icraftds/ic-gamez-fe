@@ -1,0 +1,41 @@
+.chapter-card {
+  background: rgba(20, 15, 40, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.chapter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.chapter-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.chapter-info h3 {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+}
+
+.chapter-info p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.chapter-content {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 20px 20px;
+}
+
+.empty-lesson {
+  text-align: center;
+  padding: 20px;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}

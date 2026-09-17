@@ -58,6 +58,11 @@ const router = createRouter({
       path: '/leaderboard',
       name: 'leaderboard',
       component: () => import('./views/LeaderboardView.vue')
+    },
+    {
+      path: '/pricing',
+      name: 'pricing',
+      component: () => import('./views/PricingView.vue')
     }
   ]
 })

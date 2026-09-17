@@ -26,13 +26,15 @@
       </div>
 
       <div class="nav-right">
-        <div class="credits-indicator" v-if="!isPremiumUser">
-          <i class="fa-solid fa-bolt text-warning"></i>
-          <span>{{ credits }}</span>
-        </div>
-        <div class="premium-badge" v-else>
-          <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
-        </div>
+        <template v-if="isLoggedIn">
+          <div class="credits-indicator" v-if="!isPremiumUser">
+            <i class="fa-solid fa-bolt text-warning"></i>
+            <span>{{ credits }}</span>
+          </div>
+          <div class="premium-badge" v-else>
+            <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
+          </div>
+        </template>
 
         <template v-if="isLoggedIn">
           <router-link to="/dashboard" class="user-profile-btn" @click="mobileMenuOpen = false">

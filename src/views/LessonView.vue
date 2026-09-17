@@ -123,7 +123,7 @@ import WorkspaceTopbar from '../components/workspace/WorkspaceTopbar.vue'
 import WorkspaceSidebar from '../components/workspace/WorkspaceSidebar.vue'
 const TheoryPanel = defineAsyncComponent(() => import('../components/workspace/TheoryPanel.vue'))
 const QuizPanel = defineAsyncComponent(() => import('../components/workspace/QuizPanel.vue'))
-const PracticePanel = defineAsyncComponent(() => import('../components/workspace/PracticePanel.vue'))
+const PracticePanel = defineAsyncComponent(() => import('../components/workspace/PracticePanel/PracticePanel.vue'))
 const AuthRequiredModal = defineAsyncComponent(() => import('../components/common/AuthRequiredModal.vue'))
 const PremiumModal = defineAsyncComponent(() => import('../components/common/PremiumModal.vue'))
 import XpToast from '../components/common/XpToast.vue'
@@ -460,19 +460,4 @@ watch(currentLesson, (newLesson) => {
 
 
 <style src="../assets/css/pages/LessonView.css" scoped></style>
-<style scoped>
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-</style>
+<style scoped src="../assets/css/views/LessonView.css"></style>

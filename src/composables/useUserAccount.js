@@ -1,9 +1,9 @@
 import { ref, computed } from 'vue'
 import api, { initCsrf } from '../services/api'
 
-const credits = ref(5)
-const maxCredits = 5
+const credits = ref(10)
 const isPremiumUser = ref(false)
+const maxCredits = computed(() => isPremiumUser.value ? 15 : 10)
 const currentPlan = ref('free')
 const isLoggedIn = ref(false)
 const isLoading = ref(false)
@@ -134,7 +134,7 @@ export function useUserAccount() {
         id: null, name: '', email: '', avatar: '',
         level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, joinDate: ''
       }
-      credits.value = 5
+      credits.value = 10
       isPremiumUser.value = false
       isLoading.value = false
     }
@@ -158,7 +158,11 @@ export function useUserAccount() {
     if (credits.value >= amount) {
       // Optimitic update
       credits.value -= amount
-      // TODO: Hit backend endpoint `/credits/deduct` if it exists
+      try {
+        await api.post('/user/deduct-credits', { amount })
+      } catch (error) {
+        console.error('Failed to deduct credits on backend', error)
+      }
       return true
     }
     return false
@@ -193,7 +197,7 @@ export function useUserAccount() {
 
   const resetCredits = () => {
     // Usually handled by backend cron job, but we leave this for local mock consistency if needed
-    credits.value = maxCredits
+    credits.value = maxCredits.value
   }
 
   const hasEnoughCredits = (amount = 1) => {

@@ -14,6 +14,4 @@ import ContinueLearning from './home/ContinueLearning.vue'
 import RecentActivity from './home/RecentActivity.vue'
 </script>
 
-<style scoped>
-/* Scoped styles are now encapsulated within individual sub-components */
-</style>
+<style scoped src="../../assets/css/components/dashboard/DashboardHome.css"></style>

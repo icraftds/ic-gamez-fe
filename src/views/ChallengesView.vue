@@ -33,28 +33,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-.challenges-view {
-  min-height: 100vh;
-  padding-bottom: 50px;
-}
-
-.layout {
-  display: flex;
-  gap: 30px;
-  margin-top: 40px;
-  flex-direction: row-reverse;
-}
-
-@media (max-width: 1024px) {
-  .layout { gap: 20px; }
-}
-
-@media (max-width: 768px) {
-  .layout {
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 20px;
-  }
-}
-</style>
+<style scoped src="../assets/css/views/ChallengesView.css"></style>

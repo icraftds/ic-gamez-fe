@@ -30,22 +30,4 @@ defineProps({
 defineEmits(['click'])
 </script>
 
-<style scoped>
-tr.is-premium-row {
-  opacity: 0.8;
-}
-
-.status-cell {
-  text-align: center;
-}
-
-.status-cell .completed {
-  color: #10b981;
-  font-size: 1.2rem;
-}
-
-.status-cell .pending {
-  color: #475569;
-  font-size: 1.2rem;
-}
-</style>
+<style scoped src="../../assets/css/components/challenges/ChallengeTableRow.css"></style>

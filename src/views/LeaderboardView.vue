@@ -24,9 +24,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-.leaderboard-view {
-  min-height: 100vh;
-  padding-bottom: 80px;
-}
-</style>
+<style scoped src="../assets/css/views/LeaderboardView.css"></style>

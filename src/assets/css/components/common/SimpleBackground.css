@@ -1,0 +1,12 @@
+.simple-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background: radial-gradient(circle at top right, rgba(147, 51, 234, 0.15), transparent 40%),
+              radial-gradient(circle at bottom left, rgba(0, 240, 255, 0.1), transparent 40%),
+              var(--bg-color, #05050f);
+  pointer-events: none;
+}
