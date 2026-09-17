@@ -5,7 +5,7 @@ export function useChallengesStats() {
   const { allChallenges } = useLearningPaths();
 
   const completedCount = computed(
-    () => allChallenges.value.filter((c) => c.isCompleted).length
+    () => allChallenges.value.filter((c) => c.isCompleted || c.practiceDone).length
   );
   
   const completionPercentage = computed(() => {
@@ -17,7 +17,7 @@ export function useChallengesStats() {
     const challenges = allChallenges.value.filter((c) => c.difficulty === diff);
     return {
       total: challenges.length,
-      completed: challenges.filter((c) => c.isCompleted).length,
+      completed: challenges.filter((c) => c.isCompleted || c.practiceDone).length,
     };
   };
 

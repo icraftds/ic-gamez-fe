@@ -42,18 +42,16 @@ api.interceptors.response.use(
 
     // Tangani error 401 Unauthorized secara global
     if (error.response && error.response.status === 401) {
-      // Jika error 401 berasal dari '/auth/me' atau '/challenges', abaikan redirect.
-      // Ini wajar karena user guest (belum login) memang akan mendapat 401 saat dicek status login-nya di awal (App.vue),
-      // dan halaman Tantangan (Challenges) bisa dilihat oleh guest tanpa harus di-redirect paksa.
-      if (error.config && (error.config.url === '/auth/me' || error.config.url.includes('/challenges'))) {
+      // Jika error 401 berasal dari '/auth/me', abaikan redirect karena wajar saat init App.vue
+      if (error.config && error.config.url === '/auth/me') {
         return Promise.reject(error);
       }
 
-      // Jika user tidak terautentikasi pada request lain (misal mencoba ambil data private)
-      const currentPath = window.location.pathname;
-      const isAuthPage = currentPath === '/login' || currentPath === '/register';
-      if (currentPath !== '/' && !isAuthPage) {
-        // Redirect smooth menggunakan router
+      // Bersihkan token yang tidak valid
+      localStorage.removeItem('auth_token');
+      
+      // Hanya redirect ke login jika halaman saat ini memang wajib login
+      if (router.currentRoute.value.meta && router.currentRoute.value.meta.requiresAuth) {
         router.push('/login');
       }
     }
@@ -66,21 +64,6 @@ api.interceptors.response.use(
  * sebelum melakukan request POST/PUT/DELETE.
  */
 export const initCsrf = async () => {
-  // -- KODE UNTUK MODE SANCTUM SPA (COOKIE) --
-  // Jika Anda kembali ke mode Cookie, hilangkan komentar blok try-catch di bawah ini:
-  
-  /*
-  try {
-    // Gunakan VITE_BASE_URL, hilangkan trailing slash jika ada, lalu sambungkan dengan /sanctum/csrf-cookie
-    const baseUrl = import.meta.env.VITE_BASE_URL.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');
-    await axios.get(`${baseUrl}/sanctum/csrf-cookie`, {
-      withCredentials: true
-    });
-  } catch (error) {
-    console.error('Gagal mengambil CSRF cookie:', error);
-  }
-  */
-
   // Untuk mode API Token (Bearer), fungsi ini tidak perlu melakukan apa-apa.
   return Promise.resolve();
 };
