@@ -33,7 +33,7 @@
             <span>{{ credits }}</span>
           </div>
           <div class="premium-badge" v-else>
-            <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
+            <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> {{ credits }} PRO
           </div>
         </template>
 

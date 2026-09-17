@@ -46,8 +46,8 @@
         <div class="stat-badge energy-badge" title="Sisa Energi" v-if="!isPremiumUser">
           <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
         </div>
-        <div class="stat-badge premium-badge" title="Akun PRO" v-else>
-          <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
+        <div class="stat-badge premium-badge" title="Akun PRO (Sisa Energi)" v-else>
+          <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> {{ credits }} PRO
         </div>
       </div>
 
