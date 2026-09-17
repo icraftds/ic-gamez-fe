@@ -100,7 +100,14 @@ const goToLesson = (chapterId, payload) => {
   const lesson = payload?.lesson ?? payload
   const step = payload?.step ?? 'theory'
 
-  if (lesson.is_premium && !isPremiumUser.value) {
+  const firstChapter = path.value?.chapters?.[0]
+  const firstLesson = firstChapter?.lessons?.[0]
+  
+  const isFirstLesson = firstChapter && firstLesson &&
+    (chapterId === firstChapter.id || chapterId === firstChapter.slug) &&
+    (lesson.id === firstLesson.id || lesson.slug === firstLesson.slug)
+
+  if (lesson.is_premium && !isPremiumUser.value && !isFirstLesson) {
     showPremiumModal.value = true
     return
   }
@@ -115,4 +122,3 @@ const goToLesson = (chapterId, payload) => {
 </script>
 
 <style scoped src="../assets/css/views/PathDetailView.css"></style>
-
