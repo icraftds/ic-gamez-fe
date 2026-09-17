@@ -1,4 +1,5 @@
 import axios from 'axios';
+import router from '../router';
 
 // Konfigurasi instance Axios
 const api = axios.create({
@@ -51,8 +52,8 @@ api.interceptors.response.use(
       const currentPath = window.location.pathname;
       const isAuthPage = currentPath === '/login' || currentPath === '/register';
       if (currentPath !== '/' && !isAuthPage) {
-        // Redirect ke halaman login yang baru
-        window.location.href = '/login';
+        // Redirect smooth menggunakan router
+        router.push('/login');
       }
     }
     return Promise.reject(error);

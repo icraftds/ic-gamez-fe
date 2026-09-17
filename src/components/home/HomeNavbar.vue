@@ -23,6 +23,7 @@
         <router-link to="/challenges" class="nav-link" :class="{ active: $route.path.startsWith('/challenges') }" @click="mobileMenuOpen = false">Tantangan</router-link>
         <router-link to="/encyclopedia" class="nav-link" :class="{ active: $route.path === '/encyclopedia' }" @click="mobileMenuOpen = false">Ensiklopedia</router-link>
         <router-link to="/leaderboard" class="nav-link" :class="{ active: $route.path === '/leaderboard' }" @click="mobileMenuOpen = false">Leaderboard</router-link>
+        <router-link to="/pricing" class="nav-link" :class="{ active: $route.path === '/pricing' }" @click="mobileMenuOpen = false">Paket</router-link>
       </div>
 
       <div class="nav-right">

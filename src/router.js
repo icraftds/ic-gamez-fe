@@ -32,12 +32,14 @@ const router = createRouter({
     {
       path: '/challenges',
       name: 'challenges',
-      component: () => import('./views/ChallengesView.vue')
+      component: () => import('./views/ChallengesView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import('./views/DashboardView.vue')
+      component: () => import('./views/DashboardView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/learning/:pathId',
@@ -47,7 +49,8 @@ const router = createRouter({
     {
       path: '/learning/:pathId/lesson/:chapterId/:lessonId',
       name: 'lesson',
-      component: () => import('./views/LessonView.vue')
+      component: () => import('./views/LessonView.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/encyclopedia',
@@ -65,6 +68,15 @@ const router = createRouter({
       component: () => import('./views/PricingView.vue')
     }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('auth_token')
+  if (to.meta.requiresAuth && !token) {
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 export default router

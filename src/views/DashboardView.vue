@@ -12,13 +12,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
 
 const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, upgradeToPremium, logout } = useUserAccount()
-const { hasFetchedAllPaths, fetchPaths } = useLearningPaths()
+const { hasFetchedAllPaths, fetchAllPathsDetails } = useLearningPaths()
 const route = useRoute()
 const router = useRouter()
 
 onMounted(() => {
   if (!hasFetchedAllPaths.value) {
-    fetchPaths()
+    fetchAllPathsDetails()
   }
 })
 
