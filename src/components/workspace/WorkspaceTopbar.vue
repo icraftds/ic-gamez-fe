@@ -249,7 +249,13 @@ defineEmits(['back'])
 }
 
 @media (max-width: 768px) {
-  .ws-topbar { padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
+  .ws-topbar { 
+    padding: 10px 12px; 
+    flex-wrap: wrap; 
+    gap: 8px; 
+    position: sticky;
+    top: 0;
+  }
   .topbar-left { flex: 1; min-width: 0; }
   .breadcrumb-path { display: none; }
   .breadcrumb .separator:first-of-type { display: none; }

@@ -368,8 +368,13 @@ const openHint = async () => {
 
 /* ── Mobile Responsiveness ── */
 @media (max-width: 768px) {
+  .quiz-panel {
+    overflow: visible;
+  }
+  
   .panel-content {
     padding: 20px 16px;
+    overflow-y: visible;
   }
   
   .panel-footer {

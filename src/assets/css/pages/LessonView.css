@@ -44,8 +44,18 @@
 }
 
 @media (max-width: 768px) {
-  .lesson-workspace { height: 100vh; height: -webkit-fill-available; }
-  .workspace-body { flex-direction: column; }
-  .workspace-main { padding-left: 44px; }
+  .lesson-workspace { 
+    height: auto; 
+    min-height: 100vh; 
+    overflow: visible; 
+  }
+  .workspace-body { 
+    flex-direction: column; 
+    overflow: visible; 
+  }
+  .workspace-main { 
+    padding-left: 44px; 
+    overflow: visible; 
+  }
 }
 

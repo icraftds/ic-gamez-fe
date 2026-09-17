@@ -185,8 +185,13 @@ defineEmits(['prev', 'next'])
 
 /* ── Mobile Responsiveness ── */
 @media (max-width: 768px) {
+  .theory-panel {
+    overflow: visible;
+  }
+  
   .panel-content {
     padding: 20px 16px;
+    overflow-y: visible;
   }
   
   .panel-footer {
