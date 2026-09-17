@@ -365,4 +365,32 @@ const openHint = async () => {
   color: #cbd5e1;
   line-height: 1.4;
 }
+
+/* ── Mobile Responsiveness ── */
+@media (max-width: 768px) {
+  .panel-content {
+    padding: 20px 16px;
+  }
+  
+  .panel-footer {
+    padding: 14px 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer-left,
+  .footer-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .nav-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .quiz-header h2 {
+    font-size: 1.25rem;
+  }
+}
 </style>

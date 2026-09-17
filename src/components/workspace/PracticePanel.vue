@@ -703,6 +703,42 @@ const editorExtensions = computed(() => {
 .hint-content {
   color: #cbd5e1;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.4;
+}
+
+/* ── Mobile Responsiveness ── */
+@media (max-width: 768px) {
+  .practice-panel {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .instruction-column {
+    width: 100%;
+    min-width: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(147, 51, 234, 0.15);
+    flex: none;
+  }
+
+  .instruction-content {
+    padding: 20px;
+  }
+  
+  .instruction-footer {
+    padding: 12px 20px;
+  }
+
+  .editor-column {
+    flex: none;
+    min-height: 500px;
+    height: auto;
+  }
+  
+  .console-section {
+    height: auto;
+    min-height: 150px;
+    max-height: 250px;
+  }
 }
 </style>

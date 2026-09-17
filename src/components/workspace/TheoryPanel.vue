@@ -182,4 +182,30 @@ defineEmits(['prev', 'next'])
   color: white;
 }
 .next-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ── Mobile Responsiveness ── */
+@media (max-width: 768px) {
+  .panel-content {
+    padding: 20px 16px;
+  }
+  
+  .panel-footer {
+    padding: 14px 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .nav-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .lesson-title {
+    font-size: 1.5rem;
+  }
+  
+  .lesson-body {
+    font-size: 1rem;
+  }
+}
 </style>
