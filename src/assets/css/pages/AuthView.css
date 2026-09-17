@@ -124,6 +124,7 @@
   font-size: 1.5rem;
   background: linear-gradient(135deg, #22d3ee, #8b5cf6);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 10px;
 }
@@ -341,3 +342,66 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .auth-panel-left {
+    padding: 40px 30px;
+  }
+  .auth-panel-right {
+    padding: 40px 30px;
+  }
+  .auth-panel-left h2 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-page {
+    align-items: flex-start; /* Prevent vertical cutoff when content is taller than screen */
+    padding: 80px 15px 30px; 
+  }
+  .auth-container {
+    flex-direction: column;
+    min-height: auto;
+    border-radius: 20px;
+  }
+  .auth-panel-left {
+    display: none; /* Hide illustration on small screens to save space */
+  }
+  .auth-panel-right {
+    padding: 30px 20px;
+    width: 100%;
+  }
+  .btn-back-auth {
+    top: 15px;
+    left: 15px;
+    font-size: 0.85rem;
+    padding: 8px 14px;
+    background: rgba(20, 15, 40, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 10; /* Ensure it stays above form */
+  }
+  .auth-header h2 {
+    font-size: 1.35rem;
+  }
+  .auth-header p {
+    font-size: 0.85rem;
+  }
+  .form-group label {
+    font-size: 0.85rem;
+  }
+  .input-wrapper input {
+    font-size: 0.9rem;
+    padding: 10px 15px 10px 40px;
+  }
+  .input-wrapper i {
+    font-size: 1rem;
+    left: 12px;
+  }
+  .btn-submit {
+    font-size: 0.95rem;
+    padding: 10px;
+  }
+}
+

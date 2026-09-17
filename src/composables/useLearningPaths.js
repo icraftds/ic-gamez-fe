@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue'
 import api from '../services/api'
 
-// State global agar data tidak hilang saat berpindah komponen
 const globalPaths = ref([])
 const globalIsLoading = ref(false)
 const globalIsPreparingLesson = ref(false)
