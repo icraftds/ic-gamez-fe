@@ -9,7 +9,11 @@
 export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, currentCode) => {
   // Pengecekan Universal: Jika masih ada "___" di bagian kode utama (abaikan komentar), berarti belum diisi!
   if (currentCode) {
-    const codeWithoutComments = currentCode.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const codeWithoutComments = currentCode
+      .replace(/\/\/.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/#.*$/gm, '');
     if (codeWithoutComments.includes('___')) return false;
   }
 
