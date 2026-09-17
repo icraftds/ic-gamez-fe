@@ -63,7 +63,13 @@ export function useUserAccount() {
     try {
       isLoading.value = true
       await initCsrf()
-      await api.post('/auth/login', { email, password })
+      const response = await api.post('/auth/login', { email, password })
+      
+      // Simpan token ke localStorage untuk Mode API Token
+      if (response.data && response.data.token) {
+        localStorage.setItem('auth_token', response.data.token)
+      }
+      
       await fetchUser()
       return { success: true }
     } catch (error) {
@@ -85,7 +91,13 @@ export function useUserAccount() {
     try {
       isLoading.value = true
       await initCsrf()
-      await api.post('/auth/register', { name, email, password, password_confirmation: password })
+      const response = await api.post('/auth/register', { name, email, password, password_confirmation: password })
+      
+      // Simpan token ke localStorage untuk Mode API Token
+      if (response.data && response.data.token) {
+        localStorage.setItem('auth_token', response.data.token)
+      }
+      
       await fetchUser() // Auto login
       return { success: true }
     } catch (error) {
@@ -111,6 +123,9 @@ export function useUserAccount() {
     } catch (error) {
       console.error('Logout error:', error)
     } finally {
+      // Hapus token dari localStorage saat logout
+      localStorage.removeItem('auth_token')
+      
       isLoggedIn.value = false
       userProfile.value = {
         id: null, name: '', email: '', avatar: '',

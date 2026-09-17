@@ -3,12 +3,27 @@ import axios from 'axios';
 // Konfigurasi instance Axios
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
-  withCredentials: true, 
-  withXSRFToken: true, 
+  
+  // -- KODE UNTUK MODE SANCTUM SPA (COOKIE) --
+  // Jika Anda menggunakan domain yang sama (misal app.unikom.my.id dan api.unikom.my.id), 
+  // hilangkan komentar pada dua baris di bawah ini:
+  // withCredentials: true, 
+  // withXSRFToken: true, 
+  // ------------------------------------------
+
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   }
+});
+
+// Request Interceptor untuk menyisipkan Bearer Token (Mode API Token)
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Interceptor Response
@@ -49,6 +64,10 @@ api.interceptors.response.use(
  * sebelum melakukan request POST/PUT/DELETE.
  */
 export const initCsrf = async () => {
+  // -- KODE UNTUK MODE SANCTUM SPA (COOKIE) --
+  // Jika Anda kembali ke mode Cookie, hilangkan komentar blok try-catch di bawah ini:
+  
+  /*
   try {
     // Gunakan VITE_BASE_URL, hilangkan trailing slash jika ada, lalu sambungkan dengan /sanctum/csrf-cookie
     const baseUrl = import.meta.env.VITE_BASE_URL.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');
@@ -58,6 +77,10 @@ export const initCsrf = async () => {
   } catch (error) {
     console.error('Gagal mengambil CSRF cookie:', error);
   }
+  */
+
+  // Untuk mode API Token (Bearer), fungsi ini tidak perlu melakukan apa-apa.
+  return Promise.resolve();
 };
 
 export default api;
