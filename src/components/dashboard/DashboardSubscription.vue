@@ -12,7 +12,7 @@
     <!-- Plan Selection -->
     <div v-else class="plans-container">
       <!-- Free Plan (Hardcoded default) -->
-      <div class="plan-card free" :class="{ active: currentPlan === 'free' || !currentPlan }">
+      <div class="plan-card free" :class="{ active: (currentPlan === 'free' || !currentPlan) && !isPremiumUser }">
         <div class="plan-header">
           <div class="plan-icon"><i class="fa-solid fa-paper-plane"></i></div>
           <h3>Free Plan</h3>
@@ -26,13 +26,13 @@
           <li class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
         </ul>
         <div class="plan-action">
-          <div v-if="currentPlan === 'free' || !currentPlan" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
+          <div v-if="(currentPlan === 'free' || !currentPlan) && !isPremiumUser" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
           <button v-else disabled class="btn-disabled">Paket Dasar</button>
         </div>
       </div>
 
       <!-- Dynamic Plans from API -->
-      <div v-for="plan in plans" :key="plan.id" class="plan-card" :class="[plan.slug, { active: currentPlan === plan.slug }]">
+      <div v-for="plan in plans" :key="plan.id" class="plan-card" :class="[plan.slug, { active: currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro') }]">
         <!-- Optional Badges based on slug -->
         <div v-if="plan.slug === 'pro'" class="badge-popular">Paling Populer</div>
         <div v-else-if="plan.slug === 'expert'" class="badge-premium">Premium</div>
@@ -55,7 +55,7 @@
         </ul>
         
         <div class="plan-action">
-          <div v-if="currentPlan === plan.slug" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
+          <div v-if="currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro')" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
           <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="selectPlan(plan)">Pilih {{ plan.name }}</button>
         </div>
       </div>
@@ -81,6 +81,11 @@
             <input type="text" v-model="couponCode" placeholder="Masukkan kode kupon" />
           </div>
           <p class="coupon-msg info">Diskon atau bonus durasi akan diterapkan secara otomatis saat Anda menekan tombol Bayar.</p>
+        </div>
+
+        <div v-if="isPremiumUser" class="checkout-warning-msg">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Perhatian: Sisa waktu dari paket Anda sebelumnya akan hangus jika Anda menyetujui pembelian ini.
         </div>
         
         <div v-if="checkoutErrorMessage" class="checkout-error-msg">
@@ -176,11 +181,6 @@ const formatPrice = (price) => {
 }
 
 const processCheckout = async () => {
-  if (isPremiumUser.value) {
-    const confirm = window.confirm("Perhatian: Sisa waktu dari paket Anda sebelumnya akan hangus jika Anda menyetujui pembelian ini. Lanjutkan?")
-    if (!confirm) return
-  }
-
   checkoutErrorMessage.value = ''
   checkoutSuccessMessage.value = ''
   // Panggil checkout dari composable
@@ -503,6 +503,23 @@ const processCheckout = async () => {
   font-size: 0.85rem;
   margin-top: 8px;
   color: #94a3b8;
+}
+
+.checkout-warning-msg {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.4;
+}
+.checkout-warning-msg i {
+  margin-top: 2px;
 }
 
 .checkout-error-msg {
