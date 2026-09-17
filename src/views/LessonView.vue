@@ -231,7 +231,14 @@ const requireAuth = (targetStep) => {
 
 // ── Handlers ─────────────────────────────────────────────────────
 const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
-  if (lesson.is_premium && !isPremiumUser.value) {
+  const firstChapter = path.value?.chapters?.[0]
+  const firstLesson = firstChapter?.lessons?.[0]
+  
+  const isClickedFirstLesson = firstChapter && firstLesson &&
+    (cId === firstChapter.id || cId === firstChapter.slug) &&
+    (lesson.id === firstLesson.id || lesson.slug === firstLesson.slug)
+
+  if (lesson.is_premium && !isPremiumUser.value && !isClickedFirstLesson) {
     showPremiumModal.value = true
     return
   }
@@ -361,15 +368,10 @@ const onPracticeRun = async () => {
   }
 }
 
-/** Selesai & Lanjut dari practice. Pastikan XP diberikan juga. */
+/** Selesai & Lanjut dari practice. */
 const onPracticeFinish = async () => {
   if (currentLesson.value) {
     currentLesson.value.practiceDone = true
-    // Beri XP jika belum pernah (misal user langsung klik finish)
-    const result = await scoring.awardXp('practice', currentLesson.value.id)
-    if (result.awarded) {
-      showXpToast(result.xp, 'Praktik Selesai!', 'practice')
-    }
   }
 
   const next = getNextLesson()

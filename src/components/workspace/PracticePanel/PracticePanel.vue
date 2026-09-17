@@ -54,7 +54,13 @@
           </button>
         </div>
 
-        <button class="nav-btn finish-btn" @click="$emit('finish')">
+        <button 
+          class="nav-btn finish-btn" 
+          @click="$emit('finish')"
+          :disabled="runStatus !== 'success'"
+          :title="runStatus !== 'success' ? 'Jalankan kode dan pastikan berhasil sebelum lanjut' : ''"
+          :class="{ 'disabled-btn': runStatus !== 'success' }"
+        >
           <i class="fa-solid fa-check"></i>
           {{ isLastLesson ? 'Selesai' : 'Selesai & Lanjut' }}
         </button>
