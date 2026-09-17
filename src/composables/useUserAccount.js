@@ -47,6 +47,9 @@ export function useUserAccount() {
       }
       credits.value = data.credits
       isPremiumUser.value = data.is_premium
+      currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
+        ? data.current_plan.slug 
+        : (data.current_plan || 'free')
     } catch (error) {
       isLoggedIn.value = false
       // Clear user data on failure (e.g. 401)
