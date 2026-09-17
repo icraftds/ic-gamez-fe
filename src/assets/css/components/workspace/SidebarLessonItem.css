@@ -49,6 +49,7 @@
 .status-icon { font-size: 0.65rem; flex-shrink: 0; }
 .status-icon.completed { color: #10b981; }
 .status-icon.locked { color: #f59e0b; }
+.status-icon.premium-unlocked { color: #f59e0b; }
 
 /* ── Sub Items ── */
 .sub-items {

@@ -42,10 +42,14 @@ export function useLearningPaths() {
         detailedPath.chapters.forEach(chapter => {
           if (chapter.lessons) {
             chapter.lessons.forEach(lesson => {
-              if (lesson.progress) {
-                lesson.isCompleted = lesson.progress.is_completed || false;
-                lesson.quizPassed = lesson.progress.quiz_passed || false;
-                lesson.practiceDone = !!lesson.progress.saved_code;
+              let prog = lesson.progress;
+              if (Array.isArray(prog)) {
+                prog = prog.length > 0 ? prog[0] : null;
+              }
+              if (prog && Object.keys(prog).length > 0) {
+                lesson.isCompleted = prog.is_completed || false;
+                lesson.quizPassed = prog.quiz_passed || false;
+                lesson.practiceDone = !!prog.saved_code;
               } else {
                 lesson.isCompleted = hasBeenScored('theory', lesson.id) || false;
                 lesson.quizPassed = hasBeenScored('quiz', lesson.id) || false;

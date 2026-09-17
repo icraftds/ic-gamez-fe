@@ -145,7 +145,11 @@ const fetchChallenges = async () => {
         pathId,
         chapterId,
         difficulty: challenge.is_premium ? 'Sulit' : 'Sedang',
-        isCompleted: challenge.progress ? (challenge.progress.is_completed || !!challenge.progress.saved_code) : false,
+        isCompleted: (() => {
+          let p = challenge.progress;
+          if (Array.isArray(p)) p = p.length > 0 ? p[0] : null;
+          return p ? (p.is_completed || !!p.saved_code) : false;
+        })(),
         isPremium: challenge.is_premium,
         costCredit: challenge.cost_credit,
       };

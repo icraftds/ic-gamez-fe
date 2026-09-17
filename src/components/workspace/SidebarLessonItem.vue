@@ -14,7 +14,7 @@
       </span>
       <span class="lesson-title">{{ lesson.title }}</span>
       <i v-if="lesson.isCompleted" class="fa-solid fa-check status-icon completed"></i>
-      <i v-else-if="lesson.is_premium && !isPremiumUser" class="fa-solid fa-lock status-icon locked"></i>
+      <i v-else-if="lesson.is_premium" class="fa-solid status-icon" :class="isPremiumUser ? 'fa-lock-open premium-unlocked' : 'fa-lock locked'"></i>
       <i class="fa-solid lesson-expand-icon" :class="isOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
     </button>
 
