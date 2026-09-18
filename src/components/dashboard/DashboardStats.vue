@@ -148,7 +148,7 @@
             <span class="gh-rank-xp">{{ statsData.xp.total }} XP</span>
           </div>
         </div>
-        <router-link to="/dashboard/leaderboard" class="gh-highlight-link" style="display: block; margin-top: 16px; font-size: 14px;">Lihat Leaderboard Lengkap →</router-link>
+        <router-link to="/leaderboard" class="gh-highlight-link" style="display: block; margin-top: 16px; font-size: 14px;">Lihat Leaderboard Lengkap →</router-link>
       </div>
 
     </template>
