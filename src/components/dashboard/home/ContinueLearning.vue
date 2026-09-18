@@ -1,6 +1,6 @@
 <template>
   <div class="section-card">
-    <h2>Lanjut Belajar</h2>
+    <h2>Teruskan Perjalanan Belajarmu</h2>
     <div class="continue-grid">
       <div class="continue-card" v-for="path in paths" :key="path.id">
         <div class="cc-header">
@@ -13,10 +13,10 @@
         </div>
         <div class="cc-bar-bg"><div class="cc-bar-fill" :style="{ width: getPathProgress(path) + '%' }"></div></div>
         <div class="cc-stats">
-          <span>{{ getCompletedLessonsForPath(path) }} dari {{ getTotalLessonsForPath(path) }} latihan selesai</span>
+          <span>{{ getCompletedLessonsForPath(path) }} dari {{ getTotalLessonsForPath(path) }} modul diselesaikan</span>
         </div>
         <router-link :to="`/learning/${path.id}`" class="btn-continue">
-          Mulai Belajar {{ path.title.split(' ')[0] }} →
+          Lanjutkan Modul {{ path.title.split(' ')[0] }} 🚀
         </router-link>
       </div>
     </div>

@@ -1,13 +1,13 @@
 <template>
   <div class="greeting-card">
     <div class="greeting-left">
-      <h1>Halo, <span class="highlight-name">{{ userProfile.name }}</span> 👋</h1>
-      <p>Yuk lanjutin streak-mu! 5 menit konsisten lebih efektif daripada maraton sehari.</p>
+      <h1>Selamat datang, <span class="highlight-name">{{ userProfile.name }}</span> 🚀</h1>
+      <p>Terus tingkatkan kemampuan coding kamu hari ini. Konsistensi adalah kunci keberhasilan.</p>
       <div class="quick-stats">
-        <div class="qs-item"><span class="qs-value text-cyan">{{ userProfile.xp }}</span> <span class="qs-label">XP</span></div>
-        <div class="qs-item"><span class="qs-value text-orange">{{ userProfile.streak }}</span> <span class="qs-label">hari streak</span></div>
-        <div class="qs-item"><span class="qs-value">{{ completedLessons }}</span> <span class="qs-label">latihan selesai</span></div>
-        <div class="qs-item"><span class="qs-value">0</span> <span class="qs-label">sertifikat</span></div>
+        <div class="qs-item"><span class="qs-value text-cyan">{{ userProfile.xp }}</span> <span class="qs-label">Poin Pengalaman</span></div>
+        <div class="qs-item"><span class="qs-value text-orange">{{ userProfile.streak }}</span> <span class="qs-label">Hari Berturut-turut</span></div>
+        <div class="qs-item"><span class="qs-value">{{ completedLessons }}</span> <span class="qs-label">Modul Diselesaikan</span></div>
+        <div class="qs-item"><span class="qs-value">0</span> <span class="qs-label">Sertifikat Diraih</span></div>
       </div>
     </div>
     <button v-if="!isPremiumUser" class="btn-upgrade-sm" @click="$router.push({ path: '/dashboard', query: { tab: 'langganan' } })">Upgrade Premium</button>

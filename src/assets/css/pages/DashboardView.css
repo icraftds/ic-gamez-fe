@@ -1,6 +1,6 @@
 .dashboard-view {
   min-height: 100vh;
-  padding-bottom: 50px;
+  padding-bottom: 20px;
 }
 
 /* Dashboard Navbar */
@@ -171,7 +171,7 @@
 
 /* Content */
 .dash-content {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .not-logged-in {

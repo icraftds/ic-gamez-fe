@@ -3,55 +3,79 @@
     <h2>Medali & Sertifikat</h2>
     <p class="subtitle">Koleksi lencana dan sertifikat pencapaianmu – siap dipajang di LinkedIn.</p>
 
-    <!-- Category Tabs -->
-    <div class="medal-tabs">
-      <button
-        v-for="cat in categories"
-        :key="cat.id"
-        class="medal-tab"
-        :class="{ active: activeCategory === cat.id }"
-        @click="activeCategory = cat.id"
-      >
-        {{ cat.label }} <span class="tab-count">{{ cat.earned }}/{{ cat.total }}</span>
-      </button>
-    </div>
-
-    <!-- Badges Grid -->
-    <div class="section-card">
-      <div class="medal-section-header">
-        <h3><i class="fa-solid fa-trophy"></i> Lencana {{ activeCategoryLabel }}</h3>
-        <span class="medal-count">{{ activeCategoryEarned }} dari {{ activeCategoryTotal }} terkumpul</span>
+    <div class="medals-container">
+      <!-- Category Sidebar -->
+      <div class="category-sidebar">
+        <button
+          v-for="cat in categories"
+          :key="cat.id"
+          class="cat-btn"
+          :class="{ active: activeCategory === cat.id }"
+          @click="activeCategory = cat.id"
+        >
+          <div class="cat-btn-content">
+            <span class="cat-label">{{ cat.label }}</span>
+            <span class="cat-count">{{ cat.earned }}/{{ cat.total }}</span>
+          </div>
+          <div class="cat-progress-bg">
+            <div class="cat-progress-fill" :style="{ width: (cat.total > 0 ? (cat.earned / cat.total) * 100 : 0) + '%' }"></div>
+          </div>
+        </button>
       </div>
 
-      <div class="medals-grid">
-        <div
-          v-for="medal in activeMedals"
-          :key="medal.id"
-          class="medal-item"
-          :class="{ locked: !medal.earned }"
-        >
-          <div class="medal-icon-wrapper">
-            <i :class="medal.icon" class="medal-icon"></i>
-            <span v-if="medal.target" class="medal-target-badge">{{ medal.target }}</span>
+      <!-- Badges Grid Area -->
+      <div class="badges-area">
+        <div class="badges-header">
+          <h3><i class="fa-solid fa-medal"></i> Koleksi {{ activeCategoryLabel }}</h3>
+          <span class="badges-subtitle">{{ activeCategoryEarned }} dari {{ activeCategoryTotal }} medali terbuka</span>
+        </div>
+
+        <div class="badges-grid">
+          <div
+            v-for="medal in activeMedals"
+            :key="medal.id"
+            class="badge-card"
+            :class="{ 'is-locked': !medal.earned, 'is-earned': medal.earned }"
+          >
+            <div class="badge-icon-container">
+              <div class="badge-glow" v-if="medal.earned"></div>
+              <div class="badge-hexagon">
+                <i :class="medal.icon" class="b-icon"></i>
+              </div>
+              <div v-if="!medal.earned && medal.current > 0" class="badge-mini-progress">
+                {{ Math.round((medal.current / medal.target) * 100) }}%
+              </div>
+            </div>
+            <div class="badge-info">
+              <h4>{{ medal.name }}</h4>
+              <p class="badge-desc">{{ medal.description }}</p>
+              <div class="badge-status">
+                <span v-if="medal.earned" class="status-earned"><i class="fa-solid fa-check"></i> Terbuka</span>
+                <span v-else class="status-locked">
+                  <i class="fa-solid fa-lock"></i> {{ medal.current }}/{{ medal.target }}
+                </span>
+              </div>
+            </div>
           </div>
-          <h4>{{ medal.name }}</h4>
-          <p class="medal-progress" v-if="medal.target">{{ medal.current }}/{{ medal.target }}</p>
-          <p class="medal-progress" v-else>{{ medal.earned ? 'Terkunci' : 'Terkunci' }}</p>
-          <p class="medal-desc">{{ medal.description }}</p>
         </div>
       </div>
     </div>
 
     <!-- Sertifikat -->
-    <div class="section-card">
-      <h3><i class="fa-solid fa-certificate"></i> Sertifikat</h3>
-      <p class="sub-desc">Siap di-download dan dipajang di LinkedIn.</p>
-
-      <div class="cert-empty">
-        <i class="fa-solid fa-scroll" style="font-size: 2.5rem; color: #475569; margin-bottom: 15px;"></i>
-        <p><strong>Belum ada sertifikat di kategori ini</strong></p>
-        <p class="sub-text">Sertifikat terbit otomatis begitu kamu menuntaskan satu kursus.</p>
-        <router-link to="/learning" class="btn-accent">Mulai Kursus</router-link>
+    <div class="certificate-section">
+      <div class="cert-header">
+        <h3><i class="fa-solid fa-award"></i> Sertifikat Profesional</h3>
+        <p>Tunjukkan keahlianmu ke dunia. Sinkronisasi 1-klik ke LinkedIn.</p>
+      </div>
+      
+      <div class="cert-showcase empty-state">
+        <div class="cert-hologram"></div>
+        <div class="cert-content">
+          <i class="fa-solid fa-file-contract empty-icon"></i>
+          <h4>Sertifikat Belum Tersedia</h4>
+          <p>Selesaikan setidaknya satu modul (Path) secara penuh untuk mendapatkan sertifikat resmi pertamamu.</p>
+          <router-link to="/learning" class="btn-cert-action">Mulai Belajar Sekarang <i class="fa-solid fa-arrow-right"></i></router-link>
+        </div>
       </div>
     </div>
   </div>

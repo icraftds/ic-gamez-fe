@@ -5,7 +5,7 @@ const credits = ref(10)
 const isPremiumUser = ref(false)
 const maxCredits = computed(() => isPremiumUser.value ? 15 : 10)
 const currentPlan = ref('free')
-const isLoggedIn = ref(false)
+const isLoggedIn = ref(!!localStorage.getItem('auth_token'))
 const isLoading = ref(false)
 
 const userProfile = ref({
