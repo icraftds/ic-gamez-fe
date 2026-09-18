@@ -35,6 +35,20 @@ const performLogout = async () => {
 
 const activeTab = ref(route.query.tab || 'beranda')
 
+import { watch } from 'vue'
+
+watch(() => route.query.tab, (newTab) => {
+  if (newTab && newTab !== activeTab.value) {
+    activeTab.value = newTab
+  }
+})
+
+watch(activeTab, (newTab) => {
+  if (route.query.tab !== newTab) {
+    router.replace({ query: { ...route.query, tab: newTab } })
+  }
+})
+
 const tabs = [
   { id: 'beranda', label: 'Beranda' },
   { id: 'statistik', label: 'Statistik' },

@@ -298,6 +298,7 @@ const onQuizSubmit = async () => {
   if (result.success) {
     // Jawaban Benar (Backend mengembalikan 200 OK)
     quiz.isCorrect.value = true
+    if (currentLesson.value) currentLesson.value.quizPassed = true
     if (result.explanation && currentLesson.value.quizzes?.[0]) {
       currentLesson.value.quizzes[0].explanation = result.explanation
     }
@@ -357,6 +358,7 @@ const onPracticeRun = async () => {
     if (isMatch) {
       practiceStatus.value = 'success'
       if (currentLesson.value) {
+        currentLesson.value.practiceDone = true
         const result = await scoring.awardXp('practice', currentLesson.value.id)
         if (result.awarded) {
           showXpToast(result.xp, 'Praktik Berhasil!', 'practice')

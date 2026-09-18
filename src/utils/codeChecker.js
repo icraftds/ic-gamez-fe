@@ -7,6 +7,11 @@
  * @returns {boolean} - True jika output sesuai harapan, False jika tidak
  */
 export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, currentCode) => {
+  // Cegah submit kosong
+  if (!currentCode || currentCode.trim() === '') {
+    return false;
+  }
+
   // Pengecekan Universal: Jika masih ada "___" di bagian kode utama (abaikan komentar), berarti belum diisi!
   if (currentCode) {
     const codeWithoutComments = currentCode
