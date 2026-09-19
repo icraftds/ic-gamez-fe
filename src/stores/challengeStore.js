@@ -142,21 +142,34 @@ export const useChallengeStore = defineStore('challenge', {
       if (this.mode === 'speedrun') {
         try {
           const { default: api } = await import('../services/api')
-          const res = await api.get('/challenges/active')
-          if (res.data && res.data.data) {
-             const beChallenge = res.data.data
+          // Ambil data Event beserta relasi Tantangan & Lesson-nya
+          const resEvent = await api.get('/events/daily/active')
+          let beEvent = null;
+          if (resEvent.data && resEvent.data.event) {
+             beEvent = resEvent.data.event;
+          }
+
+          if (beEvent) {
+             // Ambil data lesson/soal dari relasi di Database
+             const lesson = (beEvent.challenges && beEvent.challenges.length > 0 && beEvent.challenges[0].lesson) 
+                            ? beEvent.challenges[0].lesson 
+                            : {};
              this.stageData = {
-               id: beChallenge.id,
-               title: beChallenge.title,
-               diff: beChallenge.difficulty,
-               diffClass: 'diff-' + beChallenge.difficulty.toLowerCase(),
-               prose: beChallenge.description_html,
-               template: beChallenge.template_code,
-               funcName: beChallenge.function_name,
-               testCases: beChallenge.test_cases
+               id: beEvent.id,
+               title: beEvent.title,
+               diff: lesson.difficulty || 'Sedang',
+               diffClass: 'diff-' + (lesson.difficulty ? lesson.difficulty.toLowerCase() : 'sedang'),
+               
+               // Ambil penjelasan/instruksi spesifik soal (lesson.explanation), jika kosong baru pakai deskripsi umum event
+               prose: lesson.explanation || beEvent.description || beEvent.description_html || 'Tidak ada deskripsi',
+               
+               // Ambil kode awal, nama fungsi, dan testcase murni dari database lesson
+               template: lesson.practice || '// Tulis kodemu di sini',
+               funcName: lesson.function_name || 'solution',
+               testCases: lesson.test_cases || []
              }
           } else {
-             // Fallback
+             // Fallback jika tidak ada event aktif
              this.stageData = challenges.find(c => c.id === stage)
           }
         } catch (error) {
