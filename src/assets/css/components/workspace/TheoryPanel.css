@@ -114,11 +114,13 @@
 /* ── Mobile Responsiveness ── */
 @media (max-width: 768px) {
   .theory-panel {
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
   
   .panel-content {
     padding: 20px 16px;
+    overflow-x: hidden;
     overflow-y: visible;
   }
   
@@ -135,9 +137,19 @@
   
   .lesson-title {
     font-size: 1.5rem;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
   
   .lesson-body {
     font-size: 1rem;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .lesson-body :deep(pre) {
+    max-width: 100%;
+    padding: 15px;
+    overflow-x: auto;
   }
 }

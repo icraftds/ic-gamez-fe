@@ -47,16 +47,21 @@
   .lesson-workspace { 
     height: auto; 
     min-height: 100vh; 
-    overflow: visible; 
+    overflow-x: hidden;
+    overflow-y: visible;
   }
   .workspace-body { 
     flex-direction: column; 
-    overflow: visible; 
+    overflow-x: hidden;
+    overflow-y: visible;
     padding-top: 56px; /* Offset for fixed topbar */
+    width: 100%;
   }
   .workspace-main { 
     padding-left: 44px; 
-    overflow: visible; 
+    box-sizing: border-box;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 }
-
