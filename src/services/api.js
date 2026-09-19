@@ -37,8 +37,12 @@ api.interceptors.response.use(
     const isWipError = error.response && (error.response.status === 404 || error.response.status === 501);
     
     if (isNetworkError || isWipError) {
-      // Jika ini error saat cek token di awal, abaikan agar tidak muncul pop-up WIP di halaman login
-      if (error.config && error.config.url === '/auth/me') {
+      // Jika ini error saat cek token di awal, logout, atau speedrun (karena 404 dari database), abaikan agar tidak muncul pop-up WIP
+      if (error.config && (
+        error.config.url === '/auth/me' || 
+        error.config.url === '/auth/logout' ||
+        error.config.url.includes('submit-speedrun')
+      )) {
         return Promise.reject(error);
       }
       

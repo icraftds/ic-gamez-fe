@@ -111,6 +111,13 @@ const isAlreadyPlayedToday = computed(() => {
   if (!currentEvent.value) return false;
   if (!isLoggedIn.value) return false; // Not logged in? Can't have played.
   
+  // Use backend status if available (more secure)
+  if (userStatus.value) {
+    if (userStatus.value.is_played_today && userStatus.value.status === 'approved') return true;
+    if (userStatus.value.attempts >= 5) return true; // Kehabisan kesempatan
+  }
+  
+  // Local fallback
   const userId = userProfile.value?.id || 'guest';
   const completedDate = localStorage.getItem(`ic_daily_completed_${userId}_${currentEvent.value.id}`);
   if (completedDate === new Date().toDateString()) {
@@ -119,12 +126,15 @@ const isAlreadyPlayedToday = computed(() => {
   return false;
 });
 
+const userStatus = ref(null);
+
 const fetchActiveChallenge = async () => {
   isLoadingEvent.value = true;
   try {
-    const res = await api.get('/challenges/active');
-    if (res.data && res.data.data) {
-      currentEvent.value = res.data.data;
+    const res = await api.get('/events/daily/active');
+    if (res.data && res.data.event) {
+      currentEvent.value = res.data.event;
+      userStatus.value = res.data.user_status;
     }
   } catch (error) {
     console.error('Failed to load active challenge', error);
