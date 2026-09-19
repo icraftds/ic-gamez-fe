@@ -154,7 +154,12 @@ const claimWeeklyReward = async () => {
       showToast('Selamat! Anda telah masuk kualifikasi hadiah mingguan.', 'success');
     }
   } catch (error) {
-    showToast('Klaim partisipasi mingguan berhasil! (Simulasi Backend)', 'success');
+    // TANGKAP ERROR DARI BACKEND
+    if (error.response && error.response.status === 403) {
+      showToast(error.response.data.message || 'Fitur ini khusus pengguna PRO.', 'error');
+    } else {
+      showToast('Gagal mengklaim hadiah. Silakan coba lagi.', 'error');
+    }
   } finally {
     isSubmitting.value = false;
   }

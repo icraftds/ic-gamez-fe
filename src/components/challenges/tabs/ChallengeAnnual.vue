@@ -120,11 +120,12 @@ const submitProject = async () => {
     form.liveUrl = '';
     form.file = null;
   } catch (error) {
-    showToast('Proyek berhasil dikumpulkan! (Simulasi Backend)', 'success');
-    // Reset Form for simulation
-    form.repoUrl = '';
-    form.liveUrl = '';
-    form.file = null;
+    // TANGKAP ERROR DARI BACKEND
+    if (error.response && error.response.status === 403) {
+      showToast(error.response.data.message || 'Akses ditolak. Fitur ini khusus pengguna PRO.', 'error');
+    } else {
+      showToast('Gagal mengirimkan proyek. Periksa koneksi Anda.', 'error');
+    }
   } finally {
     isSubmitting.value = false;
   }
