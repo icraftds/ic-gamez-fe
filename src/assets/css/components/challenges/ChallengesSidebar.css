@@ -138,12 +138,22 @@
   font-size: 0.9rem;
 }
 
-.progress-stats .stat-row {
+/* Shared Stat Rows for Progress and History */
+.progress-stats .stat-row,
+.history-stats .stat-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
   color: #cbd5e1;
+}
+
+/* History Specific */
+.history-stats .stat-row span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .diff-mudah {

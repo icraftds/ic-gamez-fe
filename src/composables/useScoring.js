@@ -9,26 +9,35 @@ const XP_REWARDS = Object.freeze({
 
 const scoredActivities = ref(new Set())
 const isProgressLoaded = ref(false)
+let progressLoadPromise = null
 
 export function useScoring() {
   const { refreshStats } = useUserAccount()
 
   const loadProgress = async () => {
     if (isProgressLoaded.value) return
+    if (progressLoadPromise) {
+      await progressLoadPromise
+      return
+    }
+
     try {
-      const response = await api.get('/progress')
+      progressLoadPromise = api.get('/progress')
+      const response = await progressLoadPromise
       const progressList = response.data.data
       
       const newSet = new Set()
       progressList.forEach(p => {
         if (p.is_completed) newSet.add(`${p.lesson_id}:theory`)
         if (p.quiz_passed) newSet.add(`${p.lesson_id}:quiz`)
-        if (p.saved_code) newSet.add(`${p.lesson_id}:practice`) // Asumsikan jika ada code = practice disubmit (atau gunakan parameter terpisah)
+        if (p.saved_code) newSet.add(`${p.lesson_id}:practice`)
       })
       scoredActivities.value = newSet
       isProgressLoaded.value = true
     } catch (error) {
       console.error('Failed to load user progress', error)
+    } finally {
+      progressLoadPromise = null
     }
   }
 

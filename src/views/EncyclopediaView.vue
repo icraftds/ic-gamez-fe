@@ -9,7 +9,7 @@
         <aside class="encyclopedia-sidebar">
           <div class="search-box">
             <i class="fa-solid fa-search"></i>
-            <input type="text" placeholder="Cari algoritma, teori..." />
+            <input type="text" placeholder="Cari algoritma, teori..." @focus="openWipModal" />
           </div>
           
           <div v-if="isLoading" class="sidebar-loading">
@@ -51,12 +51,14 @@ import SimpleBackground from '../components/common/SimpleBackground.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ArticleReader from '../components/encyclopedia/ArticleReader.vue'
 import api from '../services/api'
+import { useWipModal } from '../composables/useWipModal'
 
 const encyclopediaData = ref([])
 const selectedTopicId = ref(null)
 const selectedTopic = ref(null)
 const isLoading = ref(true)
 const isTopicLoading = ref(false)
+const { openWipModal } = useWipModal()
 
 const fetchEncyclopedia = async () => {
   try {

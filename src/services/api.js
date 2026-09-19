@@ -1,5 +1,6 @@
 import axios from 'axios';
 import router from '../router';
+import { useWipModal } from '../composables/useWipModal';
 
 // Konfigurasi instance Axios
 const api = axios.create({
@@ -31,6 +32,23 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
+    // 1. Cek apakah ini fitur yang belum jadi / belum di-push (404 Not Found, 501 Not Implemented, atau Server Mati)
+    const isNetworkError = !error.response;
+    const isWipError = error.response && (error.response.status === 404 || error.response.status === 501 || error.response.status === 500);
+    
+    if (isNetworkError || isWipError) {
+      // Jika ini error saat cek token di awal, abaikan agar tidak muncul pop-up WIP di halaman login
+      if (error.config && error.config.url === '/auth/me') {
+        return Promise.reject(error);
+      }
+      
+      const { openWipModal } = useWipModal();
+      openWipModal();
+      
+      // Return a pending promise so the app doesn't crash on unhandled rejection
+      return new Promise(() => {});
+    }
+
     // Tangani error 403 Forbidden secara global (misal: akses konten premium ditolak)
     if (error.response && error.response.status === 403) {
       const message = error.response.data?.message || '';

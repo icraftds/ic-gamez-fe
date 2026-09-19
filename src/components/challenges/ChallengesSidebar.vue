@@ -72,8 +72,26 @@
       </div>
     </div>
 
+    <div class="card history-card">
+      <h3>Riwayat Event</h3>
+      <div class="history-stats">
+        <div class="stat-row">
+          <span><i class="fa-solid fa-bolt" style="color: #f59e0b; width: 20px;"></i> Harian</span>
+          <span class="count" style="color: white; font-weight: 600;">{{ userStats?.events?.daily || 0 }}x</span>
+        </div>
+        <div class="stat-row">
+          <span><i class="fa-solid fa-calendar-week" style="color: #3b82f6; width: 20px;"></i> Mingguan</span>
+          <span class="count" style="color: white; font-weight: 600;">{{ userStats?.events?.weekly || 0 }}x</span>
+        </div>
+        <div class="stat-row">
+          <span><i class="fa-solid fa-trophy" style="color: #10b981; width: 20px;"></i> Tahunan</span>
+          <span class="count" style="color: white; font-weight: 600;">{{ userStats?.events?.annual || 0 }}x</span>
+        </div>
+      </div>
+    </div>
+
     <div class="card tags-card">
-      <h3>Tag</h3>
+      <h3>Tag Populer</h3>
       <div class="tags-container">
         <span class="tag">SQL Dasar</span>
         <span class="tag">Filtering</span>
@@ -85,10 +103,11 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
 import { useUserAccount } from "../../composables/useUserAccount.js";
 import { useChallengesStats } from "../../composables/useChallengesStats.js";
 
-const { isPremiumUser, subscriptionStatus, upgradeToPremium } = useUserAccount();
+const { isPremiumUser, subscriptionStatus, upgradeToPremium, userStats, fetchUserStats } = useUserAccount();
 const {
   allChallenges,
   completedCount,
@@ -100,6 +119,10 @@ const {
   totalSulit,
   completedSulit
 } = useChallengesStats();
+
+onMounted(() => {
+  fetchUserStats();
+});
 </script>
 
 <style scoped src="../../assets/css/components/challenges/ChallengesSidebar.css"></style>

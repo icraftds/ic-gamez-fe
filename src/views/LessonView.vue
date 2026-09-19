@@ -78,7 +78,10 @@
           <!-- Fallback: lesson tidak ditemukan -->
           <div key="notfound" v-else class="not-found">
             <i class="fa-solid fa-circle-exclamation"></i>
-            <p>Materi tidak ditemukan. Pastikan URL Anda benar.</p>
+            <p>Materi tidak ditemukan atau sudah dihapus. Pastikan URL Anda benar.</p>
+            <button class="btn-primary" @click="router.push('/learning')" style="margin-top: 15px; padding: 10px 20px; border-radius: 8px;">
+              Kembali ke Modul Belajar
+            </button>
           </div>
         </transition>
       </main>

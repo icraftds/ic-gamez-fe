@@ -55,7 +55,7 @@
               <label class="remember-me">
                 <input type="checkbox" /> Ingat saya
               </label>
-              <a href="#" class="forgot-password">Lupa Password?</a>
+              <a href="#" class="forgot-password" @click.prevent="openWipModal">Lupa Password?</a>
             </div>
 
             <button type="submit" class="btn-submit" :disabled="isLoading">
@@ -68,7 +68,7 @@
             <span>ATAU</span>
           </div>
 
-          <button class="btn-google" @click="handleGoogleLogin" :disabled="isLoading">
+          <button class="btn-google" @click="openWipModal" :disabled="isLoading">
             <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="google-logo" />
             <span>Lanjutkan dengan Google</span>
           </button>
@@ -86,10 +86,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
-import { useToast } from '../composables/useToast'
+import { useWipModal } from '../composables/useWipModal'
 
 const { login, isLoading } = useUserAccount()
-const { showToast } = useToast()
+const { openWipModal } = useWipModal()
 const router = useRouter()
 
 const errorMessage = ref('')
@@ -110,9 +110,6 @@ const handleLogin = async () => {
   }
 }
 
-const handleGoogleLogin = () => {
-  showToast('Fitur Login dengan Google akan segera hadir!', 'info')
-}
 </script>
 
 <style src="../assets/css/pages/AuthView.css" scoped></style>

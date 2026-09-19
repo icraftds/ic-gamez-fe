@@ -26,9 +26,9 @@ export function useLearningPaths() {
   }
 
   // To get detailed info including chapters and lessons for a specific path
-  const fetchPathDetails = async (slug) => {
+  const fetchPathDetails = async (slug, skipLoadingState = false) => {
     try {
-      isLoading.value = true
+      if (!skipLoadingState) isLoading.value = true
       const response = await api.get(`/paths/${slug}`)
       // Update or insert the detailed path into our state
       const detailedPath = response.data.data
@@ -71,7 +71,7 @@ export function useLearningPaths() {
       console.error('Failed to fetch path details', error)
       return null
     } finally {
-      isLoading.value = false
+      if (!skipLoadingState) isLoading.value = false
     }
   }
 
@@ -79,8 +79,13 @@ export function useLearningPaths() {
     if (paths.value.length === 0) {
       await fetchPaths();
     }
-    const promises = paths.value.map(p => fetchPathDetails(p.slug || p.id));
-    await Promise.all(promises);
+    isLoading.value = true;
+    try {
+      const promises = paths.value.map(p => fetchPathDetails(p.slug || p.id, true));
+      await Promise.all(promises);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   const getPathById = (id) => {

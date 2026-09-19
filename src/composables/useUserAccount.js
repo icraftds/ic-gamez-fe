@@ -209,14 +209,31 @@ export function useUserAccount() {
     return isPremiumUser.value ? 'Premium' : 'Gratis'
   })
 
+  const userStats = ref({
+    events: { daily: 0, weekly: 0, annual: 0 }
+  })
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await api.get('/user/statistics')
+      if (response.data && response.data.data) {
+        userStats.value = response.data.data
+      }
+    } catch (error) {
+      console.error('Failed to fetch user stats', error)
+    }
+  }
+
   return {
     isLoggedIn,
     isLoading,
     userProfile,
+    userStats,
     login,
     register,
     logout,
     fetchUser,
+    fetchUserStats,
     refreshStats,
     addXp,
     credits,

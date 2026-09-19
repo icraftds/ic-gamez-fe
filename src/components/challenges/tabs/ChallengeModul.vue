@@ -75,10 +75,10 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import { useLearningPaths } from "../../composables/useLearningPaths.js";
-import { useUserAccount } from "../../composables/useUserAccount.js";
-import ChallengeTableRow from "./ChallengeTableRow.vue";
-import api from "../../services/api.js";
+import { useLearningPaths } from "../../../composables/useLearningPaths.js";
+import { useUserAccount } from "../../../composables/useUserAccount.js";
+import ChallengeTableRow from "../ChallengeTableRow.vue";
+import api from "../../../services/api.js";
 
 const emit = defineEmits(['require-premium', 'require-auth']);
 
@@ -202,4 +202,4 @@ const openChallenge = (challenge) => {
 };
 </script>
 
-<style scoped src="../../assets/css/components/challenges/ChallengesList.css"></style>
+<style scoped src="../../../assets/css/components/challenges/ChallengeModul.css"></style>

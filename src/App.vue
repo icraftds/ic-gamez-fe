@@ -13,6 +13,9 @@
       </div>
     </div>
     <AppToast />
+    
+    <!-- Global WIP Modal -->
+    <CoffeeModal v-model="showWipModal" />
   </div>
 </template>
 
@@ -21,15 +24,18 @@ import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppFooter from './components/common/AppFooter.vue'
 import AppToast from './components/common/AppToast.vue'
+import CoffeeModal from './components/common/CoffeeModal.vue'
 import { useUserAccount } from './composables/useUserAccount'
 import { useLearningPaths } from './composables/useLearningPaths'
+import { useWipModal } from './composables/useWipModal'
 
 const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
-const isAuthPage = computed(() => ['login', 'register'].includes(route.name))
+const isAuthPage = computed(() => ['login', 'register', 'developer'].includes(route.name))
 
 const { fetchUser } = useUserAccount()
 const { isPreparingLesson } = useLearningPaths()
+const { showWipModal } = useWipModal()
 
 onMounted(() => {
   // Fetch user session when app loads

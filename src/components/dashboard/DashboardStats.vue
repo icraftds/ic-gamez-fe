@@ -54,7 +54,7 @@
             </div>
           </div>
           <div class="gh-heatmap-footer">
-            <a href="#">Pelajari cara kami menghitung aktivitas</a>
+            <a href="#" @click.prevent="openWipModal">Pelajari cara kami menghitung aktivitas</a>
             <div class="gh-legend">
               <span>Less</span>
               <div class="gh-cell level-0"></div>
@@ -159,9 +159,11 @@
 import { computed, onMounted } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
 import { useDashboardStats } from '../../composables/useDashboardStats'
+import { useWipModal } from '../../composables/useWipModal'
 
 const { userProfile } = useUserAccount()
 const { statsData, heatmapData, isLoadingStats, isLoadingHeatmap, fetchStats, fetchHeatmap } = useDashboardStats()
+const { openWipModal } = useWipModal()
 
 onMounted(() => {
   fetchStats()
