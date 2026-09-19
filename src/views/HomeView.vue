@@ -7,7 +7,6 @@
       <HeroSection />
       <IntroSection />
       <LearningPathStack />
-      <LeaderboardTable />
     </div>
     <CoffeeModal v-model="showCoffeeModal" />
   </div>
@@ -21,7 +20,7 @@ import HomeNavbar from '../components/home/HomeNavbar.vue'
 import HeroSection from '../components/home/HeroSection.vue'
 import IntroSection from '../components/home/IntroSection.vue'
 import LearningPathStack from '../components/home/LearningPathStack.vue'
-import LeaderboardTable from '../components/home/LeaderboardTable.vue'
+
 import { useLearningPaths } from '../composables/useLearningPaths'
 
 const showCoffeeModal = ref(false)
