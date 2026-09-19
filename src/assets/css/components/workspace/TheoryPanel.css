@@ -116,12 +116,16 @@
   .theory-panel {
     overflow-x: hidden;
     overflow-y: visible;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .panel-content {
     padding: 20px 16px;
     overflow-x: hidden;
     overflow-y: visible;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .panel-footer {
@@ -151,5 +155,6 @@
     max-width: 100%;
     padding: 15px;
     overflow-x: auto;
+    box-sizing: border-box;
   }
 }

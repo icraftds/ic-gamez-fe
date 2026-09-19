@@ -179,6 +179,8 @@
     top: 0;
     left: 0;
     width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
   .topbar-left { flex: 1; min-width: 0; }
   .breadcrumb-path { display: none; }

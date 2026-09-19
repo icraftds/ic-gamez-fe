@@ -417,3 +417,5 @@ watch(currentLesson, (newLesson) => {
 
 <style src="../assets/css/pages/LessonView.css" scoped></style>
 <style scoped src="../assets/css/views/LessonView.css"></style>
+t o u c h  
+ 
