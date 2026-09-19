@@ -47,23 +47,19 @@
 
 @media (max-width: 768px) {
   .lesson-workspace { 
-    height: auto; 
-    min-height: 100vh; 
-    overflow-x: hidden;
-    overflow-y: visible;
+    height: 100vh; 
+    overflow: hidden;
   }
   .workspace-body { 
     flex-direction: column; 
-    overflow-x: hidden;
-    overflow-y: visible;
+    overflow: hidden;
     padding-top: 56px; /* Offset for fixed topbar */
     width: 100%;
   }
   .workspace-main { 
-    padding-left: 44px; 
-    box-sizing: border-box;
-    width: 100%;
-    overflow-x: hidden;
-    overflow-y: visible;
+    margin-left: 44px; 
+    width: calc(100% - 44px);
+    overflow: hidden;
+    padding-left: 0;
   }
 }
