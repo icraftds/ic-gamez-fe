@@ -34,7 +34,7 @@ api.interceptors.response.use(
   error => {
     // 1. Cek apakah ini fitur yang belum jadi / belum di-push (404 Not Found, 501 Not Implemented, atau Server Mati)
     const isNetworkError = !error.response;
-    const isWipError = error.response && (error.response.status === 404 || error.response.status === 501 || error.response.status === 500);
+    const isWipError = error.response && (error.response.status === 404 || error.response.status === 501);
     
     if (isNetworkError || isWipError) {
       // Jika ini error saat cek token di awal, abaikan agar tidak muncul pop-up WIP di halaman login
