@@ -47,7 +47,18 @@ api.interceptors.response.use(
       }
       
       const { openWipModal } = useWipModal();
-      openWipModal();
+      
+      // Jika error terjadi saat mengambil soal harian (Belum ada event)
+      if (error.config && error.config.url.includes('/events/daily/active')) {
+        openWipModal({
+          title: 'Tantangan Belum Ada',
+          desc: 'Wah, sepertinya tantangan hari ini belum dimulai nih. Tunggu challenge selanjutnya yaa!',
+          icon: 'fa-face-sad-tear'
+        });
+      } else {
+        // Pop-up Fitur WIP biasa (Default)
+        openWipModal();
+      }
       
       // Return a pending promise so the app doesn't crash on unhandled rejection
       return new Promise(() => {});

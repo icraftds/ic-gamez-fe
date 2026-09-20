@@ -5,10 +5,10 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
       <div class="coffee-icon">
-        <i class="fa-solid fa-person-digging"></i>
+        <i class="fa-solid" :class="wipIcon"></i>
       </div>
-      <h3 style="margin-bottom: 0.5rem;">Fitur Dalam Pengembangan</h3>
-      <p style="margin-bottom: 1.5rem; color: #94a3b8;">Stay tune ya! Fitur ini sedang kami siapkan untuk Anda.</p>
+      <h3 style="margin-bottom: 0.5rem;">{{ wipTitle }}</h3>
+      <p style="margin-bottom: 1.5rem; color: #94a3b8;">{{ wipDesc }}</p>
       
       <div class="social-support">
         <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">Support kami di sosial media:</p>
@@ -26,6 +26,10 @@
 </template>
 
 <script setup>
+import { useWipModal } from '../../composables/useWipModal'
+
+const { wipTitle, wipDesc, wipIcon } = useWipModal()
+
 defineProps({
   modelValue: {
     type: Boolean,
