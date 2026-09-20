@@ -18,10 +18,11 @@ export const EventService = {
   },
 
   // Submit Tantangan Harian (SPEEDRUN ANTI-CHEAT)
-  submitDaily(eventId, isSuccess, durationSec = null) {
+  submitDaily(eventId, isSuccess, durationSec = null, codeContent = null) {
     return api.post(`/events/${eventId}/submit-speedrun`, {
       is_success: isSuccess,
-      duration_sec: durationSec
+      duration_sec: durationSec,
+      code_content: codeContent
     });
   },
 

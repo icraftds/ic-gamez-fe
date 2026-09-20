@@ -40,6 +40,25 @@ const { showWipModal } = useWipModal()
 onMounted(() => {
   // Fetch user session when app loads
   fetchUser()
+
+  // Anti-Cheat Basic: Cegah Klik Kanan
+  window.addEventListener('contextmenu', function (e) {
+    // Kecualikan input text dan textarea agar user tetap bisa klik kanan untuk paste (jika dibutuhkan)
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault()
+    }
+  }, false)
+
+  // Anti-Cheat Basic: Cegah shortcut DevTools (F12, Ctrl+Shift+I/J, Ctrl+U)
+  window.addEventListener('keydown', function(e) {
+    if (
+      e.key === 'F12' || 
+      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) || 
+      (e.ctrlKey && (e.key === 'U' || e.key === 'u'))
+    ) {
+      e.preventDefault()
+    }
+  })
 })
 </script>
 

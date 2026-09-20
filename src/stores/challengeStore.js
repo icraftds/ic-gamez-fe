@@ -399,7 +399,7 @@ export const useChallengeStore = defineStore('challenge', {
               
               try {
                   const { EventService } = await import('../services/eventService')
-                  await EventService.submitDaily(this.eventId, true, durationSec)
+                  await EventService.submitDaily(this.eventId, true, durationSec, this.codeContent)
               } catch (e) {
                   console.warn('API submission failed', e)
               }
@@ -443,7 +443,7 @@ export const useChallengeStore = defineStore('challenge', {
             const { EventService } = await import('../services/eventService');
             
             // Call API with false (wrong answer) to deduct attempt on backend
-            const res = await EventService.submitDaily(this.eventId, false, null);
+            const res = await EventService.submitDaily(this.eventId, false, null, this.codeContent);
             
             // Sync tokens from backend
             this.tokens = res.data.remaining_tokens;
@@ -485,7 +485,7 @@ export const useChallengeStore = defineStore('challenge', {
         try {
           const { EventService } = await import('../services/eventService')
           // Beri tahu backend bahwa user gagal / quit early sehingga token tetap dikurangi
-          await EventService.submitDaily(this.eventId, false, null) 
+          await EventService.submitDaily(this.eventId, false, null, this.codeContent) 
         } catch (e) {
           console.warn('API failure submission failed', e)
         }
