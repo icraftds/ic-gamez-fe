@@ -16,7 +16,7 @@
           <a href="https://instagram.com/icraft.ds" target="_blank" class="btn-social ig" style="display: flex; align-items: center; gap: 8px; padding: 10px 15px; border-radius: 12px; text-decoration: none; background: rgba(225, 48, 108, 0.1); color: #e1306c; border: 1px solid rgba(225, 48, 108, 0.2); font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
             <i class="fa-brands fa-instagram" style="font-size: 1.1rem;"></i> icraft.ds
           </a>
-          <a href="https://tiktok.com/@icraft.ds" target="_blank" class="btn-social tiktok" style="display: flex; align-items: center; gap: 8px; padding: 10px 15px; border-radius: 12px; text-decoration: none; background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
+          <a href="https://tiktok.com/@icraftds.id" target="_blank" class="btn-social tiktok" style="display: flex; align-items: center; gap: 8px; padding: 10px 15px; border-radius: 12px; text-decoration: none; background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); font-weight: 600; font-size: 0.9rem; transition: all 0.3s;">
             <i class="fa-brands fa-tiktok" style="font-size: 1.1rem;"></i> icraft.ds
           </a>
         </div>

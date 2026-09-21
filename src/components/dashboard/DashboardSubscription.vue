@@ -56,74 +56,24 @@
         
         <div class="plan-action">
           <div v-if="currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro')" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
-          <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="selectPlan(plan)">Pilih {{ plan.name }}</button>
+          <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="goToCheckout(plan)">Pilih {{ plan.name }}</button>
         </div>
       </div>
     </div>
-
-    <!-- Checkout Modal / Section -->
-    <teleport to="body">
-      <div v-if="showCheckout" class="checkout-overlay" @click="closeCheckout">
-      <div class="checkout-modal" @click.stop>
-        <h3>Selesaikan Pembayaran</h3>
-        <p class="checkout-plan-name">Paket: {{ selectedPlan.name }} Plan</p>
-        
-        <div class="price-summary">
-          <div class="summary-row total">
-            <span>Harga Paket</span>
-            <span>Rp {{ formatPrice(selectedPlan.price) }}</span>
-          </div>
-        </div>
-
-        <div class="coupon-section">
-          <label>Punya Kode Kupon?</label>
-          <div class="coupon-input-group">
-            <input type="text" v-model="couponCode" placeholder="Masukkan kode kupon" />
-          </div>
-          <p class="coupon-msg info">Diskon atau bonus durasi akan diterapkan secara otomatis saat Anda menekan tombol Bayar.</p>
-        </div>
-
-        <div v-if="isPremiumUser" class="checkout-warning-msg">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          Perhatian: Sisa waktu dari paket Anda sebelumnya akan hangus jika Anda menyetujui pembelian ini.
-        </div>
-        
-        <div v-if="checkoutErrorMessage" class="checkout-error-msg">
-          <i class="fa-solid fa-circle-exclamation"></i> {{ checkoutErrorMessage }}
-        </div>
-        <div v-if="checkoutSuccessMessage" class="checkout-success-msg">
-          <i class="fa-solid fa-circle-check"></i> {{ checkoutSuccessMessage }}
-        </div>
-
-        <div class="checkout-actions">
-          <button class="btn-cancel" @click="closeCheckout" :disabled="isLoading">Batal</button>
-          <button class="btn-pay" @click="processCheckout" :disabled="isLoading">
-            <span v-if="isLoading"><i class="fa-solid fa-spinner fa-spin"></i> Memproses...</span>
-            <span v-else>Bayar Sekarang</span>
-          </button>
-        </div>
-      </div>
-      </div>
-    </teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserAccount } from '../../composables/useUserAccount'
 import api from '../../services/api'
 
-const { isPremiumUser, currentPlan, checkoutPlan, isLoading } = useUserAccount()
+const router = useRouter()
+const { isPremiumUser, currentPlan } = useUserAccount()
 
 const plans = ref([])
 const isLoadingPlans = ref(false)
-
-const showCheckout = ref(false)
-const selectedPlan = ref(null)
-
-const couponCode = ref('')
-const checkoutErrorMessage = ref('')
-const checkoutSuccessMessage = ref('')
 
 onMounted(async () => {
   try {
@@ -164,36 +114,22 @@ const getPlanBenefits = (slug) => {
   return ['Akses fitur premium', 'Unlimited Energy', 'Sertifikat kelulusan']
 }
 
-const selectPlan = (plan) => {
-  selectedPlan.value = plan
-  showCheckout.value = true
-  couponCode.value = ''
-  checkoutErrorMessage.value = ''
-}
-
-const closeCheckout = () => {
-  showCheckout.value = false
-  checkoutSuccessMessage.value = ''
-}
-
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
 }
 
-const processCheckout = async () => {
-  checkoutErrorMessage.value = ''
-  checkoutSuccessMessage.value = ''
-  // Panggil checkout dari composable
-  const res = await checkoutPlan(selectedPlan.value.slug || selectedPlan.value.id, couponCode.value)
-  if (res.success) {
-    checkoutSuccessMessage.value = res.message || 'Pembayaran berhasil!'
-    setTimeout(() => {
-      showCheckout.value = false
-      checkoutSuccessMessage.value = ''
-    }, 2000)
-  } else {
-    checkoutErrorMessage.value = res.message
-  }
+/**
+ * Arahkan user ke halaman checkout dengan data paket sebagai query params.
+ */
+const goToCheckout = (plan) => {
+  router.push({
+    name: 'checkout',
+    query: {
+      plan: plan.name,
+      price: plan.price,
+      slug: plan.slug
+    }
+  })
 }
 </script>
 

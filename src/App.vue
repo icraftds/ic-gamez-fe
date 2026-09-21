@@ -50,15 +50,15 @@ onMounted(() => {
   }, false)
 
   // Anti-Cheat Basic: Cegah shortcut DevTools (F12, Ctrl+Shift+I/J, Ctrl+U)
-  window.addEventListener('keydown', function(e) {
-    if (
-      e.key === 'F12' || 
-      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) || 
-      (e.ctrlKey && (e.key === 'U' || e.key === 'u'))
-    ) {
-      e.preventDefault()
-    }
-  })
+  // window.addEventListener('keydown', function(e) {
+  //   if (
+  //     e.key === 'F12' || 
+  //     (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) || 
+  //     (e.ctrlKey && (e.key === 'U' || e.key === 'u'))
+  //   ) {
+  //     e.preventDefault()
+  //   }
+  // })
 })
 </script>
 

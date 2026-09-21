@@ -48,11 +48,11 @@ api.interceptors.response.use(
       
       const { openWipModal } = useWipModal();
       
-      // Jika error terjadi saat mengambil soal harian (Belum ada event)
-      if (error.config && error.config.url.includes('/events/daily/active')) {
+      // Jika error terjadi saat memuat daftar/detail tantangan (Belum ada event)
+      if (error.config && error.config.url.includes('/events')) {
         openWipModal({
-          title: 'Tantangan Belum Ada',
-          desc: 'Wah, sepertinya tantangan hari ini belum dimulai nih. Tunggu challenge selanjutnya yaa!',
+          title: 'Tantangan Belum Tersedia',
+          desc: 'Wah, sepertinya tantangan ini belum dimulai nih. Tunggu challenge selanjutnya yaa!',
           icon: 'fa-face-sad-tear'
         });
       } else {
