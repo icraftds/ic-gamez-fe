@@ -183,17 +183,14 @@ const formatPrice = (price) => {
 const processCheckout = async () => {
   checkoutErrorMessage.value = ''
   checkoutSuccessMessage.value = ''
-  // Panggil checkout dari composable
-  const res = await checkoutPlan(selectedPlan.value.slug || selectedPlan.value.id, couponCode.value)
-  if (res.success) {
-    checkoutSuccessMessage.value = res.message || 'Pembayaran berhasil!'
-    setTimeout(() => {
-      showCheckout.value = false
-      checkoutSuccessMessage.value = ''
-    }, 2000)
-  } else {
-    checkoutErrorMessage.value = res.message
-  }
+  
+  // HOTFIX: Matikan fitur upgrade instan di production (master). 
+  // Gunakan modal "Fitur Dalam Pengembangan" sementara menunggu branch payment gateway dimerge.
+  const { useWipModal } = await import('../../composables/useWipModal')
+  const { openWipModal } = useWipModal()
+  openWipModal()
+  
+  showCheckout.value = false
 }
 </script>
 
