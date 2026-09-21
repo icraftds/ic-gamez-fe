@@ -199,7 +199,8 @@ const goToInstruction = async () => {
 
     emit('instruction', {
       paymentDetails: tx.payment_details || {},
-      selectedMethod: selectedMethod.value
+      selectedMethod: selectedMethod.value,
+      discountedPrice: discountedPrice.value
     })
   } catch (err) {
     console.error('Failed to create payment', err)
