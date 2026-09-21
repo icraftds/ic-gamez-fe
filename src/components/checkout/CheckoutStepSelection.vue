@@ -124,6 +124,9 @@
 <script setup>
 import { ref } from 'vue'
 import api from '../../services/api'
+import { useWipModal } from '../../composables/useWipModal'
+
+const { openWipModal } = useWipModal()
 
 const props = defineProps({
   planName: String,
@@ -200,8 +203,7 @@ const goToInstruction = async () => {
     })
   } catch (err) {
     console.error('Failed to create payment', err)
-    const errMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Coba lagi.'
-    alert('Gagal memuat metode pembayaran: ' + errMessage)
+    openWipModal()
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)
