@@ -157,7 +157,7 @@ const validateCoupon = async () => {
       plan_slug: props.planSlug
     })
     
-    discountedPrice.value = res.data.discounted_price
+    discountedPrice.value = res.data.data.final_price
     couponMessage.value = res.data.message || 'Kupon berhasil diterapkan!'
     couponStatus.value = 'success'
   } catch (err) {
