@@ -16,7 +16,7 @@
         <span>{{ planName }} Plan</span>
       </div>
       <div class="order-price">
-        <div v-if="discountedPrice !== null" class="discount-price-wrap">
+        <div v-if="discountedPrice != null" class="discount-price-wrap">
           <span class="price-strikethrough">Rp {{ formattedPrice }}</span>
           <span class="price-final">Rp {{ formatNumber(discountedPrice) }}</span>
         </div>

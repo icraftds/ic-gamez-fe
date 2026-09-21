@@ -50,6 +50,7 @@
             :planName="planName"
             :planIcon="planIcon"
             :formattedPrice="formattedPrice"
+            :discountedPrice="discountedPrice"
             :expiryTime="expiryTime"
             @back="goBackToSelection"
           />
@@ -104,6 +105,7 @@ const formattedPrice = computed(() => {
 const currentStep = ref(1)
 const paymentDetails = ref({})
 const selectedMethod = ref('')
+const discountedPrice = ref(null)
 
 const onProcessing = (isProcessing) => {
   // Can be used if parent needs to know processing state (e.g. block navigation)
@@ -112,18 +114,23 @@ const onProcessing = (isProcessing) => {
 const onInstruction = (data) => {
   paymentDetails.value = data.paymentDetails
   selectedMethod.value = data.selectedMethod
+  discountedPrice.value = data.discountedPrice
   
   if (!expiryTime.value) {
-    expiryTime.value = Date.now() + 15 * 60 * 1000 // 15 mins
+    expiryTime.value = Date.now() + 15 * 60 * 1000 // 15 mins default
   }
 
+  // Simpan ke local storage
   localStorage.setItem('ic_pending_checkout', JSON.stringify({
-    paymentDetails: data.paymentDetails,
-    selectedMethod: data.selectedMethod,
-    planName: planName.value,
-    planPrice: planPrice.value,
     planSlug: planSlug.value,
-    expiryTime: expiryTime.value
+    planName: planName.value,
+    planIcon: planIcon.value,
+    planPrice: planPrice.value,
+    discountedPrice: discountedPrice.value,
+    paymentDetails: paymentDetails.value,
+    selectedMethod: selectedMethod.value,
+    expiryTime: expiryTime.value,
+    savedAt: Date.now()
   }))
   
   currentStep.value = 2
@@ -132,6 +139,7 @@ const onInstruction = (data) => {
 const goBackToSelection = () => {
   localStorage.removeItem('ic_pending_checkout')
   expiryTime.value = null
+  discountedPrice.value = null
   currentStep.value = 1
 }
 
@@ -183,11 +191,12 @@ onMounted(() => {
       try {
         const data = JSON.parse(saved)
         if (data.expiryTime > Date.now()) {
-          planName.value = data.planName
-          planPrice.value = data.planPrice
-          planSlug.value = data.planSlug
-          paymentDetails.value = data.paymentDetails
-          selectedMethod.value = data.selectedMethod
+          planName.value = data.planName || planName.value
+          planPrice.value = data.planPrice || planPrice.value
+          planSlug.value = data.planSlug || planSlug.value
+          discountedPrice.value = data.discountedPrice || null
+          paymentDetails.value = data.paymentDetails || {}
+          selectedMethod.value = data.selectedMethod || ''
           expiryTime.value = data.expiryTime
           currentStep.value = 2
         } else {
