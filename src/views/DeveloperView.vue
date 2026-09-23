@@ -8,7 +8,7 @@
         <div class="profile-header">
           <div class="avatar-container">
             <div class="avatar">
-              <img :src="profilePhoto" alt="Randi Zakaria" class="avatar-img" />
+              <img :src="profilePhoto" alt="Randi Zakaria Putra, S.Kom., CWDev" class="avatar-img" />
             </div>
             <div class="status-badge">
               <i class="fa-solid fa-code"></i>
@@ -57,7 +57,7 @@
 <script setup>
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import TopBar from '../components/TopBar.vue'
-import profilePhoto from '../assets/profile.jpg'
+import profilePhoto from '../assets/profile/profile.jpg'
 </script>
 
 <style scoped>
