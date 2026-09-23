@@ -8,7 +8,7 @@
         <div class="profile-header">
           <div class="avatar-container">
             <div class="avatar">
-              <span class="avatar-initials">RZ</span>
+              <img :src="profilePhoto" alt="Randi Zakaria" class="avatar-img" />
             </div>
             <div class="status-badge">
               <i class="fa-solid fa-code"></i>
@@ -57,6 +57,7 @@
 <script setup>
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import TopBar from '../components/TopBar.vue'
+import profilePhoto from '../assets/profile.jpg'
 </script>
 
 <style scoped>
@@ -119,11 +120,11 @@ import TopBar from '../components/TopBar.vue'
   border: 4px solid rgba(15, 23, 42, 0.8);
 }
 
-.avatar-initials {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .status-badge {
