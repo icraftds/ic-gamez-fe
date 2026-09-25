@@ -1,29 +1,73 @@
 <template>
   <nav class="navbar">
     <div class="nav-left">
-      <div class="logo">
-        <i class="fa-solid fa-cube text-primary"></i>
-        <span>Icraft<span class="text-secondary">DS</span></span>
-      </div>
+      <router-link to="/" class="logo">
+        <img src="/images/logo-icgamez.png" alt="IC GameZ" class="logo-img" />
+      </router-link>
     </div>
 
     <!-- Hamburger Button (mobile only) -->
-    <button class="hamburger" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Toggle menu">
+    <button
+      class="hamburger"
+      @click="mobileMenuOpen = !mobileMenuOpen"
+      aria-label="Toggle menu"
+    >
       <i :class="mobileMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
     </button>
 
     <!-- Mobile Overlay -->
-    <div class="mobile-overlay" :class="{ open: mobileMenuOpen }" @click="mobileMenuOpen = false"></div>
+    <div
+      class="mobile-overlay"
+      :class="{ open: mobileMenuOpen }"
+      @click="mobileMenuOpen = false"
+    ></div>
 
     <!-- Nav Center + Right wrapped for mobile drawer -->
     <div class="nav-drawer" :class="{ open: mobileMenuOpen }">
       <div class="nav-center">
-        <router-link to="/" class="nav-link" :class="{ active: $route.path === '/' }" @click="mobileMenuOpen = false">Beranda</router-link>
-        <router-link to="/learning" class="nav-link" :class="{ active: $route.path.startsWith('/learning') }" @click="mobileMenuOpen = false">Learning Path</router-link>
-        <router-link to="/challenges" class="nav-link" :class="{ active: $route.path.startsWith('/challenges') }" @click="mobileMenuOpen = false">Tantangan</router-link>
-        <router-link to="/encyclopedia" class="nav-link" :class="{ active: $route.path === '/encyclopedia' }" @click="mobileMenuOpen = false">Ensiklopedia</router-link>
-        <router-link to="/leaderboard" class="nav-link" :class="{ active: $route.path === '/leaderboard' }" @click="mobileMenuOpen = false">Leaderboard</router-link>
-        <router-link v-if="!isLoggedIn" to="/pricing" class="nav-link" :class="{ active: $route.path === '/pricing' }" @click="mobileMenuOpen = false">Paket</router-link>
+        <router-link
+          to="/"
+          class="nav-link"
+          :class="{ active: $route.path === '/' }"
+          @click="mobileMenuOpen = false"
+          >Beranda</router-link
+        >
+        <router-link
+          to="/learning"
+          class="nav-link"
+          :class="{ active: $route.path.startsWith('/learning') }"
+          @click="mobileMenuOpen = false"
+          >Alur Belajar</router-link
+        >
+        <router-link
+          to="/challenges"
+          class="nav-link"
+          :class="{ active: $route.path.startsWith('/challenges') }"
+          @click="mobileMenuOpen = false"
+          >Tantangan</router-link
+        >
+        <router-link
+          to="/encyclopedia"
+          class="nav-link"
+          :class="{ active: $route.path === '/encyclopedia' }"
+          @click="mobileMenuOpen = false"
+          >Ensiklopedia</router-link
+        >
+        <router-link
+          to="/leaderboard"
+          class="nav-link"
+          :class="{ active: $route.path === '/leaderboard' }"
+          @click="mobileMenuOpen = false"
+          >Leaderboard</router-link
+        >
+        <router-link
+          v-if="!isLoggedIn"
+          to="/pricing"
+          class="nav-link"
+          :class="{ active: $route.path === '/pricing' }"
+          @click="mobileMenuOpen = false"
+          >Paket</router-link
+        >
       </div>
 
       <div class="nav-right">
@@ -33,18 +77,35 @@
             <span>{{ credits }}</span>
           </div>
           <div class="premium-badge" v-else>
-            <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> {{ credits }} PRO
+            <i class="fa-solid fa-bolt" style="color: #f59e0b"></i>
+            {{ credits }} PRO
           </div>
         </template>
 
         <template v-if="isLoggedIn">
-          <router-link to="/dashboard" class="user-profile-btn" @click="mobileMenuOpen = false">
-            <img :src="userProfile.avatar" alt="User Avatar" class="avatar-sm">
+          <router-link
+            to="/dashboard"
+            class="user-profile-btn"
+            @click="mobileMenuOpen = false"
+          >
+            <img
+              :src="userProfile.avatar"
+              alt="User Avatar"
+              class="avatar-sm"
+            />
             <span class="user-name">{{ userProfile.name }}</span>
           </router-link>
-          <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+          <button class="btn-logout" @click="handleLogoutClick" title="Logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </button>
         </template>
-        <router-link v-else to="/login" class="btn-login" @click="mobileMenuOpen = false">Masuk / Daftar</router-link>
+        <router-link
+          v-else
+          to="/login"
+          class="btn-login"
+          @click="mobileMenuOpen = false"
+          >Masuk / Daftar</router-link
+        >
       </div>
     </div>
 
@@ -60,28 +121,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserAccount } from '../../composables/useUserAccount'
-import ConfirmModal from '../common/ConfirmModal.vue'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useUserAccount } from "../../composables/useUserAccount";
+import ConfirmModal from "../common/ConfirmModal.vue";
 
-const { credits, maxCredits, isPremiumUser, isLoggedIn, userProfile, logout } = useUserAccount()
-const router = useRouter()
+const { credits, maxCredits, isPremiumUser, isLoggedIn, userProfile, logout } =
+  useUserAccount();
+const router = useRouter();
 
-const showLogoutConfirm = ref(false)
-const mobileMenuOpen = ref(false)
-
+const showLogoutConfirm = ref(false);
+const mobileMenuOpen = ref(false);
 
 const handleLogoutClick = () => {
-  showLogoutConfirm.value = true
-  mobileMenuOpen.value = false
-}
+  showLogoutConfirm.value = true;
+  mobileMenuOpen.value = false;
+};
 
 const performLogout = async () => {
-  await logout()
-  router.push('/')
-}
+  await logout();
+  router.push("/");
+};
 </script>
 
 <style src="../../assets/css/components/HomeNavbar.css" scoped></style>
-

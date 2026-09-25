@@ -1,0 +1,8 @@
+{
+  "navbar": {
+    "login": "Masuk",
+    "register": "Daftar",
+    "dashboard": "Dashboard",
+    "language": "Bahasa"
+  }
+}

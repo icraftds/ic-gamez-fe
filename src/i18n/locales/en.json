@@ -1,0 +1,8 @@
+{
+  "navbar": {
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "language": "Language"
+  }
+}
