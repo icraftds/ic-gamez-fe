@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #e2e8f0;
+  color: var(--text-main, #e2e8f0);
   font-weight: 600;
 }
 .order-plan-name i {
@@ -163,8 +163,8 @@
   line-height: 1.4;
 }
 .va-instructions li .step-num {
-  background: rgba(255,255,255,0.06);
-  color: #64748b;
+  background: var(--white-alpha-0_1, rgba(255,255,255,0.06));
+  color: var(--text-muted, #64748b);
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -217,8 +217,8 @@
   width: 100%;
   padding: 13px;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #94a3b8;
+  border: 1px solid var(--white-alpha-0_1, rgba(255,255,255,0.1));
+  color: var(--text-muted, #94a3b8);
   border-radius: 10px;
   font-weight: 600;
   font-size: 0.9rem;
@@ -227,7 +227,7 @@
   margin-top: 10px;
 }
 .btn-outline:hover {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.15);
-  color: #e2e8f0;
+  background: var(--white-alpha-0_04, rgba(255,255,255,0.04));
+  border-color: var(--white-alpha-0_15, rgba(255,255,255,0.15));
+  color: var(--text-main, #e2e8f0);
 }

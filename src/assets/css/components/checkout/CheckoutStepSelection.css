@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #e2e8f0;
+  color: var(--text-main, #e2e8f0);
   font-weight: 600;
 }
 .order-plan-name i {
@@ -33,7 +33,7 @@
 }
 .price-strikethrough {
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
   text-decoration: line-through;
   font-weight: 500;
   margin-bottom: 2px;
@@ -58,8 +58,8 @@
 .coupon-input-wrapper {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--white-alpha-0_03, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--white-alpha-0_1, rgba(255, 255, 255, 0.1));
   border-radius: 10px;
   padding: 0 14px;
   height: 46px;
@@ -79,7 +79,7 @@
   flex: 1;
   background: transparent;
   border: none;
-  color: #e2e8f0;
+  color: var(--text-main, #e2e8f0);
   font-size: 0.95rem;
   outline: none;
 }
@@ -145,8 +145,8 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--white-alpha-0_03, rgba(255,255,255,0.025));
+  border: 1px solid var(--white-alpha-0_1, rgba(255,255,255,0.06));
   border-radius: 12px;
   padding: 16px 18px;
   cursor: pointer;
@@ -165,7 +165,7 @@
 .method-radio {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 2px solid var(--white-alpha-0_15, rgba(255,255,255,0.15));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -213,13 +213,13 @@
   flex: 1;
 }
 .method-name {
-  color: #e2e8f0;
+  color: var(--text-main, #e2e8f0);
   font-weight: 600;
   font-size: 0.95rem;
   margin-bottom: 2px;
 }
 .method-desc {
-  color: #64748b;
+  color: var(--text-muted, #64748b);
   font-size: 0.8rem;
 }
 .method-badge {

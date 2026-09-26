@@ -38,6 +38,8 @@
             :planIcon="planIcon"
             :formattedPrice="formattedPrice"
             :planSlug="planSlug"
+            :planId="planId"
+            :rawPrice="planPrice"
             @instruction="onInstruction"
             @success="handlePaymentSuccess"
             @processing="onProcessing"
@@ -85,11 +87,12 @@ import CheckoutStepSuccess from '../components/checkout/CheckoutStepSuccess.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { isPremiumUser, fetchUser } = useUserAccount()
+const { userProfile, isPremiumUser, fetchUser } = useUserAccount()
 
 const planName = ref(route.query.plan || 'Pro')
 const planPrice = ref(Number(route.query.price) || 49000)
 const planSlug = ref(route.query.slug || 'pro')
+const planId = ref(Number(route.query.id) || 2)
 const expiryTime = ref(null)
 
 const planIcon = computed(() => {
@@ -166,10 +169,27 @@ const handlePaymentSuccess = async () => {
 let pollingInterval = null
 const startPolling = () => {
   stopPolling()
+  
+  // Catat state awal sebelum polling
+  const initialIsPremium = isPremiumUser.value
+  // credits didefinisikan dari useUserAccount
+  const initialCredits = userProfile.value?.credits || 0
+  const initialPlan = userProfile.value?.current_plan?.slug || userProfile.value?.current_plan || 'free'
+  
   pollingInterval = setInterval(async () => {
     try {
       await fetchUser()
-      if (isPremiumUser.value) {
+      
+      // Pembayaran sukses HANYA JIKA:
+      // 1. Sebelumnya Free, sekarang jadi Premium (untuk paket berlangganan)
+      // 2. Atau paketnya berubah (misal dari pro ke expert)
+      // 3. Atau credits bertambah (jika nanti ada topup koin)
+      const newPlan = userProfile.value?.current_plan?.slug || userProfile.value?.current_plan || 'free'
+      const becamePremium = !initialIsPremium && isPremiumUser.value
+      const planChanged = isPremiumUser.value && initialPlan !== newPlan
+      const gainedCredits = (userProfile.value?.credits || 0) > initialCredits
+      
+      if (becamePremium || planChanged || gainedCredits) {
         handlePaymentSuccess()
       }
     } catch (e) {

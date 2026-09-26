@@ -127,7 +127,8 @@ const goToCheckout = (plan) => {
     query: {
       plan: plan.name,
       price: plan.price,
-      slug: plan.slug
+      slug: plan.slug,
+      id: plan.id
     }
   })
 }

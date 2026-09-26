@@ -7,7 +7,7 @@
     <div class="order-summary">
       <div class="order-plan-name">
         <i :class="planIcon"></i>
-        <span>{{ planName }} Plan</span>
+        <span>{{ planName }}</span>
       </div>
       <div class="order-price">
         <div v-if="discountedPrice !== null" class="discount-price-wrap">
@@ -132,7 +132,9 @@ const props = defineProps({
   planName: String,
   planIcon: String,
   formattedPrice: String,
-  planSlug: String
+  planSlug: String,
+  planId: Number,
+  rawPrice: Number
 })
 
 const emit = defineEmits(['instruction', 'success', 'processing'])
@@ -172,39 +174,57 @@ const validateCoupon = async () => {
   }
 }
 
+import axios from 'axios'
+import { useUserAccount } from '../../composables/useUserAccount'
+const { userProfile } = useUserAccount()
+
 const goToInstruction = async () => {
   isProcessingPayment.value = true
   emit('processing', true)
   
   try {
-    const res = await api.post('/payments/create', {
-      item_type: 'premium_plan',
-      payment_method: selectedMethod.value,
-      plan_slug: props.planSlug,
-      coupon_code: couponCode.value
+    const userId = userProfile.value?.id || 1 // fallback to 1 if not found
+    
+    const amountToPay = discountedPrice.value !== null ? discountedPrice.value : props.rawPrice
+
+    const payload = {
+      user_id: userId,
+      plan_id: props.planId || 2,
+      amount: amountToPay,
+      payment_method: selectedMethod.value
+    }
+    
+    // Hit Payment Gateway Service Directly
+    const res = await axios.post('http://localhost:8001/api/v1/payment/checkout', payload, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
     })
     
-    const tx = res.data?.data
-    if (!tx) throw new Error('Data transaksi tidak ditemukan dari server.')
+    const tx = res.data?.data || {}
+    
+    let redirectUrl = tx.checkout_url || tx.payment_url;
+    
+    // Jika metode adalah payment_link tapi URL kosong, coba konstruksi manual
+    if (selectedMethod.value === 'payment_link' && !redirectUrl && tx.pakasir_txn_id) {
+      redirectUrl = `https://app.pakasir.com/pay-v2/${tx.pakasir_txn_id}`
+    }
 
-    if (tx.status === 'completed' || tx.amount === 0) {
-      emit('success')
+    if (redirectUrl && selectedMethod.value === 'payment_link') {
+      window.location.href = redirectUrl
       return
     }
 
-    if (tx.payment_method === 'payment_link' && tx.payment_details?.payment_link) {
-      window.location.href = tx.payment_details.payment_link
-      return
-    }
-
+    // Untuk QRIS dan VA, teruskan data (termasuk qr_string / va_number) ke layar instruksi
     emit('instruction', {
-      paymentDetails: tx.payment_details || {},
+      paymentDetails: tx,
       selectedMethod: selectedMethod.value,
       discountedPrice: discountedPrice.value
     })
   } catch (err) {
-    console.error('Failed to create payment', err)
-    openWipModal()
+    console.error('Failed to create payment in Payment Gateway:', err)
+    alert(err.response?.data?.message || 'Gagal memproses pembayaran ke Payment Gateway')
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)
