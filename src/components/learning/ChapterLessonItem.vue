@@ -13,7 +13,10 @@
         <span v-if="lesson.is_premium && !isPremiumUser" class="premium-badge"><i class="fa-solid fa-lock"></i> PRO</span>
       </div>
       <div class="lesson-action-icon">
-        <i class="fa-solid fa-arrow-right"></i>
+        <span v-if="lesson.is_premium && !isPremiumUser" class="unlock-pro-btn">
+          <i class="fa-solid fa-lock"></i> Unlock Pro
+        </span>
+        <i v-else class="fa-solid fa-arrow-right"></i>
       </div>
     </div>
   </div>
