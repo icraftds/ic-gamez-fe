@@ -45,7 +45,8 @@ api.interceptors.response.use(
       if (error.config && (
         error.config.url === '/auth/me' || 
         error.config.url === '/auth/logout' ||
-        error.config.url.includes('submit-speedrun')
+        error.config.url.includes('submit-speedrun') ||
+        error.config.url.includes('/hints')
       )) {
         return Promise.reject(error);
       }
