@@ -205,6 +205,12 @@ const stopPolling = () => {
 }
 
 onMounted(() => {
+  if (localStorage.getItem('ic_returning_from_payment') === 'true') {
+    localStorage.removeItem('ic_returning_from_payment')
+    router.replace('/payment/success')
+    return
+  }
+
   if (route.query.resume === 'true') {
     const saved = localStorage.getItem('ic_pending_checkout')
     if (saved) {

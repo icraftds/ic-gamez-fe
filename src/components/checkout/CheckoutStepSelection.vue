@@ -213,6 +213,7 @@ const goToInstruction = async () => {
     }
 
     if (redirectUrl && selectedMethod.value === 'payment_link') {
+      localStorage.setItem('ic_returning_from_payment', 'true')
       window.location.href = redirectUrl
       return
     }
