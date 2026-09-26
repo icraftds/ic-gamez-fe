@@ -44,12 +44,13 @@
             <li class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
           </ul>
           <div class="plan-action">
-            <button class="btn-disabled" @click="handlePlanClick('free')">Klaim Gratis</button>
+            <div v-if="(currentPlan === 'free' || !currentPlan) && !isPremiumUser" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
+            <button v-else class="btn-disabled" @click="handlePlanClick('free')">Klaim Gratis</button>
           </div>
         </div>
 
         <!-- Dynamic Plans from API -->
-        <div v-for="plan in plans" :key="plan.id" class="plan-card" :class="[plan.slug]">
+        <div v-for="plan in plans" :key="plan.id" class="plan-card" :class="[plan.slug, { active: currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro') }]">
           <!-- Optional Badges based on slug -->
           <div v-if="plan.slug === 'pro'" class="badge-popular">Paling Populer</div>
           <div v-else-if="plan.slug === 'expert'" class="badge-premium">Premium</div>
@@ -71,7 +72,8 @@
           </ul>
           
           <div class="plan-action">
-            <button class="btn-upgrade" :class="plan.slug + '-btn'" @click="handlePlanClick(plan.slug, plan)">Pilih {{ plan.name }}</button>
+            <div v-if="currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro')" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
+            <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="handlePlanClick(plan.slug, plan)">Pilih {{ plan.name }}</button>
           </div>
         </div>
       </div>
@@ -98,7 +100,7 @@ import AuthRequiredModal from '../components/common/AuthRequiredModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 
 const router = useRouter()
-const { isLoggedIn } = useUserAccount()
+const { isLoggedIn, isPremiumUser, currentPlan } = useUserAccount()
 
 const plans = ref([])
 const isLoadingPlans = ref(false)
