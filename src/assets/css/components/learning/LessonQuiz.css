@@ -1,11 +1,11 @@
 .step-content {
   width: 100%;
   max-width: 800px;
-  background: rgba(20, 15, 40, 0.7);
+  background: var(--glass-bg-card-0_7);
   border: 1px solid rgba(147, 51, 234, 0.3);
   border-radius: 16px;
   padding: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px var(--black-alpha-0_3);
   backdrop-filter: blur(10px);
 }
 
@@ -15,7 +15,7 @@
   gap: 15px;
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--white-alpha-0_1);
 }
 
 .btn-primary {
@@ -40,9 +40,9 @@
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--white-alpha-0_1);
+  color: var(--text-main-hex);
+  border: 1px solid var(--white-alpha-0_2);
   padding: 10px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -50,7 +50,7 @@
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--white-alpha-0_2);
 }
 
 .quiz-box h3 {
@@ -69,9 +69,9 @@
 }
 
 .option-btn {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
+  background: var(--black-alpha-0_3);
+  border: 1px solid var(--white-alpha-0_2);
+  color: var(--text-main-hex);
   padding: 15px;
   border-radius: 8px;
   text-align: left;
@@ -104,7 +104,7 @@
   margin-top: 20px;
   padding: 15px;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--black-alpha-0_2);
 }
 
 .success-msg {

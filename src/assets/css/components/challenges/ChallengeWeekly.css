@@ -34,7 +34,7 @@
 .weekly-header h2 {
   font-size: 2rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-main-hex);
   margin: 0 0 10px 0;
 }
 
@@ -45,7 +45,7 @@
 }
 
 .weekly-header p {
-  color: #94a3b8;
+  color: var(--text-sub-hex);
   font-size: 1rem;
   max-width: 600px;
   margin: 0 auto 20px auto;
@@ -58,7 +58,7 @@
   background: rgba(15, 23, 42, 0.5);
   padding: 15px 20px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--white-alpha-0_05);
 }
 
 .pb-label {
@@ -67,12 +67,12 @@
   margin-bottom: 8px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-main-hex);
 }
 
 .pb-bg {
   height: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--white-alpha-0_1);
   border-radius: 5px;
   overflow: hidden;
   margin-bottom: 10px;
@@ -97,7 +97,7 @@
 }
 
 .sub-challenges h3 {
-  color: #fff;
+  color: var(--text-main-hex);
   margin-bottom: 20px;
   font-size: 1.2rem;
 }
@@ -110,7 +110,7 @@
 
 .q-card {
   background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--white-alpha-0_05);
   border-radius: 16px;
   padding: 20px;
   display: flex;
@@ -123,7 +123,7 @@
 
 .q-card:hover {
   background: rgba(30, 41, 59, 0.8);
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--white-alpha-0_1);
 }
 
 .q-card.completed {
@@ -152,17 +152,17 @@
 }
 
 .q-status.pending { color: #3b82f6; }
-.q-status.locked-st { color: #94a3b8; }
+.q-status.locked-st { color: var(--text-sub-hex); }
 
 .q-card h4 {
-  color: #fff;
+  color: var(--text-main-hex);
   margin: 0;
   font-size: 1.1rem;
   padding-right: 100px; /* Space for status */
 }
 
 .q-card p {
-  color: #94a3b8;
+  color: var(--text-sub-hex);
   font-size: 0.95rem;
   line-height: 1.5;
   margin: 0 0 10px 0;
@@ -172,7 +172,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--white-alpha-0_05);
   padding-top: 15px;
   margin-top: auto;
 }
@@ -199,13 +199,13 @@
 
 .btn-sm.outline {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
+  border: 1px solid var(--white-alpha-0_1);
+  color: var(--text-sub-hex);
 }
 
 .btn-sm.primary {
   background: #3b82f6;
-  color: #fff;
+  color: var(--text-main-hex);
 }
 
 .btn-sm.primary:hover {

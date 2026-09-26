@@ -14,7 +14,7 @@
 .global-loading-overlay {
   position: fixed;
   inset: 0;
-  background: var(--glass-bg, rgba(15, 10, 30, 0.85));
+  background: var(--glass-bg, var(--glass-bg-input-0_85));
   backdrop-filter: blur(12px);
   z-index: 9999;
   display: flex;
@@ -30,7 +30,7 @@
 }
 
 .loader-content p {
-  color: #fff;
+  color: var(--text-main-hex);
   font-weight: 600;
   letter-spacing: 1px;
 }
@@ -38,7 +38,7 @@
 .spinner-large {
   width: 48px;
   height: 48px;
-  border: 4px solid rgba(255,255,255,0.1);
+  border: 4px solid var(--white-alpha-0_1);
   border-left-color: #00f0ff;
   border-radius: 50%;
   animation: spin 1s linear infinite;

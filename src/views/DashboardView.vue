@@ -65,8 +65,7 @@ const tabs = [
     <nav class="dash-navbar">
       <div class="dash-nav-left">
         <router-link to="/" class="logo">
-          <i class="fa-solid fa-cube text-primary"></i>
-          <span>Icraft<span class="text-secondary">DS</span></span>
+          <img src="/images/logo-icgamez.png" alt="IC GameZ" class="logo-img" />
         </router-link>
         <span class="dash-label">DASHBOARD</span>
       </div>

@@ -36,7 +36,7 @@
 }
 
 .hero-desc {
-  color: #94a3b8;
+  color: var(--text-sub-hex);
   font-size: 1.15rem;
   max-width: 600px;
   line-height: 1.6;
@@ -67,7 +67,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 10, 30, 0.85);
+  background: var(--glass-bg-input-0_85);
   backdrop-filter: blur(12px);
   z-index: 9999;
   display: flex;
@@ -84,7 +84,7 @@
 }
 
 .loader-content p {
-  color: #f8fafc;
+  color: var(--text-main-hex);
   font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: 0.5px;

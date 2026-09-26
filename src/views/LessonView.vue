@@ -170,16 +170,18 @@ const runner = useCodeRunner()
 const scoring = useScoring()
 
 const lessonLanguage = computed(() => {
-  const pSlug = path.value?.slug || pathId.value;
-  const cSlug = currentChapter.value?.slug || chapterId.value;
+  const pSlug = (path.value?.slug || pathId.value || '').toLowerCase();
+  const cSlug = (currentChapter.value?.slug || chapterId.value || '').toLowerCase();
   
-  if (pSlug === 'database') return 'sql'
-  if (pSlug === 'frontend' || pSlug === 'frontend-web') {
-    if (['fe1', 'fe2'].includes(cSlug)) return 'html'
-    if (cSlug === 'fe3') return 'css'
-    return 'javascript'
+  if (pSlug.includes('database') || pSlug.includes('sql')) return 'sql';
+  
+  if (pSlug.includes('frontend') || pSlug.includes('web')) {
+    if (cSlug.includes('javascript') || cSlug.includes('js') || ['fe4', 'fe5', 'fe6'].includes(cSlug)) return 'javascript';
+    if (cSlug.includes('css') || cSlug === 'fe3') return 'css';
+    return 'html';
   }
-  return 'javascript'
+  
+  return 'javascript';
 })
 
 // ── Toast State ───────────────────────────────────────────────────
@@ -417,5 +419,6 @@ watch(currentLesson, (newLesson) => {
 
 <style src="../assets/css/pages/LessonView.css" scoped></style>
 <style scoped src="../assets/css/views/LessonView.css"></style>
-t o u c h  
+t o u c h 
+ 
  

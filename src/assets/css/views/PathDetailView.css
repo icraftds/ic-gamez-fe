@@ -12,9 +12,9 @@
 }
 
 .back-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
+  background: var(--white-alpha-0_1);
+  border: 1px solid var(--white-alpha-0_2);
+  color: var(--text-main-hex);
   padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -23,7 +23,7 @@
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--white-alpha-0_2);
 }
 
 .path-header {
@@ -41,7 +41,7 @@
   justify-content: center;
   align-items: center;
   font-size: 1.8rem;
-  color: white;
+  color: var(--text-main-hex);
 }
 
 .path-title h2 {
@@ -50,7 +50,7 @@
 }
 
 .path-title p {
-  color: #94a3b8;
+  color: var(--text-sub-hex);
 }
 
 .chapters-container {
@@ -72,8 +72,8 @@
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #94a3b8;
-  background: rgba(20, 15, 40, 0.7);
+  color: var(--text-sub-hex);
+  background: var(--glass-bg-card-0_7);
   border-radius: 12px;
 }
 

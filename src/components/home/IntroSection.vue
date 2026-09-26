@@ -3,11 +3,11 @@
     <div class="intro-content">
       <h2>Bersiap Untuk Karier Impian Anda</h2>
       <p>
-        Lebih dari ribuan developer telah bergabung dengan komunitas IC
-        Game-Z untuk memvalidasi keahlian mereka, berlatih untuk interview
-        teknis, dan menemukan peluang baru. <br /><br />Sistem AI Mentor
-        terintegrasi kami akan mendampingi Anda di setiap baris kode,
-        memberikan petunjuk, dan membantu Anda belajar lebih cepat.
+        Lebih dari ribuan developer telah bergabung dengan komunitas IC Game-Z
+        untuk memvalidasi keahlian mereka, berlatih untuk interview teknis, dan
+        menemukan peluang baru. <br /><br />Sistem AI Mentor terintegrasi kami
+        akan mendampingi Anda di setiap baris kode, memberikan petunjuk, dan
+        membantu Anda belajar lebih cepat.
       </p>
       <router-link to="#" class="btn-learn-more"
         >Pelajari Cara Kerjanya <i class="fa-solid fa-arrow-right"></i
@@ -80,17 +80,19 @@
                 >let</span
               >
               i = <span class="num">0</span>; i &lt; nums.length; i++) {<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span>
-              comp = target - nums[i];<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span>
-              (map.<span class="func">has</span>(comp)) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> comp =
+              target - nums[i];<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> (map.<span
+                class="func"
+                >has</span
+              >(comp)) {<br />
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword"
                 >return</span
               >
               [map.<span class="func">get</span>(comp), i];<br />
               &nbsp;&nbsp;&nbsp;&nbsp;}<br />
-              &nbsp;&nbsp;&nbsp;&nbsp;map.<span class="func">set</span
-              >(nums[i], i);<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;map.<span class="func">set</span>(nums[i],
+              i);<br />
               &nbsp;&nbsp;}<br />
               }
             </div>

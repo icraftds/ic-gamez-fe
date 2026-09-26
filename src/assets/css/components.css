@@ -10,8 +10,8 @@
         border-radius: 24px;
         padding: 35px 25px;
         border: 1px solid var(--glass-border);
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-        border-left: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid var(--white-alpha-0_2);
+        border-left: 1px solid var(--white-alpha-0_2);
         display: flex;
         flex-direction: column;
         text-decoration: none;
@@ -37,13 +37,13 @@
       .persp-card:nth-child(odd) {
         transform: rotateY(15deg) rotateX(10deg);
         box-shadow:
-          -15px 20px 40px rgba(0, 0, 0, 0.4),
+          -15px 20px 40px var(--black-alpha-0_4),
           0 0 20px rgba(147, 51, 234, 0.1);
       }
       .persp-card:nth-child(even) {
         transform: rotateY(-15deg) rotateX(10deg);
         box-shadow:
-          15px 20px 40px rgba(0, 0, 0, 0.4),
+          15px 20px 40px var(--black-alpha-0_4),
           0 0 20px rgba(147, 51, 234, 0.1);
       }
 
@@ -51,7 +51,7 @@
         transform: rotateY(0deg) rotateX(0deg) translateZ(40px) !important;
         border-color: var(--primary);
         box-shadow:
-          0 40px 80px rgba(0, 0, 0, 0.6),
+          0 40px 80px var(--black-alpha-0_6),
           0 0 40px rgba(0, 240, 255, 0.4) !important;
         z-index: 10;
       }
@@ -74,7 +74,7 @@
       .modal-overlay {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(10, 5, 20, 0.8);
+        background: var(--glass-bg-heavy-0_8);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         z-index: 2000;
@@ -90,7 +90,7 @@
         pointer-events: auto;
       }
       .modal-content {
-        background: rgba(30, 20, 50, 0.95);
+        background: var(--glass-bg-modal-0_95);
         border: 1px solid var(--primary);
         box-shadow: 0 0 40px rgba(147, 51, 234, 0.4), inset 0 0 20px rgba(147, 51, 234, 0.2);
         border-radius: 24px;
@@ -116,7 +116,7 @@
         transition: color 0.3s;
       }
       .modal-close:hover {
-        color: white;
+        color: var(--text-main-hex);
       }
       .coffee-icon {
         font-size: 4rem;
@@ -132,7 +132,7 @@
       .modal-content h3 {
         font-size: 1.8rem;
         margin-bottom: 15px;
-        color: white;
+        color: var(--text-main-hex);
       }
       .modal-content p {
         color: var(--text-muted);
@@ -163,7 +163,7 @@
       .card-code-preview {
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(20, 15, 40, 0.95);
+        background: var(--glass-bg-card-0_95);
         border-radius: 12px;
         padding: 15px;
         box-sizing: border-box;
@@ -249,10 +249,10 @@
         gap: 8px;
       }
       .btn-disabled {
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--white-alpha-0_05);
         color: var(--text-muted);
         box-shadow: none;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--white-alpha-0_1);
       }
       .persp-card:hover .btn-start:not(.btn-disabled) {
         transform: scale(1.05) translateZ(10px);
@@ -303,9 +303,9 @@
 
       /* Data Tables */
       .table-container {
-        background: rgba(15, 10, 30, 0.7);
+        background: var(--glass-bg-input-0_7);
         border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--white-alpha-0_05);
         overflow: hidden;
         backdrop-filter: blur(10px);
         display: flex;
@@ -319,7 +319,7 @@
       .data-table th {
         text-align: left;
         padding: 15px 20px;
-        background: rgba(0, 0, 0, 0.2);
+        background: var(--black-alpha-0_2);
         color: #64748b;
         font-size: 0.85rem;
         font-weight: 700;
@@ -327,14 +327,14 @@
       }
       .data-table td {
         padding: 12px 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        color: #e2e8f0;
+        border-bottom: 1px solid var(--white-alpha-0_05);
+        color: var(--text-main-hex);
       }
       .data-table tr {
         transition: background 0.2s ease;
       }
       .data-table tbody tr:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--white-alpha-0_05);
       }
 
       /* Pagination */
@@ -344,13 +344,13 @@
         justify-content: center;
         gap: 15px;
         padding: 20px 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        background: rgba(15, 10, 30, 0.5);
+        border-top: 1px solid var(--white-alpha-0_05);
+        background: var(--glass-bg-input-0_5);
       }
       .page-btn {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #e2e8f0;
+        background: var(--white-alpha-0_05);
+        border: 1px solid var(--white-alpha-0_1);
+        color: var(--text-main-hex);
         padding: 8px 16px;
         border-radius: 8px;
         cursor: pointer;
@@ -364,7 +364,7 @@
       .page-btn:hover:not(:disabled) {
         background: rgba(147, 51, 234, 0.2);
         border-color: #c084fc;
-        color: #fff;
+        color: var(--text-main-hex);
       }
       .page-btn:disabled {
         opacity: 0.4;
@@ -372,15 +372,15 @@
         background: transparent;
       }
       .page-info {
-        color: #94a3b8;
+        color: var(--text-sub-hex);
         font-size: 0.95rem;
         font-weight: 500;
       }
 
       /* Filters */
       .filter-select {
-        background: rgba(15, 10, 30, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: var(--glass-bg-input-0_8);
+        border: 1px solid var(--white-alpha-0_15);
         padding: 10px 15px;
         border-radius: 8px;
         display: flex;
@@ -393,7 +393,7 @@
         box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2);
       }
       .filter-select i {
-        color: #94a3b8;
+        color: var(--text-sub-hex);
       }
       .filter-select select {
         -webkit-appearance: none;
@@ -401,7 +401,7 @@
         appearance: none;
         background-color: transparent;
         border: none;
-        color: #e2e8f0;
+        color: var(--text-main-hex);
         font-size: 0.95rem;
         font-family: inherit;
         outline: none;
@@ -414,8 +414,8 @@
         background-size: 10px;
       }
       .filter-select select option {
-        background-color: #0f0a1e;
-        color: #e2e8f0;
+        background-color: var(--bg-alt);
+        color: var(--text-main-hex);
         padding: 10px;
       }
 
@@ -423,7 +423,7 @@
       .empty-state {
         text-align: center;
         padding: 40px;
-        color: #94a3b8;
+        color: var(--text-sub-hex);
         font-size: 1.1rem;
       }
 
@@ -443,7 +443,7 @@
         .persp-card:nth-child(odd),
         .persp-card:nth-child(even) {
           transform: none !important;
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+          box-shadow: 0 10px 20px var(--black-alpha-0_3) !important;
         }
         .persp-card { padding: 25px 20px; }
         .persp-card h3 { font-size: 1.3rem; }

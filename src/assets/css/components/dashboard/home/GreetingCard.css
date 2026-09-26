@@ -1,6 +1,6 @@
 .greeting-card {
-  background: rgba(15, 10, 30, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-input-0_7);
+  border: 1px solid var(--white-alpha-0_05);
   border-radius: 16px;
   padding: 30px;
   display: flex;
@@ -13,7 +13,7 @@
 
 .greeting-card:hover {
   transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-5px);
-  box-shadow: -10px 15px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 158, 11, 0.2);
+  box-shadow: -10px 15px 30px var(--black-alpha-0_6), 0 0 20px rgba(245, 158, 11, 0.2);
   border-color: rgba(245, 158, 11, 0.3);
 }
 .greeting-card h1 { font-size: 2rem; margin-bottom: 8px; }
@@ -26,10 +26,10 @@
   text-decoration-color: #f59e0b;
   text-underline-offset: 4px;
 }
-.greeting-card > .greeting-left > p { color: #94a3b8; margin-bottom: 20px; }
+.greeting-card > .greeting-left > p { color: var(--text-sub-hex); margin-bottom: 20px; }
 .quick-stats { display: flex; gap: 30px; }
 .qs-item { display: flex; align-items: baseline; gap: 6px; }
-.qs-value { font-size: 1.5rem; font-weight: 800; color: white; }
+.qs-value { font-size: 1.5rem; font-weight: 800; color: var(--text-main-hex); }
 .qs-label { color: #64748b; font-size: 0.9rem; }
 .text-cyan { color: #22d3ee; }
 .text-orange { color: #f97316; }

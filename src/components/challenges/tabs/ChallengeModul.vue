@@ -144,7 +144,7 @@ const fetchChallenges = async () => {
         category,
         pathId,
         chapterId,
-        difficulty: challenge.is_premium ? 'Sulit' : 'Sedang',
+        difficulty: challenge.difficulty || (challenge.is_premium ? 'Sulit' : 'Sedang'),
         isCompleted: (() => {
           let p = challenge.progress;
           if (Array.isArray(p)) p = p.length > 0 ? p[0] : null;
@@ -203,3 +203,4 @@ const openChallenge = (challenge) => {
 </script>
 
 <style scoped src="../../../assets/css/components/challenges/ChallengeModul.css"></style>
+

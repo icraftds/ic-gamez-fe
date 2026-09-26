@@ -106,6 +106,7 @@
 import { onMounted } from "vue";
 import { useUserAccount } from "../../composables/useUserAccount.js";
 import { useChallengesStats } from "../../composables/useChallengesStats.js";
+import { useLearningPaths } from "../../composables/useLearningPaths.js";
 
 const { isPremiumUser, subscriptionStatus, upgradeToPremium, userStats, fetchUserStats } = useUserAccount();
 const {
@@ -120,9 +121,13 @@ const {
   completedSulit
 } = useChallengesStats();
 
-onMounted(() => {
+const { fetchAllPathsDetails } = useLearningPaths();
+
+onMounted(async () => {
   fetchUserStats();
+  await fetchAllPathsDetails();
 });
 </script>
 
 <style scoped src="../../assets/css/components/challenges/ChallengesSidebar.css"></style>
+

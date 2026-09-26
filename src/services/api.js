@@ -25,6 +25,10 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  
+  const locale = localStorage.getItem('user_locale') || 'id';
+  config.headers['Accept-Language'] = locale;
+  
   return config;
 });
 
@@ -42,7 +46,8 @@ api.interceptors.response.use(
         error.config.url === '/auth/me' || 
         error.config.url === '/auth/logout' ||
         error.config.url.includes('submit-speedrun') ||
-        error.config.url.includes('/coupons/validate')
+        error.config.url.includes('/coupons/validate') ||
+        error.config.url.includes('/hints')
       )) {
         return Promise.reject(error);
       }

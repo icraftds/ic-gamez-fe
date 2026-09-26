@@ -7,14 +7,14 @@
   display: flex;
   align-items: center;
   padding: 18px 24px;
-  background: rgba(10, 6, 18, 0.4);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--bg-editor-alt);
+  border-bottom: 1px solid var(--white-alpha-0_05);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .lesson-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--white-alpha-0_05);
   border-left: 3px solid var(--primary);
   padding-left: 21px; /* Compensate for border */
 }
@@ -66,4 +66,16 @@
   opacity: 1;
   transform: translateX(0);
   color: var(--primary);
+}
+
+.unlock-pro-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }

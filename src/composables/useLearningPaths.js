@@ -118,7 +118,7 @@ export function useLearningPaths() {
                   pathId: path.slug || path.id,
                   chapterId: chapter.slug || chapter.id,
                   category: path.title,
-                  difficulty: lesson.is_premium ? 'Sulit' : 'Sedang'
+                  difficulty: lesson.difficulty || (lesson.is_premium ? 'Sulit' : 'Sedang')
                 })
               }
             })
@@ -143,3 +143,4 @@ export function useLearningPaths() {
     hasFetchedAllPaths
   }
 }
+

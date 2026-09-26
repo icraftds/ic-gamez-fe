@@ -17,7 +17,7 @@
   text-align: left;
   transition: all 0.2s;
 }
-.lesson-item:hover { color: #94a3b8; background: rgba(255, 255, 255, 0.03); }
+.lesson-item:hover { color: var(--text-sub-hex); background: var(--white-alpha-0_03); }
 .lesson-item.is-active {
   color: #c084fc;
   background: rgba(147, 51, 234, 0.1);
@@ -57,7 +57,7 @@
   flex-direction: column;
   padding: 4px 14px 4px 40px;
   gap: 4px;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--black-alpha-0_1);
 }
 
 .sub-item {
@@ -77,14 +77,14 @@
 }
 
 .sub-item:not(.locked):hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
+  background: var(--white-alpha-0_05);
+  color: var(--text-main-hex);
 }
 
 .sub-item.is-active {
   background: rgba(147, 51, 234, 0.15);
   border-color: rgba(147, 51, 234, 0.3);
-  color: #e2e8f0;
+  color: var(--text-main-hex);
 }
 
 .sub-item.locked {

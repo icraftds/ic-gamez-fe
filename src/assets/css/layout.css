@@ -17,7 +17,7 @@
         align-items: center;
         gap: 10px;
         padding: 12px 24px;
-        background: rgba(15, 10, 30, 0.8);
+        background: var(--glass-bg-input-0_8);
         border: 1px solid var(--glass-border);
         border-radius: 999px;
         color: var(--text-light);
@@ -29,7 +29,7 @@
         box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);
       }
       .nav-btn:hover {
-        background: rgba(30, 20, 50, 1);
+        background: var(--glass-bg-modal-1);
         transform: translateX(-5px);
         box-shadow: 0 8px 25px rgba(147, 51, 234, 0.4);
         border-color: var(--primary);

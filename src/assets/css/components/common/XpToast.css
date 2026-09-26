@@ -10,8 +10,8 @@
   border-radius: 14px;
   backdrop-filter: blur(16px);
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    0 8px 32px var(--black-alpha-0_5),
+    0 0 0 1px var(--white-alpha-0_08) inset;
   overflow: hidden;
   min-width: 240px;
 }
@@ -54,7 +54,7 @@
 
 .xp-toast-label {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--text-sub-hex);
   font-weight: 500;
 }
 
@@ -76,9 +76,9 @@
   background: linear-gradient(
     115deg,
     transparent 30%,
-    rgba(255, 255, 255, 0.06) 45%,
-    rgba(255, 255, 255, 0.12) 50%,
-    rgba(255, 255, 255, 0.06) 55%,
+    var(--white-alpha-0_06) 45%,
+    var(--white-alpha-0_12) 50%,
+    var(--white-alpha-0_06) 55%,
     transparent 70%
   );
   animation: shine-sweep 2s ease-in-out infinite;
