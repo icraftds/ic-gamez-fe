@@ -12,7 +12,7 @@
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #fff, #94a3b8);
+  background: linear-gradient(135deg, var(--text-main-hex), var(--text-sub-hex));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -20,7 +20,7 @@
 
 .section-subtitle {
   font-size: 1.15rem;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted, var(--text-sub-hex));
   line-height: 1.6;
 }
 

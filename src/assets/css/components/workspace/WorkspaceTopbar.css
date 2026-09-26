@@ -1,6 +1,6 @@
 .ws-topbar {
   height: 56px;
-  background: rgba(15, 10, 30, 0.95);
+  background: var(--glass-bg-input-0_95);
   border-bottom: 1px solid rgba(147, 51, 234, 0.2);
   backdrop-filter: blur(12px);
   display: flex;
@@ -23,9 +23,9 @@
 }
 
 .back-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94a3b8;
+  background: var(--white-alpha-0_08);
+  border: 1px solid var(--white-alpha-0_12);
+  color: var(--text-sub-hex);
   width: 34px;
   height: 34px;
   border-radius: 8px;
@@ -36,7 +36,7 @@
   flex-shrink: 0;
   transition: all 0.2s;
 }
-.back-btn:hover { background: rgba(255, 255, 255, 0.15); color: white; }
+.back-btn:hover { background: var(--white-alpha-0_15); color: var(--text-main-hex); }
 
 .breadcrumb {
   display: flex;
@@ -50,7 +50,7 @@
 .separator { font-size: 0.6rem; color: #334155; flex-shrink: 0; }
 .breadcrumb-path { color: #7c3aed; font-weight: 600; flex-shrink: 0; }
 .breadcrumb-chapter { color: #64748b; flex-shrink: 0; }
-.breadcrumb-lesson { color: #e2e8f0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.breadcrumb-lesson { color: var(--text-main-hex); font-weight: 500; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 
 /* ── Right: progress steps ── */
 .progress-steps {
@@ -84,15 +84,15 @@
   transition: all 0.3s;
   flex-shrink: 0;
 }
-.step.active .step-dot { background: #7c3aed; border-color: #c084fc; color: white; }
-.step.done .step-dot { background: #10b981; border-color: #10b981; color: white; }
+.step.active .step-dot { background: #7c3aed; border-color: #c084fc; color: var(--text-main-hex); }
+.step.done .step-dot { background: #10b981; border-color: #10b981; color: var(--text-main-hex); }
 
 .step-label { white-space: nowrap; }
 
 .step-connector {
   width: 32px;
   height: 2px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--white-alpha-0_1);
   border-radius: 2px;
   margin: 0 8px;
   transition: background 0.3s;
@@ -110,7 +110,7 @@
 .separator-vertical {
   width: 1px;
   height: 24px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--white-alpha-0_1);
 }
 
 .avatar-sm {
@@ -118,7 +118,7 @@
   height: 32px;
   border-radius: 50%;
   border: 2px solid rgba(147, 51, 234, 0.5);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--white-alpha-0_05);
   object-fit: cover;
   cursor: pointer;
   transition: all 0.2s;
@@ -143,9 +143,9 @@
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
+  background: var(--white-alpha-0_05);
+  border: 1px solid var(--white-alpha-0_1);
+  color: var(--text-main-hex);
 }
 
 .level-badge i {

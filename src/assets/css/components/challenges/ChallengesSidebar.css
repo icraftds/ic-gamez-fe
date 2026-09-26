@@ -6,8 +6,8 @@
 }
 
 .card {
-  background: rgba(15, 10, 30, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-input-0_7);
+  border: 1px solid var(--white-alpha-0_05);
   border-radius: 16px;
   padding: 25px;
   backdrop-filter: blur(10px);
@@ -17,8 +17,8 @@
   font-size: 1.1rem;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+  border-bottom: 1px solid var(--white-alpha-0_1);
+  color: var(--text-main-hex);
 }
 
 .status-row {
@@ -36,18 +36,18 @@
 }
 
 .badge.free {
-  background: rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
+  background: var(--white-alpha-0_1);
+  color: var(--text-sub-hex);
 }
 
 .badge.premium {
   background: linear-gradient(135deg, #d97706, #f59e0b);
-  color: white;
+  color: var(--text-main-hex);
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
 }
 
 .upgrade-box {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--black-alpha-0_2);
   padding: 15px;
   border-radius: 12px;
   border: 1px dashed rgba(245, 158, 11, 0.3);
@@ -61,7 +61,7 @@
 
 .upgrade-box li {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--text-sub-hex);
   margin-bottom: 8px;
   display: flex;
   gap: 8px;
@@ -105,7 +105,7 @@
 
 .circle-bg {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.1);
+  stroke: var(--white-alpha-0_1);
   stroke-width: 2.5;
 }
 
@@ -133,7 +133,7 @@
 
 .progress-text {
   text-align: center;
-  color: #94a3b8;
+  color: var(--text-sub-hex);
   margin-bottom: 20px;
   font-size: 0.9rem;
 }
@@ -146,7 +146,7 @@
   align-items: center;
   margin-bottom: 12px;
   font-size: 0.95rem;
-  color: #cbd5e1;
+  color: var(--text-sub-hex);
 }
 
 /* History Specific */
@@ -174,17 +174,17 @@
 }
 
 .tag {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--white-alpha-0_05);
+  border: 1px solid var(--white-alpha-0_1);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
-  color: #cbd5e1;
+  color: var(--text-sub-hex);
   cursor: pointer;
 }
 .tag:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--white-alpha-0_1);
+  color: var(--text-main-hex);
 }
 
 @media (max-width: 768px) {

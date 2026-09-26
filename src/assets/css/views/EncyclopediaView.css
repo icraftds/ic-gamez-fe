@@ -13,8 +13,8 @@
 .encyclopedia-sidebar {
   width: 300px;
   flex-shrink: 0;
-  background: rgba(10, 5, 20, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-bg-heavy-0_6);
+  border: 1px solid var(--white-alpha-0_1);
   border-radius: 16px;
   padding: 20px;
   backdrop-filter: blur(10px);
@@ -43,16 +43,16 @@
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--text-sub-hex);
 }
 
 .search-box input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--black-alpha-0_4);
+  border: 1px solid var(--white-alpha-0_2);
   border-radius: 99px;
   padding: 10px 15px 10px 40px;
-  color: #fff;
+  color: var(--text-main-hex);
   font-family: 'Fredoka', sans-serif;
   outline: none;
   transition: all 0.3s;
@@ -68,13 +68,13 @@
 }
 
 .nav-section h4 {
-  color: #94a3b8;
+  color: var(--text-sub-hex);
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 10px;
   padding-bottom: 5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--white-alpha-0_1);
 }
 
 .topic-nav ul {
@@ -90,7 +90,7 @@
 .topic-nav a {
   display: block;
   padding: 8px 12px;
-  color: #cbd5e1;
+  color: var(--text-sub-hex);
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.2s;
@@ -98,8 +98,8 @@
 }
 
 .topic-nav a:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: var(--white-alpha-0_05);
+  color: var(--text-main-hex);
 }
 
 .topic-nav a.active {
@@ -133,7 +133,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  color: #94a3b8;
+  color: var(--text-sub-hex);
   padding: 30px 0;
 }
 .article-loading {
@@ -142,11 +142,11 @@
   align-items: center;
   justify-content: center;
   height: 400px;
-  background: rgba(15, 10, 30, 0.8);
+  background: var(--glass-bg-input-0_8);
   border: 1px solid rgba(147, 51, 234, 0.3);
   border-radius: 16px;
   backdrop-filter: blur(20px);
-  color: #cbd5e1;
+  color: var(--text-sub-hex);
 }
 .spinner {
   width: 50px;
