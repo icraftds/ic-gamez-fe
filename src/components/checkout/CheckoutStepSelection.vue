@@ -195,7 +195,8 @@ const goToInstruction = async () => {
     }
     
     // Hit Payment Gateway Service Directly
-    const res = await axios.post('http://localhost:8001/api/v1/payment/checkout', payload, {
+    const paymentBaseUrl = import.meta.env.VITE_PAYMENT_URL || 'http://localhost:8001/api/v1'
+    const res = await axios.post(`${paymentBaseUrl}/payment/checkout`, payload, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
