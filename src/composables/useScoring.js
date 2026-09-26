@@ -65,9 +65,9 @@ export function useScoring() {
       scoredActivities.value.add(key)
       await refreshStats()
       
-      const awarded = response.data.awarded !== undefined ? response.data.awarded : true;
-      const xp = response.data.xp_earned !== undefined ? response.data.xp_earned : (type === 'quiz' ? XP_REWARDS.QUIZ_CORRECT : XP_REWARDS.PRACTICE_COMPLETE);
-      const explanation = response.data.explanation
+      const awarded = response.data?.data?.awarded !== undefined ? response.data.data.awarded : true;
+      const xp = response.data?.data?.xp_earned !== undefined ? response.data.data.xp_earned : (type === 'quiz' ? XP_REWARDS.QUIZ_CORRECT : XP_REWARDS.PRACTICE_COMPLETE);
+      const explanation = response.data?.data?.explanation || response.data?.explanation
       return { success: true, awarded, xp, explanation };
     } catch (error) {
       console.error(`Failed to award XP for ${type}`, error)
