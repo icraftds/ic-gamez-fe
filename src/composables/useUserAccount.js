@@ -69,8 +69,8 @@ export function useUserAccount() {
       const response = await api.post('/auth/login', { email, password })
       
       // Simpan token ke localStorage untuk Mode API Token
-      if (response.data && response.data.token) {
-        localStorage.setItem('auth_token', response.data.token)
+      if (response.data && response.data.local_token) {
+        localStorage.setItem('auth_token', response.data.local_token)
       }
       
       await fetchUser()
@@ -90,18 +90,14 @@ export function useUserAccount() {
   /**
    * Register a new user
    */
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, password_confirmation) => {
     try {
       isLoading.value = true
       await initCsrf()
-      const response = await api.post('/auth/register', { name, email, password, password_confirmation: password })
+      const response = await api.post('/auth/register', { name, email, password, password_confirmation })
       
-      // Simpan token ke localStorage untuk Mode API Token
-      if (response.data && response.data.token) {
-        localStorage.setItem('auth_token', response.data.token)
-      }
+      // Jangan login otomatis & jangan simpan token karena butuh OTP
       
-      await fetchUser() // Auto login
       return { success: true }
     } catch (error) {
       console.error('Register failed:', error)
@@ -111,6 +107,47 @@ export function useUserAccount() {
       const message = error.response?.data?.message || 'Pendaftaran gagal'
       const errors = error.response?.data?.errors || {}
       return { success: false, message, errors }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Verify OTP
+   */
+  const verifyOtp = async (email, otp) => {
+    try {
+      isLoading.value = true
+      const response = await api.post('/auth/verify-otp', { email, otp })
+      
+      // Simpan local_token
+      if (response.data && response.data.local_token) {
+        localStorage.setItem('auth_token', response.data.local_token)
+      }
+      
+      await fetchUser() // Auto login
+      return { success: true }
+    } catch (error) {
+      console.error('Verify OTP failed:', error)
+      const message = error.response?.data?.message || 'OTP tidak valid atau kadaluarsa'
+      return { success: false, message }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Resend OTP
+   */
+  const resendOtp = async (email) => {
+    try {
+      isLoading.value = true
+      const response = await api.post('/auth/resend-otp', { email })
+      return { success: true, message: response.data?.message || 'OTP berhasil dikirim ulang' }
+    } catch (error) {
+      console.error('Resend OTP failed:', error)
+      const message = error.response?.data?.message || 'Gagal mengirim ulang OTP'
+      return { success: false, message }
     } finally {
       isLoading.value = false
     }
@@ -231,6 +268,8 @@ export function useUserAccount() {
     userStats,
     login,
     register,
+    verifyOtp,
+    resendOtp,
     logout,
     fetchUser,
     fetchUserStats,
