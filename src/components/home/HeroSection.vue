@@ -9,14 +9,14 @@
         jadilah yang terbaik di papan peringkat global.
       </p>
       <div class="hero-actions">
-        <a href="#challenges" class="btn-start btn-hero">
+        <router-link to="/challenges" class="btn-start btn-hero">
           Lihat Tantangan
-          <i class="fa-solid fa-arrow-down bounce-icon"></i>
-        </a>
-        <a href="#leaderboard" class="btn-start btn-gold btn-hero">
+          <i class="fa-solid fa-arrow-right bounce-icon"></i>
+        </router-link>
+        <router-link to="/leaderboard" class="btn-start btn-gold btn-hero">
           Lihat Top Global
           <i class="fa-solid fa-trophy trophy-icon"></i>
-        </a>
+        </router-link>
       </div>
     </template>
 

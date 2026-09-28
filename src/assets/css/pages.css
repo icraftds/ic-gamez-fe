@@ -102,17 +102,22 @@
         margin: 0 auto;
       }
       .hero h1 {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
         font-size: 5rem;
         margin-bottom: 24px;
         line-height: 1.1;
         letter-spacing: -1px;
-        text-shadow: 0 10px 40px rgba(147, 51, 234, 0.4);
+        text-shadow: 0 10px 40px var(--text-glow);
       }
       .gradient-text {
         background: linear-gradient(135deg, var(--primary), var(--secondary));
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        text-shadow: 0 0 20px var(--text-glow-subtle);
       }
       .hero p {
         font-size: 1.25rem;
@@ -180,7 +185,7 @@
         font-size: 2.8rem;
         margin-bottom: 20px;
         line-height: 1.2;
-        text-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+        text-shadow: 0 0 20px var(--text-glow-subtle);
       }
       .intro-content p {
         font-size: 1.1rem;
@@ -335,9 +340,11 @@
         margin-bottom: 60px;
       }
       .section-header h2 {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
         font-size: 3rem;
         margin-bottom: 15px;
-        text-shadow: 0 5px 20px rgba(147, 51, 234, 0.3);
+        text-shadow: 0 5px 20px var(--text-glow-subtle);
       }
 
       /* Leaderboard Styles */
@@ -492,7 +499,7 @@
         .btn { font-family: 'Fredoka', sans-serif; padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 0.9rem; cursor: pointer; text-decoration: none; border: none; transition: all 0.3s;}
         .btn-outline { background: var(--white-alpha-0_1); color: var(--text-main); border: 1px solid var(--white-alpha-0_2); }
         .btn-outline:hover { background: var(--white-alpha-0_2); transform: translateY(-2px); }
-        .btn-primary { background: linear-gradient(90deg, var(--primary-dark), var(--secondary)); color: white; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4); }
+        .btn-primary { background: linear-gradient(90deg, var(--primary-dark), var(--secondary)); color: white; box-shadow: 0 4px 15px var(--text-glow); }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6); }
 
         .workspace {
