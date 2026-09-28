@@ -55,39 +55,6 @@
         <div class="method-badge">Instan</div>
       </div>
 
-      <div
-        class="method-card"
-        :class="{ selected: selectedMethod === 'va_bca' }"
-        @click="selectedMethod = 'va_bca'"
-      >
-        <div class="method-radio">
-          <div class="method-radio-inner"></div>
-        </div>
-        <div class="method-icon va">
-          <i class="fa-solid fa-building-columns"></i>
-        </div>
-        <div class="method-info">
-          <div class="method-name">Virtual Account BCA</div>
-          <div class="method-desc">Transfer melalui ATM, iBanking, atau mBanking</div>
-        </div>
-      </div>
-
-      <div
-        class="method-card"
-        :class="{ selected: selectedMethod === 'va_bni' }"
-        @click="selectedMethod = 'va_bni'"
-      >
-        <div class="method-radio">
-          <div class="method-radio-inner"></div>
-        </div>
-        <div class="method-icon va">
-          <i class="fa-solid fa-building-columns"></i>
-        </div>
-        <div class="method-info">
-          <div class="method-name">Virtual Account BNI</div>
-          <div class="method-desc">Transfer melalui ATM, iBanking, atau mBanking</div>
-        </div>
-      </div>
 
       <!-- Payment Link Option -->
       <div
@@ -108,6 +75,10 @@
         <div class="method-badge alt">Fleksibel</div>
       </div>
     </div>
+    
+    <div v-if="paymentError" class="payment-error-message">
+      <i class="fa-solid fa-circle-exclamation"></i> {{ paymentError }}
+    </div>
 
     <button
       class="btn-primary"
@@ -123,10 +94,11 @@
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 import api from '../../services/api'
-import { useWipModal } from '../../composables/useWipModal'
+import { useUserAccount } from '../../composables/useUserAccount'
 
-const { openWipModal } = useWipModal()
+const { userProfile } = useUserAccount()
 
 const props = defineProps({
   planName: String,
@@ -146,6 +118,7 @@ const isValidatingCoupon = ref(false)
 const couponMessage = ref('')
 const couponStatus = ref(null)
 const discountedPrice = ref(null)
+const paymentError = ref('')
 
 const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
@@ -174,10 +147,6 @@ const validateCoupon = async () => {
   }
 }
 
-import axios from 'axios'
-import { useUserAccount } from '../../composables/useUserAccount'
-const { userProfile } = useUserAccount()
-
 const goToInstruction = async () => {
   isProcessingPayment.value = true
   emit('processing', true)
@@ -195,7 +164,7 @@ const goToInstruction = async () => {
     }
     
     // Hit Payment Gateway Service Directly
-    const paymentBaseUrl = import.meta.env.VITE_PAYMENT_URL || 'http://localhost:8001/api/v1'
+    const paymentBaseUrl = import.meta.env.VITE_PAYMENT_GATEWAY_URL || 'https://ic-pg.unikom.my.id/api/v1'
     const res = await axios.post(`${paymentBaseUrl}/payment/checkout`, payload, {
       headers: {
         'Accept': 'application/json',
@@ -226,7 +195,7 @@ const goToInstruction = async () => {
     })
   } catch (err) {
     console.error('Failed to create payment in Payment Gateway:', err)
-    alert(err.response?.data?.message || 'Gagal memproses pembayaran ke Payment Gateway')
+    paymentError.value = err.response?.data?.message || 'Gagal memproses pembayaran ke Payment Gateway'
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)
