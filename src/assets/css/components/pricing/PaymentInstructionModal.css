@@ -70,6 +70,7 @@
 .gradient-text {
   background: linear-gradient(135deg, #00ffea, #7000ff);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 1.75rem;
   font-weight: 700;

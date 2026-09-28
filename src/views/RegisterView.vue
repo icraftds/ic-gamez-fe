@@ -83,9 +83,22 @@
             </p>
             
             <div class="form-group">
-              <label>Kode OTP</label>
-              <div class="input-wrapper">
-                <input type="text" v-model="otpCode" placeholder="Masukan 6 digit OTP" required maxlength="6" :disabled="isLoading" style="letter-spacing: 5px; text-align: center; font-size: 1.2rem;" />
+              <label style="text-align: center; display: block; margin-bottom: 10px;">Kode OTP</label>
+              <div class="otp-container" :class="otpStatus">
+                <input 
+                  v-for="(digit, index) in otpDigits" 
+                  :key="index"
+                  type="text" 
+                  inputmode="numeric"
+                  maxlength="1"
+                  v-model="otpDigits[index]"
+                  :ref="(el) => { if(el) otpInputs[index] = el }"
+                  @input="handleOtpInput(index, $event)"
+                  @keydown="handleOtpKeydown(index, $event)"
+                  @paste="handleOtpPaste"
+                  :disabled="isLoading || otpStatus === 'success'"
+                  class="otp-input"
+                />
               </div>
             </div>
 
@@ -120,7 +133,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useToast } from '../composables/useToast'
@@ -130,7 +143,10 @@ const { showToast } = useToast()
 const router = useRouter()
 
 const step = ref(1)
-const otpCode = ref('')
+const otpDigits = ref(['', '', '', '', '', ''])
+const otpInputs = ref([])
+const otpCode = computed(() => otpDigits.value.join(''))
+const otpStatus = ref('')
 const errorMessage = ref('')
 const validationErrors = ref({})
 
@@ -165,14 +181,63 @@ const handleRegister = async () => {
 
 const handleVerifyOtp = async () => {
   errorMessage.value = ''
+  otpStatus.value = ''
+  
+  if (otpCode.value.length < 6) {
+     errorMessage.value = 'Mohon lengkapi 6 digit kode OTP.'
+     otpStatus.value = 'error'
+     setTimeout(() => otpStatus.value = '', 1000)
+     return
+  }
   
   const result = await verifyOtp(registerForm.value.email, otpCode.value)
   if (result.success) {
+    otpStatus.value = 'success'
     showToast('Registrasi dan verifikasi berhasil!', 'success')
-    router.push('/dashboard')
+    setTimeout(() => {
+      router.push('/dashboard')
+    }, 1500)
   } else {
+    otpStatus.value = 'error'
     errorMessage.value = result.message
+    setTimeout(() => otpStatus.value = '', 1000)
   }
+}
+
+const handleOtpInput = (index, event) => {
+  const value = event.target.value
+  
+  if (!/^\d*$/.test(value)) {
+    otpDigits.value[index] = ''
+    return
+  }
+
+  if (value && index < 5) {
+    nextTick(() => {
+      otpInputs.value[index + 1]?.focus()
+    })
+  }
+}
+
+const handleOtpKeydown = (index, event) => {
+  if (event.key === 'Backspace' && !otpDigits.value[index] && index > 0) {
+    otpInputs.value[index - 1]?.focus()
+  }
+}
+
+const handleOtpPaste = (event) => {
+  event.preventDefault()
+  const pastedData = event.clipboardData.getData('text').slice(0, 6)
+  if (!/^\d+$/.test(pastedData)) return
+  
+  for (let i = 0; i < pastedData.length; i++) {
+    otpDigits.value[i] = pastedData[i]
+  }
+  
+  const nextIndex = Math.min(pastedData.length, 5)
+  nextTick(() => {
+    otpInputs.value[nextIndex]?.focus()
+  })
 }
 
 const handleResendOtp = async () => {
@@ -191,3 +256,70 @@ const handleGoogleLogin = () => {
 </script>
 
 <style src="../assets/css/pages/AuthView.css" scoped></style>
+
+<style scoped>
+.otp-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.otp-input {
+  width: 50px;
+  height: 60px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: #00ffea;
+  background: rgba(0, 255, 255, 0.05);
+  box-shadow: 0 0 10px rgba(0, 255, 234, 0.2);
+}
+
+.otp-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Error Animation */
+.otp-container.error .otp-input {
+  border-color: #ff4757;
+  color: #ff4757;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Success Animation */
+.otp-container.success .otp-input {
+  border-color: #2ed573;
+  color: #2ed573;
+  animation: successPop 0.5s forwards;
+}
+
+.otp-container.success .otp-input:nth-child(1) { animation-delay: 0.0s; }
+.otp-container.success .otp-input:nth-child(2) { animation-delay: 0.05s; }
+.otp-container.success .otp-input:nth-child(3) { animation-delay: 0.1s; }
+.otp-container.success .otp-input:nth-child(4) { animation-delay: 0.15s; }
+.otp-container.success .otp-input:nth-child(5) { animation-delay: 0.2s; }
+.otp-container.success .otp-input:nth-child(6) { animation-delay: 0.25s; }
+
+@keyframes successPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); background: rgba(46, 213, 115, 0.1); }
+  100% { transform: scale(1); background: rgba(46, 213, 115, 0.2); border-color: #2ed573; }
+}
+</style>
