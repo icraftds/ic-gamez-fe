@@ -156,12 +156,7 @@ const goToInstruction = async () => {
     
     const amountToPay = discountedPrice.value !== null ? discountedPrice.value : props.rawPrice
 
-    const payload = {
-      user_id: userId,
-      plan_id: props.planId || 2,
-      amount: amountToPay,
-      payment_method: selectedMethod.value
-    }
+    const payload = { item_type: "premium_plan", plan_slug: props.planSlug || "pro", payment_method: selectedMethod.value, coupon_code: couponCode.value || null }
     
     // Hit Payment Gateway Service Directly
     const paymentBaseUrl = import.meta.env.VITE_PAYMENT_GATEWAY_URL || 'https://ic-pg.unikom.my.id/api/v1'
@@ -204,3 +199,4 @@ const goToInstruction = async () => {
 </script>
 
 <style scoped src="../../assets/css/components/checkout/CheckoutStepSelection.css"></style>
+

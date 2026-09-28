@@ -25,7 +25,7 @@
     </div>
 
     <!-- QRIS Display -->
-    <div v-if="selectedMethod === 'qris'" class="qr-display">
+    <div v-if="selectedMethod === 'qris'" class="qr-display" :class="{ 'is-expired': countdown === 0 }">
       <div class="qr-box-wrapper">
         <div class="qr-box">
           <qrcode-vue v-if="paymentDetails.qr_string" :value="paymentDetails.qr_string" :size="200" level="H" />
@@ -38,7 +38,7 @@
     </div>
 
     <!-- VA Display -->
-    <div v-else class="va-display">
+    <div v-else class="va-display" :class="{ 'is-expired': countdown === 0 }">
       <div class="va-bank-name">
         <i class="fa-solid fa-building-columns"></i>
         {{ methodLabel }}
@@ -58,11 +58,16 @@
 
     <!-- Awaiting Section -->
     <div class="awaiting-section">
-      <div class="awaiting-pulse">
+      <div v-if="countdown > 0" class="awaiting-pulse">
         <span class="pulse-dot"></span>
         Menunggu Pembayaran...
       </div>
-      <p class="awaiting-timer">Selesaikan dalam <span class="timer-value">{{ formattedCountdown }}</span></p>
+      <div v-else class="awaiting-pulse expired-text">
+        <i class="fa-solid fa-circle-xmark"></i>
+        Waktu Pembayaran Habis
+      </div>
+      <p v-if="countdown > 0" class="awaiting-timer">Selesaikan dalam <span class="timer-value">{{ formattedCountdown }}</span></p>
+      <p v-else class="awaiting-timer text-muted">Silakan ulangi proses atau ganti metode pembayaran.</p>
     </div>
 
     <button class="btn-outline" @click="$emit('back')">
@@ -124,11 +129,20 @@ const calculateCountdown = () => {
     const diff = Math.floor((props.expiryTime - Date.now()) / 1000)
     countdown.value = diff > 0 ? diff : 0
   } else {
-    countdown.value = 900 // Fallback 15 mins
+    if (countdown.value > 0) {
+      countdown.value--
+    }
+  }
+
+  if (countdown.value === 0 && countdownInterval) {
+    clearInterval(countdownInterval)
   }
 }
 
 const startCountdown = () => {
+  if (!props.expiryTime) {
+    countdown.value = 900 // Fallback 15 mins
+  }
   calculateCountdown()
   countdownInterval = setInterval(() => {
     calculateCountdown()
@@ -145,3 +159,25 @@ onUnmounted(() => {
 </script>
 
 <style scoped src="../../assets/css/components/checkout/CheckoutStepInstruction.css"></style>
+
+<style scoped>
+.is-expired {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(100%);
+  transition: all 0.3s ease;
+}
+
+.expired-text {
+  color: #ff4757 !important;
+  text-shadow: 0 0 10px rgba(255, 71, 87, 0.4) !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-muted {
+  color: #a0a0b0;
+  font-size: 0.9rem;
+}
+</style>
