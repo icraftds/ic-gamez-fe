@@ -88,8 +88,7 @@ const tabs = [
         <div class="premium-badge-nav" v-else>
           <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
         </div>
-        <button class="icon-btn"><i class="fa-solid fa-moon"></i></button>
-        <button class="icon-btn"><i class="fa-solid fa-bell"></i></button>
+        <!-- Removed moon and bell icons here -->
         <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
         <div class="user-profile-group">
           <div class="user-profile-btn">
