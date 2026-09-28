@@ -48,18 +48,18 @@
   justify-content: center;
   font-size: 0.85rem;
   font-weight: 700;
-  background: rgba(255,255,255,0.04);
-  border: 2px solid rgba(255,255,255,0.08);
-  color: #475569;
+  background: var(--white-alpha-0_05);
+  border: 2px solid var(--white-alpha-0_1);
+  color: var(--text-muted);
   transition: all 0.4s ease;
   position: relative;
   z-index: 2;
 }
 .step-dot.active {
-  background: linear-gradient(135deg, #7c3aed, #00f0ff);
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.45);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
 }
 .step-dot.done {
   background: #10b981;
@@ -69,67 +69,69 @@
 .step-line {
   width: 60px;
   height: 2px;
-  background: rgba(255,255,255,0.06);
+  background: var(--white-alpha-0_1);
   transition: background 0.4s ease;
 }
 .step-line.done {
-  background: linear-gradient(90deg, #10b981, #7c3aed);
+  background: linear-gradient(90deg, #10b981, var(--secondary));
 }
 
 .checkout-card {
-  background: var(--glass-bg-card-0_95, rgba(15, 10, 30, 0.75));
-  border: 1px solid var(--white-alpha-0_1, rgba(255,255,255,0.06));
-  border-radius: 20px;
-  padding: 36px 28px;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  background: var(--glass-bg-card-0_95);
+  border: 1px solid var(--white-alpha-0_15);
+  border-radius: 24px;
+  padding: 40px 32px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
   position: relative;
   overflow: hidden;
-  color: var(--text-main, #f8fafc);
+  color: var(--text-light);
 }
 .checkout-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #7c3aed, #00f0ff, #ec4899);
+  height: 4px;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
 }
 
 :deep(.section-title) {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  color: #fff;
-  margin-bottom: 6px;
+  color: var(--text-light);
+  margin-bottom: 8px;
 }
 :deep(.section-subtitle) {
-  color: #94a3b8;
-  font-size: 0.92rem;
-  margin-bottom: 28px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 32px;
   line-height: 1.5;
 }
 :deep(.btn-primary) {
   width: 100%;
-  padding: 15px;
-  background: linear-gradient(135deg, #7c3aed, #00f0ff);
+  padding: 16px;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.05rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: 0 8px 20px rgba(0, 240, 255, 0.2);
 }
 :deep(.btn-primary:hover:not(:disabled)) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 12px 25px rgba(0, 240, 255, 0.35);
 }
 :deep(.btn-primary:disabled) {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
 }
 :deep(.btn-success) {
   width: 100%;
