@@ -148,7 +148,7 @@ const getPlanBenefits = (slug) => {
   if (slug === 'pro') {
     return [
       'Semua modul dasar & premium',
-      'Unlimited Energy',
+      'Unlock Semua Modul',
       'Sertifikat kelulusan'
     ]
   }
@@ -156,7 +156,7 @@ const getPlanBenefits = (slug) => {
     return [
       'Semua fitur Pro Plan',
       'Akses awal ke modul baru',
-      'Code Review prioritas',
+      'Kesempatan Magang Di ICraft DS',
       '1-on-1 Mentoring bulanan',
       'Portofolio review'
     ]

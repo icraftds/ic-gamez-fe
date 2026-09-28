@@ -20,7 +20,7 @@
         </div>
         <ul class="plan-benefits">
           <li><i class="fa-solid fa-check"></i> Akses modul dasar</li>
-          <li><i class="fa-solid fa-check"></i> 5 Energy / hari</li>
+          <li><i class="fa-solid fa-check"></i> 10 Energy / hari</li>
           <li class="disabled"><i class="fa-solid fa-xmark"></i> Akses konten premium</li>
           <li class="disabled"><i class="fa-solid fa-xmark"></i> Sertifikat kelulusan</li>
           <li class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
@@ -50,7 +50,7 @@
             <i class="fa-solid fa-check"></i> {{ benefit }}
           </li>
           <!-- Disabled benefits logic for visual (mocked based on slug) -->
-          <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> Code Review prioritas</li>
+          <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> Kesempatan Magang Di ICraft DS</li>
           <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
         </ul>
         
@@ -98,7 +98,7 @@ const getPlanBenefits = (slug) => {
   if (slug === 'pro') {
     return [
       'Semua modul dasar & premium',
-      'Unlimited Energy',
+      'Unlock Semua Modul',
       'Sertifikat kelulusan'
     ]
   }
@@ -106,12 +106,12 @@ const getPlanBenefits = (slug) => {
     return [
       'Semua fitur Pro Plan',
       'Akses awal ke modul baru',
-      'Code Review prioritas',
+      'Kesempatan Magang Di ICraft DS',
       '1-on-1 Mentoring bulanan',
       'Portofolio review'
     ]
   }
-  return ['Akses fitur premium', 'Unlimited Energy', 'Sertifikat kelulusan']
+  return ['Akses fitur premium', 'Unlock Semua Modul', 'Sertifikat kelulusan']
 }
 
 const formatPrice = (price) => {
