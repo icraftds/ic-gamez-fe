@@ -16,7 +16,7 @@
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  width: auto;
+  width: 190px;
 }
 
 .logo-icon {
@@ -25,11 +25,12 @@
   object-fit: contain;
 }
 
-.logo-text {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: white;
-  letter-spacing: -0.5px;
+.logo-text-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  transform: scale(4) translateX(-5px);
+  transform-origin: left center;
 }
 
 .text-primary { color: var(--primary); }

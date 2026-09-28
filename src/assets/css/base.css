@@ -38,6 +38,7 @@
   --bg-input-solid: #0f172a;
   --white-alpha-0_3: rgba(255,255,255,0.3);
   --glass-bg-input-0_98: rgba(15, 10, 30, 0.98);
+  --grid-color: rgba(147, 51, 234, 0.1);
   --glass-bg-modal-0_6: rgba(30, 20, 50, 0.6);
   --glass-bg-input-0_6: rgba(15, 10, 30, 0.6);
   --white-alpha-0_08: rgba(255, 255, 255, 0.08);
@@ -146,6 +147,7 @@ body.light-mode {
   --bg-input-solid: #ffffff;
   --white-alpha-0_3: rgba(0, 0, 0, 0.3);
   --glass-bg-input-0_98: rgba(240, 248, 255, 0.98);
+  --grid-color: rgba(14, 165, 233, 0.15);
   --glass-bg-modal-0_6: rgba(255, 255, 255, 0.6);
   --glass-bg-input-0_6: rgba(240, 248, 255, 0.6);
   --white-alpha-0_08: rgba(0, 0, 0, 0.08);

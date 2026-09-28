@@ -10,8 +10,8 @@
       <div class="auth-panel-left">
         <div class="panel-content">
           <router-link to="/" class="logo-large">
-            <img src="/images/Favicon GameZ.png" alt="IcraftDS Icon" class="logo-icon-large" />
-            <span>Icraft<span class="text-secondary">DS</span></span>
+            <img src="/images/Favicon GameZ.png" alt="IC Game Z Icon" class="logo-icon-large" />
+            <img src="/images/logo-icgamez.png" alt="IC Game Z" class="logo-text-img-large" />
           </router-link>
           <h2>Tingkatkan Skill Coding-mu</h2>
           <p>Bergabung dengan komunitas developer terbesar dan capai karir impianmu bersama kami.</p>
