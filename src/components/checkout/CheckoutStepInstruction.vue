@@ -26,10 +26,12 @@
 
     <!-- QRIS Display -->
     <div v-if="selectedMethod === 'qris'" class="qr-display">
-      <div class="qr-box">
-        <qrcode-vue v-if="paymentDetails.qr_string" :value="paymentDetails.qr_string" :size="200" level="H" />
-        <div v-else class="qr-dummy-label">
-          <i class="fa-solid fa-spinner fa-spin"></i> Memuat QR...
+      <div class="qr-box-wrapper">
+        <div class="qr-box">
+          <qrcode-vue v-if="paymentDetails.qr_string" :value="paymentDetails.qr_string" :size="200" level="H" />
+          <div v-else class="qr-dummy-label">
+            <i class="fa-solid fa-spinner fa-spin"></i> Memuat QR...
+          </div>
         </div>
       </div>
       <p class="qr-hint">Buka aplikasi e-wallet atau m-banking Anda, scan kode QR di atas untuk membayar.</p>
