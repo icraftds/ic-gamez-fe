@@ -14,16 +14,22 @@
 .logo {
   display: flex;
   align-items: center;
+  gap: 12px;
   text-decoration: none;
-  width: 140px;
+  width: auto;
 }
 
-.logo-img {
-  height: 40px;
+.logo-icon {
+  height: 36px;
   width: auto;
   object-fit: contain;
-  transform: scale(4);
-  transform-origin: left center;
+}
+
+.logo-text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
 }
 
 .text-primary { color: var(--primary); }

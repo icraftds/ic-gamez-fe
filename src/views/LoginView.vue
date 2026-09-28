@@ -10,7 +10,7 @@
       <div class="auth-panel-left">
         <div class="panel-content">
           <router-link to="/" class="logo-large">
-            <i class="fa-solid fa-cube text-primary"></i>
+            <img src="/images/Favicon GameZ.png" alt="IcraftDS Icon" class="logo-icon-large" />
             <span>Icraft<span class="text-secondary">DS</span></span>
           </router-link>
           <h2>Tingkatkan Skill Coding-mu</h2>

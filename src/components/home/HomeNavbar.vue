@@ -2,7 +2,8 @@
   <nav class="navbar">
     <div class="nav-left">
       <router-link to="/" class="logo">
-        <img src="/images/logo-icgamez.png" alt="IC GameZ" class="logo-img" />
+        <img src="/images/Favicon GameZ.png" alt="IcraftDS Icon" class="logo-icon" />
+        <span class="logo-text">Icraft<span class="text-secondary">DS</span></span>
       </router-link>
     </div>
 

@@ -108,6 +108,12 @@
   margin-bottom: 40px;
 }
 
+.logo-icon-large {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
 .auth-panel-right {
   flex: 1;
   padding: 50px;
