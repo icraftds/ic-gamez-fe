@@ -201,8 +201,7 @@ const handleVerifyOtp = async () => {
      return
   }
   
-  const result = await verifyOtp(registerForm.value.email, 
-    registerForm.value.phone, registerForm.value.phone, otpCode.value)
+  const result = await verifyOtp(registerForm.value.email, otpCode.value)
   if (result.success) {
     otpStatus.value = 'success'
     showToast('Registrasi dan verifikasi berhasil!', 'success')
@@ -257,6 +256,12 @@ const handleResendOtp = async () => {
   const result = await resendOtp(registerForm.value.email)
   if (result.success) {
     showToast(result.message, 'success')
+    // Kosongkan kotak OTP
+    otpDigits.value = ['', '', '', '', '', '']
+    // Pindahkan kursor ke kotak pertama
+    nextTick(() => {
+      otpInputs.value[0]?.focus()
+    })
   } else {
     errorMessage.value = result.message
   }
