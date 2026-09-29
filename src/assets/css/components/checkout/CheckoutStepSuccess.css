@@ -114,3 +114,18 @@
   color: #64748b;
   font-size: 0.78rem;
 }
+
+/* Light Mode Overrides */
+body.light-mode .success-message {
+  color: #475569;
+}
+body.light-mode .benefit-card {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+body.light-mode .benefit-text strong {
+  color: #1e293b;
+}
+body.light-mode .benefit-text span {
+  color: #475569;
+}
