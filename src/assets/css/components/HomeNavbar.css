@@ -36,6 +36,12 @@
   transform-origin: left center;
 }
 
+.logo-dark {
+  height: 26px; /* Adjusted to match light mode visual size */
+  margin-top: 2px;
+  margin-left: -10px; /* Adjusted to match light mode margin */
+}
+
 body.light-mode .logo-dark { display: none; }
 body:not(.light-mode) .logo-light { display: none; }
 
