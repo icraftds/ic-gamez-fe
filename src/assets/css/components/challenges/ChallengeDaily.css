@@ -74,8 +74,8 @@
 }
 
 .time-box {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid var(--white-alpha-0_1);
+  background: var(--glass-bg-modal-0_95);
+  border: 1px solid var(--white-alpha-0_15);
   border-radius: 12px;
   width: 70px;
   height: 70px;
@@ -103,8 +103,8 @@
 }
 
 .card-glass {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid var(--white-alpha-0_05);
+  background: var(--glass-bg-card-0_8);
+  border: 1px solid var(--white-alpha-0_1);
   border-radius: 16px;
   padding: 25px;
   backdrop-filter: blur(10px);
@@ -146,7 +146,7 @@
 }
 
 .action-box {
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--glass-bg-input-0_5);
   padding: 20px;
   border-radius: 12px;
   text-align: center;

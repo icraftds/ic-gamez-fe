@@ -13,8 +13,8 @@
 }
 
 .modal-content {
-  background: rgba(12, 8, 28, 0.98);
-  border: 1px solid rgba(147, 51, 234, 0.4);
+  background: var(--glass-bg-modal-0_95, rgba(12, 8, 28, 0.98));
+  border: 1px solid var(--glass-border, rgba(147, 51, 234, 0.4));
   border-radius: 20px;
   padding: 40px;
   max-width: 460px;

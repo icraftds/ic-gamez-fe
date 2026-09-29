@@ -90,11 +90,11 @@ export function useUserAccount() {
   /**
    * Register a new user
    */
-  const register = async (name, email, password, password_confirmation) => {
+  const register = async (name, email, phone, password, password_confirmation) => {
     try {
       isLoading.value = true
       await initCsrf()
-      const response = await api.post('/auth/register', { name, email, password, password_confirmation })
+      const response = await api.post('/auth/register', { name, email, phone, password, password_confirmation })
       
       // Jangan login otomatis & jangan simpan token karena butuh OTP
       

@@ -44,13 +44,22 @@
               <span v-if="validationErrors.name" class="error-text text-danger">{{ validationErrors.name[0] }}</span>
             </div>
 
-            <div class="form-group">
+                        <div class="form-group">
               <label>Email</label>
               <div class="input-wrapper">
                 <input type="email" v-model="registerForm.email" placeholder="john@example.com" required :disabled="isLoading" />
                 <i class="fa-regular fa-envelope"></i>
               </div>
               <span v-if="validationErrors.email" class="error-text text-danger">{{ validationErrors.email[0] }}</span>
+            </div>
+            
+            <div class="form-group">
+              <label>No. Telepon</label>
+              <div class="input-wrapper">
+                <input type="tel" v-model="registerForm.phone" placeholder="081234567890" required :disabled="isLoading" />
+                <i class="fa-solid fa-phone"></i>
+              </div>
+              <span v-if="validationErrors.phone" class="error-text text-danger">{{ validationErrors.phone[0] }}</span>
             </div>
             
             <div class="form-group">
@@ -153,6 +162,7 @@ const validationErrors = ref({})
 const registerForm = ref({
   name: '',
   email: '',
+  phone: '',
   password: '',
   password_confirmation: ''
 })
@@ -164,6 +174,7 @@ const handleRegister = async () => {
   const result = await register(
     registerForm.value.name, 
     registerForm.value.email, 
+    registerForm.value.phone,
     registerForm.value.password, 
     registerForm.value.password_confirmation
   )
@@ -190,7 +201,8 @@ const handleVerifyOtp = async () => {
      return
   }
   
-  const result = await verifyOtp(registerForm.value.email, otpCode.value)
+  const result = await verifyOtp(registerForm.value.email, 
+    registerForm.value.phone, registerForm.value.phone, otpCode.value)
   if (result.success) {
     otpStatus.value = 'success'
     showToast('Registrasi dan verifikasi berhasil!', 'success')
@@ -323,3 +335,4 @@ const handleGoogleLogin = () => {
   100% { transform: scale(1); background: rgba(46, 213, 115, 0.2); border-color: #2ed573; }
 }
 </style>
+

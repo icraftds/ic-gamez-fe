@@ -6,8 +6,8 @@
 }
 
 .card {
-  background: var(--glass-bg-input-0_7);
-  border: 1px solid var(--white-alpha-0_05);
+  background: var(--glass-bg-card-0_8);
+  border: 1px solid var(--white-alpha-0_15);
   border-radius: 16px;
   padding: 25px;
   backdrop-filter: blur(10px);

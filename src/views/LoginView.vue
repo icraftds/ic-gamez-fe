@@ -104,6 +104,7 @@ const handleLogin = async () => {
   
   const result = await login(loginForm.value.email, loginForm.value.password)
   if (result.success) {
+    sessionStorage.setItem('just_logged_in', 'true')
     router.push('/dashboard')
   } else {
     errorMessage.value = result.message

@@ -113,7 +113,7 @@ const fireConfetti = async () => {
 }
 
 const goToDashboard = () => {
-  router.push('/dashboard')
+  router.push('/dashboard?pro_success=1')
 }
 
 onMounted(() => {

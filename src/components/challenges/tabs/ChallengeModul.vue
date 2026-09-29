@@ -31,26 +31,52 @@
       </div>
     </div>
 
-    <div class="table-container">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>NAMA TANTANGAN</th>
-            <th>KATEGORI</th>
-            <th>TINGKAT</th>
-            <th>STATUS</th>
-          </tr>
-        </thead>
-        <tbody>
-          <ChallengeTableRow
-            v-for="challenge in challenges"
-            :key="challenge.id"
-            :challenge="challenge"
-            :isPremiumUser="isPremiumUser"
-            @click="openChallenge(challenge)"
-          />
-        </tbody>
-      </table>
+    <div class="challenges-grid-container">
+      <div class="challenges-grid">
+        <div
+          v-for="challenge in challenges"
+          :key="challenge.id"
+          class="challenge-card"
+          :class="{ 'is-premium-locked': challenge.isPremium && !isPremiumUser }"
+          @click="openChallenge(challenge)"
+        >
+          <div class="challenge-card-header">
+            <span class="badge category-badge">{{ challenge.category }}</span>
+            <span v-if="challenge.isPremium" class="badge badge-premium">
+              <i class="fa-solid" :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'"></i> Premium
+            </span>
+          </div>
+          <h3 class="challenge-title">{{ challenge.title }}</h3>
+          
+          <div class="challenge-topics">
+            <p class="topic-label"><i class="fa-solid fa-book-open"></i> Topik Pembelajaran:</p>
+            <p class="topic-text">Pelajari dan asah kemampuan terkait {{ challenge.category }} untuk meningkatkan skill Anda.</p>
+          </div>
+
+          <div class="challenge-rewards">
+            <div class="reward-item xp">
+              <i class="fa-solid fa-star"></i> +{{ challenge.xp_reward || 50 }} XP
+            </div>
+            <div class="reward-item coin">
+              <i class="fa-solid fa-coins"></i> +{{ challenge.coin_reward || 10 }} Koin
+            </div>
+          </div>
+
+          <div class="challenge-card-footer">
+            <span class="difficulty-badge" :class="challenge.difficulty.toLowerCase()">
+              {{ challenge.difficulty }}
+            </span>
+            <div class="status-indicator">
+              <span v-if="challenge.isCompleted" class="status-completed">
+                <i class="fa-solid fa-circle-check"></i> Selesai
+              </span>
+              <span v-else class="status-pending">
+                Mulai Tantangan <i class="fa-solid fa-arrow-right"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div v-if="isLoading" class="empty-state">
         Memuat tantangan...
       </div>
