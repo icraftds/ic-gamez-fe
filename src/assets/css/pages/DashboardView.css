@@ -29,17 +29,16 @@
   gap: 12px;
   text-decoration: none;
   color: var(--text-main-hex);
-  width: 190px;
 }
 
 .logo-icon {
-  height: 36px;
+  height: 40px;
   width: auto;
   object-fit: contain;
 }
 
 .logo-text-img {
-  height: 32px;
+  height: 60px;
   width: auto;
   object-fit: contain;
 }
@@ -50,7 +49,7 @@
 
 .logo-dark {
   display: none;
-  height: 32px;
+  height: 60px;
   margin-top: 1px;
 }
 
@@ -63,7 +62,7 @@ body:not(.light-mode) .logo-dark { display: block; }
 
 .dash-label {
   color: #475569;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 2px;
   padding-left: 15px;
