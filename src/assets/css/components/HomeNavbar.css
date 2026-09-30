@@ -16,7 +16,6 @@
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  width: 190px;
 }
 
 .logo-icon {
@@ -26,7 +25,7 @@
 }
 
 .logo-text-img {
-  height: 32px;
+  height: 28px;
   width: auto;
   object-fit: contain;
 }
@@ -36,7 +35,7 @@
 }
 
 .logo-dark {
-  height: 32px;
+  height: 28px;
   margin-top: 1px;
 }
 
