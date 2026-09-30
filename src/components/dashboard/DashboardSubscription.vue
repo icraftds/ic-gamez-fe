@@ -32,11 +32,16 @@
       </div>
 
       <!-- Dynamic Plans from API -->
-      <div v-for="plan in plans" :key="plan.id" class="plan-card" :class="[plan.slug, { active: currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro') }]">
-        <!-- Optional Badges based on slug -->
-        <div v-if="plan.slug === 'pro'" class="badge-popular">Paling Populer</div>
+      <div
+        v-for="plan in plans"
+        :key="plan.id"
+        class="plan-card"
+        :class="[plan.slug, { active: currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro') }]"
+      >
+        <!-- Badges -->
+        <div v-if="plan.slug === 'pro'"    class="badge-popular">Paling Populer</div>
         <div v-else-if="plan.slug === 'expert'" class="badge-premium">Premium</div>
-        
+
         <div class="plan-header">
           <div class="plan-icon" :class="plan.slug + '-icon'">
             <i :class="getPlanIcon(plan.slug)"></i>
@@ -44,24 +49,38 @@
           <h3>{{ plan.name }}</h3>
           <p class="price">Rp {{ formatPrice(plan.price) }}<span>/{{ plan.duration_in_days }} hari</span></p>
         </div>
-        
+
+        <!-- Energy badge -->
+        <div class="plan-energy-badge" :class="'energy-' + plan.slug">
+          <i :class="getPlanEnergyIcon(plan.slug)"></i>
+          {{ getPlanEnergyLabel(plan.slug) }}
+        </div>
+
         <ul class="plan-benefits">
-          <li v-for="(benefit, index) in getPlanBenefits(plan.slug)" :key="index">
+          <li v-for="(benefit, index) in getPlanBenefits(plan.slug)" :key="'b-' + index">
             <i class="fa-solid fa-check"></i> {{ benefit }}
           </li>
-          <!-- Disabled benefits logic for visual (mocked based on slug) -->
-          <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> Kesempatan Magang Di ICraft DS</li>
-          <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
+          <li v-for="(item, index) in getPlanDisabled(plan.slug)" :key="'d-' + index" class="disabled">
+            <i class="fa-solid fa-xmark"></i> {{ item }}
+          </li>
         </ul>
-        
+
         <div class="plan-action">
-          <div v-if="currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro')" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
-          <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="goToCheckout(plan)">Pilih {{ plan.name }}</button>
+          <div
+            v-if="currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro')"
+            class="active-badge"
+          >
+            <i class="fa-solid fa-check-circle"></i> Paket Saat Ini
+          </div>
+          <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="goToCheckout(plan)">
+            Pilih {{ plan.name }}
+          </button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -88,31 +107,47 @@ onMounted(async () => {
   }
 })
 
-const getPlanIcon = (slug) => {
-  if (slug === 'pro') return 'fa-solid fa-rocket'
-  if (slug === 'expert') return 'fa-solid fa-crown'
-  return 'fa-solid fa-star'
+const PLAN_CONFIG = {
+  pro: {
+    icon: 'fa-solid fa-rocket',
+    energyLabel: 'Energi tak terbatas',
+    energyIcon: 'fa-solid fa-infinity',
+    benefits: [
+      'Akses semua modul dasar & premium',
+      'Sertifikat kelulusan digital',
+      '200.000 iCoinZ bonus bergabung',
+      'Hint premium tak terbatas',
+      'Leaderboard eksklusif',
+    ],
+    disabled: [
+      'Kesempatan Magang di ICraft DS',
+      '1-on-1 Mentoring bulanan',
+    ],
+  },
+  expert: {
+    icon: 'fa-solid fa-crown',
+    energyLabel: '25 Energi / minggu',
+    energyIcon: 'fa-solid fa-bolt',
+    benefits: [
+      'Semua fitur Pro Plan',
+      '25 Energi bonus setiap minggu',
+      '300.000 iCoinZ bonus bergabung',
+      'Kesempatan Magang di ICraft DS',
+      '1-on-1 Mentoring bulanan',
+      'Portofolio review eksklusif',
+    ],
+    disabled: [],
+  },
 }
 
-const getPlanBenefits = (slug) => {
-  if (slug === 'pro') {
-    return [
-      'Semua modul dasar & premium',
-      'Unlock Semua Modul',
-      'Sertifikat kelulusan'
-    ]
-  }
-  if (slug === 'expert') {
-    return [
-      'Semua fitur Pro Plan',
-      'Akses awal ke modul baru',
-      'Kesempatan Magang Di ICraft DS',
-      '1-on-1 Mentoring bulanan',
-      'Portofolio review'
-    ]
-  }
-  return ['Akses fitur premium', 'Unlock Semua Modul', 'Sertifikat kelulusan']
-}
+const getPlanIcon = (slug) => PLAN_CONFIG[slug]?.icon ?? 'fa-solid fa-star'
+
+const getPlanBenefits = (slug) => PLAN_CONFIG[slug]?.benefits ?? ['Akses fitur premium']
+
+const getPlanDisabled = (slug) => PLAN_CONFIG[slug]?.disabled ?? []
+
+const getPlanEnergyLabel  = (slug) => PLAN_CONFIG[slug]?.energyLabel ?? ''
+const getPlanEnergyIcon   = (slug) => PLAN_CONFIG[slug]?.energyIcon ?? 'fa-solid fa-bolt'
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")

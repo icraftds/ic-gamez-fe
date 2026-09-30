@@ -34,49 +34,89 @@
         </div>
       </div>
     </div>
+
+    <!-- CoinZ Reward Modal -->
+    <CoinzRewardModal
+      v-model="showCoinzModal"
+      :amount="coinzAmount"
+      :plan="coinzPlan"
+    />
   </div>
 </template>
 
+
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import HomeNavbar from '../components/home/HomeNavbar.vue'
+import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 
 const router = useRouter()
-const { fetchUser, isPremiumUser, credits } = useUserAccount()
+const route  = useRoute()
+const { fetchUser, isPremiumUser, userProfile, credits } = useUserAccount()
 
-const isLoading = ref(true)
-const isSuccess = ref(false)
+const isLoading  = ref(true)
+const isSuccess  = ref(false)
+
+// CoinZ reward modal state
+const showCoinzModal  = ref(false)
+const coinzAmount     = ref(0)
+const coinzPlan       = ref('pro')
+
+// Map plan_id (passed via query) → coinz amount & plan label
+const PLAN_COINZ = {
+  '1': { amount: 200000, plan: 'pro' },
+  '2': { amount: 300000, plan: 'expert' },
+  '3': { amount: null,   plan: 'topup' }, // amount = credits gained (dynamic)
+}
+
 let pollingInterval = null
-let maxAttempts = 15 // Cek maksimal 15 kali (60 detik)
-let attempts = 0
+let maxAttempts     = 15
+let attempts        = 0
 
 const checkPaymentStatus = async () => {
   attempts++
   try {
-    // Catat state awal sebelum fetch
     const initialIsPremium = isPremiumUser.value
-    const initialCredits = userProfile.value?.credits || 0
-    const initialPlan = userProfile.value?.current_plan?.slug || userProfile.value?.current_plan || 'free'
-    
-    await fetchUser() // fetch /auth/me ke Main Backend
-    
-    // Pembayaran sukses HANYA JIKA:
-    // 1. Sebelumnya Free, sekarang jadi Premium
-    // 2. Atau paketnya berubah (misal upgrade dari pro ke expert)
-    // 3. Atau credits bertambah
-    const newPlan = userProfile.value?.current_plan?.slug || userProfile.value?.current_plan || 'free'
+    const initialCredits   = userProfile.value?.credits ?? credits.value ?? 0
+    const initialPlan      = userProfile.value?.current_plan?.slug ?? userProfile.value?.current_plan ?? 'free'
+
+    await fetchUser()
+
+    const newPlan      = userProfile.value?.current_plan?.slug ?? userProfile.value?.current_plan ?? 'free'
+    const newCredits   = userProfile.value?.credits ?? credits.value ?? 0
     const becamePremium = !initialIsPremium && isPremiumUser.value
-    const planChanged = isPremiumUser.value && initialPlan !== newPlan
-    const gainedCredits = (userProfile.value?.credits || 0) > initialCredits
-    
+    const planChanged   = isPremiumUser.value && initialPlan !== newPlan
+    const gainedCredits = newCredits > initialCredits
+
     if (becamePremium || planChanged || gainedCredits) {
       isLoading.value = false
       isSuccess.value = true
       stopPolling()
       fireConfetti()
+
+      // Determine coinz reward details
+      const planIdParam = route.query.plan_id ?? null
+      const planConfig  = planIdParam ? PLAN_COINZ[String(planIdParam)] : null
+
+      if (planConfig) {
+        coinzPlan.value   = planConfig.plan
+        coinzAmount.value = planConfig.plan === 'topup'
+          ? (newCredits - initialCredits)  // dynamic for topup
+          : planConfig.amount
+      } else if (becamePremium || planChanged) {
+        // Fallback: detect from plan name
+        coinzPlan.value   = newPlan === 'expert' ? 'expert' : 'pro'
+        coinzAmount.value = newPlan === 'expert' ? 300000 : 200000
+      } else if (gainedCredits) {
+        coinzPlan.value   = 'topup'
+        coinzAmount.value = newCredits - initialCredits
+      }
+
+      // Show reward modal after short delay (let success card render first)
+      setTimeout(() => { showCoinzModal.value = true }, 1200)
     }
   } catch (err) {
     console.error('Failed to verify payment', err)
@@ -91,7 +131,7 @@ const checkPaymentStatus = async () => {
 
 const startPolling = () => {
   stopPolling()
-  checkPaymentStatus() // initial check
+  checkPaymentStatus()
   pollingInterval = setInterval(checkPaymentStatus, 4000)
 }
 
@@ -116,14 +156,10 @@ const goToDashboard = () => {
   router.push('/dashboard?pro_success=1')
 }
 
-onMounted(() => {
-  startPolling()
-})
-
-onUnmounted(() => {
-  stopPolling()
-})
+onMounted(() => { startPolling() })
+onUnmounted(() => { stopPolling() })
 </script>
+
 
 <style scoped>
 .payment-success-view {

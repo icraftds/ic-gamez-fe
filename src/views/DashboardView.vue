@@ -1,29 +1,47 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import DashboardHome from '../components/dashboard/DashboardHome.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
 import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
 import ConfirmModal from '../components/common/ConfirmModal.vue'
+import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
 
-const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, upgradeToPremium, logout } = useUserAccount()
+const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout } = useUserAccount()
 const { hasFetchedAllPaths, fetchAllPathsDetails } = useLearningPaths()
 const route = useRoute()
 const router = useRouter()
+
+// Determine coinz amount based on current plan
+const coinzBonusAmount = computed(() => {
+  const plan = currentPlan.value
+  if (plan === 'expert') return 300000
+  if (plan === 'pro')    return 200000
+  return 0
+})
+const coinzBonusPlan = computed(() => {
+  const plan = currentPlan.value
+  if (plan === 'expert') return 'expert'
+  return 'pro'
+})
+
+const showCoinzModal = ref(false)
+const showPromoModal = ref(false)
 
 onMounted(() => {
   if (!hasFetchedAllPaths.value) {
     fetchAllPathsDetails()
   }
   if (route.query.pro_success === '1') {
-    showMarketModal.value = true
+    // Show CoinZ reward modal instead of old static modal
+    showCoinzModal.value = true
   }
-  
+
   if (sessionStorage.getItem('just_logged_in') === 'true') {
     sessionStorage.removeItem('just_logged_in')
     if (isLoggedIn.value && !isPremiumUser.value) {
@@ -31,9 +49,6 @@ onMounted(() => {
     }
   }
 })
-
-const showMarketModal = ref(false)
-const showPromoModal = ref(false)
 
 const closePromoModal = () => {
   showPromoModal.value = false
@@ -44,8 +59,8 @@ const goToSubscription = () => {
   activeTab.value = 'langganan'
 }
 
-const closeMarketModal = () => {
-  showMarketModal.value = false
+const closeCoinzModal = () => {
+  showCoinzModal.value = false
   const newQuery = { ...route.query }
   delete newQuery.pro_success
   router.replace({ query: newQuery })
@@ -116,7 +131,16 @@ const tabs = [
           <i class="fa-solid fa-bolt text-warning"></i>
           <span>{{ credits }}</span>
         </div>
-        <div class="premium-badge-nav" v-else>
+        <!-- Pro badge -->
+        <div v-else-if="currentPlan === 'pro'" class="premium-badge-nav badge-pro-nav">
+          <i class="fa-solid fa-rocket"></i> PRO
+        </div>
+        <!-- Expert badge -->
+        <div v-else-if="currentPlan === 'expert'" class="premium-badge-nav badge-expert-nav">
+          <i class="fa-solid fa-crown"></i> EXPERT
+        </div>
+        <!-- Fallback premium badge -->
+        <div v-else class="premium-badge-nav">
           <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
         </div>
         <!-- Removed moon and bell icons here -->
@@ -156,16 +180,13 @@ const tabs = [
       @confirm="performLogout"
     />
     
-    <!-- IC Market Popup -->
-    <div v-if="showMarketModal" class="market-modal-overlay">
-      <div class="market-modal-content">
-        <i class="fa-solid fa-coins modal-icon-gold"></i>
-        <h2>Selamat Anda Mendapatkan Koin!</h2>
-        <p>Anda mendapatkan koin ekstra karena telah berhasil berlangganan paket Pro! Koin ini dapat ditukarkan dengan berbagai hadiah menarik di IC Market.</p>
-        <a href="https://market.icraftds.id/" target="_blank" class="btn-market">Tukarkan Koin Sekarang?</a>
-        <button class="btn-close-modal" @click="closeMarketModal">Tutup</button>
-      </div>
-    </div>
+    <!-- CoinZ Reward Modal -->
+    <CoinzRewardModal
+      v-model="showCoinzModal"
+      :amount="coinzBonusAmount"
+      :plan="coinzBonusPlan"
+      @close="closeCoinzModal"
+    />
 
     <!-- Promo Modal -->
     <div v-if="showPromoModal" class="promo-modal-overlay">
