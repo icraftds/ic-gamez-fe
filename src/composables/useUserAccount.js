@@ -81,8 +81,9 @@ export function useUserAccount() {
       const response = await api.post('/auth/login', { email, password })
       
       // Simpan token bawaan SSO ke localStorage
-      if (response.data && response.data.token) {
-        localStorage.setItem('auth_token', response.data.token)
+      const token = response.data?.data?.token || response.data?.token
+      if (token) {
+        localStorage.setItem('auth_token', token)
       }
       
       await fetchUser()
@@ -133,8 +134,9 @@ export function useUserAccount() {
       const response = await api.post('/auth/verify-otp', { email, otp })
       
       // Simpan token bawaan SSO
-      if (response.data && response.data.token) {
-        localStorage.setItem('auth_token', response.data.token)
+      const token = response.data?.data?.token || response.data?.token
+      if (token) {
+        localStorage.setItem('auth_token', token)
       }
       
       await fetchUser() // Auto login
