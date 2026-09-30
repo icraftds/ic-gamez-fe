@@ -16,7 +16,7 @@
               v-for="(option, optIndex) in question.options"
               :key="optIndex"
               class="option-btn"
-              :class="getOptionClass(optIndex, question.answerIndex)"
+              :class="getOptionClass(optIndex, question.answer_index)"
               :disabled="isSubmitted || isChecking"
               @click="$emit('update:selectedAnswer', optIndex)"
             >

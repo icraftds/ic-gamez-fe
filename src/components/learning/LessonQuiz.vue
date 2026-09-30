@@ -11,8 +11,8 @@
             class="option-btn"
             :class="{ 
               'selected': selectedAnswer === optIndex,
-              'correct': hasSubmitted && optIndex === q.answerIndex,
-              'wrong': hasSubmitted && selectedAnswer === optIndex && selectedAnswer !== q.answerIndex
+              'correct': hasSubmitted && optIndex === q.answer_index,
+              'wrong': hasSubmitted && selectedAnswer === optIndex && selectedAnswer !== q.answer_index
             }"
             @click="!hasSubmitted && (selectedAnswer = optIndex)"
           >
@@ -74,7 +74,7 @@ const isCorrect = ref(false)
 const submitQuiz = () => {
   if (props.quiz && props.quiz.length > 0) {
     hasSubmitted.value = true
-    isCorrect.value = selectedAnswer.value === props.quiz[0].answerIndex
+    isCorrect.value = selectedAnswer.value === props.quiz[0].answer_index
   }
 }
 

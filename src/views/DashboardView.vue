@@ -127,12 +127,12 @@ const tabs = [
       </div>
 
       <div class="dash-nav-right">
-        <div class="credits-indicator" v-if="!isPremiumUser">
+        <div class="credits-indicator">
           <i class="fa-solid fa-bolt text-warning"></i>
           <span>{{ credits }}</span>
         </div>
         <!-- Pro badge -->
-        <div v-else-if="currentPlan === 'pro'" class="premium-badge-nav badge-pro-nav">
+        <div v-if="currentPlan === 'pro'" class="premium-badge-nav badge-pro-nav">
           <i class="fa-solid fa-rocket"></i> PRO
         </div>
         <!-- Expert badge -->
@@ -309,6 +309,7 @@ const tabs = [
   font-size: 5rem;
   background: linear-gradient(to right, #ef4444, #f59e0b);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 20px;
   animation: promoPulse 1s infinite alternate;

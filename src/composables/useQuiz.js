@@ -14,7 +14,7 @@ export function useQuiz() {
   const submit = (quiz) => {
     if (!quiz || quiz.length === 0) return
     isSubmitted.value = true
-    isCorrect.value = selectedAnswer.value === quiz[0].answerIndex
+    isCorrect.value = selectedAnswer.value === quiz[0].answer_index
   }
 
   /** Reset semua state kuis ke kondisi awal. */
