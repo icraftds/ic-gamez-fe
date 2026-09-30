@@ -78,7 +78,7 @@ const saveProfile = async () => {
   }
 }
 
-const { isLoggedIn, userProfile, credits, coinz, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout } = useUserAccount()
+const { isLoggedIn, userProfile, credits, coinz, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout, isLoading: isUserLoading } = useUserAccount()
 
 const showUserDropdown = ref(false)
 
@@ -100,7 +100,8 @@ import { onUnmounted } from 'vue'
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
-const { hasFetchedAllPaths, fetchAllPathsDetails } = useLearningPaths()
+const { hasFetchedAllPaths, fetchAllPathsDetails, isLoading: isPathsLoading } = useLearningPaths()
+const isDataFetching = computed(() => isPathsLoading.value || isUserLoading.value)
 const route = useRoute()
 const router = useRouter()
 
@@ -218,7 +219,10 @@ const tabs = [
           <img :src="'/images/icoinz.svg'" alt="iCoinZ" class="coinz-icon" />
           <div class="coinz-info">
             <span class="coinz-label">ICOINZ</span>
-            <span class="coinz-amount">{{ coinz.toLocaleString('id-ID') }}</span>
+            <span class="coinz-amount">
+              <i v-if="isUserLoading" class="fa-solid fa-circle-notch fa-spin" style="font-size: 0.9rem; opacity: 0.7;"></i>
+              <span v-else>{{ coinz.toLocaleString('id-ID') }}</span>
+            </span>
           </div>
         </div>
 
@@ -298,11 +302,17 @@ const tabs = [
     </div>
     <!-- Content -->
     <div class="container dash-content" v-if="isLoggedIn">
+      <div v-if="isDataFetching" class="data-fetch-loader">
+        <div class="loader-ring"></div>
+        <p>Memuat Data Dashboard...</p>
+      </div>
+      <template v-else>
       <DashboardHome v-if="activeTab === 'beranda'" />
       <DashboardStats v-else-if="activeTab === 'statistik'" />
       <DashboardMedals v-else-if="activeTab === 'medali'" />
       <LeaderboardTable v-else-if="activeTab === 'leaderboard'" :isFullView="true" />
       <DashboardSubscription v-else-if="activeTab === 'langganan'" />
+      </template>
     </div>
 
     <div v-else class="container not-logged-in">
@@ -770,5 +780,26 @@ const tabs = [
   .coinz-amount {
     font-size: 0.95rem;
   }
+}
+.data-fetch-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: var(--text-sub-hex, #9ca3af);
+}
+.loader-ring {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(99, 102, 241, 0.2);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spinLoader 1s linear infinite;
+  margin-bottom: 20px;
+}
+@keyframes spinLoader {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
