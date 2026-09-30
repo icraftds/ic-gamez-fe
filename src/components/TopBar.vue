@@ -16,6 +16,9 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useChallengeStore } from '../stores/challengeStore'
+import ContinueLearning from './dashboard/home/ContinueLearning.vue'
+
+
 
 const store = useChallengeStore()
 const title = computed(() => store.stageData?.title.split(". ")[1] || 'Loading...')
