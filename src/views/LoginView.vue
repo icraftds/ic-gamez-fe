@@ -10,7 +10,7 @@
       <div class="auth-panel-left">
         <div class="panel-content">
           <router-link to="/" class="logo-large">
-            <img src="/images/Favicon GameZ.png" alt="IC Game Z Icon" class="logo-icon-large" />
+            <!-- <img src="/images/Favicon GameZ.png" alt="IC Game Z Icon" class="logo-icon-large" /> -->
             <img src="/images/Logo iC GameZ Lightmode.png" alt="IC Game Z" class="logo-text-img-large" />
           </router-link>
           <h2>Tingkatkan Skill Coding-mu</h2>
