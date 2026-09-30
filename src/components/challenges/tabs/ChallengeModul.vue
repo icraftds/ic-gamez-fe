@@ -55,7 +55,7 @@
 
           <div class="challenge-rewards">
             <div class="reward-item xp">
-              <i class="fa-solid fa-star"></i> +{{ challenge.xp_reward || 50 }} XP
+              <i class="fa-solid fa-star"></i> +{{ getExpectedXp(challenge.difficulty, challenge.costCredit) }} XP
             </div>
             <div class="reward-item coin">
               <i class="fa-solid fa-coins"></i> +{{ challenge.coin_reward || 10 }} Koin
@@ -205,6 +205,17 @@ watch(selectedCategory, () => {
   currentPage.value = 1;
   fetchChallenges();
 });
+
+const getExpectedXp = (difficulty, costCredit = 0) => {
+  const diff = (difficulty || 'sedang').toLowerCase();
+  let base = 50;
+  if (diff === 'mudah' || diff === 'easy') base = 25;
+  else if (diff === 'sedang' || diff === 'medium') base = 50;
+  else if (diff === 'sulit' || diff === 'hard') base = 100;
+  else if (diff === 'boss') base = 300;
+  
+  return Math.floor(base * (1 + (costCredit / 10)));
+};
 
 const openChallenge = (challenge) => {
   if (!isLoggedIn.value) {
