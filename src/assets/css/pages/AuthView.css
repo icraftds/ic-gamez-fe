@@ -118,8 +118,6 @@
   height: 60px;
   width: auto;
   object-fit: contain;
-  transform: scale(4) translateX(-6px);
-  transform-origin: left center;
 }
 
 .auth-panel-right {
@@ -381,7 +379,22 @@
     border-radius: 20px;
   }
   .auth-panel-left {
-    display: none; /* Hide illustration on small screens to save space */
+    padding: 20px;
+  }
+  .auth-panel-left h2,
+  .auth-panel-left p,
+  .auth-panel-left .orb {
+    display: none; /* Hide text and decorations, keep logo only */
+  }
+  .logo-large {
+    margin-bottom: 0;
+    justify-content: center;
+  }
+  .logo-icon-large {
+    height: 36px;
+  }
+  .logo-text-img-large {
+    height: 40px;
   }
   .auth-panel-right {
     padding: 30px 20px;

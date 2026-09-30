@@ -42,9 +42,23 @@
   height: 40px;
   width: auto;
   object-fit: contain;
-  transform: scale(4) translateX(-5px);
-  transform-origin: left center;
 }
+
+.logo-light {
+  display: block;
+}
+
+.logo-dark {
+  display: none;
+  height: 26px;
+  margin-top: 2px;
+  margin-left: -10px;
+}
+
+body.light-mode .logo-dark { display: none; }
+body.light-mode .logo-light { display: block; }
+body:not(.light-mode) .logo-light { display: none; }
+body:not(.light-mode) .logo-dark { display: block; }
 .text-primary { color: var(--primary); }
 .text-secondary { color: var(--secondary); }
 
