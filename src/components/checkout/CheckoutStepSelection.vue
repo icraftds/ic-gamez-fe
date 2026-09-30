@@ -167,8 +167,8 @@ const goToInstruction = async () => {
     }
     
     // Hit Payment Gateway Service Directly
-    const paymentBaseUrl = (import.meta.env.VITE_PAYMENT_GATEWAY_URL || 'https://ic-pg.unikom.my.id').replace(/\/+$/, '')
-    const res = await axios.post(`${paymentBaseUrl}/api/payment/checkout`, payload, {
+    const paymentBaseUrl = (import.meta.env.VITE_PAYMENT_GATEWAY_URL || 'https://ic-pg.unikom.my.id/api').replace(/\/+$/, '')
+    const res = await axios.post(`${paymentBaseUrl}/payment/checkout`, payload, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
