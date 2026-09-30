@@ -110,7 +110,7 @@ onMounted(async () => {
 const PLAN_CONFIG = {
   pro: {
     icon: 'fa-solid fa-rocket',
-    energyLabel: 'Energi tak terbatas',
+    energyLabel: '20 Energi/minggu',
     energyIcon: 'fa-solid fa-infinity',
     benefits: [
       'Akses semua modul dasar & premium',

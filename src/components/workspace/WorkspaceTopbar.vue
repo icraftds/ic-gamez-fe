@@ -72,7 +72,7 @@
               <i class="fa-solid fa-arrow-trend-up text-primary"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
             </div>
             <div class="stat-item" title="Sisa Energi">
-              <i class="fa-solid fa-bolt text-warning"></i> {{ credits }} {{ isPremiumUser ? 'PRO' : '' }}
+              <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
             </div>
           </div>
           <div class="dropdown-actions">
@@ -92,7 +92,7 @@ import { useRouter } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 
 const router = useRouter();
-const { isLoggedIn, userProfile, isPremiumUser, credits, logout } = useUserAccount();
+const { isLoggedIn, userProfile, isPremiumUser, credits, logout, fetchUser } = useUserAccount();
 const STEPS = [
   { number: 1, label: "Materi" },
   { number: 2, label: "Tes" },
@@ -128,6 +128,7 @@ const handleClickOutside = (e) => {
 };
 
 onMounted(() => {
+  fetchUser();
   document.addEventListener('click', handleClickOutside);
 });
 

@@ -4,7 +4,11 @@ import api, { initCsrf } from '../services/api'
 const credits = ref(10)
 const coinz = ref(0)
 const isPremiumUser = ref(false)
-const maxCredits = computed(() => isPremiumUser.value ? 15 : 10)
+const maxCredits = computed(() => {
+  if (currentPlan.value === 'expert') return 25
+  if (currentPlan.value === 'pro') return 20
+  return 10
+})
 const currentPlan = ref('free')
 const isLoggedIn = ref(!!localStorage.getItem('auth_token'))
 const isLoading = ref(false)
