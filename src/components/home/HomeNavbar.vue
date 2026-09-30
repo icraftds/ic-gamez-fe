@@ -78,8 +78,12 @@
             <i class="fa-solid fa-bolt text-warning"></i>
             <span>{{ credits }}</span>
           </div>
-          <div class="premium-badge" v-else>
-            <i class="fa-solid fa-bolt" style="color: #f59e0b"></i>
+          <div class="premium-badge badge-expert" v-else-if="currentPlan === 'expert'">
+            <i class="fa-solid fa-crown" style="color: #ffffff"></i>
+            {{ credits }} EXPERT
+          </div>
+          <div class="premium-badge badge-pro" v-else>
+            <i class="fa-solid fa-star" style="color: #ffffff"></i>
             {{ credits }} PRO
           </div>
         </template>
@@ -128,7 +132,7 @@ import { useRouter } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import ConfirmModal from "../common/ConfirmModal.vue";
 
-const { credits, maxCredits, isPremiumUser, isLoggedIn, userProfile, logout } =
+const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, userProfile, logout } =
   useUserAccount();
 const router = useRouter();
 
