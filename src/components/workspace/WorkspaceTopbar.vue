@@ -47,45 +47,51 @@
     <div class="user-indicator" v-if="isLoggedIn">
       <div class="separator-vertical"></div>
 
-      <div class="user-stats">
-        <div class="stat-badge level-badge" title="Level Anda">
-          <i class="fa-solid fa-star"></i> Lvl {{ userProfile.level }}
-        </div>
-        <div class="stat-badge xp-badge" title="Total XP Anda">
-          <i class="fa-solid fa-arrow-trend-up"></i>
-          {{ userProfile.totalXp ?? userProfile.xp }} XP
-        </div>
-        <div
-          class="stat-badge energy-badge"
-          title="Sisa Energi"
-          v-if="!isPremiumUser"
-        >
-          <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
-        </div>
-        <div
-          class="stat-badge premium-badge"
-          title="Akun PRO (Sisa Energi)"
-          v-else
-        >
-          <i class="fa-solid fa-bolt" style="color: #f59e0b"></i>
-          {{ credits }} PRO
+      <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
+        <img
+          :src="userProfile.avatar"
+          :alt="userProfile.name"
+          class="avatar-sm"
+          :title="'Masuk sebagai ' + userProfile.name"
+        />
+        <i class="fa-solid fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
+        
+        <div v-if="showUserDropdown" class="user-dropdown-menu" @click.stop>
+          <div class="dropdown-header">
+            <img :src="userProfile.avatar" class="dropdown-avatar" />
+            <div class="dropdown-user-info">
+              <div class="user-name">{{ userProfile.name }}</div>
+              <div class="user-email">{{ userProfile.email }}</div>
+            </div>
+          </div>
+          <div class="dropdown-stats">
+            <div class="stat-item" title="Level Anda">
+              <i class="fa-solid fa-star text-warning"></i> Lvl {{ userProfile.level }}
+            </div>
+            <div class="stat-item" title="Total XP Anda">
+              <i class="fa-solid fa-arrow-trend-up text-primary"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
+            </div>
+            <div class="stat-item" title="Sisa Energi">
+              <i class="fa-solid fa-bolt text-warning"></i> {{ credits }} {{ isPremiumUser ? 'PRO' : '' }}
+            </div>
+          </div>
+          <div class="dropdown-actions">
+            <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Dashboard</button>
+            <button @click="handleLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+          </div>
         </div>
       </div>
-
-      <img
-        :src="userProfile.avatar"
-        :alt="userProfile.name"
-        class="avatar-sm"
-        :title="'Masuk sebagai ' + userProfile.name"
-      />
     </div>
   </header>
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 
-const { isLoggedIn, userProfile, isPremiumUser, credits } = useUserAccount();
+const router = useRouter();
+const { isLoggedIn, userProfile, isPremiumUser, credits, logout } = useUserAccount();
 const STEPS = [
   { number: 1, label: "Materi" },
   { number: 2, label: "Tes" },
@@ -100,8 +106,114 @@ defineProps({
 });
 
 defineEmits(["back"]);
+
+const showUserDropdown = ref(false);
+
+const handleLogout = () => {
+  logout();
+  router.push('/login');
+};
+
+const handleClickOutside = (e) => {
+  if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {
+    showUserDropdown.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
+<style scoped>
+.user-dropdown-menu {
+  position: absolute;
+  top: 130%;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 250px;
+  z-index: 9999;
+  border: 1px solid #e5e7eb;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+}
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 8px;
+}
+.dropdown-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+.dropdown-user-info {
+  display: flex;
+  flex-direction: column;
+}
+.user-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #111827;
+}
+.user-email {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+.dropdown-stats {
+  padding: 0 16px 8px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 8px;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 600;
+}
+.stat-item i {
+  width: 20px;
+  margin-right: 8px;
+}
+.dropdown-actions button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.dropdown-actions button:hover {
+  background: #f9fafb;
+}
+.dropdown-actions button i {
+  width: 20px;
+  margin-right: 8px;
+}
+.dropdown-actions button.text-danger {
+  color: #ef4444;
+}
+.dropdown-actions button.text-danger:hover {
+  background: #fef2f2;
+}
+</style>
 <style
   scoped
   src="../../assets/css/components/workspace/WorkspaceTopbar.css"

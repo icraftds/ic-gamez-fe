@@ -243,6 +243,23 @@ body:not(.light-mode) .logo-dark { display: block; }
   .dash-tab { padding: 6px 14px; font-size: 0.85rem; }
 }
 
+@media (max-width: 1024px) {
+  .dash-navbar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .dash-nav-center {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+  .dash-nav-right {
+    margin-left: auto;
+  }
+  .user-profile-btn span { display: none; }
+}
+
 @media (max-width: 768px) {
   .dash-navbar {
     flex-wrap: wrap;

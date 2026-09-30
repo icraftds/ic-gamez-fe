@@ -11,6 +11,55 @@ import { useUserAccount } from '../composables/useUserAccount'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
+import api from '../services/api'
+
+// Profile modal state
+const showProfileModal = ref(false)
+const isSavingProfile = ref(false)
+const profileForm = ref({
+  name: '',
+  phone: '',
+  avatar_url: '',
+  password: ''
+})
+
+const openProfileModal = () => {
+  profileForm.value = {
+    name: userProfile.value.name,
+    phone: userProfile.value.phone || '',
+    avatar_url: userProfile.value.avatar.includes('dicebear') ? '' : userProfile.value.avatar,
+    password: ''
+  }
+  showProfileModal.value = true
+}
+
+const saveProfile = async () => {
+  try {
+    isSavingProfile.value = true
+    const payload = {
+      name: profileForm.value.name,
+      phone: profileForm.value.phone,
+      avatar_url: profileForm.value.avatar_url || null
+    }
+    if (profileForm.value.password) {
+      payload.password = profileForm.value.password
+    }
+    
+    await api.post('/user/profile', payload)
+    
+    userProfile.value.name = profileForm.value.name
+    userProfile.value.phone = profileForm.value.phone
+    if (profileForm.value.avatar_url) {
+      userProfile.value.avatar = profileForm.value.avatar_url
+    }
+    
+    showProfileModal.value = false
+  } catch (err) {
+    alert('Gagal memperbarui profil: ' + (err.response?.data?.message || err.message))
+  } finally {
+    isSavingProfile.value = false
+  }
+}
 
 const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout } = useUserAccount()
 const { hasFetchedAllPaths, fetchAllPathsDetails } = useLearningPaths()
@@ -127,9 +176,12 @@ const tabs = [
       </div>
 
       <div class="dash-nav-right">
-        <div class="credits-indicator">
-          <i class="fa-solid fa-bolt text-warning"></i>
-          <span>{{ credits }}</span>
+        <div class="coinz-badge">
+          <img :src="'/images/coin.svg'" alt="iCoinZ" class="coinz-icon" />
+          <div class="coinz-info">
+            <span class="coinz-label">ICOINZ</span>
+            <span class="coinz-amount">{{ credits.toLocaleString('id-ID') }}</span>
+          </div>
         </div>
         <!-- Pro badge -->
         <div v-if="currentPlan === 'pro'" class="premium-badge-nav badge-pro-nav">
@@ -146,14 +198,44 @@ const tabs = [
         <!-- Removed moon and bell icons here -->
         <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
         <div class="user-profile-group">
-          <div class="user-profile-btn">
+          <div class="user-profile-btn" @click="openProfileModal" style="cursor: pointer;">
             <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" />
-            <span>{{ userProfile.name }}</span>
+            <span>{{ userProfile.name.split(' ')[0] }}</span>
           </div>
           <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
       </div>
     </nav>
+    <!-- Profile Edit Modal -->
+    <div v-if="showProfileModal" class="modal-backdrop" @click.self="showProfileModal = false">
+      <div class="modal-content profile-modal">
+        <div class="modal-header">
+          <h3>Edit Profil</h3>
+          <button class="close-btn" @click="showProfileModal = false"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <form @submit.prevent="saveProfile" class="profile-form">
+          <div class="form-group">
+            <label>Foto Profil (URL)</label>
+            <input type="text" v-model="profileForm.avatar_url" class="form-control" placeholder="https://example.com/avatar.jpg">
+          </div>
+          <div class="form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" v-model="profileForm.name" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Nomor Telepon</label>
+            <input type="text" v-model="profileForm.phone" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Password Baru (Opsional)</label>
+            <input type="password" v-model="profileForm.password" class="form-control" placeholder="Kosongkan jika tidak ingin diubah">
+          </div>
+          <button type="submit" class="btn-save-profile" :disabled="isSavingProfile">
+            {{ isSavingProfile ? 'Menyimpan...' : 'Simpan Perubahan' }}
+          </button>
+        </form>
+      </div>
+    </div>
     <!-- Content -->
     <div class="container dash-content" v-if="isLoggedIn">
       <DashboardHome v-if="activeTab === 'beranda'" />
@@ -374,5 +456,104 @@ const tabs = [
 @keyframes promoFadeIn {
   0% { opacity: 0; }
   100% { opacity: 1; }
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.profile-modal {
+  background: #111827;
+  padding: 24px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  color: white;
+  border: 1px solid #1f2937;
+}
+.profile-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.profile-modal .modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.profile-form .form-group {
+  margin-bottom: 16px;
+}
+.profile-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+.profile-form .form-control {
+  width: 100%;
+  padding: 10px 12px;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  color: white;
+}
+.profile-form .form-control:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+.btn-save-profile {
+  width: 100%;
+  padding: 12px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.btn-save-profile:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.coinz-badge {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  margin-right: 12px;
+}
+.coinz-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+.coinz-info {
+  display: flex;
+  flex-direction: column;
+}
+.coinz-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #3b82f6;
+  line-height: 1;
+}
+.coinz-amount {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.2;
 }
 </style>
