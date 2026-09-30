@@ -203,7 +203,7 @@ const generatedHeatmapCells = computed(() => {
   for (let i = 364; i >= 0; i--) {
     const d = new Date(today)
     d.setDate(today.getDate() - i)
-    const dateStr = d.toISOString().split('T')[0]
+    const dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
     
     if (activityMap[dateStr]) {
       cells.push({ id: dateStr, date: dateStr, level: activityMap[dateStr].level, count: activityMap[dateStr].count })
