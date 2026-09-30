@@ -77,6 +77,7 @@
           </div>
           <div class="dropdown-actions">
             <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Dashboard</button>
+            <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
             <button @click="handleLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
           </div>
         </div>
@@ -108,6 +109,12 @@ defineProps({
 defineEmits(["back"]);
 
 const showUserDropdown = ref(false);
+
+const goToMarket = () => {
+  const token = localStorage.getItem('auth_token') || '';
+  const marketUrl = 'http://localhost:3000/auto-login';
+  window.open(`${marketUrl}?token=${token}`, '_blank');
+};
 
 const handleLogout = () => {
   logout();
@@ -212,6 +219,12 @@ onUnmounted(() => {
 }
 .dropdown-actions button.text-danger:hover {
   background: #fef2f2;
+}
+.dropdown-actions button.text-primary {
+  color: #3b82f6;
+}
+.dropdown-actions button.text-primary:hover {
+  background: #eff6ff;
 }
 </style>
 <style

@@ -81,6 +81,13 @@ const saveProfile = async () => {
 const { isLoggedIn, userProfile, credits, coinz, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout } = useUserAccount()
 
 const showUserDropdown = ref(false)
+
+const goToMarket = () => {
+  const token = localStorage.getItem('auth_token') || ''
+  // Menggunakan URL iC-Market (ubah sesuai URL deployment asli)
+  const marketUrl = 'http://localhost:3000/auto-login'
+  window.open(`${marketUrl}?token=${token}`, '_blank')
+}
 const handleClickOutside = (e) => {
   if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {
     showUserDropdown.value = false
@@ -249,6 +256,9 @@ const tabs = [
                 </div>
               </div>
               <div class="dropdown-actions">
+                <button @click="goToMarket" class="text-primary" title="Buka iC-Market">
+                  <i class="fa-solid fa-store"></i> Buka iC-Market
+                </button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
               </div>
             </div>
@@ -705,5 +715,11 @@ const tabs = [
 }
 .dropdown-actions button.text-danger:hover {
   background: #fef2f2;
+}
+.dropdown-actions button.text-primary {
+  color: #3b82f6;
+}
+.dropdown-actions button.text-primary:hover {
+  background: #eff6ff;
 }
 </style>
