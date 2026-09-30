@@ -112,8 +112,8 @@ const showUserDropdown = ref(false);
 
 const goToMarket = () => {
   const token = localStorage.getItem('auth_token') || '';
-  const marketUrl = 'http://localhost:3000/auto-login';
-  window.open(`${marketUrl}?token=${token}`, '_blank');
+  const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://ic-market.unikom.my.id';
+  window.open(`${marketUrl}/auto-login?token=${token}`, '_blank');
 };
 
 const handleLogout = () => {
