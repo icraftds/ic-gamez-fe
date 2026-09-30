@@ -200,7 +200,7 @@ const tabs = [
           <img src="/images/Logo iC GameZ Lightmode.png" alt="IC Game Z" class="logo-text-img logo-light" />
           <img src="/images/Logo iC GameZ darkmode.png" alt="IC Game Z" class="logo-text-img logo-dark" />
         </router-link>
-        <span class="dash-label">DASHBOARD</span>
+
       </div>
 
       <div class="dash-nav-center">
