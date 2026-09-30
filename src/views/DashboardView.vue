@@ -232,8 +232,8 @@ const tabs = [
           <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
             <div class="user-profile-btn">
               <div style="position: relative;">
-                <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" />
-                <div v-if="isPremiumUser" class="badge-pro-avatar" title="Pengguna PRO/EXPERT">PRO</div>
+                <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" :class="{'avatar-pro': currentPlan === 'pro', 'avatar-expert': currentPlan === 'expert'}" />
+
               </div>
               <span style="margin-left: 8px;">{{ userProfile.name.split(' ')[0] }}</span>
               <i class="fa-solid fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
@@ -242,7 +242,7 @@ const tabs = [
             <!-- User Dropdown Menu -->
             <div v-if="showUserDropdown" class="user-dropdown-menu" @click.stop>
               <div class="dropdown-header" @click="openProfileModal" style="cursor: pointer;" title="Edit Profil">
-                <img :src="userProfile.avatar" class="dropdown-avatar" />
+                <img :src="userProfile.avatar" class="dropdown-avatar" :class="{'avatar-pro': currentPlan === 'pro', 'avatar-expert': currentPlan === 'expert'}" />
                 <div class="dropdown-user-info">
                   <div class="user-name">{{ userProfile.name }} <i class="fa-solid fa-pen" style="font-size: 0.7rem; color: #9ca3af; margin-left: 4px;"></i></div>
                   <div class="user-email">{{ userProfile.email }}</div>
@@ -256,7 +256,7 @@ const tabs = [
                   <i class="fa-solid fa-arrow-trend-up text-primary"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
                 </div>
                 <div class="stat-item" title="Sisa Energi">
-                  <i class="fa-solid fa-bolt text-warning"></i> {{ credits }} {{ isPremiumUser ? 'PRO' : '' }}
+                  <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
                 </div>
               </div>
               <div class="dropdown-actions">
@@ -540,56 +540,97 @@ const tabs = [
   z-index: 1000;
 }
 .profile-modal {
-  background: #111827;
-  padding: 24px;
-  border-radius: 12px;
+  background: linear-gradient(145deg, #1f2937, #111827);
+  padding: 30px;
+  border-radius: 16px;
   width: 90%;
-  max-width: 400px;
+  max-width: 420px;
   color: white;
-  border: 1px solid #1f2937;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: promoPopIn 0.3s ease-out;
 }
 .profile-modal .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
 }
 .profile-modal .modal-header h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: 700;
+  color: #f8fafc;
+}
+.profile-modal .modal-header .close-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px;
+}
+.profile-modal .modal-header .close-btn:hover {
+  color: white;
 }
 .profile-form .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  text-align: left;
 }
 .profile-form label {
   display: block;
   margin-bottom: 8px;
-  font-size: 0.9rem;
-  color: #9ca3af;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 .profile-form .form-control {
   width: 100%;
-  padding: 10px 12px;
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 6px;
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid #334155;
+  border-radius: 8px;
   color: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 .profile-form .form-control:focus {
   outline: none;
   border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.profile-form input[type="file"]::file-selector-button {
+  background: #334155;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 12px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.profile-form input[type="file"]::file-selector-button:hover {
+  background: #475569;
 }
 .btn-save-profile {
   width: 100%;
-  padding: 12px;
-  background: #6366f1;
+  padding: 14px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
   color: white;
   border: none;
-  border-radius: 6px;
-  font-weight: 600;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.05rem;
   cursor: pointer;
   margin-top: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-save-profile:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
 }
 .btn-save-profile:disabled {
   opacity: 0.7;
@@ -801,5 +842,14 @@ const tabs = [
 @keyframes spinLoader {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.avatar-pro {
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+.avatar-expert {
+  border: 2px solid #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
 }
 </style>
