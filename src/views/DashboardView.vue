@@ -19,7 +19,7 @@ const isSavingProfile = ref(false)
 const profileForm = ref({
   name: '',
   phone: '',
-  avatar_url: '',
+  avatar: null, // File object
   password: ''
 })
 
@@ -27,30 +27,47 @@ const openProfileModal = () => {
   profileForm.value = {
     name: userProfile.value.name,
     phone: userProfile.value.phone || '',
-    avatar_url: userProfile.value.avatar.includes('dicebear') ? '' : userProfile.value.avatar,
+    avatar: null,
     password: ''
   }
   showProfileModal.value = true
 }
 
+const handleAvatarChange = (e) => {
+  const file = e.target.files[0]
+  if (file) {
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Ukuran file maksimal 2 MB')
+      e.target.value = ''
+      return
+    }
+    profileForm.value.avatar = file
+  }
+}
+
 const saveProfile = async () => {
   try {
     isSavingProfile.value = true
-    const payload = {
-      name: profileForm.value.name,
-      phone: profileForm.value.phone,
-      avatar_url: profileForm.value.avatar_url || null
-    }
-    if (profileForm.value.password) {
-      payload.password = profileForm.value.password
-    }
     
-    await api.post('/user/profile', payload)
+    const formData = new FormData()
+    formData.append('_method', 'PUT')
+    formData.append('name', profileForm.value.name)
+    if (profileForm.value.phone) formData.append('phone', profileForm.value.phone)
+    if (profileForm.value.password) formData.append('password', profileForm.value.password)
+    if (profileForm.value.avatar) formData.append('avatar', profileForm.value.avatar)
+
+    const response = await api.post('/user/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     
     userProfile.value.name = profileForm.value.name
     userProfile.value.phone = profileForm.value.phone
-    if (profileForm.value.avatar_url) {
-      userProfile.value.avatar = profileForm.value.avatar_url
+    
+    // Update avatar from backend response if exists
+    if (response.data && response.data.data && response.data.data.avatar_url) {
+      userProfile.value.avatar = response.data.data.avatar_url
     }
     
     showProfileModal.value = false
@@ -61,7 +78,21 @@ const saveProfile = async () => {
   }
 }
 
-const { isLoggedIn, userProfile, credits, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout } = useUserAccount()
+const { isLoggedIn, userProfile, credits, coinz, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout } = useUserAccount()
+
+const showUserDropdown = ref(false)
+const handleClickOutside = (e) => {
+  if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {
+    showUserDropdown.value = false
+  }
+}
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+import { onUnmounted } from 'vue'
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 const { hasFetchedAllPaths, fetchAllPathsDetails } = useLearningPaths()
 const route = useRoute()
 const router = useRouter()
@@ -177,32 +208,51 @@ const tabs = [
 
       <div class="dash-nav-right">
         <div class="coinz-badge">
-          <img :src="'/images/coin.svg'" alt="iCoinZ" class="coinz-icon" />
+          <img :src="'/images/icoinz.svg'" alt="iCoinZ" class="coinz-icon" />
           <div class="coinz-info">
             <span class="coinz-label">ICOINZ</span>
-            <span class="coinz-amount">{{ credits.toLocaleString('id-ID') }}</span>
+            <span class="coinz-amount">{{ coinz.toLocaleString('id-ID') }}</span>
           </div>
         </div>
-        <!-- Pro badge -->
-        <div v-if="currentPlan === 'pro'" class="premium-badge-nav badge-pro-nav">
-          <i class="fa-solid fa-rocket"></i> PRO
-        </div>
-        <!-- Expert badge -->
-        <div v-else-if="currentPlan === 'expert'" class="premium-badge-nav badge-expert-nav">
-          <i class="fa-solid fa-crown"></i> EXPERT
-        </div>
-        <!-- Fallback premium badge -->
-        <div v-else class="premium-badge-nav">
-          <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> PRO
-        </div>
-        <!-- Removed moon and bell icons here -->
+
         <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
+        
         <div class="user-profile-group">
-          <div class="user-profile-btn" @click="openProfileModal" style="cursor: pointer;">
-            <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" />
-            <span>{{ userProfile.name.split(' ')[0] }}</span>
+          <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
+            <div class="user-profile-btn">
+              <div style="position: relative;">
+                <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" />
+                <div v-if="isPremiumUser" class="badge-pro-avatar" title="Pengguna PRO/EXPERT">PRO</div>
+              </div>
+              <span style="margin-left: 8px;">{{ userProfile.name.split(' ')[0] }}</span>
+              <i class="fa-solid fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
+            </div>
+            
+            <!-- User Dropdown Menu -->
+            <div v-if="showUserDropdown" class="user-dropdown-menu" @click.stop>
+              <div class="dropdown-header" @click="openProfileModal" style="cursor: pointer;" title="Edit Profil">
+                <img :src="userProfile.avatar" class="dropdown-avatar" />
+                <div class="dropdown-user-info">
+                  <div class="user-name">{{ userProfile.name }} <i class="fa-solid fa-pen" style="font-size: 0.7rem; color: #9ca3af; margin-left: 4px;"></i></div>
+                  <div class="user-email">{{ userProfile.email }}</div>
+                </div>
+              </div>
+              <div class="dropdown-stats">
+                <div class="stat-item" title="Level Anda">
+                  <i class="fa-solid fa-star text-warning"></i> Lvl {{ userProfile.level }}
+                </div>
+                <div class="stat-item" title="Total XP Anda">
+                  <i class="fa-solid fa-arrow-trend-up text-primary"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
+                </div>
+                <div class="stat-item" title="Sisa Energi">
+                  <i class="fa-solid fa-bolt text-warning"></i> {{ credits }} {{ isPremiumUser ? 'PRO' : '' }}
+                </div>
+              </div>
+              <div class="dropdown-actions">
+                <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+              </div>
+            </div>
           </div>
-          <button class="btn-logout" @click="handleLogoutClick" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
       </div>
     </nav>
@@ -215,8 +265,8 @@ const tabs = [
         </div>
         <form @submit.prevent="saveProfile" class="profile-form">
           <div class="form-group">
-            <label>Foto Profil (URL)</label>
-            <input type="text" v-model="profileForm.avatar_url" class="form-control" placeholder="https://example.com/avatar.jpg">
+            <label>Foto Profil (Maks 2 MB)</label>
+            <input type="file" @change="handleAvatarChange" accept="image/*" class="form-control" style="padding: 8px;">
           </div>
           <div class="form-group">
             <label>Nama Lengkap</label>
@@ -555,5 +605,105 @@ const tabs = [
   font-weight: 800;
   color: #111827;
   line-height: 1.2;
+}
+
+.badge-pro-avatar {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 250px;
+  z-index: 9999;
+  border: 1px solid #e5e7eb;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+}
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 8px;
+}
+.dropdown-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+.dropdown-user-info {
+  display: flex;
+  flex-direction: column;
+}
+.user-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #111827;
+}
+.user-email {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+.dropdown-stats {
+  padding: 0 16px 8px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 8px;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 600;
+}
+.stat-item i {
+  width: 20px;
+  margin-right: 8px;
+}
+.dropdown-actions button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.dropdown-actions button:hover {
+  background: #f9fafb;
+}
+.dropdown-actions button i {
+  width: 20px;
+  margin-right: 8px;
+}
+.dropdown-actions button.text-danger {
+  color: #ef4444;
+}
+.dropdown-actions button.text-danger:hover {
+  background: #fef2f2;
 }
 </style>

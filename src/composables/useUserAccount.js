@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import api, { initCsrf } from '../services/api'
 
 const credits = ref(10)
+const coinz = ref(0)
 const isPremiumUser = ref(false)
 const maxCredits = computed(() => isPremiumUser.value ? 15 : 10)
 const currentPlan = ref('free')
@@ -52,6 +53,14 @@ export function useUserAccount() {
       currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
         ? data.current_plan.slug 
         : (data.current_plan || 'free')
+
+      // Fetch Coinz
+      try {
+        const walletRes = await api.get('/user/wallet')
+        coinz.value = walletRes.data.data?.balance || walletRes.data.data?.coinz || 0
+      } catch(e) {
+        coinz.value = 0
+      }
     } catch (error) {
       isLoggedIn.value = false
       // Clear user data on failure (e.g. 401)
@@ -278,6 +287,7 @@ export function useUserAccount() {
     refreshStats,
     addXp,
     credits,
+    coinz,
     maxCredits,
     isPremiumUser,
     currentPlan,
