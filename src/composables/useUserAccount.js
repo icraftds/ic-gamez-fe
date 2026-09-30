@@ -59,6 +59,7 @@ export function useUserAccount() {
         const walletRes = await api.get('/user/wallet')
         coinz.value = walletRes.data.data?.balance || walletRes.data.data?.coinz || 0
       } catch(e) {
+        console.error('Wallet fetch error:', e.response?.data || e)
         coinz.value = 0
       }
     } catch (error) {
@@ -79,9 +80,9 @@ export function useUserAccount() {
       await initCsrf()
       const response = await api.post('/auth/login', { email, password })
       
-      // Simpan token ke localStorage untuk Mode API Token
-      if (response.data && response.data.local_token) {
-        localStorage.setItem('auth_token', response.data.local_token)
+      // Simpan token bawaan SSO ke localStorage
+      if (response.data && response.data.token) {
+        localStorage.setItem('auth_token', response.data.token)
       }
       
       await fetchUser()
@@ -131,9 +132,9 @@ export function useUserAccount() {
       isLoading.value = true
       const response = await api.post('/auth/verify-otp', { email, otp })
       
-      // Simpan local_token
-      if (response.data && response.data.local_token) {
-        localStorage.setItem('auth_token', response.data.local_token)
+      // Simpan token bawaan SSO
+      if (response.data && response.data.token) {
+        localStorage.setItem('auth_token', response.data.token)
       }
       
       await fetchUser() // Auto login
@@ -176,6 +177,7 @@ export function useUserAccount() {
     } finally {
       // Hapus token dari localStorage saat logout
       localStorage.removeItem('auth_token')
+      localStorage.removeItem('sso_token')
       
       isLoggedIn.value = false
       userProfile.value = {

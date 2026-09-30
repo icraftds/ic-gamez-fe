@@ -589,32 +589,63 @@ const tabs = [
 .coinz-badge {
   display: flex;
   align-items: center;
-  background: #ffffff;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid #e5e7eb;
-  margin-right: 12px;
+  /* Default: Dark mode style (cyberpunk/glassmorphism) */
+  background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.6));
+  backdrop-filter: blur(10px);
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(75, 85, 99, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  margin-right: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border 0.3s ease;
+  cursor: default;
+}
+.coinz-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(96, 165, 250, 0.2);
+}
+:global(.light-mode) .coinz-badge {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(249, 250, 251, 0.7));
+  border: 1px solid rgba(229, 231, 235, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+:global(.light-mode) .coinz-badge:hover {
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2);
 }
 .coinz-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
+  width: 28px;
+  height: 28px;
+  margin-right: 10px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  transition: transform 0.3s ease;
+}
+.coinz-badge:hover .coinz-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 .coinz-info {
   display: flex;
   flex-direction: column;
 }
 .coinz-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: #3b82f6;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #60a5fa;
   line-height: 1;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+:global(.light-mode) .coinz-label {
+  color: #3b82f6;
 }
 .coinz-amount {
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #111827;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #f9fafb;
   line-height: 1.2;
+  transition: color 0.3s ease;
+}
+:global(.light-mode) .coinz-amount {
+  color: #111827;
 }
 
 .badge-pro-avatar {
@@ -721,5 +752,23 @@ const tabs = [
 }
 .dropdown-actions button.text-primary:hover {
   background: #eff6ff;
+}
+
+@media (max-width: 768px) {
+  .coinz-badge {
+    padding: 6px 12px;
+    margin-right: 8px;
+  }
+  .coinz-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+  }
+  .coinz-label {
+    font-size: 0.55rem;
+  }
+  .coinz-amount {
+    font-size: 0.95rem;
+  }
 }
 </style>
