@@ -1,7 +1,7 @@
 <template>
   <div 
     class="path-card group" 
-    :class="{ premium: path.isPremium, locked: path.isLocked }"
+    :class="{ premium: path.isPremium || path.is_premium, locked: path.isLocked || path.is_locked }"
     @click="handleClick"
   >
     <div class="card-glow" :style="{ background: themeColor }"></div>
@@ -10,10 +10,10 @@
         <div class="path-icon" :style="{ color: themeColor, backgroundColor: themeColor + '20', border: `1px solid ${themeColor}50` }">
           <i :class="path.icon"></i>
         </div>
-        <div v-if="path.isLocked" class="locked-badge-float">
+        <div v-if="path.isLocked || path.is_locked" class="locked-badge-float">
           <i class="fa-solid fa-lock"></i> TAHAP MVP
         </div>
-        <div v-else-if="path.isPremium" class="premium-badge-float">
+        <div v-else-if="path.isPremium || path.is_premium" class="premium-badge-float">
           <i class="fa-solid" :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'"></i> PRO
         </div>
       </div>
@@ -29,10 +29,10 @@
             <i class="fa-solid fa-book-open"></i> {{ path.chapters?.length || 0 }} Modul
           </div>
         </div>
-        <div class="action-btn" :style="{ color: path.isLocked ? '#64748b' : themeColor }">
-          <span v-if="path.isLocked">Terkunci</span>
+        <div class="action-btn" :style="{ color: (path.isLocked || path.is_locked) ? '#64748b' : themeColor }">
+          <span v-if="path.isLocked || path.is_locked">Terkunci</span>
           <span v-else>Mulai</span>
-          <i v-if="!path.isLocked" class="fa-solid fa-arrow-right icon-arrow"></i>
+          <i v-if="!path.isLocked && !path.is_locked" class="fa-solid fa-arrow-right icon-arrow"></i>
         </div>
       </div>
     </div>
@@ -65,8 +65,8 @@ const handleClick = () => {
 }
 
 const themeColor = computed(() => {
-  if (props.path.isLocked) return '#475569' // Slate gray for locked
-  if (props.path.isPremium) return '#f59e0b' // Amber/Gold for premium
+  if (props.path.isLocked || props.path.is_locked) return '#475569' // Slate gray for locked
+  if (props.path.isPremium || props.path.is_premium) return '#f59e0b' // Amber/Gold for premium
   const colors = ['#00f0ff', '#ec4899', '#9333ea', '#10b981']
   return colors[props.index % colors.length] || '#00f0ff'
 })
