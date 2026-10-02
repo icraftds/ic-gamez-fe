@@ -27,15 +27,14 @@
       <div v-else class="challenge-info card-glass">
         <h3><i class="fa-solid fa-code"></i> {{ currentEvent?.title }}</h3>
         <div class="tags">
-          <span class="tag">JavaScript</span>
-          <span class="tag">Algoritma</span>
-          <span class="tag" :class="currentEvent?.difficulty === 'Mudah' ? 'diff-mudah' : currentEvent?.difficulty === 'Sedang' ? 'diff-sedang' : 'diff-sulit'">
-            {{ currentEvent?.difficulty }}
+          <span class="tag" v-for="tag in getTags(currentEvent)" :key="tag">{{ tag }}</span>
+          <span v-if="getDifficultyLabel(currentEvent)" class="tag" :class="getDifficultyClass(currentEvent)">
+            {{ getDifficultyLabel(currentEvent) }}
           </span>
         </div>
         <div class="desc" v-html="currentEvent?.description || currentEvent?.description_html"></div>
         
-        <div class="action-box">
+        <div class="action-box" v-if="currentEvent?.title !== 'Tantangan Belum Tersedia'">
           <button class="btn-start" :class="{ 'btn-disabled': isAlreadyPlayedToday }" @click="startChallenge">
             <i class="fa-solid fa-play" v-if="!isAlreadyPlayedToday"></i> 
             <i class="fa-solid fa-lock" v-else></i>
@@ -43,6 +42,12 @@
           </button>
           <p class="note" v-if="!isAlreadyPlayedToday"><i class="fa-solid fa-circle-info"></i> Waktu akan dihitung mundur segera setelah Anda menekan tombol mulai.</p>
           <p class="note" style="color: #ef4444;" v-else><i class="fa-solid fa-circle-info"></i> Anda sudah menyelesaikan atau kehabisan kesempatan hari ini. Silakan coba lagi besok!</p>
+        </div>
+        
+        <div class="action-box" v-else>
+          <button class="btn-start btn-disabled" disabled style="background: var(--bg-alt); color: var(--text-muted); cursor: not-allowed; border: 1px solid var(--glass-border);">
+            <i class="fa-solid fa-hourglass-start"></i> Menunggu Tantangan
+          </button>
         </div>
       </div>
 
@@ -106,6 +111,34 @@ let timerInterval = null;
 const leaderboard = ref([]);
 const currentEvent = ref(null);
 const isLoadingEvent = ref(true);
+
+// Computed properties untuk tags dan difficulty
+const getTags = (event) => {
+  if (!event) return ['JavaScript', 'Algoritma'];
+  // Placeholder tags, in a real app these might come from the lesson's tags/category
+  return ['JavaScript', 'Algoritma'];
+};
+
+const getDifficultyLabel = (event) => {
+  if (!event) return '';
+  if (event.difficulty) return event.difficulty; // Fallback untuk mock data
+  
+  if (event.challenges && event.challenges.length > 0 && event.challenges[0].lesson) {
+    const diff = event.challenges[0].lesson.difficulty;
+    if (diff === 'easy') return 'Mudah';
+    if (diff === 'medium') return 'Sedang';
+    if (diff === 'hard') return 'Sulit';
+    return diff;
+  }
+  return 'Menengah'; // Default
+};
+
+const getDifficultyClass = (event) => {
+  const diff = getDifficultyLabel(event);
+  if (diff === 'Mudah' || diff === 'easy') return 'diff-mudah';
+  if (diff === 'Sedang' || diff === 'medium') return 'diff-sedang';
+  return 'diff-sulit';
+};
 
 const isAlreadyPlayedToday = computed(() => {
   if (!currentEvent.value) return false;
