@@ -235,12 +235,13 @@
 .timeline-container {
   display: flex;
   justify-content: center;
+  flex: 1;
 }
 
 .timeline-tree {
   position: relative;
   width: 100%;
-  max-width: 720px; /* Constrained slightly more to give space from sidebar */
+  max-width: 600px;
   display: flex;
   flex-direction: column;
 }
@@ -248,15 +249,26 @@
 /* Main Spine */
 .spine {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 6px;
-  background: linear-gradient(to bottom, var(--primary), var(--secondary));
-  border-radius: 6px;
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+  top: 30px;
+  bottom: 30px;
+  left: 30px;
+  width: 4px;
+  background: rgba(0, 240, 255, 0.2);
+  border-radius: 4px;
   z-index: 1;
+}
+.spine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary));
+  animation: growSpine 1.5s ease-out forwards;
+}
+@keyframes growSpine {
+  to { height: 100%; }
 }
 
 /* Chapter Section */
@@ -264,46 +276,37 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  padding-left: 70px;
   margin-bottom: 40px;
   z-index: 2;
+  position: relative;
 }
 
 /* Chapter Node */
 .chapter-node-wrapper {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   opacity: 0;
   animation: chapterAppear 0.4s ease-out forwards;
 }
 
 @keyframes chapterAppear {
-  0% { opacity: 0; transform: translateY(-20px) scale(0.95); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
 }
 
 .chapter-node {
-  background: var(--bg-deep);
-  border: 2px solid var(--secondary);
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(0, 240, 255, 0.1));
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  border-left: 4px solid var(--secondary);
   border-radius: 12px;
-  padding: 16px 32px;
-  text-align: center;
-  box-shadow: 0 8px 30px rgba(236, 72, 153, 0.2);
-  min-width: 250px;
+  padding: 16px 24px;
+  text-align: left;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
   position: relative;
-}
-.chapter-node::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120%;
-  height: 120%;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 70%);
-  z-index: -1;
-  pointer-events: none;
 }
 .chapter-label {
   display: block;
@@ -312,7 +315,7 @@
   color: var(--secondary);
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .chapter-node h3 {
   font-size: 1.4rem;
@@ -325,14 +328,14 @@
 .lessons-list {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
   width: 100%;
 }
 
 /* Lesson Wrapper */
 .lesson-wrapper {
   display: flex;
-  width: 50%;
+  width: 100%;
   position: relative;
   align-items: center;
   opacity: 0;
@@ -340,64 +343,28 @@
 }
 
 @keyframes branchSlideDown {
-  0% { opacity: 0; transform: translateY(-30px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.lesson-wrapper.left-side {
-  align-self: flex-start;
-  justify-content: flex-end;
-  padding-right: 40px; /* Space for connector */
-}
-
-.lesson-wrapper.right-side {
-  align-self: flex-end;
-  justify-content: flex-start;
-  padding-left: 40px; /* Space for connector */
-}
-
-/* Connectors */
-.lesson-connector {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 40px;
-  height: 4px;
-  background: var(--primary);
-  box-shadow: 0 0 10px var(--primary);
-  z-index: 1;
-}
-.lesson-wrapper.left-side .lesson-connector {
-  right: 0;
-}
-.lesson-wrapper.right-side .lesson-connector {
-  left: 0;
+  0% { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
 }
 
 /* Spine Dot */
 .spine-dot {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
+  left: -40px; /* 70px padding - 30px spine pos = 40px */
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
   background: var(--bg-deep);
   border: 3px solid var(--primary);
   border-radius: 50%;
-  box-shadow: 0 0 15px var(--primary);
+  box-shadow: 0 0 10px var(--primary);
   z-index: 3;
-}
-.lesson-wrapper.left-side .spine-dot {
-  right: -8px; /* Center exactly on the 6px spine */
-}
-.lesson-wrapper.right-side .spine-dot {
-  left: -8px;
 }
 
 /* Lesson Card */
 .lesson-card {
   width: 100%;
-  max-width: 300px;
   background: var(--bg-deep);
   border: 2px solid rgba(0, 240, 255, 0.3);
   border-radius: 12px;
@@ -596,28 +563,12 @@
     text-align: left;
   }
   
-  .lesson-wrapper {
-    width: 100%;
-    align-self: flex-start !important;
-    justify-content: flex-start !important;
-    padding-left: 50px !important;
-    padding-right: 0 !important;
-  }
-
-  .lesson-connector {
-    width: 30px;
-    left: 20px !important;
-    right: auto !important;
-  }
-
   .spine-dot {
-    left: -8px !important;
-    right: auto !important;
+    left: -32px;
   }
   
   .next-chapter-wrapper,
   .end-node-wrapper {
     justify-content: flex-start;
-    padding-left: 50px;
   }
 }

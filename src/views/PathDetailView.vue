@@ -58,11 +58,8 @@
                     v-for="(lesson, lIdx) in selectedChapter.lessons" 
                     :key="lesson.id" 
                     class="lesson-wrapper"
-                    :class="lIdx % 2 === 0 ? 'left-side' : 'right-side'"
                     :style="{ animationDelay: `${0.2 + (lIdx * 0.15)}s` }"
                   >
-                    <!-- Connector to Spine -->
-                    <div class="lesson-connector"></div>
                     <!-- Dot on the Spine -->
                     <div class="spine-dot"></div>
 

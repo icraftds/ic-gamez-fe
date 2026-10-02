@@ -413,22 +413,37 @@ body:not(.light-mode) .logo-light { display: none; }
 
 
 .nav-shop-btn {
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fbbf24;
-  font-size: 1.2rem;
+  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s;
-  margin-right: 15px;
+  transition: all 0.3s ease;
 }
 .nav-shop-btn:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
 }
 .dropdown-trigger {
   position: relative;
   display: flex;
   align-items: center;
   cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 12px 4px 4px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+.dropdown-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 .dropdown-icon {
   margin-left: 8px;
