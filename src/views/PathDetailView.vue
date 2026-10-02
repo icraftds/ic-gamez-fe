@@ -16,66 +16,105 @@
         </div>
       </div>
 
-      <div class="timeline-container" v-if="path && path.chapters && path.chapters.length > 0">
+      <div class="layout-wrapper" v-if="path && path.chapters && path.chapters.length > 0">
         
-        <div class="timeline-tree">
-          <!-- Main Vertical Spine -->
-          <div class="spine"></div>
-
-          <div v-for="(chapter, cIdx) in path.chapters" :key="chapter.id" class="chapter-section">
-            
-            <!-- Chapter Node (Centered) -->
-            <div class="chapter-node-wrapper">
-              <div class="chapter-node">
-                <span class="chapter-label">BAB {{ cIdx + 1 }}</span>
-                <h3>{{ chapter.title }}</h3>
-              </div>
-            </div>
-
-            <!-- Lessons in this Chapter -->
-            <div class="lessons-list" v-if="chapter.lessons && chapter.lessons.length > 0">
-              <div 
-                v-for="(lesson, lIdx) in chapter.lessons" 
-                :key="lesson.id" 
-                class="lesson-wrapper"
-                :class="lIdx % 2 === 0 ? 'left-side' : 'right-side'"
+        <!-- Hanging Sidebar -->
+        <div class="sidebar-wrapper">
+          <div class="chapter-sidebar">
+            <h3 class="sidebar-title">Daftar Bab</h3>
+            <div class="chapter-nav">
+              <button 
+                v-for="(chapter, cIdx) in path.chapters" 
+                :key="chapter.id"
+                class="chapter-nav-btn"
+                :class="{ active: selectedChapterId === chapter.id }"
+                @click="selectedChapterId = chapter.id"
               >
-                <!-- Connector to Spine -->
-                <div class="lesson-connector"></div>
-                <!-- Dot on the Spine -->
-                <div class="spine-dot"></div>
+                <span class="bab-label">BAB {{ cIdx + 1 }}</span>
+                <span class="bab-title">{{ chapter.title }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
-                <!-- Lesson Card -->
-                <div 
-                  class="lesson-card group"
-                  :class="{ 
-                    'premium': lesson.is_premium, 
-                    'locked': lesson.is_premium && !isPremiumUser && !(cIdx === 0 && lIdx === 0) 
-                  }"
-                  @click="goToLesson(chapter.id, lesson)"
-                >
-                  <div class="lesson-header">
-                    <span class="lesson-status">
-                      <i v-if="lesson.is_premium" class="fa-solid fa-lock premium-lock" :class="{ 'unlocked': isPremiumUser || (cIdx === 0 && lIdx === 0) }"></i>
-                      <i v-else class="fa-solid fa-check-circle free-check"></i>
-                    </span>
-                    <span class="lesson-tag">Materi</span>
-                  </div>
-                  <h4>{{ lesson.title }}</h4>
-                  <div class="lesson-footer">
-                    <span class="btn-text">Mulai <i class="fa-solid fa-arrow-right icon-arrow"></i></span>
+        <div class="timeline-container">
+          <div class="timeline-tree">
+            <!-- Main Vertical Spine -->
+            <div class="spine"></div>
+
+            <transition name="fade" mode="out-in">
+              <div v-if="selectedChapter" :key="selectedChapter.id" class="chapter-section">
+                
+                <!-- Chapter Node (Centered) -->
+                <div class="chapter-node-wrapper">
+                  <div class="chapter-node">
+                    <span class="chapter-label">BAB {{ selectedChapterIndex + 1 }}</span>
+                    <h3>{{ selectedChapter.title }}</h3>
                   </div>
                 </div>
-              </div>
-            </div>
 
-          </div>
-          
-          <!-- End Node -->
-          <div class="end-node-wrapper">
-            <div class="end-node">
-              <i class="fa-solid fa-flag-checkered"></i> Selesai
-            </div>
+                <!-- Lessons in this Chapter -->
+                <div class="lessons-list" v-if="selectedChapter.lessons && selectedChapter.lessons.length > 0">
+                  <div 
+                    v-for="(lesson, lIdx) in selectedChapter.lessons" 
+                    :key="lesson.id" 
+                    class="lesson-wrapper"
+                    :class="lIdx % 2 === 0 ? 'left-side' : 'right-side'"
+                    :style="{ animationDelay: `${0.2 + (lIdx * 0.15)}s` }"
+                  >
+                    <!-- Connector to Spine -->
+                    <div class="lesson-connector"></div>
+                    <!-- Dot on the Spine -->
+                    <div class="spine-dot"></div>
+
+                    <!-- Lesson Card -->
+                    <div 
+                      class="lesson-card group"
+                      :class="{ 
+                        'premium': lesson.is_premium, 
+                        'locked': lesson.is_premium && !isPremiumUser && !(selectedChapterIndex === 0 && lIdx === 0) 
+                      }"
+                      @click="goToLesson(selectedChapter.id, lesson)"
+                    >
+                      <div class="lesson-header">
+                        <span class="lesson-status">
+                          <i v-if="lesson.is_premium" class="fa-solid fa-lock premium-lock" :class="{ 'unlocked': isPremiumUser || (selectedChapterIndex === 0 && lIdx === 0) }"></i>
+                          <i v-else class="fa-solid fa-check-circle free-check"></i>
+                        </span>
+                        <span class="lesson-tag">Materi</span>
+                      </div>
+                      <h4>{{ lesson.title }}</h4>
+                      <div class="lesson-footer">
+                        <span class="btn-text">Mulai <i class="fa-solid fa-arrow-right icon-arrow"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Next Chapter Button -->
+                <div 
+                  class="next-chapter-wrapper" 
+                  v-if="selectedChapterIndex < path.chapters.length - 1"
+                  :style="{ animationDelay: `${0.2 + ((selectedChapter.lessons?.length || 0) * 0.15)}s` }"
+                >
+                  <button class="next-chapter-node" @click="goToNextChapter">
+                    Lanjut ke BAB {{ selectedChapterIndex + 2 }} <i class="fa-solid fa-arrow-down"></i>
+                  </button>
+                </div>
+
+                <!-- End Node -->
+                <div 
+                  class="end-node-wrapper" 
+                  v-if="selectedChapterIndex === path.chapters.length - 1"
+                  :style="{ animationDelay: `${0.2 + ((selectedChapter.lessons?.length || 0) * 0.15)}s` }"
+                >
+                  <div class="end-node">
+                    <i class="fa-solid fa-flag-checkered"></i> Selesai
+                  </div>
+                </div>
+
+              </div>
+            </transition>
           </div>
         </div>
 
@@ -93,7 +132,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useUserAccount } from '../composables/useUserAccount'
@@ -109,6 +148,35 @@ const { isPremiumUser } = useUserAccount()
 const pathId = computed(() => route.params.pathId)
 const path = computed(() => getPathById(pathId.value))
 const showPremiumModal = ref(false)
+
+const selectedChapterId = ref(null)
+
+watch(() => path.value, (newPath) => {
+  if (newPath && newPath.chapters && newPath.chapters.length > 0 && !selectedChapterId.value) {
+    selectedChapterId.value = newPath.chapters[0].id
+  }
+}, { immediate: true })
+
+const selectedChapter = computed(() => {
+  if (!path.value || !path.value.chapters) return null
+  return path.value.chapters.find(c => c.id === selectedChapterId.value) || path.value.chapters[0]
+})
+
+const selectedChapterIndex = computed(() => {
+  if (!path.value || !path.value.chapters) return 0
+  const index = path.value.chapters.findIndex(c => c.id === selectedChapterId.value)
+  return index !== -1 ? index : 0
+})
+
+const goToNextChapter = () => {
+  if (path.value && path.value.chapters) {
+    const nextIndex = selectedChapterIndex.value + 1
+    if (nextIndex < path.value.chapters.length) {
+      selectedChapterId.value = path.value.chapters[nextIndex].id
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+}
 
 onMounted(async () => {
   if (!path.value || !path.value.chapters) {
@@ -149,7 +217,7 @@ const goToLesson = (chapterId, lesson) => {
 .roadmap-view {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip; /* Using clip instead of hidden to allow position: sticky to work */
 }
 
 .content-area {
@@ -195,18 +263,113 @@ const goToLesson = (chapterId, lesson) => {
   margin: 0 auto;
 }
 
+/* Layout Wrapper */
+.layout-wrapper {
+  display: flex;
+  gap: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: flex-start;
+  padding: 0 20px;
+}
+
+/* Sidebar */
+.sidebar-wrapper {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 100px;
+  z-index: 10;
+}
+
+.chapter-sidebar {
+  background: var(--glass-bg-card-0_6);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+/* Custom Scrollbar for Sidebar */
+.chapter-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.chapter-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chapter-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.2);
+  border-radius: 10px;
+}
+.chapter-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+.sidebar-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-light);
+  margin-bottom: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.chapter-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chapter-nav-btn {
+  background: var(--bg-deep);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chapter-nav-btn:hover {
+  background: rgba(0, 240, 255, 0.05);
+  border-color: rgba(0, 240, 255, 0.3);
+}
+
+.chapter-nav-btn.active {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2);
+}
+
+.chapter-nav-btn .bab-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.chapter-nav-btn .bab-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
 /* Vertical Timeline Layout */
 .timeline-container {
   display: flex;
   justify-content: center;
-  width: 100%;
-  padding: 0 20px;
+  flex-grow: 1;
 }
 
 .timeline-tree {
   position: relative;
   width: 100%;
-  max-width: 800px; /* Keep it constrained for readability */
+  max-width: 720px; /* Constrained slightly more to give space from sidebar */
   display: flex;
   flex-direction: column;
 }
@@ -240,6 +403,13 @@ const goToLesson = (chapterId, lesson) => {
   justify-content: center;
   width: 100%;
   margin-bottom: 40px;
+  opacity: 0;
+  animation: chapterAppear 0.4s ease-out forwards;
+}
+
+@keyframes chapterAppear {
+  0% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .chapter-node {
@@ -294,6 +464,13 @@ const goToLesson = (chapterId, lesson) => {
   width: 50%;
   position: relative;
   align-items: center;
+  opacity: 0;
+  animation: branchSlideDown 0.5s ease-out forwards;
+}
+
+@keyframes branchSlideDown {
+  0% { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .lesson-wrapper.left-side {
@@ -424,13 +601,49 @@ const goToLesson = (chapterId, lesson) => {
   color: var(--text-muted);
 }
 
+/* Next Chapter Button */
+.next-chapter-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 40px;
+  z-index: 2;
+  opacity: 0;
+  animation: chapterAppear 0.4s ease-out forwards;
+}
+
+.next-chapter-node {
+  background: var(--bg-deep);
+  border: 2px dashed var(--primary);
+  border-radius: 50px;
+  padding: 12px 32px;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1rem;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.next-chapter-node:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-style: solid;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(0, 240, 255, 0.3);
+}
+
 /* End Node */
 .end-node-wrapper {
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 40px;
   z-index: 2;
+  opacity: 0;
+  animation: chapterAppear 0.4s ease-out forwards;
 }
 .end-node {
   background: var(--bg-deep);
@@ -470,8 +683,33 @@ const goToLesson = (chapterId, lesson) => {
   font-size: 1.1rem;
 }
 
+/* Fade Transition */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
 /* Responsive Mobile Layout */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+  .layout-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar-wrapper {
+    width: 100%;
+    position: relative;
+    top: 0;
+    margin-bottom: 40px;
+  }
+
+  .chapter-sidebar {
+    max-height: none;
+    overflow-y: visible;
+  }
+
   .spine {
     left: 20px;
     transform: none;
@@ -506,6 +744,7 @@ const goToLesson = (chapterId, lesson) => {
     right: auto !important;
   }
   
+  .next-chapter-wrapper,
   .end-node-wrapper {
     justify-content: flex-start;
     padding-left: 50px;
