@@ -1,30 +1,28 @@
 <template>
   <div class="shop-view-wrapper">
-    <!-- Premium Header -->
-    <div class="shop-hero">
-      <div class="shop-hero-content">
-        <div class="hero-icon">
-          <i class="fa-solid fa-cart-plus"></i>
-        </div>
-        <h1>GameZ Shop</h1>
-        <p>Tingkatkan pengalaman belajarmu. Dapatkan tambahan energi untuk menyelesaikan lebih banyak tantangan hari ini!</p>
-        
-        <div class="wallet-status">
-          <div class="wallet-badge coinz-badge">
-            <img src="/images/icoinz.svg" alt="iCoinZ" class="icoinz-icon" />
-            <span>{{ coinz }} iCoinZ</span>
+    <!-- Compact Header -->
+    <div class="shop-compact-header container">
+      <div class="header-content-left">
+        <div class="title-with-icon">
+          <div class="header-icon-box">
+            <i class="fa-solid fa-store"></i>
+          </div>
+          <div class="header-text-group">
+            <h1>GameZ Shop</h1>
+            <p>Dapatkan tambahan energi untuk menyelesaikan tantangan.</p>
           </div>
         </div>
       </div>
-      <div class="hero-bg-glow"></div>
+      <div class="header-content-right">
+        <div class="wallet-compact-badge" title="Saldo iCoinZ">
+          <img src="/images/icoinz.svg" alt="iCoinZ" class="icoinz-icon" />
+          <span class="coin-amount">{{ coinz }}</span>
+        </div>
+      </div>
     </div>
 
     <!-- Shop Content -->
     <div class="shop-content-section container">
-      <div class="section-title">
-        <h2>Paket Energi</h2>
-        <p class="subtitle">Pilih paket energi yang sesuai dengan kebutuhanmu</p>
-      </div>
 
       <div v-if="isLoading" class="loading-state">
         <img src="/images/icoinz.svg" alt="Loading" class="icoinz-loading-icon" />
@@ -182,86 +180,91 @@ const purchaseWithGateway = (pkg) => {
   padding-bottom: 80px;
 }
 
-.shop-hero {
-  position: relative;
-  padding: 80px 20px;
-  background: linear-gradient(to bottom, rgba(245, 158, 11, 0.05), transparent);
-  border-bottom: 1px solid rgba(245, 158, 11, 0.1);
+.shop-compact-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  overflow: hidden;
+  margin-top: 50px;
+  margin-bottom: 40px;
+  padding: 20px 30px;
+  background: var(--glass-bg-card-0_8);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
 }
 
-.hero-bg-glow {
-  position: absolute;
-  top: -50%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
+.title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
-.shop-hero-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  max-width: 700px;
-}
-
-.hero-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
+.header-icon-box {
+  width: 50px;
+  height: 50px;
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1));
-  border-radius: 50%;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   color: #fbbf24;
-  box-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
 }
 
-.shop-hero-content h1 {
-  font-size: 3rem;
-  color: var(--text-light);
-  margin-bottom: 15px;
+.header-text-group h1 {
+  font-size: 1.8rem;
   font-weight: 800;
-  letter-spacing: -1px;
+  color: var(--text-light);
+  margin-bottom: 4px;
 }
 
-.shop-hero-content p {
-  font-size: 1.1rem;
+.header-text-group p {
+  font-size: 0.95rem;
   color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 30px;
 }
 
-.wallet-status {
-  display: flex;
-  justify-content: center;
-}
-
-.wallet-badge {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  padding: 12px 24px;
-  border-radius: 30px;
-  color: #fbbf24;
-  font-weight: 700;
+.wallet-compact-badge {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.2rem;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
+  padding: 10px 20px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 30px;
+}
+
+.wallet-compact-badge img {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4));
+}
+
+.coin-amount {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fbbf24;
+}
+
+@media (max-width: 768px) {
+  .shop-compact-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+  }
+  .header-content-right {
+    width: 100%;
+  }
+  .wallet-compact-badge {
+    justify-content: center;
+    width: 100%;
+  }
 }
 
 .shop-content-section {
-  margin-top: 50px;
+  margin-top: 10px;
 }
 
 .section-title {

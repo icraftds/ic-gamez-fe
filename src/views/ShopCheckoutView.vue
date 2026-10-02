@@ -97,13 +97,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
 import api from '../services/api'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { fetchUser } = useUserAccount()
+const { fetchUser, userProfile } = useUserAccount()
 
 const pkgId = route.query.pkgId
 const pkgName = route.query.name || 'Paket'
@@ -129,11 +130,27 @@ const processPayment = async () => {
       await fetchUser()
       state.value = 'success'
     } else {
-      const res = await api.post('/shop/purchase/gateway', { 
-        package_id: pkgId,
-        payment_method: 'qris'
+      const userId = userProfile.value?.id || 1
+      const payload = { 
+        item_type: "credit_topup", 
+        payment_method: "qris", 
+        user_id: userId,
+        plan_id: 3,
+        amount: price,
+        package_id: pkgId
+      }
+      
+      const paymentBaseUrl = (import.meta.env.VITE_PAYMENT_GATEWAY_URL || 'https://ic-pg.unikom.my.id/api').replace(/\/+$/, '')
+      const res = await axios.post(`${paymentBaseUrl}/payment/checkout`, payload, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
       })
-      const checkoutUrl = res.data.data?.checkout_url || res.data.data?.payment_url
+      
+      const tx = res.data?.data || {}
+      const checkoutUrl = tx.checkout_url || tx.payment_url
+      
       if (checkoutUrl) {
         window.location.href = checkoutUrl
       } else {
