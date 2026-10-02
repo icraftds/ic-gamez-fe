@@ -144,48 +144,35 @@ const playSuccessAnimation = (energyAmount) => {
   }, 2500)
 }
 
-const purchaseWithCoinz = async (pkg) => {
+const purchaseWithCoinz = (pkg) => {
   if (coinz.value < pkg.price_icoinz) {
     alert('Saldo iCoinZ kamu tidak cukup.')
     return
   }
   
-  if (!confirm(`Beli ${pkg.name} dengan ${pkg.price_icoinz} iCoinZ?`)) return
-
-  try {
-    isProcessing.value = true
-    await api.post('/shop/purchase/coinz', { package_id: pkg.id })
-    await fetchUser() // Refresh balance & energy
-    playSuccessAnimation(pkg.energy_amount)
-  } catch (error) {
-    alert(error.response?.data?.message || 'Gagal melakukan pembelian')
-  } finally {
-    isProcessing.value = false
-  }
+  router.push({
+    path: '/shop/checkout',
+    query: {
+      pkgId: pkg.id,
+      name: pkg.name,
+      energy: pkg.energy_amount,
+      method: 'coinz',
+      price: pkg.price_icoinz
+    }
+  })
 }
 
-const purchaseWithGateway = async (pkg) => {
-  if (!confirm(`Lanjut ke pembayaran Rp ${formatPrice(pkg.price_idr)} untuk ${pkg.name}?`)) return
-
-  try {
-    isProcessing.value = true
-    const res = await api.post('/shop/purchase/gateway', { 
-      package_id: pkg.id,
-      payment_method: 'qris' // Default to qris, can be dynamic if you add a selection modal
-    })
-    
-    // Redirect to checkout URL provided by gateway
-    const checkoutUrl = res.data.data.checkout_url || res.data.data.payment_url
-    if (checkoutUrl) {
-      window.location.href = checkoutUrl
-    } else {
-      alert('Berhasil dibuat, tapi URL pembayaran tidak ditemukan.')
+const purchaseWithGateway = (pkg) => {
+  router.push({
+    path: '/shop/checkout',
+    query: {
+      pkgId: pkg.id,
+      name: pkg.name,
+      energy: pkg.energy_amount,
+      method: 'gateway',
+      price: pkg.price_idr
     }
-  } catch (error) {
-    alert(error.response?.data?.message || 'Gagal membuat transaksi')
-  } finally {
-    isProcessing.value = false
-  }
+  })
 }
 </script>
 

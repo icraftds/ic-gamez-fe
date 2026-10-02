@@ -67,6 +67,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/shop/checkout',
+      name: 'shop-checkout',
+      component: () => import('./views/ShopCheckoutView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/leaderboard',
       name: 'leaderboard',
       component: () => import('./views/LeaderboardView.vue')
