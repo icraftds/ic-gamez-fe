@@ -73,7 +73,10 @@
 
       <div class="nav-right">
         <template v-if="isLoggedIn">
-          <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer; margin-left: 1rem;">
+          <button class="nav-btn shop-btn" @click="showShopModal = true" title="Buka iC-Market" style="background: transparent; border: none; color: #fbbf24; font-size: 1.2rem; cursor: pointer; transition: transform 0.2s; margin-right: 15px;">
+            <i class="fa-solid fa-store"></i>
+          </button>
+          <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
             <img
               :src="userProfile.avatar"
               :alt="userProfile.name"
@@ -105,7 +108,7 @@
               </div>
               <div class="dropdown-actions">
                 <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Dashboard</button>
-                <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
+                <button @click="showShopModal = true; showUserDropdown = false" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
               </div>
             </div>
@@ -130,6 +133,12 @@
       type="warning"
       @confirm="performLogout"
     />
+
+    <ShopModal 
+      :isOpen="showShopModal" 
+      @close="showShopModal = false"
+      @purchased="fetchUser"
+    />
   </nav>
 </template>
 
@@ -138,6 +147,7 @@ import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import ConfirmModal from "../common/ConfirmModal.vue";
+import ShopModal from "../shop/ShopModal.vue";
 
 const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, userProfile, logout, fetchUser } =
   useUserAccount();
@@ -146,6 +156,7 @@ const router = useRouter();
 const showLogoutConfirm = ref(false);
 const mobileMenuOpen = ref(false);
 const showUserDropdown = ref(false);
+const showShopModal = ref(false);
 
 const firstName = computed(() => {
   if (!userProfile.value || !userProfile.value.name) return '';
@@ -157,12 +168,6 @@ const avatarBorderClass = computed(() => {
   if (isPremiumUser.value) return 'border-blue';
   return 'border-gray';
 });
-
-const goToMarket = () => {
-  const token = localStorage.getItem('auth_token') || '';
-  const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://ic-market.unikom.my.id';
-  window.open(`${marketUrl}/auto-login?token=${token}`, '_blank');
-};
 
 const handleClickOutside = (e) => {
   if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {

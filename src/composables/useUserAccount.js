@@ -212,7 +212,6 @@ export function useUserAccount() {
   }
 
   const deductCredit = async (amount = 1) => {
-    if (isPremiumUser.value) return true
     if (credits.value >= amount) {
       // Optimitic update
       credits.value -= amount
@@ -259,7 +258,6 @@ export function useUserAccount() {
   }
 
   const hasEnoughCredits = (amount = 1) => {
-    if (isPremiumUser.value) return true
     return credits.value >= amount
   }
 

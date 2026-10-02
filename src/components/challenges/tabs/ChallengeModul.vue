@@ -43,7 +43,7 @@
           <div class="challenge-card-header">
             <span class="badge category-badge">{{ challenge.category }}</span>
             <span v-if="challenge.isPremium" class="badge badge-premium">
-              <i class="fa-solid" :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'"></i> Premium
+              <i class="fa-solid" :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'"></i> Pro / Expert
             </span>
           </div>
           <h3 class="challenge-title">{{ challenge.title }}</h3>
@@ -234,7 +234,7 @@ const openChallenge = (challenge) => {
   }
 
   router.push(
-    `/learning/${challenge.pathId}/lesson/${challenge.chapterId}/${challenge.id}?step=3`,
+    `/learning/${challenge.pathId}/lesson/${challenge.chapterId}/${challenge.id}?step=practice&mode=challenge`
   );
 };
 </script>

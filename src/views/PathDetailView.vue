@@ -78,8 +78,9 @@
                     >
                       <div class="lesson-header">
                         <span class="lesson-status">
-                          <i v-if="lesson.is_premium" class="fa-solid fa-lock premium-lock" :class="{ 'unlocked': isPremiumUser || (selectedChapterIndex === 0 && lIdx === 0) }"></i>
-                          <i v-else class="fa-solid fa-check-circle free-check"></i>
+                          <i v-if="lesson.is_premium && !isPremiumUser && !(selectedChapterIndex === 0 && lIdx === 0)" class="fa-solid fa-lock premium-lock"></i>
+                          <i v-else-if="isLessonCompleted(lesson)" class="fa-solid fa-check-circle free-check"></i>
+                          <i v-else class="fa-regular fa-circle" style="color: #6b7280; font-size: 0.9rem;"></i>
                         </span>
                         <span class="lesson-tag">Materi</span>
                       </div>
@@ -185,6 +186,12 @@ onMounted(async () => {
   }
   isPreparingLesson.value = false
 })
+
+const isLessonCompleted = (lesson) => {
+  let p = lesson.progress
+  if (Array.isArray(p)) p = p.length > 0 ? p[0] : null
+  return p ? p.is_completed : false
+}
 
 const goToLesson = (chapterId, lesson) => {
   const step = 'theory'

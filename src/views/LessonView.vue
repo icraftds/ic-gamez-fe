@@ -367,7 +367,11 @@ const onPracticeRun = async () => {
       practiceStatus.value = 'success'
       if (currentLesson.value) {
         currentLesson.value.practiceDone = true
-        const result = await scoring.awardXp('practice', currentLesson.value.id)
+        const extraData = {}
+        if (route.query.mode) {
+          extraData.mode = route.query.mode
+        }
+        const result = await scoring.awardXp('practice', currentLesson.value.id, extraData)
         if (result.awarded) {
           showXpToast(result.xp, 'Praktik Berhasil!', 'practice')
         }

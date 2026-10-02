@@ -137,6 +137,7 @@
 /* Layout Wrapper */
 .layout-wrapper {
   display: flex;
+  justify-content: center;
   gap: 60px;
   max-width: 1200px;
   margin: 0 auto;
@@ -234,7 +235,6 @@
 .timeline-container {
   display: flex;
   justify-content: center;
-  flex-grow: 1;
 }
 
 .timeline-tree {
