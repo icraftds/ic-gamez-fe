@@ -130,26 +130,17 @@ const processPayment = async () => {
       await fetchUser()
       state.value = 'success'
     } else {
-      const userId = userProfile.value?.id || 1
-      const payload = { 
-        item_type: "credit_topup", 
-        payment_method: "qris", 
-        user_id: userId,
-        plan_id: 3,
-        amount: price,
-        package_id: pkgId
-      }
-      
-      const paymentBaseUrl = (import.meta.env.VITE_PAYMENT_GATEWAY_URL || 'https://ic-pg.unikom.my.id/api').replace(/\/+$/, '')
-      const res = await axios.post(`${paymentBaseUrl}/payment/checkout`, payload, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
+      const res = await api.post('/shop/purchase/gateway', { 
+        package_id: pkgId,
+        payment_method: 'qris'
       })
       
       const tx = res.data?.data || {}
-      const checkoutUrl = tx.checkout_url || tx.payment_url
+      let checkoutUrl = tx.checkout_url || tx.payment_url
+      
+      if (!checkoutUrl && tx.pakasir_txn_id) {
+        checkoutUrl = `https://app.pakasir.com/pay-v2/${tx.pakasir_txn_id}`
+      }
       
       if (checkoutUrl) {
         window.location.href = checkoutUrl
