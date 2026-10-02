@@ -177,3 +177,8 @@ body.light-mode {
   --glass-bg: rgba(255, 255, 255, 0.8) !important;
   --glass-border: rgba(14, 165, 233, 0.3) !important;
 }
+
+/* Ensure all profile pictures/avatars keep their aspect ratio */
+.avatar, .avatar-sm, .dropdown-avatar, .podium-avatar, .table-avatar, .welcome-avatar, .user-avatar, img[alt*="vatar"] {
+  object-fit: cover !important;
+}

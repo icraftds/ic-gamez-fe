@@ -82,48 +82,79 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useUserAccount } from '../../composables/useUserAccount'
+
+const { userProfile, userStats, fetchUserStats } = useUserAccount()
+
+onMounted(async () => {
+  // If stats aren't loaded yet or missing data, fetch them
+  if (!userStats.value.completed_exercises) {
+    await fetchUserStats()
+  }
+})
 
 const activeCategory = ref('all')
 
-const categories = [
-  { id: 'all', label: 'Semua', earned: 0, total: 15 },
-  { id: 'sql', label: 'SQL', earned: 0, total: 6 },
-  { id: 'frontend', label: 'Frontend', earned: 0, total: 4 },
-  { id: 'streak', label: 'Streak', earned: 0, total: 3 },
-  { id: 'level', label: 'Level', earned: 0, total: 2 }
-]
+// Safe getters for user progress
+const getSqlCount = () => {
+  // Can be based on SQL path completion or events. Let's use completed_exercises for paths + daily events
+  const paths = userStats.value?.completed_exercises?.breakdown?.sql || 0
+  const daily = userStats.value?.events?.daily || 0
+  return paths + daily
+}
+const getFrontendCount = () => userStats.value?.completed_exercises?.breakdown?.frontend || 0
+const getStreak = () => userProfile.value?.longest_streak || 0
+const getLevel = () => userProfile.value?.level || 1
 
-const allMedals = [
-  { id: 'm1', category: 'sql', name: 'Halo, SELECT!', icon: 'fa-solid fa-database', description: 'Challenge SQL pertamamu beres! Query pertama emang paling...', target: 1, current: 0, earned: false },
-  { id: 'm2', category: 'sql', name: 'Lagi Anget-Angetnya', icon: 'fa-solid fa-fire', description: '5 challenge kelar. Jarimu mulai hafal WHERE tanpa mikir.', target: 5, current: 0, earned: false },
-  { id: 'm3', category: 'sql', name: 'Mulai Ketagihan Ngulik', icon: 'fa-solid fa-magnifying-glass', description: '10 challenge SQL! Udah mulai nagih kan? Nggak apa-apa...', target: 10, current: 0, earned: false },
-  { id: 'm4', category: 'sql', name: 'Pendekar Query', icon: 'fa-solid fa-shield-halved', description: '25 challenge kamu libas. JOIN sama GROUP BY udah nggak bikin kering...', target: 25, current: 0, earned: false },
-  { id: 'm5', category: 'sql', name: 'Suhu SQL', icon: 'fa-solid fa-crown', description: '50 challenge! Level analis beneran nih — dan sertifikatnya udah nungg...', target: 50, current: 0, earned: false },
-  { id: 'm6', category: 'sql', name: 'Legenda Ngulik SQL', icon: 'fa-solid fa-gem', description: '100 challenge SQL tamat. Kamu resmi legenda — dan iya, ini pantas...', target: 100, current: 0, earned: false },
-  { id: 'm7', category: 'frontend', name: 'Hello, World!', icon: 'fa-brands fa-html5', description: 'Buat halaman HTML pertamamu. Langkah pertama selalu spesial.', target: 1, current: 0, earned: false },
-  { id: 'm8', category: 'frontend', name: 'CSS Wizard', icon: 'fa-brands fa-css3-alt', description: 'Selesaikan 5 tantangan CSS. Layoutmu mulai rapih!', target: 5, current: 0, earned: false },
-  { id: 'm9', category: 'streak', name: 'Konsisten 7 Hari', icon: 'fa-solid fa-calendar-check', description: 'Belajar 7 hari berturut-turut. Disiplin adalah kuncinya!', target: 7, current: 0, earned: false },
-  { id: 'm10', category: 'streak', name: 'Maraton 30 Hari', icon: 'fa-solid fa-rocket', description: 'Streak 30 hari tanpa putus. Kamu luar biasa!', target: 30, current: 0, earned: false },
-  { id: 'm11', category: 'level', name: 'Naik Level 5', icon: 'fa-solid fa-arrow-up', description: 'Mencapai Level 5. Perjalananmu baru dimulai!', target: 5, current: 0, earned: false },
-  { id: 'm12', category: 'level', name: 'Level 25 Master', icon: 'fa-solid fa-star', description: 'Level 25! Kamu sudah jadi master.', target: 25, current: 0, earned: false },
-]
+const allMedals = computed(() => {
+  const sqlCount = getSqlCount()
+  const feCount = getFrontendCount()
+  const streakCount = getStreak()
+  const lvlCount = getLevel()
+
+  return [
+    { id: 'm1', category: 'sql', name: 'Halo, SELECT!', icon: 'fa-solid fa-database', description: 'Challenge SQL pertamamu beres! Query pertama emang paling...', target: 1, current: Math.min(sqlCount, 1), earned: sqlCount >= 1 },
+    { id: 'm2', category: 'sql', name: 'Lagi Anget-Angetnya', icon: 'fa-solid fa-fire', description: '5 challenge kelar. Jarimu mulai hafal WHERE tanpa mikir.', target: 5, current: Math.min(sqlCount, 5), earned: sqlCount >= 5 },
+    { id: 'm3', category: 'sql', name: 'Mulai Ketagihan Ngulik', icon: 'fa-solid fa-magnifying-glass', description: '10 challenge SQL! Udah mulai nagih kan?', target: 10, current: Math.min(sqlCount, 10), earned: sqlCount >= 10 },
+    { id: 'm4', category: 'sql', name: 'Pendekar Query', icon: 'fa-solid fa-shield-halved', description: '25 challenge kamu libas. JOIN sama GROUP BY udah jago.', target: 25, current: Math.min(sqlCount, 25), earned: sqlCount >= 25 },
+    { id: 'm5', category: 'sql', name: 'Suhu SQL', icon: 'fa-solid fa-crown', description: '50 challenge! Level analis beneran nih.', target: 50, current: Math.min(sqlCount, 50), earned: sqlCount >= 50 },
+    { id: 'm6', category: 'sql', name: 'Legenda Ngulik SQL', icon: 'fa-solid fa-gem', description: '100 challenge SQL tamat. Kamu resmi legenda.', target: 100, current: Math.min(sqlCount, 100), earned: sqlCount >= 100 },
+    { id: 'm7', category: 'frontend', name: 'Hello, World!', icon: 'fa-brands fa-html5', description: 'Buat halaman HTML pertamamu. Langkah pertama selalu spesial.', target: 1, current: Math.min(feCount, 1), earned: feCount >= 1 },
+    { id: 'm8', category: 'frontend', name: 'CSS Wizard', icon: 'fa-brands fa-css3-alt', description: 'Selesaikan 5 tantangan CSS. Layoutmu mulai rapih!', target: 5, current: Math.min(feCount, 5), earned: feCount >= 5 },
+    { id: 'm9', category: 'streak', name: 'Konsisten 7 Hari', icon: 'fa-solid fa-calendar-check', description: 'Belajar 7 hari berturut-turut. Disiplin adalah kuncinya!', target: 7, current: Math.min(streakCount, 7), earned: streakCount >= 7 },
+    { id: 'm10', category: 'streak', name: 'Maraton 30 Hari', icon: 'fa-solid fa-rocket', description: 'Streak 30 hari tanpa putus. Kamu luar biasa!', target: 30, current: Math.min(streakCount, 30), earned: streakCount >= 30 },
+    { id: 'm11', category: 'level', name: 'Naik Level 5', icon: 'fa-solid fa-arrow-up', description: 'Mencapai Level 5. Perjalananmu baru dimulai!', target: 5, current: Math.min(lvlCount, 5), earned: lvlCount >= 5 },
+    { id: 'm12', category: 'level', name: 'Level 25 Master', icon: 'fa-solid fa-star', description: 'Level 25! Kamu sudah jadi master.', target: 25, current: Math.min(lvlCount, 25), earned: lvlCount >= 25 },
+  ]
+})
+
+const categories = computed(() => {
+  const medals = allMedals.value
+  return [
+    { id: 'all', label: 'Semua', earned: medals.filter(m => m.earned).length, total: medals.length },
+    { id: 'sql', label: 'SQL', earned: medals.filter(m => m.category === 'sql' && m.earned).length, total: medals.filter(m => m.category === 'sql').length },
+    { id: 'frontend', label: 'Frontend', earned: medals.filter(m => m.category === 'frontend' && m.earned).length, total: medals.filter(m => m.category === 'frontend').length },
+    { id: 'streak', label: 'Streak', earned: medals.filter(m => m.category === 'streak' && m.earned).length, total: medals.filter(m => m.category === 'streak').length },
+    { id: 'level', label: 'Level', earned: medals.filter(m => m.category === 'level' && m.earned).length, total: medals.filter(m => m.category === 'level').length }
+  ]
+})
 
 const activeCategoryLabel = computed(() => {
-  const cat = categories.find(c => c.id === activeCategory.value)
+  const cat = categories.value.find(c => c.id === activeCategory.value)
   return cat ? cat.label : ''
 })
 const activeCategoryEarned = computed(() => {
-  const cat = categories.find(c => c.id === activeCategory.value)
+  const cat = categories.value.find(c => c.id === activeCategory.value)
   return cat ? cat.earned : 0
 })
 const activeCategoryTotal = computed(() => {
-  const cat = categories.find(c => c.id === activeCategory.value)
+  const cat = categories.value.find(c => c.id === activeCategory.value)
   return cat ? cat.total : 0
 })
 const activeMedals = computed(() => {
-  if (activeCategory.value === 'all') return allMedals
-  return allMedals.filter(m => m.category === activeCategory.value)
+  if (activeCategory.value === 'all') return allMedals.value
+  return allMedals.value.filter(m => m.category === activeCategory.value)
 })
 </script>
 
