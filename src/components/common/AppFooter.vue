@@ -5,11 +5,17 @@
         <!-- Column 1: Brand & Description -->
         <div class="footer-col brand-col">
           <div class="footer-logo">
-            <span class="logo-ic">iC</span> <span class="logo-gamez">Game-Z</span>
+            <img src="/images/Logo iC GameZ darkmode.png" alt="iC Game-Z" class="footer-logo-img logo-dark" />
+            <img src="/images/Logo iC GameZ Lightmode.png" alt="iC Game-Z" class="footer-logo-img logo-light" />
           </div>
           <p class="footer-desc">
             Platform gamifikasi edukasi coding dan pemrograman. iC Game-Z Level up Your Skill !!
           </p>
+          <div class="social-links">
+            <a href="https://instagram.com/icraft.ds" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://tiktok.com/@icraft.ds" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://threads.net/@icraft.ds" target="_blank" title="Threads"><i class="fa-brands fa-threads"></i></a>
+          </div>
         </div>
 
         <!-- Column 2: Belajar -->

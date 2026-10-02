@@ -22,27 +22,56 @@
 }
 
 .footer-logo {
-  font-size: 1.8rem;
-  font-weight: 900;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
-  gap: 4px;
 }
 
-.logo-ic {
-  color: var(--primary);
+.footer-logo-img {
+  height: 32px; /* Set logo height to look proportional */
+  width: auto;
+  object-fit: contain;
 }
 
-.logo-gamez {
-  color: var(--text-light);
-}
+.logo-light { display: none; }
+body.light-mode .logo-dark { display: none; }
+body.light-mode .logo-light { display: block; }
 
 .footer-desc {
   line-height: 1.6;
   font-size: 0.95rem;
   max-width: 320px;
   color: #94a3b8;
+  margin-bottom: 20px;
+}
+
+.social-links {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.social-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+.social-links a:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-3px);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 240, 255, 0.3);
 }
 
 .footer-heading {
