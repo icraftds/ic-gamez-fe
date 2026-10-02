@@ -155,7 +155,10 @@ const currentLesson = computed(() => getLessonById(pathId.value, chapterId.value
 const currentChapter = computed(() => getChapterById(pathId.value, chapterId.value))
 
 onMounted(async () => {
-  if (!path.value || !path.value.chapters) {
+  // Pastikan detail (termasuk quizzes) dimuat. Endpoint index tidak me-load quizzes.
+  const hasQuizzesLoaded = path.value?.chapters?.[0]?.lessons?.[0]?.quizzes !== undefined;
+  
+  if (!path.value || !path.value.chapters || !hasQuizzesLoaded) {
     await fetchPathDetails(pathId.value)
   }
   isPreparingLesson.value = false

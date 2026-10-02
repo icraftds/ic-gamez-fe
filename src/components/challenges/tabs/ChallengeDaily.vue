@@ -33,7 +33,7 @@
             {{ currentEvent?.difficulty }}
           </span>
         </div>
-        <div class="desc" v-html="currentEvent?.description_html"></div>
+        <div class="desc" v-html="currentEvent?.description || currentEvent?.description_html"></div>
         
         <div class="action-box">
           <button class="btn-start" :class="{ 'btn-disabled': isAlreadyPlayedToday }" @click="startChallenge">

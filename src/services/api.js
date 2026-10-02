@@ -47,7 +47,9 @@ api.interceptors.response.use(
         error.config.url === '/auth/logout' ||
         error.config.url.includes('submit-speedrun') ||
         error.config.url.includes('/coupons/validate') ||
-        error.config.url.includes('/hints')
+        error.config.url.includes('/hints') ||
+        error.config.url.includes('/events/') ||
+        error.config.url.includes('/events/daily/active')
       )) {
         return Promise.reject(error);
       }

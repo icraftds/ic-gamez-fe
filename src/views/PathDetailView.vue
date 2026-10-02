@@ -179,7 +179,8 @@ const goToNextChapter = () => {
 }
 
 onMounted(async () => {
-  if (!path.value || !path.value.chapters) {
+  const hasQuizzesLoaded = path.value?.chapters?.[0]?.lessons?.[0]?.quizzes !== undefined;
+  if (!path.value || !path.value.chapters || !hasQuizzesLoaded) {
     await fetchPathDetails(pathId.value)
   }
   isPreparingLesson.value = false
