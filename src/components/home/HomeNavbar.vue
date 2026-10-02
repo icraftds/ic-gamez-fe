@@ -73,11 +73,6 @@
 
       <div class="nav-right">
         <template v-if="isLoggedIn">
-          <div class="credits-indicator">
-            <i class="fa-solid fa-bolt text-warning"></i>
-            <span>{{ credits }}</span>
-          </div>
-
           <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer; margin-left: 1rem;">
             <img
               :src="userProfile.avatar"

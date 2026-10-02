@@ -238,7 +238,9 @@ export const useChallengeStore = defineStore('challenge', {
         `);
 
         testCases.forEach((tc, index) => {
-          const result = evalFunc(tc.input);
+          // Deep clone the input to prevent user code from mutating the original test cases
+          const clonedInput = JSON.parse(JSON.stringify(tc.input));
+          const result = evalFunc(clonedInput);
           
           // Deep equality check for arrays/objects or simple check
           const isPassed = JSON.stringify(result) === JSON.stringify(tc.expected);
