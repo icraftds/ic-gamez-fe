@@ -5,8 +5,26 @@
         <span class="tag-pro"><i class="fa-solid fa-crown"></i> Mega Project 2026</span>
         <h2>Sistem Manajemen Rumah Sakit Terintegrasi</h2>
         <p>Acara tahunan eksklusif dari CTO Icraft untuk member Pro. Bangun aplikasi full-stack menggunakan Laravel dan Vue.js yang akan dinilai oleh panel ahli dan bisa menjadi portofolio emas Anda.</p>
+        
+        <!-- MEGA PRIZE POOL SHOWCASE -->
+        <div class="mega-prize-pool">
+          <div class="prize-glow"></div>
+          <div class="prize-content">
+            <i class="fa-solid fa-trophy prize-icon gold"></i>
+            <div class="prize-text">
+              <span class="prize-label">PRIZE POOL</span>
+              <h1 class="prize-amount">Rp 5.000.000<span class="plus">+</span></h1>
+            </div>
+            <i class="fa-solid fa-coins prize-icon silver"></i>
+          </div>
+          <div class="prize-subtext-container">
+            <p class="prize-subtext"><i class="fa-solid fa-money-bills"></i> Uang Tunai Jutaan Rupiah</p>
+            <p class="prize-subtext"><i class="fa-solid fa-certificate"></i> Sertifikat Eksklusif Icraft</p>
+            <p class="prize-subtext"><i class="fa-solid fa-handshake"></i> Tawaran Tim Inti Icraft</p>
+          </div>
+        </div>
+
         <div class="banner-meta">
-          <span><i class="fa-solid fa-money-bill-wave"></i> Total Hadiah Rp 5.000.000+</span>
           <span><i class="fa-regular fa-clock"></i> Berakhir 31 Des 2026</span>
         </div>
       </div>
@@ -137,3 +155,115 @@ onMounted(() => {
 </script>
 
 <style scoped src="../../../assets/css/components/challenges/ChallengeAnnual.css"></style>
+<style scoped>
+.mega-prize-pool {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+.mega-prize-pool:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 50px rgba(236, 72, 153, 0.25);
+}
+.prize-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, transparent 60%);
+  animation: pulseGlow 4s alternate infinite;
+  pointer-events: none;
+}
+@keyframes pulseGlow {
+  0% { opacity: 0.5; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
+.prize-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 20px;
+}
+.prize-icon {
+  font-size: 3rem;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+.prize-icon.gold {
+  color: #fbbf24;
+}
+.prize-icon.silver {
+  color: #94a3b8;
+}
+.prize-text {
+  text-align: center;
+}
+.prize-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #f472b6;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 5px;
+}
+.prize-amount {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin: 0;
+  background: linear-gradient(to right, #f472b6, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 5px rgba(236, 72, 153, 0.3));
+}
+.prize-amount .plus {
+  font-size: 2.5rem;
+  color: #c084fc;
+  -webkit-text-fill-color: initial;
+}
+.prize-subtext-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+.prize-subtext {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.prize-subtext i {
+  color: #fbbf24;
+}
+@media (max-width: 768px) {
+  .prize-amount {
+    font-size: 2.5rem;
+  }
+  .prize-icon {
+    font-size: 2rem;
+  }
+  .prize-subtext-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+}
+</style>
