@@ -1,8 +1,7 @@
 <template>
   <div class="learning-view">
     <SimpleBackground />
-    <HomeNavbar />
-
+    
     <div class="container learning-container">
       <div class="learning-hero">
         <div class="hero-badge">
@@ -61,7 +60,6 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
-import HomeNavbar from '../components/home/HomeNavbar.vue'
 import PathCard from '../components/learning/PathCard.vue'
 import { useLearningPaths } from '../composables/useLearningPaths'
 

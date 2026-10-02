@@ -25,7 +25,8 @@
 
     <!-- Nav Center + Right wrapped for mobile drawer -->
     <div class="nav-drawer" :class="{ open: mobileMenuOpen }">
-      <div class="nav-center">
+      <div class="nav-center" ref="navCenter">
+        <div class="nav-indicator" :style="indicatorStyle"></div>
         <router-link
           to="/"
           class="nav-link"
@@ -73,10 +74,10 @@
 
       <div class="nav-right">
         <template v-if="isLoggedIn">
-          <button class="nav-btn shop-btn" @click="showShopModal = true" title="Buka iC-Market" style="background: transparent; border: none; color: #fbbf24; font-size: 1.2rem; cursor: pointer; transition: transform 0.2s; margin-right: 15px;">
-            <i class="fa-solid fa-store"></i>
+          <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)" >
+            <i class="fa-solid fa-cart-plus"></i>
           </button>
-          <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
+          <div class="dropdown-container dropdown-trigger" @click="showUserDropdown = !showUserDropdown">
             <img
               :src="userProfile.avatar"
               :alt="userProfile.name"
@@ -84,8 +85,8 @@
               :class="avatarBorderClass"
               :title="'Masuk sebagai ' + userProfile.name"
             />
-            <span class="user-name-short" style="margin-left: 8px; font-weight: 600;">{{ firstName }}</span>
-            <i class="fa-solid fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
+            <span class="user-name-short" >{{ firstName }}</span>
+            <i class="fa-solid fa-chevron-down dropdown-icon"></i>
             
             <div v-if="showUserDropdown" class="user-dropdown-menu" @click.stop>
               <div class="dropdown-header">
@@ -108,7 +109,8 @@
               </div>
               <div class="dropdown-actions">
                 <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Dashboard</button>
-                <button @click="showShopModal = true; showUserDropdown = false" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
+                <button @click="$router.push('/shop'); showUserDropdown = false" class="text-warning" title="GameZ Shop"><i class="fa-solid fa-cart-plus"></i> GameZ Shop</button>
+                <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
               </div>
             </div>
@@ -133,30 +135,47 @@
       type="warning"
       @confirm="performLogout"
     />
-
-    <ShopModal 
-      :isOpen="showShopModal" 
-      @close="showShopModal = false"
-      @purchased="fetchUser"
-    />
   </nav>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import ConfirmModal from "../common/ConfirmModal.vue";
-import ShopModal from "../shop/ShopModal.vue";
 
 const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, userProfile, logout, fetchUser } =
   useUserAccount();
 const router = useRouter();
+const route = useRoute();
 
 const showLogoutConfirm = ref(false);
 const mobileMenuOpen = ref(false);
 const showUserDropdown = ref(false);
-const showShopModal = ref(false);
+
+const navCenter = ref(null);
+const indicatorStyle = ref({ width: '0px', left: '0px', opacity: 0 });
+
+const updateIndicator = async () => {
+  await nextTick();
+  if (!navCenter.value) return;
+  const activeLink = navCenter.value.querySelector('.nav-link.active');
+  if (activeLink) {
+    const parentRect = navCenter.value.getBoundingClientRect();
+    const linkRect = activeLink.getBoundingClientRect();
+    indicatorStyle.value = {
+      width: `${linkRect.width}px`,
+      left: `${linkRect.left - parentRect.left}px`,
+      opacity: 1
+    };
+  } else {
+    indicatorStyle.value.opacity = 0;
+  }
+};
+
+watch(() => route.path, () => {
+  updateIndicator();
+});
 
 const firstName = computed(() => {
   if (!userProfile.value || !userProfile.value.name) return '';
@@ -181,6 +200,13 @@ const handleLogoutClick = () => {
   showUserDropdown.value = false;
 };
 
+const goToMarket = () => {
+  const token = localStorage.getItem('auth_token') || ''
+  const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://market.icraftds.id/'
+  window.open(`${marketUrl}/auto-login?token=${token}`, '_blank')
+  showUserDropdown.value = false;
+};
+
 const performLogout = async () => {
   await logout();
   router.push("/");
@@ -191,14 +217,16 @@ onMounted(() => {
     fetchUser();
   }
   document.addEventListener('click', handleClickOutside);
+  updateIndicator();
+  window.addEventListener('resize', updateIndicator);
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
+  window.removeEventListener('resize', updateIndicator);
 });
 </script>
 
 
-<style src="../../assets/css/components/HomeNavbar.css" scoped></style>
 
 <style scoped src="../../assets/css/components/home/HomeNavbar.css"></style>

@@ -1,8 +1,7 @@
 <template>
   <div class="checkout-view">
     <SimpleBackground />
-    <HomeNavbar />
-
+    
     <div class="checkout-wrapper">
       <!-- Breadcrumb -->
       <div class="checkout-breadcrumb">
@@ -78,7 +77,6 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
-import HomeNavbar from '../components/home/HomeNavbar.vue'
 
 import CheckoutStepSelection from '../components/checkout/CheckoutStepSelection.vue'
 import CheckoutStepInstruction from '../components/checkout/CheckoutStepInstruction.vue'

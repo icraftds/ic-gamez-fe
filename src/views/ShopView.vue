@@ -1,12 +1,8 @@
 <template>
-  <div v-if="isOpen" class="modal-overlay" @click.self="close">
-    <div class="modal-content">
-      <button class="close-btn" @click="close">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div class="modal-header">
-        <h2><i class="fa-solid fa-store text-warning"></i> iC-Market</h2>
+  <div class="shop-page">
+    <div class="shop-container">
+      <div class="shop-header">
+        <h2><i class="fa-solid fa-cart-plus text-warning"></i> GameZ Shop</h2>
         <p>Kehabisan energi? Tambah energi kamu untuk terus belajar dan menyelesaikan tantangan!</p>
         
         <div class="wallet-info">
@@ -17,7 +13,7 @@
         </div>
       </div>
 
-      <div class="modal-body">
+      <div class="shop-body">
         <div v-if="isLoading" class="loading-state">
           <div class="spinner-large"></div>
           <p>Memuat paket energi...</p>
@@ -69,26 +65,17 @@
           <p class="energy-gained">+{{ purchasedEnergy }} Energi</p>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '../../services/api'
-import { useUserAccount } from '../../composables/useUserAccount'
+import api from '../services/api'
+import { useUserAccount } from '../composables/useUserAccount'
 import confetti from 'canvas-confetti'
 
-const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    default: false
-  }
-})
-
-const emit = defineEmits(['close', 'purchased'])
 const router = useRouter()
 const { coinz, fetchUser } = useUserAccount()
 
@@ -110,17 +97,9 @@ const fetchPackages = async () => {
   }
 }
 
-watch(() => props.isOpen, (newVal) => {
-  if (newVal && packages.value.length === 0) {
-    fetchPackages()
-  }
+onMounted(() => {
+  fetchPackages()
 })
-
-const close = () => {
-  if (!isProcessing.value) {
-    emit('close')
-  }
-}
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
@@ -139,8 +118,6 @@ const playSuccessAnimation = (energyAmount) => {
 
   setTimeout(() => {
     showSuccessAnim.value = false
-    emit('purchased', energyAmount) // trigger parent to update UI counter
-    close()
   }, 2500)
 }
 
@@ -190,70 +167,38 @@ const purchaseWithGateway = async (pkg) => {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  z-index: 1000;
+.shop-page {
+  min-height: calc(100vh - 140px);
+  padding: 40px 20px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  animation: fadeIn 0.3s ease-out;
+  align-items: flex-start;
 }
 
-.modal-content {
+.shop-container {
   background: var(--bg-alt);
   border: 1px solid var(--glass-border);
   border-radius: 20px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 85vh;
+  width: 100%;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
   position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.close-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: var(--white-alpha-0_1);
-  border: none;
-  color: var(--text-muted);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  z-index: 10;
-}
-
-.close-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  transform: rotate(90deg);
-}
-
-.modal-header {
-  padding: 30px 30px 20px;
+.shop-header {
+  padding: 40px 30px 30px;
   text-align: center;
   border-bottom: 1px solid var(--glass-border);
   background: linear-gradient(180deg, rgba(245,158,11,0.05) 0%, transparent 100%);
 }
 
-.modal-header h2 {
+.shop-header h2 {
   color: var(--text-light);
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   margin: 0 0 10px;
   display: flex;
   align-items: center;
@@ -263,10 +208,10 @@ const purchaseWithGateway = async (pkg) => {
 
 .text-warning { color: #f59e0b; }
 
-.modal-header p {
+.shop-header p {
   color: var(--text-muted);
-  font-size: 0.95rem;
-  margin: 0 0 20px;
+  font-size: 1.05rem;
+  margin: 0 0 25px;
   line-height: 1.5;
 }
 
@@ -278,32 +223,31 @@ const purchaseWithGateway = async (pkg) => {
 .wallet-badge {
   background: rgba(245, 158, 11, 0.1);
   border: 1px solid rgba(245, 158, 11, 0.3);
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 20px;
   color: #fbbf24;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
-.modal-body {
-  padding: 20px 30px 30px;
-  overflow-y: auto;
+.shop-body {
+  padding: 30px 40px 40px;
 }
 
 .packages-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 25px;
 }
 
 .package-card {
   background: var(--bg);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
-  padding: 20px;
+  padding: 25px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -336,47 +280,47 @@ const purchaseWithGateway = async (pkg) => {
 }
 
 .package-icon {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.8rem;
+  font-size: 2rem;
   color: #f59e0b;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
 }
 
 .package-details h3 {
   color: var(--text-light);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   margin: 0 0 8px;
 }
 
 .energy-amount {
   color: #f59e0b;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  margin: 0 0 20px;
+  margin: 0 0 25px;
 }
 
 .package-actions {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin-top: auto;
 }
 
 .btn-buy {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: none;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -417,12 +361,12 @@ const purchaseWithGateway = async (pkg) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 0;
+  padding: 60px 0;
   color: var(--text-muted);
-  gap: 16px;
+  gap: 20px;
 }
 .empty-state i {
-  font-size: 3rem;
+  font-size: 4rem;
   opacity: 0.5;
 }
 
@@ -439,7 +383,6 @@ const purchaseWithGateway = async (pkg) => {
   align-items: center;
   justify-content: center;
   z-index: 20;
-  border-radius: 20px;
   animation: fadeIn 0.3s;
 }
 
@@ -449,7 +392,7 @@ const purchaseWithGateway = async (pkg) => {
 }
 
 .success-icon {
-  font-size: 5rem;
+  font-size: 6rem;
   color: #10b981;
   margin-bottom: 20px;
   animation: scalePulse 2s infinite;
@@ -457,13 +400,13 @@ const purchaseWithGateway = async (pkg) => {
 
 .success-content h3 {
   color: #fff;
-  font-size: 1.8rem;
+  font-size: 2rem;
   margin: 0 0 10px;
 }
 
 .energy-gained {
   color: #fbbf24;
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 800;
   margin: 0;
   text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
@@ -476,8 +419,8 @@ const purchaseWithGateway = async (pkg) => {
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes popIn {
@@ -492,7 +435,13 @@ const purchaseWithGateway = async (pkg) => {
   100% { transform: scale(1); }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  .shop-page {
+    padding: 20px 10px;
+  }
+  .shop-body {
+    padding: 20px;
+  }
   .packages-grid {
     grid-template-columns: 1fr;
   }

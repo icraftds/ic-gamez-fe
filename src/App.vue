@@ -1,7 +1,14 @@
 <template>
   <div class="app-layout" :class="{ 'workspace-mode': isWorkspacePage }">
+    <HomeNavbar v-if="showHomeNavbar" />
     <div class="app-content">
-      <router-view />
+      <router-view v-slot="{ Component, route }">
+        <transition name="page-fade" mode="out-in">
+          <div :key="route.path" class="route-wrapper">
+            <component :is="Component" />
+          </div>
+        </transition>
+      </router-view>
     </div>
     <AppFooter v-if="!isWorkspacePage && !isAuthPage" />
     
@@ -27,6 +34,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import HomeNavbar from './components/home/HomeNavbar.vue'
 import AppFooter from './components/common/AppFooter.vue'
 import AppToast from './components/common/AppToast.vue'
 import CoffeeModal from './components/common/CoffeeModal.vue'
@@ -36,7 +44,11 @@ import { useWipModal } from './composables/useWipModal'
 
 const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
-const isAuthPage = computed(() => ['login', 'register', 'developer'].includes(route.name))
+const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
+const showHomeNavbar = computed(() => {
+  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'dashboard', 'not-found']
+  return !hiddenRoutes.includes(route.name) && !route.path.startsWith('/dashboard')
+})
 
 const { fetchUser } = useUserAccount()
 const { isPreparingLesson } = useLearningPaths()
@@ -114,5 +126,28 @@ onMounted(() => {
   background: var(--primary);
   color: #fff;
   box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+}
+
+/* Page Transitions */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.route-wrapper {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>

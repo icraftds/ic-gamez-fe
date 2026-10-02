@@ -61,6 +61,8 @@
       </div>
     </div>
 
+    <NewMedalPopup :show="showNewMedal" :medal="newMedalData" @update:show="showNewMedal = $event" />
+
     <!-- Sertifikat -->
     <div class="certificate-section">
       <div class="cert-header">
@@ -84,15 +86,45 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
+import NewMedalPopup from './NewMedalPopup.vue'
 
 const { userProfile, userStats, fetchUserStats } = useUserAccount()
+
+const showNewMedal = ref(false)
+const newMedalData = ref(null)
 
 onMounted(async () => {
   // If stats aren't loaded yet or missing data, fetch them
   if (!userStats.value.completed_exercises) {
     await fetchUserStats()
   }
+  checkNewMedals()
 })
+
+watch(() => userStats.value, () => {
+  checkNewMedals()
+}, { deep: true })
+
+const checkNewMedals = () => {
+  if (!userStats.value.completed_exercises) return; // Belum ter-load
+  
+  const previouslyEarned = JSON.parse(localStorage.getItem('earned_medals') || '[]')
+  const newlyEarned = []
+  
+  allMedals.value.forEach(medal => {
+    if (medal.earned && !previouslyEarned.includes(medal.id)) {
+      newlyEarned.push(medal)
+      previouslyEarned.push(medal.id)
+    }
+  })
+  
+  localStorage.setItem('earned_medals', JSON.stringify(previouslyEarned))
+  
+  if (newlyEarned.length > 0) {
+    newMedalData.value = newlyEarned[0]
+    showNewMedal.value = true
+  }
+}
 
 const activeCategory = ref('all')
 
@@ -153,8 +185,14 @@ const activeCategoryTotal = computed(() => {
   return cat ? cat.total : 0
 })
 const activeMedals = computed(() => {
-  if (activeCategory.value === 'all') return allMedals.value
-  return allMedals.value.filter(m => m.category === activeCategory.value)
+  let medals = allMedals.value
+  if (activeCategory.value !== 'all') {
+    medals = medals.filter(m => m.category === activeCategory.value)
+  }
+  return [...medals].sort((a, b) => {
+    if (a.earned === b.earned) return 0
+    return a.earned ? -1 : 1
+  })
 })
 </script>
 

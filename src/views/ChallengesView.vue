@@ -1,8 +1,7 @@
 <template>
   <div class="challenges-view">
     <SimpleBackground />
-    <HomeNavbar />
-
+    
     <div class="container layout">
       <!-- Sidebar Kiri (Status Langganan & Progress) -->
       <ChallengesSidebar />
@@ -43,7 +42,6 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SimpleBackground from "../components/common/SimpleBackground.vue";
-import HomeNavbar from "../components/home/HomeNavbar.vue";
 import PremiumModal from "../components/common/PremiumModal.vue";
 import AuthRequiredModal from "../components/common/AuthRequiredModal.vue";
 import ChallengesSidebar from "../components/challenges/ChallengesSidebar.vue";

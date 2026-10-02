@@ -1,10 +1,10 @@
 <template>
   <div class="auto-login-container">
-    <div class="spinner">
-      <i class="fa-solid fa-circle-notch fa-spin"></i>
+    <div class="loader-content">
+      <div class="spinner-large"></div>
+      <h2>Autentikasi iC-Market...</h2>
+      <p>Mohon tunggu sebentar, kami sedang menghubungkan akun Anda.</p>
     </div>
-    <h2>Authenticating...</h2>
-    <p>Please wait while we log you in securely.</p>
   </div>
 </template>
 
@@ -48,21 +48,30 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #0f172a;
-  color: #f8fafc;
+  background-color: var(--bg);
+  color: var(--text-light);
   text-align: center;
 }
-.spinner {
-  font-size: 3rem;
-  color: #3b82f6;
-  margin-bottom: 20px;
+
+.loader-content {
+  background: var(--bg-alt);
+  padding: 40px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
+
 h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin: 0;
 }
 p {
-  color: #94a3b8;
+  color: var(--text-muted);
+  margin: 0;
 }
 </style>

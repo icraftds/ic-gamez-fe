@@ -1,8 +1,7 @@
 <template>
   <div class="home-view">
     <BackgroundEffects :show-orb3="true" />
-    <HomeNavbar />
-
+    
     <div class="container" style="margin-top: 40px">
       <HeroSection />
       <IntroSection />
@@ -16,7 +15,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
 import CoffeeModal from '../components/common/CoffeeModal.vue'
-import HomeNavbar from '../components/home/HomeNavbar.vue'
 import HeroSection from '../components/home/HeroSection.vue'
 import IntroSection from '../components/home/IntroSection.vue'
 import LearningPathStack from '../components/home/LearningPathStack.vue'

@@ -1,8 +1,7 @@
 <template>
   <div class="leaderboard-view">
     <SimpleBackground />
-    <HomeNavbar />
-
+    
     <div class="container" style="margin-top: 40px">
       <LeaderboardTable :is-full-view="true" />
     </div>
@@ -12,7 +11,6 @@
 <script setup>
 import { onMounted } from 'vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
-import HomeNavbar from '../components/home/HomeNavbar.vue'
 import LeaderboardTable from '../components/home/LeaderboardTable.vue'
 
 onMounted(() => {

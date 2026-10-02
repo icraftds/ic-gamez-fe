@@ -1,8 +1,7 @@
 <template>
   <div class="roadmap-view">
     <SimpleBackground />
-    <HomeNavbar />
-    
+        
     <div class="container content-area">
       <div class="header">
         <button class="back-btn" @click="$router.push('/learning')">
@@ -138,7 +137,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
-import HomeNavbar from '../components/home/HomeNavbar.vue'
 import PremiumModal from '../components/common/PremiumModal.vue'
 
 const route = useRoute()

@@ -1,8 +1,7 @@
 <template>
   <div class="pricing-view">
     <SimpleBackground />
-    <HomeNavbar />
-
+    
     <div class="pricing-content">
       <div class="header-section">
         <h1 class="gradient-text">Pilih Paket Langganan</h1>
@@ -95,7 +94,6 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../services/api'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
-import HomeNavbar from '../components/home/HomeNavbar.vue'
 import AuthRequiredModal from '../components/common/AuthRequiredModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 

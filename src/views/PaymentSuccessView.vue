@@ -1,8 +1,7 @@
 <template>
   <div class="payment-success-view">
     <SimpleBackground />
-    <HomeNavbar />
-
+    
     <div class="success-container">
       <div class="success-card">
         <div v-if="isLoading" class="status-content">
@@ -50,7 +49,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
-import HomeNavbar from '../components/home/HomeNavbar.vue'
 import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 
 const router = useRouter()

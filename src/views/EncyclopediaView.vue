@@ -1,8 +1,7 @@
 <template>
   <div class="encyclopedia-view">
     <SimpleBackground />
-    <HomeNavbar />
-
+    
     <div class="container" style="margin-top: 40px">
       <div class="encyclopedia-layout">
         <!-- Sidebar Navigation -->
@@ -48,7 +47,6 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
-import HomeNavbar from '../components/home/HomeNavbar.vue'
 import ArticleReader from '../components/encyclopedia/ArticleReader.vue'
 import api from '../services/api'
 import { useWipModal } from '../composables/useWipModal'

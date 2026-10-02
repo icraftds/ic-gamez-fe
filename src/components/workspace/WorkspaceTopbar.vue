@@ -112,7 +112,7 @@ const showUserDropdown = ref(false);
 
 const goToMarket = () => {
   const token = localStorage.getItem('auth_token') || '';
-  const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://ic-market.unikom.my.id';
+  const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://market.icraftds.id/';
   window.open(`${marketUrl}/auto-login?token=${token}`, '_blank');
 };
 
