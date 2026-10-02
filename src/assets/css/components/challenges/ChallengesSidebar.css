@@ -3,6 +3,9 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  position: sticky;
+  top: 100px;
+  align-self: flex-start;
 }
 
 .card {
@@ -188,7 +191,13 @@
 }
 
 @media (max-width: 768px) {
-  .sidebar { width: 100%; }
+  .sidebar { 
+    width: 100%; 
+    position: relative;
+    top: 0;
+    max-height: none;
+    overflow-y: visible;
+  }
   .card { padding: 20px; }
   .progress-circle { width: 100px; }
 }
