@@ -20,7 +20,7 @@
       
       <div class="users-list" v-if="activeUsers.length > 0">
         <div v-for="user in activeUsers" :key="user.id" class="user-item">
-          <img :src="user.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.name" alt="avatar" class="user-avatar" />
+          <img :src="user.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name || 'User') + '&background=random'" alt="avatar" class="user-avatar" />
           <div class="user-info">
             <span class="user-name">{{ user.name }}</span>
             <span class="user-status">Online</span>

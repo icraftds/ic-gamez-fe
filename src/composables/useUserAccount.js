@@ -43,7 +43,7 @@ export function useUserAccount() {
         name: data.name,
         email: data.email,
         phone: data.phone || '',
-        avatar: data.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + data.name,
+        avatar: data.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.name || 'User') + '&background=random',
         level: data.level,
         xp: data.xp,
         totalXp: data.total_xp,
