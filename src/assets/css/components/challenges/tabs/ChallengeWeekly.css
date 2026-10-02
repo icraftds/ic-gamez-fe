@@ -1,0 +1,92 @@
+.reward-showcase-weekly {
+  position: relative;
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(6, 95, 70, 0.4));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  margin: 30px 0;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+.reward-showcase-weekly:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(16, 185, 129, 0.2);
+}
+.reward-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+  animation: rotateGlow 10s linear infinite;
+  pointer-events: none;
+}
+@keyframes rotateGlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.reward-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.reward-icon-wrapper {
+  background: linear-gradient(135deg, #10b981, #059669);
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  flex-shrink: 0;
+}
+.reward-icon {
+  font-size: 2rem;
+  color: #fff;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+.reward-details {
+  text-align: left;
+}
+.reward-subtitle {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #34d399;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.reward-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+}
+.reward-desc {
+  color: #cbd5e1;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+@media (max-width: 768px) {
+  .reward-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  .reward-details {
+    text-align: center;
+  }
+  .reward-title {
+    font-size: 1.8rem;
+  }
+}

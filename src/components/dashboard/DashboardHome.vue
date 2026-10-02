@@ -5,7 +5,6 @@
       <ContinueLearning />
     </div>
     <div class="dash-side-col">
-      <AdminActiveUsersWidget v-if="isAdmin" />
       <BadgeCollection />
       <RecentActivity />
     </div>
@@ -19,14 +18,8 @@ import GreetingCard from './home/GreetingCard.vue'
 import BadgeCollection from './home/BadgeCollection.vue'
 import ContinueLearning from './home/ContinueLearning.vue'
 import RecentActivity from './home/RecentActivity.vue'
-import AdminActiveUsersWidget from './home/AdminActiveUsersWidget.vue'
 
 const { userProfile } = useUserAccount()
-
-// As a fallback since we don't have explicit is_admin right now, we can check email or id
-const isAdmin = computed(() => {
-  return userProfile.value?.email === 'admin@example.com' || userProfile.value?.email === 'Randi Zakaria Putra' || true; // Forcing true to show feature
-})
 </script>
 
 <style scoped>

@@ -24,6 +24,7 @@ const userProfile = ref({
   nextLevelXp: 100,
   streak: 0,
   longest_streak: 0,
+  is_admin: false,
   joinDate: ''
 })
 
@@ -43,13 +44,14 @@ export function useUserAccount() {
         name: data.name,
         email: data.email,
         phone: data.phone || '',
-        avatar: data.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.name || 'User') + '&background=random',
+        avatar: (data.avatar_url && !data.avatar_url.includes('dicebear.com')) ? data.avatar_url : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.name || 'User') + '&background=random',
         level: data.level,
         xp: data.xp,
         totalXp: data.total_xp,
         nextLevelXp: data.next_level_xp,
         streak: data.current_streak,
         longest_streak: data.longest_streak,
+        is_admin: data.is_admin || false,
         joinDate: new Date(data.created_at).toLocaleDateString()
       }
       credits.value = data.credits
@@ -188,7 +190,7 @@ export function useUserAccount() {
       isLoggedIn.value = false
       userProfile.value = {
         id: null, name: '', email: '', avatar: '',
-        level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, joinDate: ''
+        level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: ''
       }
       credits.value = 10
       isPremiumUser.value = false
