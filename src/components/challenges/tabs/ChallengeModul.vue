@@ -58,7 +58,7 @@
               <i class="fa-solid fa-star"></i> +{{ getExpectedXp(challenge.difficulty, challenge.costCredit) }} XP
             </div>
             <div class="reward-item coin">
-              <i class="fa-solid fa-coins"></i> +{{ challenge.coin_reward || 10 }} Koin
+              <img src="/images/icoinz.svg" alt="iCoinZ" class="coin-icon" style="width: 16px; height: 16px;" /> +{{ challenge.coin_reward || 10 }} Koin
             </div>
           </div>
 
