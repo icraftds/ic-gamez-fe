@@ -130,6 +130,10 @@
               </div>
               <div class="dropdown-actions">
                 <button @click="$router.push(dashboardToggleRoute)"><i class="fa-solid fa-chart-pie"></i> {{ dashboardToggleText }}</button>
+                <button @click="toggleTheme" title="Ganti Tema Warna">
+                  <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
+                  {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
+                </button>
                 <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
               </div>
@@ -137,13 +141,17 @@
           </div>
         </template>
         
-        <router-link
-          v-else
-          to="/login"
-          class="btn-login"
-          @click="mobileMenuOpen = false"
-          >Masuk / Daftar</router-link
-        >
+        <div v-else class="guest-actions" style="display: flex; align-items: center; gap: 15px;">
+          <button @click="toggleTheme" class="nav-btn" style="background: transparent; color: var(--text-main-hex); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 8px;" :title="isLightMode ? 'Beralih ke Dark Mode' : 'Beralih ke Light Mode'">
+            <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i>
+          </button>
+          <router-link
+            to="/login"
+            class="btn-login"
+            @click="mobileMenuOpen = false"
+            >Masuk / Daftar</router-link
+          >
+        </div>
       </div>
     </div>
 
@@ -162,7 +170,10 @@
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
+import { useTheme } from "../../composables/useTheme";
 import ConfirmModal from "../common/ConfirmModal.vue";
+
+const { isLightMode, toggleTheme } = useTheme();
 
 const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz } =
   useUserAccount();

@@ -24,10 +24,6 @@
     <!-- Global WIP Modal -->
     <CoffeeModal v-model="showWipModal" />
 
-    <!-- Theme Toggle Button -->
-    <button @click="toggleTheme" class="theme-toggle-btn" :title="isLightMode ? 'Beralih ke Dark Mode' : 'Beralih ke Light Mode'">
-      <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i>
-    </button>
   </div>
 </template>
 
@@ -41,6 +37,7 @@ import CoffeeModal from './components/common/CoffeeModal.vue'
 import { useUserAccount } from './composables/useUserAccount'
 import { useLearningPaths } from './composables/useLearningPaths'
 import { useWipModal } from './composables/useWipModal'
+import { useTheme } from './composables/useTheme'
 
 const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
@@ -53,27 +50,9 @@ const showHomeNavbar = computed(() => {
 const { fetchUser } = useUserAccount()
 const { isPreparingLesson } = useLearningPaths()
 const { showWipModal } = useWipModal()
-
-const isLightMode = ref(false)
-
-const toggleTheme = () => {
-  isLightMode.value = !isLightMode.value
-  if (isLightMode.value) {
-    document.body.classList.add('light-mode')
-    localStorage.setItem('theme', 'light')
-  } else {
-    document.body.classList.remove('light-mode')
-    localStorage.setItem('theme', 'dark')
-  }
-}
+const { isLightMode, toggleTheme } = useTheme()
 
 onMounted(() => {
-  // Theme initialization
-  const savedTheme = localStorage.getItem('theme')
-  if (savedTheme === 'light') {
-    isLightMode.value = true
-    document.body.classList.add('light-mode')
-  }
 
   // Fetch user session when app loads
   fetchUser()

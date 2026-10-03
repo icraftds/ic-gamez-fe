@@ -9,6 +9,7 @@ import ConfirmModal from '../components/common/ConfirmModal.vue'
 import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useLearningPaths } from '../composables/useLearningPaths'
+import { useTheme } from '../composables/useTheme'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
 import api from '../services/api'
@@ -79,6 +80,7 @@ const saveProfile = async () => {
 }
 
 const { isLoggedIn, userProfile, credits, coinz, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout, isLoading: isUserLoading } = useUserAccount()
+const { isLightMode, toggleTheme } = useTheme()
 
 const showUserDropdown = ref(false)
 
@@ -266,6 +268,10 @@ const tabs = [
               <div class="dropdown-actions">
                 <button @click="$router.push('/')" title="Kembali ke Beranda">
                   <i class="fa-solid fa-home"></i> Kembali ke Beranda
+                </button>
+                <button @click="toggleTheme" title="Ganti Tema Warna">
+                  <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
+                  {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
                 </button>
                 <button @click="goToMarket" class="text-primary" title="Buka iC-Market">
                   <i class="fa-solid fa-store"></i> Buka iC-Market
