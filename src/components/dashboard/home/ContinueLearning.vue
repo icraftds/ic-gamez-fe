@@ -13,10 +13,10 @@
         </div>
         <div class="cc-bar-bg"><div class="cc-bar-fill" :style="{ width: getPathProgress(path) + '%' }"></div></div>
         <div class="cc-stats">
-          <span>{{ getCompletedLessonsForPath(path) }} dari {{ getTotalLessonsForPath(path) }} modul diselesaikan</span>
+          <span>{{ getCompletedLessonsForPath(path) }} dari {{ getTotalLessonsForPath(path) }} materi diselesaikan</span>
         </div>
         <router-link :to="`/learning/${path.id}`" class="btn-continue">
-          Lanjutkan Modul {{ path.title.split(' ')[0] }} 🚀
+          Lanjutkan Materi {{ path.title.split(' ')[0] }} 🚀
         </router-link>
       </div>
     </div>

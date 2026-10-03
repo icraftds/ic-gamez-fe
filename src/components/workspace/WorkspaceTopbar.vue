@@ -46,6 +46,12 @@
     <!-- User Indicator -->
     <div class="user-indicator" v-if="isLoggedIn">
       <div class="separator-vertical"></div>
+      
+      <!-- Energy Display -->
+      <div class="nav-energy" title="Sisa Energi">
+        <i class="fa-solid fa-bolt text-warning"></i>
+        <span>{{ credits }}</span>
+      </div>
 
       <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
         <img
@@ -76,7 +82,7 @@
             </div>
           </div>
           <div class="dropdown-actions">
-            <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Dashboard</button>
+            <button @click="$router.push('/')"><i class="fa-solid fa-house"></i> Kembali ke Beranda</button>
             <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
             <button @click="handleLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
           </div>

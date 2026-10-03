@@ -74,9 +74,23 @@
 
       <div class="nav-right">
         <template v-if="isLoggedIn">
+          <!-- 1. Upgrade Button (Khusus Free User) -->
+          <button v-if="!isPremiumUser" class="nav-btn upgrade-btn" @click="$router.push('/pricing')" title="Upgrade ke Premium">
+            <i class="fa-solid fa-crown text-warning"></i> Upgrade
+          </button>
+          
+          <!-- 2. GameZ Shop -->
           <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)" >
             <i class="fa-solid fa-cart-plus"></i>
           </button>
+          
+          <!-- 3. iCoinz -->
+          <div class="nav-coinz" title="Saldo iCoinZ">
+            <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
+            <span class="nav-coinz-val">{{ (coinz || 0).toLocaleString('id-ID') }}</span>
+          </div>
+
+          <!-- 4. Profile Dropdown -->
           <div class="dropdown-container dropdown-trigger" @click="showUserDropdown = !showUserDropdown">
             <img
               :src="userProfile.avatar"
@@ -108,8 +122,7 @@
                 </div>
               </div>
               <div class="dropdown-actions">
-                <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Dashboard</button>
-                <button @click="$router.push('/shop'); showUserDropdown = false" class="text-warning" title="GameZ Shop"><i class="fa-solid fa-cart-plus"></i> GameZ Shop</button>
+                <button @click="$router.push('/')"><i class="fa-solid fa-house"></i> Kembali ke Beranda</button>
                 <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
               </div>
@@ -144,7 +157,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import ConfirmModal from "../common/ConfirmModal.vue";
 
-const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, userProfile, logout, fetchUser } =
+const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, userProfile, logout, fetchUser, coinz } =
   useUserAccount();
 const router = useRouter();
 const route = useRoute();

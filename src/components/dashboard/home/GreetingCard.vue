@@ -6,7 +6,7 @@
       <div class="quick-stats">
         <div class="qs-item"><span class="qs-value text-cyan">{{ userProfile.xp }}</span> <span class="qs-label">Poin Pengalaman</span></div>
         <div class="qs-item"><span class="qs-value text-orange">{{ userProfile.streak }}</span> <span class="qs-label">Hari Berturut-turut</span></div>
-        <div class="qs-item"><span class="qs-value">{{ completedLessons }}</span> <span class="qs-label">Modul Diselesaikan</span></div>
+        <div class="qs-item"><span class="qs-value">{{ completedLessons }}</span> <span class="qs-label">Materi Diselesaikan</span></div>
         <div class="qs-item"><span class="qs-value">0</span> <span class="qs-label">Sertifikat Diraih</span></div>
       </div>
     </div>

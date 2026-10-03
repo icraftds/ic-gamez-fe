@@ -107,6 +107,40 @@ body:not(.light-mode) .logo-light { display: none; }
   gap: 15px;
 }
 
+.upgrade-btn {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  color: #fcd34d !important;
+  font-weight: 600;
+  padding: 8px 16px !important;
+  border-radius: 20px !important;
+  transition: all 0.3s;
+}
+.upgrade-btn:hover {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.nav-coinz {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.nav-coinz:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.nav-coinz-icon {
+  width: 20px;
+  height: 20px;
+}
+
 .credits-indicator {
   display: flex;
   align-items: center;

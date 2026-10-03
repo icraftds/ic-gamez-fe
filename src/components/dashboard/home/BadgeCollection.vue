@@ -2,7 +2,6 @@
   <div class="badge-collection-wrapper">
     <div class="section-header">
       <h2 class="section-title">Pencapaian & Medali</h2>
-      <router-link to="/dashboard/medali" class="link-action">Jelajahi Semua</router-link>
     </div>
     <div class="section-card">
       <div class="badges-empty" v-if="earnedBadges.length === 0">
