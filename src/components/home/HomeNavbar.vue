@@ -129,7 +129,7 @@
                 </div>
               </div>
               <div class="dropdown-actions">
-                <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Beranda</button>
+                <button @click="$router.push(dashboardToggleRoute)"><i class="fa-solid fa-chart-pie"></i> {{ dashboardToggleText }}</button>
                 <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
               </div>
@@ -212,7 +212,14 @@ const handleClickOutside = (e) => {
   if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {
     showUserDropdown.value = false;
   }
+  if (mobileMenuOpen.value && !e.target.closest('.nav-drawer') && !e.target.closest('.hamburger')) {
+    mobileMenuOpen.value = false;
+  }
 };
+
+const isLandingPage = computed(() => route.path === '/');
+const dashboardToggleText = computed(() => isLandingPage.value ? 'Kembali ke Dashboard' : 'Kembali ke Beranda');
+const dashboardToggleRoute = computed(() => isLandingPage.value ? '/dashboard' : '/');
 
 const handleLogoutClick = () => {
   showLogoutConfirm.value = true;
