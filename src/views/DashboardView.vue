@@ -215,6 +215,12 @@ const tabs = [
       </div>
 
       <div class="dash-nav-right">
+        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
+        
+        <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)">
+          <i class="fa-solid fa-cart-plus"></i>
+        </button>
+
         <div class="coinz-badge">
           <img :src="'/images/icoinz.svg'" alt="iCoinZ" class="coinz-icon" />
           <div class="coinz-info">
@@ -225,12 +231,6 @@ const tabs = [
             </span>
           </div>
         </div>
-
-        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
-        
-        <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)">
-          <i class="fa-solid fa-cart-plus"></i>
-        </button>
 
         <div class="user-profile-group">
           <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
