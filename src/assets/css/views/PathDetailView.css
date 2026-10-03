@@ -29,6 +29,7 @@
 .path-header {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 20px;
 }
 
@@ -42,6 +43,10 @@
   align-items: center;
   font-size: 1.8rem;
   color: var(--text-main-hex);
+}
+
+.path-title {
+  text-align: center;
 }
 
 .path-title h2 {
@@ -240,7 +245,7 @@
 .timeline-tree {
   position: relative;
   width: 100%;
-  max-width: 720px; /* Constrained slightly more to give space from sidebar */
+  max-width: 900px; /* Increased from 720px to fill space better */
   display: flex;
   flex-direction: column;
 }
@@ -348,14 +353,14 @@
   align-self: flex-start;
   justify-content: flex-end;
   padding-left: 20px;
-  padding-right: 40px; /* Space for connector */
+  padding-right: 60px; /* Space for longer connector */
 }
 
 .lesson-wrapper.right-side {
   align-self: flex-end;
   justify-content: flex-start;
   padding-right: 20px;
-  padding-left: 40px; /* Space for connector */
+  padding-left: 60px; /* Space for longer connector */
 }
 
 /* Connectors */
@@ -363,8 +368,9 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 4px;
+  width: 60px;
+  height: 6px;
+  border-radius: 6px;
   background: var(--primary);
   box-shadow: 0 0 12px var(--primary);
   z-index: 1;
