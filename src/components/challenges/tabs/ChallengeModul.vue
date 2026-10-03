@@ -110,7 +110,7 @@ const emit = defineEmits(['require-premium', 'require-auth']);
 
 const router = useRouter();
 const route = useRoute();
-const { paths, fetchPaths } = useLearningPaths();
+const { paths, fetchAllPathsDetails } = useLearningPaths();
 const { isPremiumUser, deductCredit, isLoggedIn } = useUserAccount();
 
 const selectedCategory = ref(route.query.category || "");
@@ -150,8 +150,11 @@ const uniqueCategories = computed(() => {
 const fetchChallenges = async () => {
   try {
     isLoading.value = true;
-    if (paths.value.length === 0) {
-      await fetchPaths();
+    
+    // Pastikan kita memiliki detail dari setiap path agar chapters tersedia
+    const hasDetailedPaths = paths.value.length > 0 && paths.value.every(p => Array.isArray(p.chapters));
+    if (!hasDetailedPaths) {
+      await fetchAllPathsDetails();
     }
     
     const response = await api.get('/challenges', {
