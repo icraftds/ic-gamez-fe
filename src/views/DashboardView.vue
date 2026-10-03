@@ -215,7 +215,7 @@ const tabs = [
       </div>
 
       <div class="dash-nav-right">
-        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
+        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-crown text-warning"></i> Upgrade</button>
         
         <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)">
           <i class="fa-solid fa-cart-plus"></i>

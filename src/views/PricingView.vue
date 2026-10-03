@@ -37,7 +37,7 @@
           </div>
           <ul class="plan-benefits">
             <li><i class="fa-solid fa-check"></i> Akses modul dasar</li>
-            <li><i class="fa-solid fa-check"></i> 5 Energy / minggu</li>
+            <li><i class="fa-solid fa-check"></i> 10 Energy / hari</li>
             <li class="disabled"><i class="fa-solid fa-xmark"></i> Akses konten premium</li>
             <li class="disabled"><i class="fa-solid fa-xmark"></i> Sertifikat kelulusan</li>
             <li class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
@@ -62,12 +62,19 @@
             <p class="price">Rp {{ formatPrice(plan.price) }}<span>/{{ plan.duration_in_days }} hari</span></p>
           </div>
           
+          <!-- Energy badge -->
+          <div class="plan-energy-badge" :class="'energy-' + plan.slug">
+            <i :class="getPlanEnergyIcon(plan.slug)"></i>
+            {{ getPlanEnergyLabel(plan.slug) }}
+          </div>
+          
           <ul class="plan-benefits">
-            <li v-for="(benefit, index) in getPlanBenefits(plan.slug)" :key="index">
+            <li v-for="(benefit, index) in getPlanBenefits(plan.slug)" :key="'b-' + index">
               <i class="fa-solid fa-check"></i> {{ benefit }}
             </li>
-            <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> Code Review prioritas</li>
-            <li v-if="plan.slug === 'pro'" class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
+            <li v-for="(item, index) in getPlanDisabled(plan.slug)" :key="'d-' + index" class="disabled">
+              <i class="fa-solid fa-xmark"></i> {{ item }}
+            </li>
           </ul>
           
           <div class="plan-action">
@@ -136,30 +143,44 @@ const resumeCheckout = () => {
   router.push({ name: 'checkout', query: { resume: 'true' } })
 }
 
-const getPlanIcon = (slug) => {
-  if (slug === 'pro') return 'fa-solid fa-rocket'
-  if (slug === 'expert') return 'fa-solid fa-crown'
-  return 'fa-solid fa-star'
+const PLAN_CONFIG = {
+  pro: {
+    icon: 'fa-solid fa-rocket',
+    energyLabel: '20 Energi/minggu',
+    energyIcon: 'fa-solid fa-infinity',
+    benefits: [
+      'Akses semua modul dasar & premium',
+      'Sertifikat kelulusan digital',
+      '200.000 iCoinZ bonus bergabung',
+      'Hint premium tak terbatas',
+      'Leaderboard eksklusif',
+    ],
+    disabled: [
+      'Kesempatan Magang di ICraft DS',
+      '1-on-1 Mentoring bulanan',
+    ],
+  },
+  expert: {
+    icon: 'fa-solid fa-crown',
+    energyLabel: '25 Energi / minggu',
+    energyIcon: 'fa-solid fa-bolt',
+    benefits: [
+      'Semua fitur Pro Plan',
+      '25 Energi bonus setiap minggu',
+      '300.000 iCoinZ bonus bergabung',
+      'Kesempatan Magang di ICraft DS',
+      '1-on-1 Mentoring bulanan',
+      'Portofolio review eksklusif',
+    ],
+    disabled: [],
+  },
 }
 
-const getPlanBenefits = (slug) => {
-  if (slug === 'pro') {
-    return [
-      'Semua modul dasar & premium',
-      '15 Energy / minggu',
-      'Sertifikat kelulusan'
-    ]
-  }
-  if (slug === 'expert') {
-    return [
-      'Semua fitur Pro Plan',
-      '25 Energy / minggu',
-      '1-on-1 Mentoring bulanan',
-      'Portofolio review'
-    ]
-  }
-  return ['Akses fitur premium', '5 Energy / minggu', 'Sertifikat kelulusan']
-}
+const getPlanIcon = (slug) => PLAN_CONFIG[slug]?.icon ?? 'fa-solid fa-star'
+const getPlanBenefits = (slug) => PLAN_CONFIG[slug]?.benefits ?? ['Akses fitur premium']
+const getPlanDisabled = (slug) => PLAN_CONFIG[slug]?.disabled ?? []
+const getPlanEnergyLabel  = (slug) => PLAN_CONFIG[slug]?.energyLabel ?? ''
+const getPlanEnergyIcon   = (slug) => PLAN_CONFIG[slug]?.energyIcon ?? 'fa-solid fa-bolt'
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")

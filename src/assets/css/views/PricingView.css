@@ -240,3 +240,7 @@
   padding: 14px;
 }
 
+
+.plan-energy-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; margin: -14px auto 18px; width: fit-content; }
+.energy-pro { background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; }
+.energy-expert { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; }

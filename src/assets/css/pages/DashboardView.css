@@ -154,19 +154,19 @@ body:not(.light-mode) .logo-dark { display: block; }
 
 .btn-upgrade-nav {
   padding: 6px 14px;
-  background: #10b981;
-  color: white;
-  border: none;
-  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 20px;
   font-weight: 700;
   font-size: 0.85rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: transform 0.2s;
+  transition: all 0.3s;
 }
-.btn-upgrade-nav:hover { transform: translateY(-1px); }
+.btn-upgrade-nav:hover { background: rgba(245, 158, 11, 0.2); transform: translateY(-1px); }
 
 .nav-shop-btn {
   background: rgba(255, 255, 255, 0.05);
