@@ -122,7 +122,7 @@
                 </div>
               </div>
               <div class="dropdown-actions">
-                <button @click="$router.push('/')"><i class="fa-solid fa-house"></i> Kembali ke Beranda</button>
+                <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Beranda</button>
                 <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
               </div>
