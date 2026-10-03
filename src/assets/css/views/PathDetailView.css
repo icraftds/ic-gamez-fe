@@ -142,12 +142,17 @@
 /* Layout Wrapper */
 .layout-wrapper {
   display: flex;
-  justify-content: flex-start;
-  gap: 30px;
-  max-width: 1400px;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 1500px;
   margin: 0 auto;
   align-items: flex-start;
   padding: 0 20px;
+}
+.layout-wrapper::after {
+  content: "";
+  width: 240px; /* Matches sidebar width to perfectly center the timeline */
+  flex-shrink: 0;
 }
 
 /* Sidebar */
@@ -578,6 +583,9 @@
   .layout-wrapper {
     flex-direction: column;
     align-items: center;
+  }
+  .layout-wrapper::after {
+    display: none;
   }
 
   .sidebar-wrapper {

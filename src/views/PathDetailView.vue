@@ -2,8 +2,9 @@
   <div class="roadmap-view">
     <SimpleBackground />
         
-    <div class="container content-area">
-      <div class="header">
+    <div class="content-area">
+      <div class="container">
+        <div class="header">
         <button class="back-btn" @click="$router.push('/learning')">
           <i class="fa-solid fa-arrow-left"></i> Kembali ke Alur
         </button>
@@ -13,6 +14,7 @@
             <p>{{ path.description }}</p>
           </div>
         </div>
+      </div>
       </div>
 
       <div class="layout-wrapper" v-if="path && path.chapters && path.chapters.length > 0">
@@ -120,7 +122,7 @@
 
       </div>
       
-      <div v-else-if="path && !isLoading" class="empty-state">
+      <div v-else-if="path && !isLoading" class="container empty-state">
         <div class="empty-icon"><i class="fa-solid fa-person-digging"></i></div>
         <h3>Roadmap Sedang Dibangun</h3>
         <p>Materi untuk alur belajar ini sedang dalam tahap penyusunan.</p>
