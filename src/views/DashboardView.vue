@@ -228,6 +228,10 @@ const tabs = [
 
         <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-arrow-up"></i> Upgrade</button>
         
+        <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)">
+          <i class="fa-solid fa-cart-plus"></i>
+        </button>
+
         <div class="user-profile-group">
           <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
             <div class="user-profile-btn">
