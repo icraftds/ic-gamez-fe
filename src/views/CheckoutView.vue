@@ -176,7 +176,7 @@ const startPolling = () => {
   
   pollingInterval = setInterval(async () => {
     try {
-      await fetchUser()
+      await fetchUser(true)
       
       // Pembayaran sukses HANYA JIKA:
       // 1. Sebelumnya Free, sekarang jadi Premium (untuk paket berlangganan)

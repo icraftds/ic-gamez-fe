@@ -32,9 +32,9 @@ export function useUserAccount() {
   /**
    * Fetch current user data from the backend
    */
-  const fetchUser = async () => {
+  const fetchUser = async (silent = false) => {
     try {
-      isLoading.value = true
+      if (!silent) isLoading.value = true
       const response = await api.get('/auth/me')
       const data = response.data.data
       
@@ -72,7 +72,7 @@ export function useUserAccount() {
       isLoggedIn.value = false
       // Clear user data on failure (e.g. 401)
     } finally {
-      isLoading.value = false
+      if (!silent) isLoading.value = false
     }
   }
 

@@ -149,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import api from '../services/api'
@@ -180,19 +180,73 @@ const formattedCountdown = computed(() => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 })
 
-const startCountdown = () => {
-  countdown.value = 900
+let pollingInterval = null
+
+const stopPolling = () => {
+  if (pollingInterval) clearInterval(pollingInterval)
+}
+
+const startPolling = () => {
+  stopPolling()
+  const initialCredits = userProfile.value?.credits || 0
+  
+  pollingInterval = setInterval(async () => {
+    try {
+      await fetchUser(true)
+      const currentCredits = userProfile.value?.credits || 0
+      
+      if (currentCredits > initialCredits) {
+        handlePaymentSuccess()
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }, 5000)
+}
+
+const handlePaymentSuccess = () => {
+  stopPolling()
+  localStorage.removeItem('ic_shop_pending')
+  state.value = 'success'
+}
+
+const startCountdown = (duration = 900) => {
+  countdown.value = duration
   countdownTimer = setInterval(() => {
     if (countdown.value > 0) {
       countdown.value--
     } else {
       clearInterval(countdownTimer)
+      stopPolling()
+      localStorage.removeItem('ic_shop_pending')
+      state.value = 'confirm'
+      errorMsg.value = 'Waktu pembayaran telah habis'
     }
   }, 1000)
 }
 
+onMounted(() => {
+  const pending = localStorage.getItem('ic_shop_pending')
+  if (pending) {
+    try {
+      const data = JSON.parse(pending)
+      if (data.expiry && new Date().getTime() < data.expiry) {
+        qrString.value = data.qr_string
+        state.value = 'qris'
+        startCountdown(Math.floor((data.expiry - new Date().getTime()) / 1000))
+        startPolling()
+      } else {
+        localStorage.removeItem('ic_shop_pending')
+      }
+    } catch (e) {
+      localStorage.removeItem('ic_shop_pending')
+    }
+  }
+})
+
 onUnmounted(() => {
   if (countdownTimer) clearInterval(countdownTimer)
+  stopPolling()
 })
 
 const formattedPrice = computed(() => {
@@ -208,8 +262,8 @@ const processPayment = async () => {
     if (method === 'coinz') {
       // Coinz: hit backend which deducts wallet + grants credits
       await api.post('/shop/purchase/coinz', { package_id: pkgId })
-      await fetchUser()
-      state.value = 'success'
+      await fetchUser(true)
+      handlePaymentSuccess()
     } else {
       // QRIS: hit PG via backend, get qr_string, show QR code
       const res = await api.post('/shop/purchase/gateway', { 
@@ -225,7 +279,14 @@ const processPayment = async () => {
       }
 
       state.value = 'qris'
-      startCountdown()
+      const expiry = new Date().getTime() + (15 * 60 * 1000)
+      localStorage.setItem('ic_shop_pending', JSON.stringify({
+        qr_string: qrString.value,
+        expiry: expiry
+      }))
+      
+      startCountdown(900)
+      startPolling()
     }
   } catch (error) {
     state.value = 'confirm'
