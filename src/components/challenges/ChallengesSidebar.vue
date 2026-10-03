@@ -93,10 +93,16 @@
     <div class="card tags-card">
       <h3>Tag Populer</h3>
       <div class="tags-container">
-        <span class="tag">SQL Dasar</span>
-        <span class="tag">Filtering</span>
-        <span class="tag">HTML</span>
-        <span class="tag">Algoritma</span>
+        <span 
+          v-for="path in paths.slice(0, 4)" 
+          :key="path.id" 
+          class="tag" 
+          @click="filterByCategory(path.title)"
+          style="cursor: pointer;"
+          :class="{ active: $route.query.category === path.title }"
+        >
+          {{ path.title }}
+        </span>
       </div>
     </div>
   </aside>
@@ -121,7 +127,21 @@ const {
   completedSulit
 } = useChallengesStats();
 
-const { fetchAllPathsDetails } = useLearningPaths();
+const { paths, fetchAllPathsDetails } = useLearningPaths();
+import { useRouter, useRoute } from "vue-router";
+const router = useRouter();
+const route = useRoute();
+
+const filterByCategory = (category) => {
+  if (route.query.category === category) {
+    // If clicking the active tag, remove filter
+    const newQuery = { ...route.query };
+    delete newQuery.category;
+    router.push({ query: newQuery });
+  } else {
+    router.push({ query: { ...route.query, category, tab: 'modul' } });
+  }
+};
 
 onMounted(async () => {
   fetchUserStats();

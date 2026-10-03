@@ -100,7 +100,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useLearningPaths } from "../../../composables/useLearningPaths.js";
 import { useUserAccount } from "../../../composables/useUserAccount.js";
 import ChallengeTableRow from "../ChallengeTableRow.vue";
@@ -109,10 +109,11 @@ import api from "../../../services/api.js";
 const emit = defineEmits(['require-premium', 'require-auth']);
 
 const router = useRouter();
+const route = useRoute();
 const { paths, fetchPaths } = useLearningPaths();
 const { isPremiumUser, deductCredit, isLoggedIn } = useUserAccount();
 
-const selectedCategory = ref("");
+const selectedCategory = ref(route.query.category || "");
 const currentPage = ref(1);
 const totalPages = ref(1);
 const challenges = ref([]);
@@ -122,9 +123,19 @@ const isDropdownOpen = ref(false);
 const dropdownRef = ref(null);
 
 const selectCategory = (cat) => {
-  selectedCategory.value = cat;
   isDropdownOpen.value = false;
+  if (cat === "") {
+    const newQuery = { ...route.query };
+    delete newQuery.category;
+    router.push({ query: newQuery });
+  } else {
+    router.push({ query: { ...route.query, category: cat } });
+  }
 };
+
+watch(() => route.query.category, (newCat) => {
+  selectedCategory.value = newCat || "";
+});
 
 const handleClickOutside = (event) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {

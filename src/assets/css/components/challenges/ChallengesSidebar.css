@@ -185,9 +185,10 @@
   color: var(--text-sub-hex);
   cursor: pointer;
 }
-.tag:hover {
+.tag:hover, .tag.active {
   background: var(--white-alpha-0_1);
   color: var(--text-main-hex);
+  border-color: rgba(99, 102, 241, 0.5); /* A subtle primary color border for active state */
 }
 
 @media (max-width: 768px) {
