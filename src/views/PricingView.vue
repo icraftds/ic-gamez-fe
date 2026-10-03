@@ -9,7 +9,7 @@
       </div>
 
       <!-- Pending Transaction Banner -->
-      <div v-if="pendingCheckout" class="pending-banner">
+      <div v-if="pendingCheckout && isLoggedIn" class="pending-banner">
         <div class="pending-info">
           <i class="fa-solid fa-clock-rotate-left"></i>
           <div>
