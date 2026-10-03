@@ -42,7 +42,7 @@
                 </div>
                 <div class="method-info">
                   <div class="method-name">{{ method === 'coinz' ? 'Saldo iCoinZ' : 'QRIS / E-Wallet' }}</div>
-                  <div class="method-desc">{{ method === 'coinz' ? 'Pembayaran instan dengan koin' : 'Diarahkan ke payment gateway' }}</div>
+                  <div class="method-desc">{{ method === 'coinz' ? 'Pembayaran instan dengan koin' : 'Scan kode QR untuk membayar' }}</div>
                 </div>
               </div>
             </div>
@@ -88,6 +88,60 @@
             </div>
           </div>
 
+          <!-- State 4: QRIS Instruction -->
+          <div v-else-if="state === 'qris'" key="qris" class="checkout-step">
+            <h2 class="section-title">Instruksi Pembayaran</h2>
+            <p class="section-subtitle">Selesaikan pembayaran sebelum waktu habis.</p>
+
+            <!-- Method Badge -->
+            <div class="instruction-method-badge">
+              <i class="fa-solid fa-qrcode"></i>
+              QRIS
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary shop-order">
+              <div class="order-plan-name">
+                <i class="fa-solid fa-bolt text-warning"></i>
+                <span>{{ pkgName }} (+{{ pkgEnergy }} Energi)</span>
+              </div>
+              <div class="order-price">
+                <span>Rp {{ formattedPrice }}</span>
+              </div>
+            </div>
+
+            <!-- QR Code Display -->
+            <div class="qr-display" :class="{ 'is-expired': countdown === 0 }">
+              <div class="qr-box-wrapper">
+                <div class="qr-box">
+                  <QrcodeVue v-if="qrString" :value="qrString" :size="200" level="H" />
+                  <div v-else class="qr-dummy-label">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Memuat QR...
+                  </div>
+                </div>
+              </div>
+              <p class="qr-hint">Buka aplikasi e-wallet atau m-banking Anda, scan kode QR di atas untuk membayar.</p>
+            </div>
+
+            <!-- Awaiting Section -->
+            <div class="awaiting-section">
+              <div v-if="countdown > 0" class="awaiting-pulse">
+                <span class="pulse-dot"></span>
+                Menunggu Pembayaran...
+              </div>
+              <div v-else class="awaiting-pulse expired-text">
+                <i class="fa-solid fa-circle-xmark"></i>
+                Waktu Pembayaran Habis
+              </div>
+              <p v-if="countdown > 0" class="awaiting-timer">Selesaikan dalam <span class="timer-value">{{ formattedCountdown }}</span></p>
+              <p v-else class="awaiting-timer text-muted">Silakan ulangi proses atau ganti metode pembayaran.</p>
+            </div>
+
+            <button class="btn-outline full-width" @click="state = 'confirm'">
+              <i class="fa-solid fa-arrow-left"></i> Kembali
+            </button>
+          </div>
+
         </Transition>
       </div>
     </div>
@@ -95,9 +149,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import axios from 'axios'
+import QrcodeVue from 'qrcode.vue'
 import api from '../services/api'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
@@ -112,8 +166,34 @@ const pkgEnergy = route.query.energy || 0
 const method = route.query.method || 'gateway'
 const price = route.query.price || 0
 
-const state = ref('confirm') // confirm, processing, success
+const state = ref('confirm') // confirm, processing, success, qris
 const errorMsg = ref('')
+const qrString = ref('')
+
+// Countdown timer for QRIS (15 minutes)
+const countdown = ref(900)
+let countdownTimer = null
+
+const formattedCountdown = computed(() => {
+  const m = Math.floor(countdown.value / 60)
+  const s = countdown.value % 60
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+})
+
+const startCountdown = () => {
+  countdown.value = 900
+  countdownTimer = setInterval(() => {
+    if (countdown.value > 0) {
+      countdown.value--
+    } else {
+      clearInterval(countdownTimer)
+    }
+  }, 1000)
+}
+
+onUnmounted(() => {
+  if (countdownTimer) clearInterval(countdownTimer)
+})
 
 const formattedPrice = computed(() => {
   if (method === 'coinz') return price.toString()
@@ -126,27 +206,26 @@ const processPayment = async () => {
   
   try {
     if (method === 'coinz') {
+      // Coinz: hit backend which deducts wallet + grants credits
       await api.post('/shop/purchase/coinz', { package_id: pkgId })
       await fetchUser()
       state.value = 'success'
     } else {
+      // QRIS: hit PG via backend, get qr_string, show QR code
       const res = await api.post('/shop/purchase/gateway', { 
         package_id: pkgId,
         payment_method: 'qris'
       })
       
       const tx = res.data?.data || {}
-      let checkoutUrl = tx.checkout_url || tx.payment_url
+      qrString.value = tx.qr_string || ''
       
-      if (!checkoutUrl && tx.pakasir_txn_id) {
-        checkoutUrl = `https://app.pakasir.com/pay-v2/${tx.pakasir_txn_id}`
+      if (!qrString.value) {
+        throw new Error('QR string tidak ditemukan dari Payment Gateway.')
       }
-      
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl
-      } else {
-        throw new Error('URL pembayaran tidak ditemukan dari server.')
-      }
+
+      state.value = 'qris'
+      startCountdown()
     }
   } catch (error) {
     state.value = 'confirm'
@@ -305,6 +384,7 @@ const processPayment = async () => {
   color: var(--primary);
 }
 .btn-outline:hover { background: rgba(0, 240, 255, 0.1); }
+.btn-outline.full-width { width: 100%; }
 
 .payment-error-message {
   padding: 12px;
@@ -369,6 +449,95 @@ const processPayment = async () => {
 .success-title { font-size: 1.8rem; color: var(--text-light); margin-bottom: 15px; font-weight: 800; }
 .success-desc { color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
 .success-actions { display: flex; gap: 15px; }
+
+/* QRIS Instruction Styles */
+.instruction-method-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(2, 132, 199, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 20px;
+  color: #38bdf8;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.qr-display {
+  text-align: center;
+  padding: 30px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 25px;
+  transition: opacity 0.3s;
+}
+.qr-display.is-expired { opacity: 0.3; pointer-events: none; }
+
+.qr-box-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+.qr-box {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  display: inline-flex;
+}
+.qr-dummy-label {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 0.95rem;
+}
+.qr-hint {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.awaiting-section {
+  text-align: center;
+  margin-bottom: 25px;
+}
+.awaiting-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #fbbf24;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  background: #fbbf24;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+.expired-text { color: #ef4444; }
+.awaiting-timer {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.timer-value {
+  font-weight: 800;
+  color: #fbbf24;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+}
+.text-muted { color: var(--text-muted); }
 
 /* Transitions */
 .fade-slide-enter-active, .fade-slide-leave-active { transition: all 0.4s ease; }
