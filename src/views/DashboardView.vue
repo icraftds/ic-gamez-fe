@@ -264,6 +264,9 @@ const tabs = [
                 </div>
               </div>
               <div class="dropdown-actions">
+                <button @click="$router.push('/')" title="Kembali ke Beranda">
+                  <i class="fa-solid fa-home"></i> Kembali ke Beranda
+                </button>
                 <button @click="goToMarket" class="text-primary" title="Buka iC-Market">
                   <i class="fa-solid fa-store"></i> Buka iC-Market
                 </button>
