@@ -87,22 +87,29 @@
           <!-- 3. iCoinz -->
           <div class="nav-coinz" title="Saldo iCoinZ">
             <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
-            <span class="nav-coinz-val">{{ (coinz || 0).toLocaleString('id-ID') }}</span>
+            <i v-if="isLoading" class="fa-solid fa-circle-notch fa-spin" style="margin-left: 4px; font-size: 0.9rem; opacity: 0.7;"></i>
+            <span v-else class="nav-coinz-val">{{ (coinz || 0).toLocaleString('id-ID') }}</span>
           </div>
 
           <!-- 4. Profile Dropdown -->
-          <div class="dropdown-container dropdown-trigger" @click="showUserDropdown = !showUserDropdown">
-            <img
-              :src="userProfile.avatar"
-              :alt="userProfile.name"
-              class="avatar-sm"
-              :class="avatarBorderClass"
-              :title="'Masuk sebagai ' + userProfile.name"
-            />
-            <span class="user-name-short" >{{ firstName }}</span>
-            <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+          <div class="dropdown-container dropdown-trigger" @click="!isLoading && (showUserDropdown = !showUserDropdown)">
+            <template v-if="isLoading">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-name"></div>
+            </template>
+            <template v-else>
+              <img
+                :src="userProfile.avatar"
+                :alt="userProfile.name"
+                class="avatar-sm"
+                :class="avatarBorderClass"
+                :title="'Masuk sebagai ' + userProfile.name"
+              />
+              <span class="user-name-short" >{{ firstName }}</span>
+              <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+            </template>
             
-            <div v-if="showUserDropdown" class="user-dropdown-menu" @click.stop>
+            <div v-if="showUserDropdown && !isLoading" class="user-dropdown-menu" @click.stop>
               <div class="dropdown-header">
                 <img :src="userProfile.avatar" class="dropdown-avatar" :class="avatarBorderClass" />
                 <div class="dropdown-user-info">
@@ -157,7 +164,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import ConfirmModal from "../common/ConfirmModal.vue";
 
-const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, userProfile, logout, fetchUser, coinz } =
+const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz } =
   useUserAccount();
 const router = useRouter();
 const route = useRoute();
