@@ -245,7 +245,7 @@
 .timeline-tree {
   position: relative;
   width: 100%;
-  max-width: 900px; /* Increased from 720px to fill space better */
+  max-width: 1000px; /* Increased from 900px to fill space better */
   display: flex;
   flex-direction: column;
 }
@@ -353,14 +353,14 @@
   align-self: flex-start;
   justify-content: flex-end;
   padding-left: 20px;
-  padding-right: 60px; /* Space for longer connector */
+  padding-right: 80px; /* Space for much longer connector */
 }
 
 .lesson-wrapper.right-side {
   align-self: flex-end;
   justify-content: flex-start;
   padding-right: 20px;
-  padding-left: 60px; /* Space for longer connector */
+  padding-left: 80px; /* Space for much longer connector */
 }
 
 /* Connectors */
@@ -368,7 +368,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 60px;
+  width: 80px;
   height: 6px;
   border-radius: 6px;
   background: var(--primary);
