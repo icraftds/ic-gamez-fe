@@ -24,21 +24,21 @@
         class="step"
         :class="{
           active: activeStep >= step.number,
-          done: activeStep > step.number,
+          done: isStepDone(step.number, lesson, activeStep),
         }"
       >
         <div
           class="step-dot"
           :aria-current="activeStep === step.number ? 'step' : undefined"
         >
-          <i v-if="activeStep > step.number" class="fa-solid fa-check"></i>
+          <i v-if="isStepDone(step.number, lesson, activeStep)" class="fa-solid fa-check"></i>
           <span v-else>{{ step.number }}</span>
         </div>
         <span class="step-label">{{ step.label }}</span>
         <div
           v-if="index < STEPS.length - 1"
           class="step-connector"
-          :class="{ active: activeStep > step.number }"
+          :class="{ active: isStepDone(step.number, lesson, activeStep) }"
         ></div>
       </li>
     </ol>
@@ -110,7 +110,17 @@ defineProps({
   chapterTitle: { type: String, default: "" },
   lessonTitle: { type: String, default: "" },
   activeStep: { type: Number, required: true },
+  lesson: { type: Object, default: () => ({}) },
 });
+
+const isStepDone = (stepNum, lessonObj, currentStep) => {
+  if (currentStep > stepNum) return true;
+  if (!lessonObj) return false;
+  if (stepNum === 1 && lessonObj.isCompleted) return true;
+  if (stepNum === 2 && lessonObj.quizPassed) return true;
+  if (stepNum === 3 && lessonObj.practiceDone) return true;
+  return false;
+};
 
 defineEmits(["back"]);
 

@@ -7,6 +7,7 @@
       :chapter-title="currentChapter?.title ?? ''"
       :lesson-title="currentLesson?.title ?? ''"
       :active-step="activeStep"
+      :lesson="currentLesson"
       @back="router.push('/learning')"
     />
 
@@ -420,6 +421,12 @@ watch(currentLesson, (newLesson) => {
   }
   if (newLesson && newLesson.id) {
     runner.loadFromStorage(newLesson.id, newLesson?.practice)
+    if (quiz.isCorrect.value) {
+      newLesson.quizPassed = true
+    }
+    if (runner.status.value === 'success') {
+      newLesson.practiceDone = true
+    }
   } else {
     runner.resetCode(newLesson?.practice)
   }
