@@ -50,8 +50,8 @@
             <!-- 2nd Place -->
             <div class="podium-card-cyber p-second">
               <div class="cyber-rank-badge silver">2</div>
-              <div class="cyber-avatar-hex" :class="getPlanHexClass(topUsers[1])">
-                <img :src="topUsers[1].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[1].name + '&background=random'" />
+              <div class="podium-avatar-wrapper plan-badge-wrapper">
+                <img :src="topUsers[1].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[1].name + '&background=random'" :class="getPlanBorderClass(topUsers[1])" />
                 <div v-if="getPlanBadge(topUsers[1])" class="plan-badge" :class="getPlanBadge(topUsers[1]).class">
                   {{ getPlanBadge(topUsers[1]).text }}
                 </div>
@@ -66,8 +66,8 @@
             <div class="podium-card-cyber p-first">
               <div class="cyber-crown"><i class="fa-solid fa-crown"></i></div>
               <div class="cyber-rank-badge gold">1</div>
-              <div class="cyber-avatar-hex big-hex" :class="getPlanHexClass(topUsers[0])">
-                <img :src="topUsers[0].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[0].name + '&background=random'" />
+              <div class="podium-avatar-wrapper big-avatar plan-badge-wrapper">
+                <img :src="topUsers[0].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[0].name + '&background=random'" :class="getPlanBorderClass(topUsers[0])" />
                 <div v-if="getPlanBadge(topUsers[0])" class="plan-badge" :class="getPlanBadge(topUsers[0]).class">
                   {{ getPlanBadge(topUsers[0]).text }}
                 </div>
@@ -81,8 +81,8 @@
             <!-- 3rd Place -->
             <div class="podium-card-cyber p-third">
               <div class="cyber-rank-badge bronze">3</div>
-              <div class="cyber-avatar-hex" :class="getPlanHexClass(topUsers[2])">
-                <img :src="topUsers[2].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[2].name + '&background=random'" />
+              <div class="podium-avatar-wrapper plan-badge-wrapper">
+                <img :src="topUsers[2].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[2].name + '&background=random'" :class="getPlanBorderClass(topUsers[2])" />
                 <div v-if="getPlanBadge(topUsers[2])" class="plan-badge" :class="getPlanBadge(topUsers[2]).class">
                   {{ getPlanBadge(topUsers[2]).text }}
                 </div>
