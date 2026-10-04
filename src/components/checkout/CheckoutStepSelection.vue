@@ -197,7 +197,23 @@ const goToInstruction = async () => {
     })
   } catch (err) {
     console.error('Failed to create payment in Payment Gateway:', err)
-    paymentError.value = err.response?.data?.message || 'Gagal memproses pembayaran ke Payment Gateway'
+    
+    let errMsg = 'Gagal memproses pembayaran. Silakan coba lagi.'
+    
+    if (err.response) {
+      const status = err.response.status
+      const dataMsg = err.response.data?.message || ''
+      
+      if (status >= 500 || dataMsg.includes('522')) {
+        errMsg = 'Server pembayaran saat ini sedang sibuk atau mengalami gangguan. Mohon tunggu beberapa menit lalu coba lagi.'
+      } else {
+        errMsg = dataMsg || errMsg
+      }
+    } else if (err.request) {
+      errMsg = 'Tidak dapat terhubung ke server pembayaran. Periksa koneksi internet Anda.'
+    }
+    
+    paymentError.value = errMsg
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)
