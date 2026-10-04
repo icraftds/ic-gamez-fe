@@ -2,7 +2,7 @@
  * Composable untuk menjalankan kode JavaScript pengguna
  * di dalam sandbox yang aman (tanpa akses ke DOM/window).
  */
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 /** @typedef {{ type: 'log' | 'error' | 'warn', text: string }} ConsoleEntry */
 
@@ -58,14 +58,51 @@ export function useCodeRunner() {
     }
   }
 
+  const status = ref('idle')
+  const currentLessonId = ref(null)
+
+  const saveToStorage = () => {
+    if (!currentLessonId.value) return
+    const data = {
+      code: code.value,
+      output: output.value,
+      status: status.value
+    }
+    localStorage.setItem(`practice_state_${currentLessonId.value}`, JSON.stringify(data))
+  }
+
+  const loadFromStorage = (lessonId, initialCode = null) => {
+    currentLessonId.value = lessonId
+    const dataStr = localStorage.getItem(`practice_state_${lessonId}`)
+    if (dataStr) {
+      try {
+        const data = JSON.parse(dataStr)
+        code.value = data.code || initialCode || '// Ketik kode Anda di sini\n'
+        output.value = data.output || []
+        status.value = data.status || 'idle'
+      } catch (e) {
+        resetCode(initialCode)
+      }
+    } else {
+      resetCode(initialCode)
+    }
+  }
+
+  // Watch for changes to persist
+  watch([code, output, status], () => {
+    saveToStorage()
+  }, { deep: true })
+
   const clearOutput = () => {
     output.value = []
+    status.value = 'idle'
   }
 
   const resetCode = (initialCode = null) => {
     code.value = initialCode || '// Ketik kode Anda di sini\n'
     output.value = []
+    status.value = 'idle'
   }
 
-  return { code, output, run, clearOutput, resetCode }
+  return { code, output, status, run, clearOutput, resetCode, loadFromStorage }
 }

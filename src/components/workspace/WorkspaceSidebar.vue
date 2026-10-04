@@ -1,7 +1,16 @@
 <template>
+  <div class="sidebar-backdrop" v-if="!isCollapsed" @click="$emit('update:isCollapsed', true)"></div>
   <aside class="ws-sidebar" :class="{ collapsed: isCollapsed }">
     <!-- Toggle Button -->
-    <div class="toggle-row">
+    <div class="toggle-row" :class="{ 'center-toggle': isCollapsed }">
+      <button 
+        v-if="!isCollapsed" 
+        class="prev-materi-btn" 
+        @click="$emit('prev-lesson')"
+      >
+        <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+      </button>
+
       <button
         class="toggle-btn"
         :title="isCollapsed ? 'Buka sidebar' : 'Tutup sidebar'"
@@ -66,7 +75,7 @@ const props = defineProps({
   isCollapsed: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['lesson-select', 'update:isCollapsed'])
+const emit = defineEmits(['lesson-select', 'update:isCollapsed', 'prev-lesson'])
 
 const openChapterIds = ref([])
 const openLessonIds = ref([])

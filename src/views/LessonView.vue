@@ -55,14 +55,14 @@
           <!-- Step 3: Praktik -->
           <PracticePanel
             key="practice"
-            :run-status="practiceStatus"
+            :run-status="runner.status.value"
             v-else-if="activeStep === STEP.PRACTICE && currentLesson"
             :lesson="currentLesson"
             :language="lessonLanguage"
             :code="runner.code.value"
             :output="runner.output.value"
             :is-last-lesson="isLastLesson"
-            @update:code="runner.code.value = $event; practiceStatus = 'idle'"
+            @update:code="runner.code.value = $event; runner.status.value = 'idle'"
             @run="onPracticeRun"
             @clear-output="runner.clearOutput()"
             @back="activeStep = STEP.QUIZ"
@@ -207,7 +207,6 @@ const showXpToast = (xp, label, type = 'quiz') => {
 
 // ── Local State ───────────────────────────────────────────────────
 const activeStep = ref(STEP.THEORY)
-const practiceStatus = ref('idle')
 const sidebarCollapsed = ref(false)
 const showAuthModal = ref(false)
 const showPremiumModal = ref(false)
@@ -266,9 +265,8 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
         return
       }
       if (!lesson.quizPassed) return // Ignore click if locked
-      runner.resetCode(lesson.practice)
+      runner.loadFromStorage(lesson.id, lesson.practice)
       activeStep.value = STEP.PRACTICE
-      practiceStatus.value = 'idle'
     } else {
       activeStep.value = STEP.THEORY
     }
@@ -346,25 +344,25 @@ const onRequestNextFromQuiz = async () => {
     currentLesson.value.quizPassed = true
   }
 
-  runner.resetCode(currentLesson.value?.practice)
+  runner.loadFromStorage(currentLesson.value?.id, currentLesson.value?.practice)
   activeStep.value = STEP.PRACTICE
 }
 
 /** Jalankan kode practice dan beri XP jika berhasil tanpa error. */
 const onPracticeRun = async () => {
-  practiceStatus.value = 'idle'
+  runner.status.value = 'idle'
   runner.run(lessonLanguage.value)
 
   const hasError = runner.output.value.some(e => e.type === 'error')
   
   if (hasError) {
-    practiceStatus.value = 'error'
+    runner.status.value = 'error'
   } else {
     // Validasi kesesuaian output
     const isMatch = checkOutputMatch(lessonLanguage.value, currentLesson.value?.practice, runner.output.value, runner.code.value);
     
     if (isMatch) {
-      practiceStatus.value = 'success'
+      runner.status.value = 'success'
       if (currentLesson.value) {
         currentLesson.value.practiceDone = true
         const extraData = {}
@@ -377,7 +375,7 @@ const onPracticeRun = async () => {
         }
       }
     } else {
-      practiceStatus.value = 'warning'
+      runner.status.value = 'warning'
     }
   }
 }
@@ -420,7 +418,11 @@ watch(currentLesson, (newLesson) => {
   } else {
     quiz.reset()
   }
-  runner.resetCode(newLesson?.practice)
+  if (newLesson && newLesson.id) {
+    runner.loadFromStorage(newLesson.id, newLesson?.practice)
+  } else {
+    runner.resetCode(newLesson?.practice)
+  }
 }, { immediate: true })
 
 // Inisialisasi pertama kali

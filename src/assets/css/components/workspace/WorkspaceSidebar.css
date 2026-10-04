@@ -17,10 +17,36 @@
 /* ── Toggle row ── */
 .toggle-row {
   display: flex;
-  justify-content: flex-end;
-  padding: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--white-alpha-0_05);
   flex-shrink: 0;
+}
+
+.toggle-row.center-toggle {
+  justify-content: center;
+  padding: 8px;
+}
+
+.prev-materi-btn {
+  background: transparent;
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  color: var(--text-sub-hex);
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.prev-materi-btn:hover {
+  background: rgba(147, 51, 234, 0.1);
+  color: var(--text-main-hex);
+  border-color: #c084fc;
 }
 
 .toggle-btn {
@@ -86,7 +112,23 @@
 
 .chapter-header.status-icon.done { color: #10b981; }
 
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 55px; /* Adjust according to Topbar height */
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 55px);
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+}
+
 @media (max-width: 768px) {
+  .sidebar-backdrop {
+    display: block;
+  }
+  
   .ws-sidebar {
     position: fixed;
     top: 55px; /* Adjust according to Topbar height */

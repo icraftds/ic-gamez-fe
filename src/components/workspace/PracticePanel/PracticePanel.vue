@@ -56,7 +56,7 @@
 
         <button class="nav-btn finish-btn" @click="handleFinishClick">
           <i class="fa-solid fa-check"></i>
-          {{ isLastLesson ? 'Selesai' : 'Selesai & Lanjut' }}
+          {{ isLastLesson ? 'Selesai' : 'Lanjut Materi' }}
         </button>
       </footer>
       
