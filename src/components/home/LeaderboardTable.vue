@@ -2,22 +2,32 @@
   <section
     :class="{ reveal: !isFullView }"
     id="leaderboard"
+    class="ic-leaderboard-section"
     style="scroll-margin-top: 100px; padding: 20px 0; width: 100%"
   >
     <div
       class="dash-leaderboard"
       :class="{ 'preview-mode': !isFullView }"
-      style="max-width: 1100px; margin: 0 auto; padding: 0 20px"
+      style="max-width: 1200px; margin: 0 auto; padding: 0 20px"
     >
-      <div class="lb-header-section" style="margin-bottom: 40px">
-        <h2 class="title-main">
+      <!-- Cyberpunk Header -->
+      <div class="lb-header-section" style="margin-bottom: 50px">
+        <div class="cyber-glitch-bg"></div>
+        <h2 class="title-main" data-text="Top CoderZ">
           Top <span class="gradient-text">CoderZ</span>
         </h2>
         <p class="subtitle">
-          Kompetisi IC Game-Z – kumpulkan XP dan buktikan kemampuan coding Anda!
+          Arena Kompetisi iC GameZ - Buktikan Siapa Yang Paling Kuat!
         </p>
-        <div class="whos-next-badge">
-          <i class="fa-solid fa-fire"></i> Who's Next?
+        
+        <!-- Tab Selector -->
+        <div class="cyber-tabs" v-if="isFullView">
+          <button class="cyber-tab" :class="{ active: activeTab === 'monthly' }" @click="activeTab = 'monthly'">
+            <i class="fa-solid fa-calendar-alt"></i> Bulan Ini
+          </button>
+          <button class="cyber-tab" :class="{ active: activeTab === 'all-time' }" @click="activeTab = 'all-time'">
+            <i class="fa-solid fa-globe"></i> Sepanjang Masa
+          </button>
         </div>
       </div>
 
@@ -25,227 +35,107 @@
       <div v-if="isLoading" class="lb-loading-state">
         <div class="cube-wrapper">
           <div class="cube">
-            <div class="side front"></div>
-            <div class="side back"></div>
-            <div class="side right"></div>
-            <div class="side left"></div>
-            <div class="side top"></div>
-            <div class="side bottom"></div>
+            <div class="side front"></div><div class="side back"></div>
+            <div class="side right"></div><div class="side left"></div>
+            <div class="side top"></div><div class="side bottom"></div>
           </div>
         </div>
-        <p class="loading-text">Menyinkronkan data Peringkat CoderZ...</p>
+        <p class="loading-text">Menyinkronkan Data Peringkat...</p>
       </div>
 
       <template v-else>
-        <!-- Podium Top 3 -->
-        <div class="podium-container" v-if="isFullView">
-          <div class="podium">
+        <!-- The Cyber Podium -->
+        <div class="cyber-podium-container" v-if="isFullView && currentRanking.length > 0">
+          <div class="cyber-podium">
             <!-- 2nd Place -->
-            <div class="podium-item second">
-              <div class="podium-card silver-card">
-                <div class="avatar-container">
-                  <img
-                    :src="
-                      topUsers[1].avatar_url ||
-                      'https://ui-avatars.com/api/?name=' +
-                        topUsers[1].name +
-                        '&background=random'
-                    "
-                    class="podium-avatar silver-border"
-                  />
-                  <div class="podium-rank silver">2</div>
-                </div>
-                <div class="podium-info">
-                  <h4>{{ topUsers[1].name }}</h4>
-                  <span class="podium-xp"
-                    >{{ topUsers[1].xp.toLocaleString() }} XP</span
-                  >
-                </div>
+            <div class="podium-card-cyber p-second">
+              <div class="cyber-rank-badge silver">2</div>
+              <div class="cyber-avatar-hex">
+                <img :src="topUsers[1].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[1].name + '&background=random'" />
+              </div>
+              <div class="cyber-podium-info">
+                <h4>{{ topUsers[1].name }}</h4>
+                <div class="xp-glitch">{{ topUsers[1].xp.toLocaleString() }} XP</div>
               </div>
             </div>
 
             <!-- 1st Place -->
-            <div class="podium-item first">
-              <div class="podium-card gold-card">
-                <div class="avatar-container">
-                  <div class="crown"><i class="fa-solid fa-crown"></i></div>
-                  <img
-                    :src="
-                      topUsers[0].avatar_url ||
-                      'https://ui-avatars.com/api/?name=' +
-                        topUsers[0].name +
-                        '&background=random'
-                    "
-                    class="podium-avatar big gold-border"
-                  />
-                  <div class="podium-rank gold">1</div>
-                </div>
-                <div class="podium-info">
-                  <h4>{{ topUsers[0].name }}</h4>
-                  <span class="podium-xp"
-                    >{{ topUsers[0].xp.toLocaleString() }} XP</span
-                  >
-                </div>
+            <div class="podium-card-cyber p-first">
+              <div class="cyber-crown"><i class="fa-solid fa-crown"></i></div>
+              <div class="cyber-rank-badge gold">1</div>
+              <div class="cyber-avatar-hex big-hex">
+                <img :src="topUsers[0].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[0].name + '&background=random'" />
+              </div>
+              <div class="cyber-podium-info">
+                <h4>{{ topUsers[0].name }}</h4>
+                <div class="xp-glitch gold-text">{{ topUsers[0].xp.toLocaleString() }} XP</div>
               </div>
             </div>
 
             <!-- 3rd Place -->
-            <div class="podium-item third">
-              <div class="podium-card bronze-card">
-                <div class="avatar-container">
-                  <img
-                    :src="
-                      topUsers[2].avatar_url ||
-                      'https://ui-avatars.com/api/?name=' +
-                        topUsers[2].name +
-                        '&background=random'
-                    "
-                    class="podium-avatar bronze-border"
-                  />
-                  <div class="podium-rank bronze">3</div>
-                </div>
-                <div class="podium-info">
-                  <h4>{{ topUsers[2].name }}</h4>
-                  <span class="podium-xp"
-                    >{{ topUsers[2].xp.toLocaleString() }} XP</span
-                  >
-                </div>
+            <div class="podium-card-cyber p-third">
+              <div class="cyber-rank-badge bronze">3</div>
+              <div class="cyber-avatar-hex">
+                <img :src="topUsers[2].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[2].name + '&background=random'" />
+              </div>
+              <div class="cyber-podium-info">
+                <h4>{{ topUsers[2].name }}</h4>
+                <div class="xp-glitch">{{ topUsers[2].xp.toLocaleString() }} XP</div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Your Rank -->
-        <div class="your-rank-grid" v-if="isFullView && isLoggedIn">
-          <div class="your-rank-card">
-            <div class="yr-icon"><i class="fa-solid fa-rocket"></i></div>
-            <div class="yr-content">
-              <span class="yr-label">Peringkat Bulan Ini</span>
-              <span class="yr-value">{{ myRankMonthly }}</span>
-            </div>
+        <!-- Your Rank HUD -->
+        <div class="your-rank-hud" v-if="isFullView && isLoggedIn">
+          <div class="hud-side">
+            <span class="hud-label">TARGET XP ANDA</span>
+            <span class="hud-value"><i class="fa-solid fa-bolt text-cyan"></i> {{ activeTab === 'monthly' ? myRankMonthly : myRankGlobal }}</span>
           </div>
-          <div class="your-rank-card">
-            <div class="yr-icon global"><i class="fa-solid fa-globe"></i></div>
-            <div class="yr-content">
-              <span class="yr-label">Top Global Rank</span>
-              <span class="yr-value text-cyan">#{{ myRankGlobal }}</span>
+          <div class="hud-center">
+            STATUS PERINGKAT <br />
+            <span class="hud-highlight">{{ activeTab === 'monthly' ? 'BULAN INI' : 'GLOBAL' }}</span>
+          </div>
+          <div class="hud-side right">
+            <span class="hud-label">POSISI SAAT INI</span>
+            <span class="hud-value text-pink">#{{ activeTab === 'monthly' ? myRankMonthly : myRankGlobal }}</span>
+          </div>
+        </div>
+
+        <!-- Cyber Table List -->
+        <div class="cyber-table-container">
+          <div class="cyber-table-header">
+            <div class="ct-col ct-rank">#</div>
+            <div class="ct-col ct-user">CODER</div>
+            <div class="ct-col ct-xp">POWER (XP)</div>
+            <div class="ct-col ct-level">TIER</div>
+          </div>
+          <div class="cyber-table-body">
+            <div
+              v-for="(user, i) in isFullView ? currentRanking : allTimeRanking.slice(0, 5)"
+              :key="i"
+              class="cyber-table-row"
+              :class="{ 'top-3-row': i < 3 && isFullView }"
+            >
+              <div class="ct-col ct-rank">
+                <span class="cyber-rank-num" :class="'r-' + (i + 1)">{{ i + 1 }}</span>
+              </div>
+              <div class="ct-col ct-user">
+                <div class="ct-avatar">
+                  <img :src="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'" />
+                </div>
+                <span class="ct-name">{{ user.name }}</span>
+              </div>
+              <div class="ct-col ct-xp">
+                <span class="xp-text">{{ user.xp.toLocaleString() }}</span>
+              </div>
+              <div class="ct-col ct-level">
+                <span class="ct-badge-level">Lvl {{ user.level }}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Leaderboard Lists -->
-        <div
-          class="tables-grid"
-          :style="
-            !isFullView
-              ? 'grid-template-columns: 1fr; max-width: 800px; margin: 0 auto;'
-              : ''
-          "
-        >
-          <!-- Rising Stars -->
-          <div class="section-card" v-if="isFullView">
-            <div class="card-header">
-              <div class="card-title-group">
-                <h3>
-                  🚀 Rising Stars <span class="badge-sub">Bulan Ini</span>
-                </h3>
-                <p class="table-sub">Reset tiap awal bulan - sisa 24 hari</p>
-              </div>
-            </div>
-
-            <div class="leaderboard-list">
-              <div class="lb-row lb-header-row">
-                <div class="lb-col-rank">RANK</div>
-                <div class="lb-col-user">PENGGUNA</div>
-                <div class="lb-col-xp">XP</div>
-                <div class="lb-col-level">LEVEL</div>
-              </div>
-
-              <div class="lb-items-wrapper">
-                <div
-                  class="lb-row lb-item"
-                  v-for="(user, i) in monthlyRanking"
-                  :key="i"
-                  :class="getRankClass(i)"
-                >
-                  <div class="lb-col-rank">
-                    <span class="rank-badge" :class="'badge-' + (i + 1)">{{
-                      i + 1
-                    }}</span>
-                  </div>
-                  <div class="lb-col-user">
-                    <img
-                      :src="
-                        user.avatar_url ||
-                        'https://ui-avatars.com/api/?name=' +
-                          user.name +
-                          '&background=random'
-                      "
-                      class="table-avatar"
-                    />
-                    <span class="user-name">{{ user.name }}</span>
-                  </div>
-                  <div class="lb-col-xp">{{ user.xp.toLocaleString() }}</div>
-                  <div class="lb-col-level">
-                    <span class="level-badge">Lvl {{ user.level }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Global Legends -->
-          <div class="section-card">
-            <div class="card-header">
-              <div class="card-title-group">
-                <h3>👑 Global Legends</h3>
-                <p class="table-sub">Total XP yang dikumpulkan sejauh ini</p>
-              </div>
-            </div>
-
-            <div class="leaderboard-list">
-              <div class="lb-row lb-header-row">
-                <div class="lb-col-rank">RANK</div>
-                <div class="lb-col-user">PENGGUNA</div>
-                <div class="lb-col-xp">XP</div>
-                <div class="lb-col-level">LEVEL</div>
-              </div>
-
-              <div class="lb-items-wrapper">
-                <div
-                  class="lb-row lb-item"
-                  v-for="(user, i) in isFullView
-                    ? allTimeRanking
-                    : allTimeRanking.slice(0, 5)"
-                  :key="i"
-                  :class="getRankClass(i)"
-                >
-                  <div class="lb-col-rank">
-                    <span class="rank-badge" :class="'badge-' + (i + 1)">{{
-                      i + 1
-                    }}</span>
-                  </div>
-                  <div class="lb-col-user">
-                    <img
-                      :src="
-                        user.avatar_url ||
-                        'https://ui-avatars.com/api/?name=' +
-                          user.name +
-                          '&background=random'
-                      "
-                      class="table-avatar"
-                    />
-                    <span class="user-name">{{ user.name }}</span>
-                  </div>
-                  <div class="lb-col-xp">{{ user.xp.toLocaleString() }}</div>
-                  <div class="lb-col-level">
-                    <span class="level-badge">Lvl {{ user.level }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </template>
     </div>
   </section>
@@ -270,9 +160,14 @@ const allTimeRanking = ref([]);
 const myRankMonthly = ref("—");
 const myRankGlobal = ref("—");
 const isLoading = ref(true);
+const activeTab = ref('monthly');
+
+const currentRanking = computed(() => {
+  return activeTab.value === 'monthly' ? monthlyRanking.value : allTimeRanking.value;
+});
 
 const topUsers = computed(() => {
-  const users = [...monthlyRanking.value];
+  const users = [...currentRanking.value];
   while (users.length < 3) {
     users.push({ name: "-", xp: 0, avatar_url: null });
   }

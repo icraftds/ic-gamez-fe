@@ -5,15 +5,18 @@
   border-right: 1px solid var(--glass-border);
   background: var(--glass-bg-card-0_9);
   backdrop-filter: blur(10px);
-  height: calc(100vh - 70px);
-  position: sticky;
-  top: 70px;
-  overflow-y: auto;
   z-index: 20;
 }
 
-.docs-sidebar::-webkit-scrollbar { width: 4px; }
-.docs-sidebar::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+.sidebar-inner {
+  position: sticky;
+  top: 70px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+.sidebar-inner::-webkit-scrollbar { width: 4px; }
+.sidebar-inner::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
 
 .sidebar-header {
   padding: 24px;

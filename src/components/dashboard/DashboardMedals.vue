@@ -40,7 +40,8 @@
             <div class="badge-icon-container">
               <div class="badge-glow" v-if="medal.earned"></div>
               <div class="badge-hexagon">
-                <i :class="medal.icon" class="b-icon"></i>
+                <img :src="medal.image" :alt="medal.name" class="badge-image" />
+                <img src="/images/icoinz.svg" class="ic-badge-emblem" alt="iC Badge" />
               </div>
               <div v-if="!medal.earned && medal.current > 0" class="badge-mini-progress">
                 {{ Math.round((medal.current / medal.target) * 100) }}%
@@ -146,18 +147,18 @@ const allMedals = computed(() => {
   const lvlCount = getLevel()
 
   return [
-    { id: 'm1', category: 'sql', name: 'Halo, SELECT!', icon: 'fa-solid fa-database', description: 'Challenge SQL pertamamu beres! Query pertama emang paling...', target: 1, current: Math.min(sqlCount, 1), earned: sqlCount >= 1 },
-    { id: 'm2', category: 'sql', name: 'Lagi Anget-Angetnya', icon: 'fa-solid fa-fire', description: '5 challenge kelar. Jarimu mulai hafal WHERE tanpa mikir.', target: 5, current: Math.min(sqlCount, 5), earned: sqlCount >= 5 },
-    { id: 'm3', category: 'sql', name: 'Mulai Ketagihan Ngulik', icon: 'fa-solid fa-magnifying-glass', description: '10 challenge SQL! Udah mulai nagih kan?', target: 10, current: Math.min(sqlCount, 10), earned: sqlCount >= 10 },
-    { id: 'm4', category: 'sql', name: 'Pendekar Query', icon: 'fa-solid fa-shield-halved', description: '25 challenge kamu libas. JOIN sama GROUP BY udah jago.', target: 25, current: Math.min(sqlCount, 25), earned: sqlCount >= 25 },
-    { id: 'm5', category: 'sql', name: 'Suhu SQL', icon: 'fa-solid fa-crown', description: '50 challenge! Level analis beneran nih.', target: 50, current: Math.min(sqlCount, 50), earned: sqlCount >= 50 },
-    { id: 'm6', category: 'sql', name: 'Legenda Ngulik SQL', icon: 'fa-solid fa-gem', description: '100 challenge SQL tamat. Kamu resmi legenda.', target: 100, current: Math.min(sqlCount, 100), earned: sqlCount >= 100 },
-    { id: 'm7', category: 'frontend', name: 'Hello, World!', icon: 'fa-brands fa-html5', description: 'Buat halaman HTML pertamamu. Langkah pertama selalu spesial.', target: 1, current: Math.min(feCount, 1), earned: feCount >= 1 },
-    { id: 'm8', category: 'frontend', name: 'CSS Wizard', icon: 'fa-brands fa-css3-alt', description: 'Selesaikan 5 tantangan CSS. Layoutmu mulai rapih!', target: 5, current: Math.min(feCount, 5), earned: feCount >= 5 },
-    { id: 'm9', category: 'streak', name: 'Konsisten 7 Hari', icon: 'fa-solid fa-calendar-check', description: 'Belajar 7 hari berturut-turut. Disiplin adalah kuncinya!', target: 7, current: Math.min(streakCount, 7), earned: streakCount >= 7 },
-    { id: 'm10', category: 'streak', name: 'Maraton 30 Hari', icon: 'fa-solid fa-rocket', description: 'Streak 30 hari tanpa putus. Kamu luar biasa!', target: 30, current: Math.min(streakCount, 30), earned: streakCount >= 30 },
-    { id: 'm11', category: 'level', name: 'Naik Level 5', icon: 'fa-solid fa-arrow-up', description: 'Mencapai Level 5. Perjalananmu baru dimulai!', target: 5, current: Math.min(lvlCount, 5), earned: lvlCount >= 5 },
-    { id: 'm12', category: 'level', name: 'Level 25 Master', icon: 'fa-solid fa-star', description: 'Level 25! Kamu sudah jadi master.', target: 25, current: Math.min(lvlCount, 25), earned: lvlCount >= 25 },
+    { id: 'm1', category: 'sql', name: 'Halo, SELECT!', image: '/images/medals/bronze.jpg', description: 'Challenge SQL pertamamu beres! Query pertama emang paling...', target: 1, current: Math.min(sqlCount, 1), earned: sqlCount >= 1 },
+    { id: 'm2', category: 'sql', name: 'Lagi Anget-Angetnya', image: '/images/medals/bronze.jpg', description: '5 challenge kelar. Jarimu mulai hafal WHERE tanpa mikir.', target: 5, current: Math.min(sqlCount, 5), earned: sqlCount >= 5 },
+    { id: 'm3', category: 'sql', name: 'Mulai Ketagihan Ngulik', image: '/images/medals/silver.jpg', description: '10 challenge SQL! Udah mulai nagih kan?', target: 10, current: Math.min(sqlCount, 10), earned: sqlCount >= 10 },
+    { id: 'm4', category: 'sql', name: 'Pendekar Query', image: '/images/medals/gold.jpg', description: '25 challenge kamu libas. JOIN sama GROUP BY udah jago.', target: 25, current: Math.min(sqlCount, 25), earned: sqlCount >= 25 },
+    { id: 'm5', category: 'sql', name: 'Suhu SQL', image: '/images/medals/diamond.jpg', description: '50 challenge! Level analis beneran nih.', target: 50, current: Math.min(sqlCount, 50), earned: sqlCount >= 50 },
+    { id: 'm6', category: 'sql', name: 'Legenda Ngulik SQL', image: '/images/medals/diamond.jpg', description: '100 challenge SQL tamat. Kamu resmi legenda.', target: 100, current: Math.min(sqlCount, 100), earned: sqlCount >= 100 },
+    { id: 'm7', category: 'frontend', name: 'Hello, World!', image: '/images/medals/bronze.jpg', description: 'Buat halaman HTML pertamamu. Langkah pertama selalu spesial.', target: 1, current: Math.min(feCount, 1), earned: feCount >= 1 },
+    { id: 'm8', category: 'frontend', name: 'CSS Wizard', image: '/images/medals/silver.jpg', description: 'Selesaikan 5 tantangan CSS. Layoutmu mulai rapih!', target: 5, current: Math.min(feCount, 5), earned: feCount >= 5 },
+    { id: 'm9', category: 'streak', name: 'Konsisten 7 Hari', image: '/images/medals/silver.jpg', description: 'Belajar 7 hari berturut-turut. Disiplin adalah kuncinya!', target: 7, current: Math.min(streakCount, 7), earned: streakCount >= 7 },
+    { id: 'm10', category: 'streak', name: 'Maraton 30 Hari', image: '/images/medals/gold.jpg', description: 'Streak 30 hari tanpa putus. Kamu luar biasa!', target: 30, current: Math.min(streakCount, 30), earned: streakCount >= 30 },
+    { id: 'm11', category: 'level', name: 'Naik Level 5', image: '/images/medals/bronze.jpg', description: 'Mencapai Level 5. Perjalananmu baru dimulai!', target: 5, current: Math.min(lvlCount, 5), earned: lvlCount >= 5 },
+    { id: 'm12', category: 'level', name: 'Level 25 Master', image: '/images/medals/gold.jpg', description: 'Level 25! Kamu sudah jadi master.', target: 25, current: Math.min(lvlCount, 25), earned: lvlCount >= 25 },
   ]
 })
 
