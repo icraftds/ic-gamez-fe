@@ -21,6 +21,7 @@
         :active-lesson-id="lessonId"
         :active-step="activeStep"
         @lesson-select="onSidebarLessonSelect"
+        @prev-lesson="goToPrevLesson"
       />
 
       <main class="workspace-main">

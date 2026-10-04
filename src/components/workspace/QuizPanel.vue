@@ -90,7 +90,7 @@
         class="nav-btn next-btn"
         @click="$emit('next')"
       >
-        Lanjut ke Praktik <i class="fa-solid fa-arrow-right"></i>
+        Praktik <i class="fa-solid fa-arrow-right"></i>
       </button>
       </div>
     </footer>
