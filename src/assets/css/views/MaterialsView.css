@@ -1,13 +1,61 @@
 .materials-view {
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   position: relative;
   color: var(--text-main-hex);
+  overflow: hidden; /* Prevent scrolling on the body, let layout handle it */
+}
+
+.reading-topbar {
+  height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 100;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-sub-hex);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.back-btn:hover {
+  color: var(--primary);
+}
+
+.reading-logo img {
+  opacity: 0.8;
+}
+
+.avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--glass-border);
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .docs-layout {
   display: flex;
-  min-height: 100vh;
-  padding-top: 70px; /* Space for main navbar */
+  flex: 1;
+  overflow: hidden; /* the sidebar and content will scroll internally */
   max-width: 1500px;
+  width: 100%;
   margin: 0 auto;
 }

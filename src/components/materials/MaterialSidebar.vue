@@ -25,19 +25,24 @@
           <transition name="slide-fade">
             <div class="path-content" v-show="openPaths.includes(path.id)">
               <div class="chapter-group" v-for="chapter in path.chapters" :key="chapter.id">
-                <h4 class="chapter-title">{{ chapter.title }}</h4>
-                <ul class="lesson-list">
-                  <li v-for="lesson in chapter.lessons" :key="lesson.id">
-                    <a 
-                      href="#" 
-                      @click.prevent="$emit('select-lesson', path.id, chapter.id, lesson.id)"
-                      class="lesson-link"
-                      :class="{ 'active': activeLessonId === lesson.id && activeChapterId === chapter.id && activePathId === path.id }"
-                    >
-                      {{ lesson.title }}
-                    </a>
-                  </li>
-                </ul>
+                <h4 class="chapter-title" @click="toggleChapter(chapter.id)">
+                  <span>{{ chapter.title }}</span>
+                  <i class="fa-solid fa-chevron-down toggle-icon" :class="{ 'rotated': openChapters.includes(chapter.id) }"></i>
+                </h4>
+                <transition name="slide-fade">
+                  <ul class="lesson-list" v-show="openChapters.includes(chapter.id)">
+                    <li v-for="lesson in chapter.lessons" :key="lesson.id">
+                      <a 
+                        href="#" 
+                        @click.prevent="$emit('select-lesson', path.id, chapter.id, lesson.id)"
+                        class="lesson-link"
+                        :class="{ 'active': activeLessonId === lesson.id && activeChapterId === chapter.id && activePathId === path.id }"
+                      >
+                        {{ lesson.title }}
+                      </a>
+                    </li>
+                  </ul>
+                </transition>
               </div>
             </div>
           </transition>
@@ -81,11 +86,22 @@ const props = defineProps({
 defineEmits(['close', 'select-lesson'])
 
 const openPaths = ref([])
+const openChapters = ref([])
 
 // Watch for changes in paths to open the first one by default if none is open
 watch(() => props.paths, (newPaths) => {
   if (newPaths.length > 0 && openPaths.value.length === 0) {
     openPaths.value.push(newPaths[0].id)
+    if (newPaths[0].chapters && newPaths[0].chapters.length > 0) {
+      openChapters.value.push(newPaths[0].chapters[0].id)
+    }
+  }
+}, { immediate: true })
+
+// Ensure active chapter is open when selected
+watch(() => props.activeChapterId, (newChapterId) => {
+  if (newChapterId && !openChapters.value.includes(newChapterId)) {
+    openChapters.value.push(newChapterId)
   }
 }, { immediate: true })
 
@@ -95,6 +111,15 @@ const togglePath = (pathId) => {
     openPaths.value.push(pathId)
   } else {
     openPaths.value.splice(index, 1)
+  }
+}
+
+const toggleChapter = (chapterId) => {
+  const index = openChapters.value.indexOf(chapterId)
+  if (index === -1) {
+    openChapters.value.push(chapterId)
+  } else {
+    openChapters.value.splice(index, 1)
   }
 }
 </script>

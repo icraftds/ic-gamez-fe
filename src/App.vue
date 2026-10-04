@@ -10,7 +10,7 @@
         </transition>
       </router-view>
     </div>
-    <AppFooter v-if="!isWorkspacePage && !isAuthPage" />
+    <AppFooter v-if="!isWorkspacePage && !isAuthPage && route.name !== 'materials'" />
     
     <!-- Global Loading Overlay -->
     <div v-if="isPreparingLesson" class="global-loading-overlay">
@@ -43,7 +43,7 @@ const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
 const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
 const showHomeNavbar = computed(() => {
-  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'dashboard', 'not-found']
+  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'dashboard', 'not-found', 'materials']
   return !hiddenRoutes.includes(route.name) && !route.path.startsWith('/dashboard')
 })
 

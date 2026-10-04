@@ -1,6 +1,22 @@
 <template>
   <div class="materials-view">
     <SimpleBackground />
+    
+    <!-- Reading Mode Topbar -->
+    <div class="reading-topbar">
+      <router-link to="/learning" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> <span>Kembali</span>
+      </router-link>
+      <div class="reading-logo">
+        <img src="/images/Logo iC GameZ darkmode.png" alt="iC GameZ" height="24" />
+      </div>
+      <div class="topbar-right">
+        <!-- We can just display the user avatar quickly without complex logic -->
+        <div class="avatar-circle">
+           <img :src="userAvatar" alt="Avatar" />
+        </div>
+      </div>
+    </div>
 
     <div class="docs-layout">
       <MaterialSidebar 
@@ -31,14 +47,20 @@ import SimpleBackground from '../components/common/SimpleBackground.vue'
 import MaterialSidebar from '../components/materials/MaterialSidebar.vue'
 import MaterialContent from '../components/materials/MaterialContent.vue'
 import { useLearningPaths } from '../composables/useLearningPaths'
+import { useUserAccount } from '../composables/useUserAccount'
 
 const { paths, isLoading, fetchAllPathsDetails, getPathById, getChapterById, getLessonById } = useLearningPaths()
+const { userProfile } = useUserAccount()
 
 const activePathId = ref(null)
 const activeChapterId = ref(null)
 const activeLessonId = ref(null)
 const isSidebarOpen = ref(false)
 const isMobile = ref(window.innerWidth <= 1024)
+
+const userAvatar = computed(() => {
+  return userProfile.value?.avatar || 'https://ui-avatars.com/api/?name=User&background=random'
+})
 
 window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth <= 1024
