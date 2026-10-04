@@ -369,7 +369,9 @@ const onPracticeRun = async () => {
       runner.status.value = 'success'
       if (currentLesson.value) {
         currentLesson.value.practiceDone = true
-        const extraData = {}
+        const extraData = {
+          saved_code: runner.code.value
+        }
         if (route.query.mode) {
           extraData.mode = route.query.mode
         }
