@@ -370,7 +370,8 @@ const onPracticeRun = async () => {
       if (currentLesson.value) {
         currentLesson.value.practiceDone = true
         const extraData = {
-          saved_code: runner.code.value
+          saved_code: runner.code.value,
+          code: runner.code.value
         }
         if (route.query.mode) {
           extraData.mode = route.query.mode
