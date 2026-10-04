@@ -35,7 +35,9 @@ export function useScoring() {
       scoredActivities.value = newSet
       isProgressLoaded.value = true
     } catch (error) {
-      console.error('Failed to load user progress', error)
+      if (error.response?.status !== 401) {
+        console.error('Failed to load user progress', error)
+      }
     } finally {
       progressLoadPromise = null
     }
