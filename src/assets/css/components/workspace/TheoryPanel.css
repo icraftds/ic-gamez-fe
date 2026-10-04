@@ -77,7 +77,7 @@
 .panel-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 12px;
   padding: 14px 20px;
@@ -129,12 +129,12 @@
   .panel-footer {
     padding: 14px 16px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 12px;
   }
 
   .nav-btn {
-    width: calc(50% - 6px);
+    width: 100%;
     justify-content: center;
   }
   
