@@ -9,6 +9,12 @@
         </div>
         <h1 class="hero-title">Learning <span class="gradient-text">Paths</span></h1>
         <p class="hero-desc">Ikuti roadmap pembelajaran terstruktur kami dari dasar pemrograman hingga penguasaan algoritma tingkat lanjut.</p>
+        
+        <div class="hero-actions">
+          <button class="materials-btn" @click="$router.push('/materials')">
+            <i class="fa-solid fa-book-open-reader"></i> Baca Pusat Materi
+          </button>
+        </div>
       </div>
       
       <!-- Filter Section (New) -->
@@ -19,7 +25,7 @@
         </div>
         <div class="filter-pills">
           <button 
-            v-for="cat in ['All', 'Free', 'Premium']" 
+            v-for="cat in ['All', 'Web Dev', 'Mobile', 'Data Science', 'Game Dev']" 
             :key="cat"
             class="pill-btn"
             :class="{ active: selectedCategory === cat }"
@@ -89,10 +95,19 @@ const filteredPaths = computed(() => {
   }
   
   // Apply Category
-  if (selectedCategory.value === 'Premium') {
-    result = result.filter(p => p.isPremium || p.is_premium)
-  } else if (selectedCategory.value === 'Free') {
-    result = result.filter(p => !p.isPremium && !p.is_premium)
+  if (selectedCategory.value !== 'All') {
+    const cat = selectedCategory.value.toLowerCase()
+    if (cat === 'web dev') {
+      result = result.filter(p => p.title.toLowerCase().includes('web') || p.title.toLowerCase().includes('frontend') || p.title.toLowerCase().includes('backend'))
+    } else if (cat === 'data science') {
+      result = result.filter(p => p.title.toLowerCase().includes('data') || p.title.toLowerCase().includes('sql') || p.title.toLowerCase().includes('python'))
+    } else if (cat === 'mobile') {
+      result = result.filter(p => p.title.toLowerCase().includes('mobile') || p.title.toLowerCase().includes('android') || p.title.toLowerCase().includes('flutter'))
+    } else if (cat === 'game dev') {
+      result = result.filter(p => p.title.toLowerCase().includes('game') || p.title.toLowerCase().includes('unity') || p.title.toLowerCase().includes('godot'))
+    } else {
+      result = result.filter(p => p.category === selectedCategory.value)
+    }
   }
   
   return result;

@@ -1,0 +1,13 @@
+.materials-view {
+  min-height: 100vh;
+  position: relative;
+  color: var(--text-main-hex);
+}
+
+.docs-layout {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 70px; /* Space for main navbar */
+  max-width: 1500px;
+  margin: 0 auto;
+}

@@ -31,7 +31,10 @@
                 :class="{ active: selectedChapterId === chapter.id }"
                 @click="selectedChapterId = chapter.id"
               >
-                <span class="bab-label">BAB {{ cIdx + 1 }}</span>
+                <span class="bab-label">
+                  BAB {{ cIdx + 1 }}
+                  <i v-if="isChapterCompleted(chapter)" class="fa-solid fa-check-circle" style="color: #10b981; margin-left: 5px;"></i>
+                </span>
                 <span class="bab-title">{{ chapter.title }}</span>
               </button>
             </div>
@@ -49,7 +52,10 @@
                 <!-- Chapter Node (Centered) -->
                 <div class="chapter-node-wrapper">
                   <div class="chapter-node">
-                    <span class="chapter-label">BAB {{ selectedChapterIndex + 1 }}</span>
+                    <span class="chapter-label">
+                      BAB {{ selectedChapterIndex + 1 }}
+                      <i v-if="isChapterCompleted(selectedChapter)" class="fa-solid fa-check-circle" style="color: #10b981; margin-left: 5px; font-size: 0.9em;"></i>
+                    </span>
                     <h3>{{ selectedChapter.title }}</h3>
                   </div>
                 </div>
@@ -190,7 +196,12 @@ onMounted(async () => {
 const isLessonCompleted = (lesson) => {
   let p = lesson.progress
   if (Array.isArray(p)) p = p.length > 0 ? p[0] : null
-  return p ? p.is_completed : false
+  return p ? (p.is_completed || !!p.saved_code) : false
+}
+
+const isChapterCompleted = (chapter) => {
+  if (!chapter || !chapter.lessons || chapter.lessons.length === 0) return false;
+  return chapter.lessons.every(lesson => isLessonCompleted(lesson));
 }
 
 const goToLesson = (chapterId, lesson) => {

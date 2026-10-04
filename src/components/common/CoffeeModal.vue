@@ -5,7 +5,8 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
       <div class="coffee-icon">
-        <i class="fa-solid" :class="wipIcon"></i>
+        <img v-if="wipIcon.includes('/')" :src="wipIcon" alt="Logo" style="width: 64px; height: 64px; object-fit: contain;" />
+        <i v-else class="fa-solid" :class="wipIcon"></i>
       </div>
       <h3 style="margin-bottom: 0.5rem;">{{ wipTitle }}</h3>
       <p style="margin-bottom: 1.5rem; color: #94a3b8;">{{ wipDesc }}</p>
