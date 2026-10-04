@@ -331,6 +331,7 @@ const onRequestNextFromTheory = async () => {
   
   if (currentLesson.value) {
     currentLesson.value.isCompleted = true
+    localStorage.setItem(`theory_completed_${currentLesson.value.id}`, 'true')
     // Beritahu backend (berjalan di background, tidak memblokir UI)
     scoring.awardXp('theory', currentLesson.value.id).catch(console.error)
   }

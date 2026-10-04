@@ -46,14 +46,23 @@ export function useLearningPaths() {
               if (Array.isArray(prog)) {
                 prog = prog.length > 0 ? prog[0] : null;
               }
+              
+              const lsQuizStr = localStorage.getItem(`quiz_state_${lesson.id}`);
+              let localQuizPassed = false;
+              if (lsQuizStr) {
+                try { localQuizPassed = JSON.parse(lsQuizStr).isCorrect; } catch(e){}
+              }
+              const localPracticeDone = localStorage.getItem(`practice_status_${lesson.id}`) === 'success';
+              const localTheoryDone = localStorage.getItem(`theory_completed_${lesson.id}`) === 'true';
+
               if (prog && Object.keys(prog).length > 0) {
-                lesson.isCompleted = prog.is_completed || false;
-                lesson.quizPassed = prog.quiz_passed || false;
-                lesson.practiceDone = !!prog.saved_code;
+                lesson.isCompleted = prog.is_completed || localTheoryDone;
+                lesson.quizPassed = prog.quiz_passed || localQuizPassed;
+                lesson.practiceDone = !!prog.saved_code || localPracticeDone;
               } else {
-                lesson.isCompleted = hasBeenScored('theory', lesson.id) || false;
-                lesson.quizPassed = hasBeenScored('quiz', lesson.id) || false;
-                lesson.practiceDone = hasBeenScored('practice', lesson.id) || false;
+                lesson.isCompleted = hasBeenScored('theory', lesson.id) || localTheoryDone;
+                lesson.quizPassed = hasBeenScored('quiz', lesson.id) || localQuizPassed;
+                lesson.practiceDone = hasBeenScored('practice', lesson.id) || localPracticeDone;
               }
             });
           }
