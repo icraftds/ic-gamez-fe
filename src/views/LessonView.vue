@@ -415,7 +415,11 @@ watch(currentLesson, (newLesson) => {
     return
   }
   initStepFromQuery()
-  quiz.reset()
+  if (newLesson && newLesson.id) {
+    quiz.loadFromStorage(newLesson.id)
+  } else {
+    quiz.reset()
+  }
   runner.resetCode(newLesson?.practice)
 }, { immediate: true })
 

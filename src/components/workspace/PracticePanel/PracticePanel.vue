@@ -86,7 +86,7 @@
         />
       </div>
 
-      <div class="console-section">
+      <div class="console-section" :style="{ height: consoleHeight + 'px', minHeight: consoleHeight + 'px' }">
         
         <div v-if="runStatus === 'success'" class="feedback-banner success">
           <i class="fa-solid fa-circle-check"></i> Kode berhasil dijalankan! Hasil telah divalidasi.
@@ -99,12 +99,12 @@
           <i class="fa-solid fa-circle-xmark"></i> Terdapat error saat menjalankan kode. Perbaiki dan coba lagi!
         </div>
 
-        <div class="console-header">
+        <div class="console-header" @mousedown="startResize">
           <div class="output-tabs">
             <button
               class="output-tab-btn"
               :class="{ active: activeOutputTab === 'console' }"
-              @click="activeOutputTab = 'console'"
+              @click.stop="activeOutputTab = 'console'"
             >
               <i class="fa-solid fa-terminal"></i> Console Output
             </button>
@@ -112,12 +112,17 @@
               v-if="isHtmlMode"
               class="output-tab-btn"
               :class="{ active: activeOutputTab === 'preview' }"
-              @click="activeOutputTab = 'preview'"
+              @click.stop="activeOutputTab = 'preview'"
             >
               <i class="fa-solid fa-eye"></i> Preview
             </button>
           </div>
-          <button class="clear-btn" @click="$emit('clear-output')">
+          
+          <div class="drag-indicator" title="Tarik untuk mengubah ukuran">
+            <i class="fa-solid fa-grip-lines"></i> <span>Geser</span>
+          </div>
+          
+          <button class="clear-btn" @click.stop="$emit('clear-output')">
             <i class="fa-solid fa-trash"></i> Clear
           </button>
         </div>
@@ -176,6 +181,31 @@ const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'
 
 const activeOutputTab = ref('console')
 const isHtmlMode = computed(() => props.language === 'html' || props.language === 'css')
+
+const consoleHeight = ref(170)
+const isResizing = ref(false)
+
+const startResize = (e) => {
+  if (e.button !== 0) return
+  isResizing.value = true
+  document.addEventListener('mousemove', doResize)
+  document.addEventListener('mouseup', stopResize)
+  document.body.style.userSelect = 'none'
+}
+
+const doResize = (e) => {
+  if (!isResizing.value) return
+  consoleHeight.value -= e.movementY
+  if (consoleHeight.value < 100) consoleHeight.value = 100
+  if (consoleHeight.value > 800) consoleHeight.value = 800
+}
+
+const stopResize = () => {
+  isResizing.value = false
+  document.removeEventListener('mousemove', doResize)
+  document.removeEventListener('mouseup', stopResize)
+  document.body.style.userSelect = ''
+}
 
 const handleFinishClick = () => {
   if (props.runStatus !== 'success') {

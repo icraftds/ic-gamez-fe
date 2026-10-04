@@ -33,19 +33,6 @@
             {{ isCorrect ? question.explanation : errorMessage }}
           </div>
 
-          <!-- Hint Section (Button & Display) right below options/feedback -->
-          <div v-if="!isCorrect && !hintText" style="margin-top: 15px;">
-            <button 
-              class="nav-btn hint-btn" 
-              @click="openHint" 
-              :disabled="isHintLoading"
-              style="width: 100%; justify-content: center;"
-            >
-              <i v-if="isHintLoading" class="fa-solid fa-spinner fa-spin"></i>
-              <i v-else class="fa-solid fa-lightbulb"></i> Buka Hint (⚡1)
-            </button>
-          </div>
-
           <div v-if="hintText" class="hint-display-inline" style="margin: 15px 0 0 0;">
             <h4><i class="fa-solid fa-lightbulb"></i> Hint:</h4>
             <div class="hint-content" v-html="hintText"></div>
@@ -64,6 +51,16 @@
       <div class="footer-left">
         <button class="nav-btn prev-btn" @click="$emit('back')">
           <i class="fa-solid fa-arrow-left"></i> Kembali
+        </button>
+        
+        <button 
+          v-if="!isCorrect && !hintText && hasQuestions" 
+          class="nav-btn hint-btn" 
+          @click="openHint" 
+          :disabled="isHintLoading"
+        >
+          <i v-if="isHintLoading" class="fa-solid fa-spinner fa-spin"></i>
+          <i v-else class="fa-solid fa-lightbulb"></i> Buka Hint (⚡1)
         </button>
       </div>
 

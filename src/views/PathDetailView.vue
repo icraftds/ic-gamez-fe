@@ -196,7 +196,16 @@ onMounted(async () => {
 const isLessonCompleted = (lesson) => {
   let p = lesson.progress
   if (Array.isArray(p)) p = p.length > 0 ? p[0] : null
-  return p ? (p.is_completed || !!p.saved_code) : false
+  
+  const theoryDone = lesson.isCompleted !== undefined ? lesson.isCompleted : (p ? p.is_completed : false);
+  
+  const hasQuiz = lesson.quizzes && lesson.quizzes.length > 0;
+  const quizDone = !hasQuiz || (lesson.quizPassed !== undefined ? lesson.quizPassed : (p ? p.quiz_passed : false));
+  
+  const hasPractice = lesson.type === 'code' || !!lesson.practice_instructions;
+  const practiceDone = !hasPractice || (lesson.practiceDone !== undefined ? lesson.practiceDone : (p ? !!p.saved_code : false));
+  
+  return theoryDone && quizDone && practiceDone;
 }
 
 const isChapterCompleted = (chapter) => {

@@ -143,7 +143,7 @@
 .retry-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
 .retry-btn:hover { background: rgba(239, 68, 68, 0.18); }
 
-.next-btn { background: linear-gradient(135deg, #7c3aed, #06b6d4); color: var(--text-main-hex); }
+.next-btn { background: linear-gradient(135deg, #10b981, #059669); color: var(--text-main-hex); }
 .next-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
 /* ── Footer layout & Hint ── */

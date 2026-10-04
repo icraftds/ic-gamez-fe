@@ -131,6 +131,31 @@
   font-size: 0.75rem;
   color: #475569;
   flex-shrink: 0;
+  cursor: ns-resize; /* Indicate draggable */
+  transition: background 0.2s;
+}
+
+.console-header:hover {
+  background: var(--white-alpha-0_04);
+}
+
+.drag-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-sub-hex);
+  opacity: 0.5;
+  font-size: 0.75rem;
+  transition: opacity 0.2s, color 0.2s;
+  user-select: none;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.console-header:hover .drag-indicator {
+  opacity: 1;
+  color: var(--primary);
 }
 
 .clear-btn {
