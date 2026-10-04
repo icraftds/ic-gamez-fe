@@ -50,8 +50,11 @@
             <!-- 2nd Place -->
             <div class="podium-card-cyber p-second">
               <div class="cyber-rank-badge silver">2</div>
-              <div class="cyber-avatar-hex">
+              <div class="cyber-avatar-hex" :class="getPlanHexClass(topUsers[1])">
                 <img :src="topUsers[1].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[1].name + '&background=random'" />
+                <div v-if="getPlanBadge(topUsers[1])" class="plan-badge" :class="getPlanBadge(topUsers[1]).class">
+                  {{ getPlanBadge(topUsers[1]).text }}
+                </div>
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[1].name }}</h4>
@@ -63,8 +66,11 @@
             <div class="podium-card-cyber p-first">
               <div class="cyber-crown"><i class="fa-solid fa-crown"></i></div>
               <div class="cyber-rank-badge gold">1</div>
-              <div class="cyber-avatar-hex big-hex">
+              <div class="cyber-avatar-hex big-hex" :class="getPlanHexClass(topUsers[0])">
                 <img :src="topUsers[0].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[0].name + '&background=random'" />
+                <div v-if="getPlanBadge(topUsers[0])" class="plan-badge" :class="getPlanBadge(topUsers[0]).class">
+                  {{ getPlanBadge(topUsers[0]).text }}
+                </div>
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[0].name }}</h4>
@@ -75,8 +81,11 @@
             <!-- 3rd Place -->
             <div class="podium-card-cyber p-third">
               <div class="cyber-rank-badge bronze">3</div>
-              <div class="cyber-avatar-hex">
+              <div class="cyber-avatar-hex" :class="getPlanHexClass(topUsers[2])">
                 <img :src="topUsers[2].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[2].name + '&background=random'" />
+                <div v-if="getPlanBadge(topUsers[2])" class="plan-badge" :class="getPlanBadge(topUsers[2]).class">
+                  {{ getPlanBadge(topUsers[2]).text }}
+                </div>
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[2].name }}</h4>
@@ -121,8 +130,11 @@
                 <span class="cyber-rank-num" :class="'r-' + (i + 1)">{{ i + 1 }}</span>
               </div>
               <div class="ct-col ct-user">
-                <div class="ct-avatar">
-                  <img :src="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'" />
+                <div class="ct-avatar plan-badge-wrapper">
+                  <img :src="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'" :class="getPlanBorderClass(user)" />
+                  <div v-if="getPlanBadge(user)" class="plan-badge" :class="getPlanBadge(user).class" style="bottom: -10px;">
+                    {{ getPlanBadge(user).text }}
+                  </div>
                 </div>
                 <span class="ct-name">{{ user.name }}</span>
               </div>
@@ -145,6 +157,24 @@
 import { ref, computed, onMounted } from "vue";
 import { useUserAccount } from "../../composables/useUserAccount";
 import api from "../../services/api";
+
+const getPlanHexClass = (user) => {
+  if (user?.current_plan === 'expert') return 'bg-expert';
+  if (user?.current_plan === 'pro' || user?.is_premium) return 'bg-pro';
+  return '';
+};
+
+const getPlanBorderClass = (user) => {
+  if (user?.current_plan === 'expert') return 'border-expert';
+  if (user?.current_plan === 'pro' || user?.is_premium) return 'border-pro';
+  return 'border-gray';
+};
+
+const getPlanBadge = (user) => {
+  if (user?.current_plan === 'expert') return { text: 'Expert', class: 'expert' };
+  if (user?.current_plan === 'pro' || user?.is_premium) return { text: 'Pro', class: 'pro' };
+  return null;
+};
 
 const props = defineProps({
   isFullView: {

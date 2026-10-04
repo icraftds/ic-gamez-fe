@@ -214,8 +214,8 @@ const firstName = computed(() => {
 });
 
 const avatarBorderClass = computed(() => {
-  if (currentPlan.value === 'expert') return 'border-gold';
-  if (isPremiumUser.value) return 'border-blue';
+  if (currentPlan.value === 'expert') return 'border-expert';
+  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'border-pro';
   return 'border-gray';
 });
 

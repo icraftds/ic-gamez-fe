@@ -58,13 +58,14 @@
           :src="userProfile.avatar"
           :alt="userProfile.name"
           class="avatar-sm"
+          :class="avatarBorderClass"
           :title="'Masuk sebagai ' + userProfile.name"
         />
         <i class="fa-solid fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
         
         <div v-if="showUserDropdown" class="user-dropdown-menu" @click.stop>
           <div class="dropdown-header">
-            <img :src="userProfile.avatar" class="dropdown-avatar" />
+            <img :src="userProfile.avatar" class="dropdown-avatar" :class="avatarBorderClass" />
             <div class="dropdown-user-info">
               <div class="user-name">{{ userProfile.name }}</div>
               <div class="user-email">{{ userProfile.email }}</div>
@@ -93,12 +94,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 
 const router = useRouter();
-const { isLoggedIn, userProfile, isPremiumUser, credits, logout, fetchUser } = useUserAccount();
+const { isLoggedIn, userProfile, isPremiumUser, currentPlan, credits, logout, fetchUser } = useUserAccount();
+
+const avatarBorderClass = computed(() => {
+  if (currentPlan.value === 'expert') return 'border-expert';
+  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'border-pro';
+  return 'border-gray';
+});
+
 const STEPS = [
   { number: 1, label: "Materi" },
   { number: 2, label: "Tes" },
