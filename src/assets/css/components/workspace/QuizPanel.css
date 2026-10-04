@@ -201,33 +201,44 @@
 /* ── Mobile Responsiveness ── */
 @media (max-width: 768px) {
   .quiz-panel {
-    overflow-x: hidden;
-    overflow-y: visible;
+    /* Keep default flex and hidden overflow to fit viewport */
   }
   
   .panel-content {
     padding: 20px 16px;
-    overflow-x: hidden;
-    overflow-y: visible;
+    /* Let it scroll naturally */
   }
   
   .panel-footer {
     padding: 14px 16px;
-    flex-direction: column;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     gap: 12px;
   }
 
   .footer-left,
   .footer-right {
-    width: 100%;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: contents;
   }
   
   .nav-btn {
-    width: 100%;
     justify-content: center;
+  }
+
+  .hint-btn {
+    order: -1; /* Move to the top */
+    width: 100%;
+  }
+
+  .prev-btn {
+    width: calc(50% - 6px);
+    order: 1;
+  }
+
+  .submit-btn, .retry-btn, .next-btn {
+    width: calc(50% - 6px);
+    order: 2;
   }
   
   .quiz-header h2 {
