@@ -116,28 +116,25 @@
 /* ── Mobile Responsiveness ── */
 @media (max-width: 768px) {
   .theory-panel {
-    overflow-x: hidden;
-    overflow-y: visible;
     max-width: 100%;
     box-sizing: border-box;
   }
   
   .panel-content {
     padding: 20px 16px;
-    overflow-x: hidden;
-    overflow-y: auto;
     max-width: 100%;
     box-sizing: border-box;
   }
   
   .panel-footer {
     padding: 14px 16px;
-    flex-direction: column;
+    display: flex;
+    justify-content: space-between;
     gap: 12px;
   }
 
   .nav-btn {
-    width: 100%;
+    width: calc(50% - 6px);
     justify-content: center;
   }
   
