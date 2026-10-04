@@ -89,19 +89,19 @@ export function useLearningPaths() {
   }
 
   const getPathById = (id) => {
-    return paths.value.find(p => p.id === id || p.slug === id)
+    return paths.value.find(p => String(p.id) === String(id) || p.slug === id)
   }
 
   const getChapterById = (pathId, chapterId) => {
     const path = getPathById(pathId)
     if (!path || !path.chapters) return null
-    return path.chapters.find(c => c.id === chapterId || c.slug === chapterId)
+    return path.chapters.find(c => String(c.id) === String(chapterId) || c.slug === chapterId)
   }
 
   const getLessonById = (pathId, chapterId, lessonId) => {
     const chapter = getChapterById(pathId, chapterId)
     if (!chapter || !chapter.lessons) return null
-    return chapter.lessons.find(l => l.id === lessonId || l.slug === lessonId)
+    return chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
   }
 
   // Jika diperlukan untuk backward compatibility

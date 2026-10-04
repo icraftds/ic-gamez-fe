@@ -17,7 +17,7 @@ export function useLessonNavigation(path, lessonId, pathId) {
   })
 
   const currentIndex = computed(() =>
-    allLessons.value.findIndex((l) => l.id === lessonId.value)
+    allLessons.value.findIndex((l) => String(l.id) === String(lessonId.value) || l.slug === lessonId.value)
   )
 
   const isFirstLesson = computed(() => currentIndex.value <= 0)

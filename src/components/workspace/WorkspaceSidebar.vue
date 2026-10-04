@@ -4,7 +4,7 @@
     <!-- Toggle Button -->
     <div class="toggle-row" :class="{ 'center-toggle': isCollapsed }">
       <button 
-        v-if="!isCollapsed" 
+        v-if="!isCollapsed && !isFirstLesson" 
         class="prev-materi-btn" 
         @click="$emit('prev-lesson')"
       >
@@ -73,6 +73,7 @@ const props = defineProps({
   activeLessonId: { type: String, default: '' },
   activeStep: { type: Number, default: 1 },
   isCollapsed: { type: Boolean, default: false },
+  isFirstLesson: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['lesson-select', 'update:isCollapsed', 'prev-lesson'])

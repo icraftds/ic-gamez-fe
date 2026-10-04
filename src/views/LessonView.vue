@@ -20,6 +20,7 @@
         :active-chapter-id="chapterId"
         :active-lesson-id="lessonId"
         :active-step="activeStep"
+        :is-first-lesson="isFirstLesson"
         @lesson-select="onSidebarLessonSelect"
         @prev-lesson="goToPrevLesson"
       />
