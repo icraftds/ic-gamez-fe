@@ -21,9 +21,9 @@
           <i v-if="currentStep > 2" class="fa-solid fa-check"></i>
           <span v-else>2</span>
         </div>
-        <div class="step-line" :class="{ done: currentStep > 2 }"></div>
-        <div class="step-dot" :class="{ active: currentStep >= 3, done: currentStep > 3 }">
-          <i v-if="currentStep > 3" class="fa-solid fa-check"></i>
+        <div class="step-line" :class="{ done: currentStep >= 4 }"></div>
+        <div class="step-dot" :class="{ active: currentStep >= 4 }">
+          <i v-if="currentStep >= 4" class="fa-solid fa-check"></i>
           <span v-else>3</span>
         </div>
       </div>
@@ -56,12 +56,8 @@
             @back="goBackToSelection"
           />
 
-          <CheckoutStepProcessing
-            v-else-if="currentStep === 3"
-          />
-
           <CheckoutStepSuccess
-            v-else-if="currentStep === 4"
+            v-else-if="currentStep >= 3"
             :planName="planName"
             :planSlug="planSlug"
             @dashboard="goToDashboard"
@@ -80,7 +76,6 @@ import SimpleBackground from '../components/common/SimpleBackground.vue'
 
 import CheckoutStepSelection from '../components/checkout/CheckoutStepSelection.vue'
 import CheckoutStepInstruction from '../components/checkout/CheckoutStepInstruction.vue'
-import CheckoutStepProcessing from '../components/checkout/CheckoutStepProcessing.vue'
 import CheckoutStepSuccess from '../components/checkout/CheckoutStepSuccess.vue'
 
 const router = useRouter()
@@ -152,13 +147,13 @@ const handlePaymentSuccess = async () => {
   try {
     const confettiModule = await import('canvas-confetti')
     const confetti = confettiModule.default || confettiModule
-    confetti({ particleCount: 180, spread: 80, origin: { y: 0.55 }, colors: ['#00f0ff', '#7c3aed', '#ec4899', '#f59e0b', '#10b981'] })
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#00f0ff', '#7c3aed', '#ec4899', '#f59e0b', '#10b981'] })
     setTimeout(() => {
-      confetti({ particleCount: 80, spread: 120, origin: { y: 0.7, x: 0.3 }, colors: ['#00f0ff', '#7c3aed'] })
-    }, 300)
+      confetti({ particleCount: 50, spread: 100, origin: { y: 0.65, x: 0.3 }, colors: ['#00f0ff', '#7c3aed'] })
+    }, 250)
     setTimeout(() => {
-      confetti({ particleCount: 80, spread: 120, origin: { y: 0.7, x: 0.7 }, colors: ['#ec4899', '#f59e0b'] })
-    }, 500)
+      confetti({ particleCount: 50, spread: 100, origin: { y: 0.65, x: 0.7 }, colors: ['#ec4899', '#f59e0b'] })
+    }, 450)
   } catch (e) {
     console.warn('canvas-confetti not available', e)
   }
@@ -182,7 +177,7 @@ const startPolling = () => {
       // 1. Sebelumnya Free, sekarang jadi Premium (untuk paket berlangganan)
       // 2. Atau paketnya berubah (misal dari pro ke expert)
       // 3. Atau credits bertambah (jika nanti ada topup koin)
-      const newPlan = userProfile.value?.current_plan?.slug || userProfile.value?.current_plan || 'free'
+      const newPlan = userProfile.value?.current_plan || 'free'
       const becamePremium = !initialIsPremium && isPremiumUser.value
       const planChanged = isPremiumUser.value && initialPlan !== newPlan
       const gainedCredits = (userProfile.value?.credits || 0) > initialCredits
@@ -193,7 +188,7 @@ const startPolling = () => {
     } catch (e) {
       // Ignore polling errors
     }
-  }, 4000)
+  }, 3000)
 }
 const stopPolling = () => {
   if (pollingInterval) {
@@ -209,25 +204,24 @@ onMounted(() => {
     return
   }
 
-  if (route.query.resume === 'true') {
-    const saved = localStorage.getItem('ic_pending_checkout')
-    if (saved) {
-      try {
-        const data = JSON.parse(saved)
-        if (data.expiryTime > Date.now()) {
-          planName.value = data.planName || planName.value
-          planPrice.value = data.planPrice || planPrice.value
-          planSlug.value = data.planSlug || planSlug.value
-          discountedPrice.value = data.discountedPrice || null
-          paymentDetails.value = data.paymentDetails || {}
-          selectedMethod.value = data.selectedMethod || ''
-          expiryTime.value = data.expiryTime
-          currentStep.value = 2
-        } else {
-          localStorage.removeItem('ic_pending_checkout')
-        }
-      } catch(e) {}
-    }
+  // Selalu coba restore dari localStorage jika ada pending checkout (agar QR tetap muncul saat refresh)
+  const saved = localStorage.getItem('ic_pending_checkout')
+  if (saved) {
+    try {
+      const data = JSON.parse(saved)
+      if (data.expiryTime > Date.now()) {
+        planName.value = data.planName || planName.value
+        planPrice.value = data.planPrice || planPrice.value
+        planSlug.value = data.planSlug || planSlug.value
+        discountedPrice.value = data.discountedPrice || null
+        paymentDetails.value = data.paymentDetails || {}
+        selectedMethod.value = data.selectedMethod || 'qris'
+        expiryTime.value = data.expiryTime
+        currentStep.value = 2
+      } else {
+        localStorage.removeItem('ic_pending_checkout')
+      }
+    } catch(e) {}
   }
 })
 

@@ -56,8 +56,8 @@
       </div>
 
 
-      <!-- Payment Link Option -->
-      <div
+      <!-- Payment Link Option (E-Wallet) - Dinonaktifkan sementara -->
+      <!-- <div
         class="method-card"
         :class="{ selected: selectedMethod === 'payment_link' }"
         @click="selectedMethod = 'payment_link'"
@@ -73,7 +73,7 @@
           <div class="method-desc">Ovo, Dana, LinkAja, Mandiri, dll. (Diarahkan)</div>
         </div>
         <div class="method-badge alt">Fleksibel</div>
-      </div>
+      </div> -->
     </div>
     
     <div v-if="paymentError" class="payment-error-message">
@@ -111,7 +111,7 @@ const props = defineProps({
 
 const emit = defineEmits(['instruction', 'success', 'processing'])
 
-const selectedMethod = ref(null)
+const selectedMethod = ref('qris')
 const isProcessingPayment = ref(false)
 const couponCode = ref('')
 const isValidatingCoupon = ref(false)
