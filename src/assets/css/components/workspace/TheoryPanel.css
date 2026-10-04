@@ -108,7 +108,7 @@
 .prev-btn:hover:not(:disabled) { background: var(--white-alpha-0_12); color: var(--text-main-hex); }
 
 .next-btn {
-  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  background: linear-gradient(135deg, #10b981, #059669);
   color: var(--text-main-hex);
 }
 .next-btn:hover { opacity: 0.9; transform: translateY(-1px); }
