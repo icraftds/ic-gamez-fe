@@ -8,7 +8,7 @@
       :lesson-title="currentLesson?.title ?? ''"
       :active-step="activeStep"
       :lesson="currentLesson"
-      @back="router.push('/learning/' + (path?.slug || pathId))"
+      @back="router.push({ path: `/learning/${path?.slug || pathId}`, query: { chapter: currentChapter?.slug || currentChapter?.id } })"
     />
 
     <div class="workspace-body">

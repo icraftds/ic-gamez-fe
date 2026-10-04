@@ -29,7 +29,7 @@
                 :key="chapter.id"
                 class="chapter-nav-btn"
                 :class="{ active: selectedChapterId === chapter.id }"
-                @click="selectedChapterId = chapter.id"
+                @click="selectChapter(chapter)"
               >
                 <span class="bab-label">
                   BAB {{ cIdx + 1 }}
@@ -158,9 +158,23 @@ const showPremiumModal = ref(false)
 
 const selectedChapterId = ref(null)
 
+const selectChapter = (chapter) => {
+  selectedChapterId.value = chapter.id
+  router.replace({ query: { chapter: chapter.slug || chapter.id } })
+}
+
 watch(() => path.value, (newPath) => {
-  if (newPath && newPath.chapters && newPath.chapters.length > 0 && !selectedChapterId.value) {
-    selectedChapterId.value = newPath.chapters[0].id
+  if (newPath && newPath.chapters && newPath.chapters.length > 0) {
+    if (route.query.chapter) {
+      const found = newPath.chapters.find(c => c.slug === route.query.chapter || String(c.id) === String(route.query.chapter))
+      if (found) {
+        selectedChapterId.value = found.id
+        return
+      }
+    }
+    if (!selectedChapterId.value) {
+      selectedChapterId.value = newPath.chapters[0].id
+    }
   }
 }, { immediate: true })
 
@@ -179,7 +193,7 @@ const goToNextChapter = () => {
   if (path.value && path.value.chapters) {
     const nextIndex = selectedChapterIndex.value + 1
     if (nextIndex < path.value.chapters.length) {
-      selectedChapterId.value = path.value.chapters[nextIndex].id
+      selectChapter(path.value.chapters[nextIndex])
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
