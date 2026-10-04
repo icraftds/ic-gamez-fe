@@ -52,7 +52,11 @@ export function useLearningPaths() {
               if (lsQuizStr) {
                 try { localQuizPassed = JSON.parse(lsQuizStr).isCorrect; } catch(e){}
               }
-              const localPracticeDone = localStorage.getItem(`practice_status_${lesson.id}`) === 'success';
+              const lsPracticeStr = localStorage.getItem(`practice_state_${lesson.id}`);
+              let localPracticeDone = false;
+              if (lsPracticeStr) {
+                try { localPracticeDone = JSON.parse(lsPracticeStr).status === 'success'; } catch(e){}
+              }
               const localTheoryDone = localStorage.getItem(`theory_completed_${lesson.id}`) === 'true';
 
               if (prog && Object.keys(prog).length > 0) {
