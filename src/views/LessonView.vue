@@ -8,7 +8,7 @@
       :lesson-title="currentLesson?.title ?? ''"
       :active-step="activeStep"
       :lesson="currentLesson"
-      @back="router.push('/learning')"
+      @back="router.push('/learning/' + (path?.slug || pathId))"
     />
 
     <div class="workspace-body">
