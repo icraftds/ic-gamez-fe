@@ -17,6 +17,11 @@ export const EventService = {
     return api.get('/events/weekly/active');
   },
 
+  // Event Aktif Tahunan
+  getActiveAnnual() {
+    return api.get('/events/annual/active');
+  },
+
   // Klasemen Speedrun Harian
   getDailyLeaderboard() {
     return api.get('/events/daily/leaderboard');

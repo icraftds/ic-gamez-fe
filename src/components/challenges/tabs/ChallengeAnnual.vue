@@ -3,8 +3,8 @@
     <div class="annual-banner">
       <div class="banner-content">
         <span class="tag-pro"><i class="fa-solid fa-crown"></i> Mega Project 2026</span>
-        <h2>Sistem Manajemen Rumah Sakit Terintegrasi</h2>
-        <p>Acara tahunan eksklusif dari CTO Icraft untuk member Pro. Bangun aplikasi full-stack menggunakan Laravel dan Vue.js yang akan dinilai oleh panel ahli dan bisa menjadi portofolio emas Anda.</p>
+        <h2>{{ currentEvent?.title || 'Sistem Manajemen Rumah Sakit Terintegrasi' }}</h2>
+        <p v-html="currentEvent?.description || currentEvent?.description_html || 'Acara tahunan eksklusif dari CTO Icraft untuk member Pro. Bangun aplikasi full-stack menggunakan Laravel dan Vue.js yang akan dinilai oleh panel ahli dan bisa menjadi portofolio emas Anda.'"></p>
         
         <!-- MEGA PRIZE POOL SHOWCASE -->
         <div class="mega-prize-pool">
@@ -13,7 +13,7 @@
             <i class="fa-solid fa-trophy prize-icon gold"></i>
             <div class="prize-text">
               <span class="prize-label">PRIZE POOL</span>
-              <h1 class="prize-amount">Rp 5.000.000<span class="plus">+</span></h1>
+              <h1 class="prize-amount">{{ currentEvent?.prize_pool || 'Rp 5.000.000' }}<span class="plus" v-if="!currentEvent?.prize_pool">+</span></h1>
             </div>
             <i class="fa-solid fa-coins prize-icon silver"></i>
           </div>
@@ -25,7 +25,7 @@
         </div>
 
         <div class="banner-meta">
-          <span><i class="fa-regular fa-clock"></i> Berakhir 31 Des 2026</span>
+          <span><i class="fa-regular fa-clock"></i> Berakhir {{ currentEvent?.end_date ? new Date(currentEvent.end_date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) : '31 Des 2026' }}</span>
         </div>
       </div>
     </div>
@@ -34,15 +34,18 @@
     <div class="annual-content">
       <div class="req-card">
         <h3><i class="fa-solid fa-list-check"></i> Spesifikasi Proyek</h3>
-        <ul class="spec-list">
-          <li><strong>Backend:</strong> REST API dengan Laravel 11.</li>
-          <li><strong>Frontend:</strong> SPA menggunakan Vue 3 & IcraftDS.</li>
-          <li><strong>Fitur Utama:</strong> Reservasi antrean realtime, rekam medis pasien, dan integrasi payment gateway.</li>
-          <li><strong>Deployment:</strong> Aplikasi harus dapat diakses secara publik (hosting/VPS).</li>
-        </ul>
-        <div class="alert-box">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <p>Dilarang menggunakan template siap pakai (AdminLTE, dll) atau hasil clone dari repository publik lain. Proyek harus orisinal.</p>
+        <div v-if="annualChallengeTask" class="spec-list-dynamic" v-html="annualChallengeTask"></div>
+        <div v-else>
+          <ul class="spec-list">
+            <li><strong>Backend:</strong> REST API dengan Laravel 11.</li>
+            <li><strong>Frontend:</strong> SPA menggunakan Vue 3 & IcraftDS.</li>
+            <li><strong>Fitur Utama:</strong> Reservasi antrean realtime, rekam medis pasien, dan integrasi payment gateway.</li>
+            <li><strong>Deployment:</strong> Aplikasi harus dapat diakses secara publik (hosting/VPS).</li>
+          </ul>
+          <div class="alert-box">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>Dilarang menggunakan template siap pakai (AdminLTE, dll) atau hasil clone dari repository publik lain. Proyek harus orisinal.</p>
+          </div>
         </div>
       </div>
 
@@ -50,7 +53,7 @@
         <h3><i class="fa-solid fa-cloud-arrow-up"></i> Area Pengumpulan</h3>
         <p class="submit-desc">Pastikan Anda mengumpulkan kode sumber (Repository) dan tautan aplikasi yang sudah online (Live URL).</p>
         
-        <form class="submit-form" @submit.prevent="submitProject">
+        <form v-if="!userStatus?.is_participated" class="submit-form" @submit.prevent="submitProject">
           <div class="form-group">
             <label>Link Repository (GitHub/GitLab)</label>
             <input type="url" v-model="form.repoUrl" placeholder="https://github.com/username/project" required class="form-input" />
@@ -75,6 +78,11 @@
             {{ isSubmitting ? 'Mengunggah...' : 'Kirim Proyek Tahunan' }} <i v-if="!isSubmitting" class="fa-solid fa-paper-plane"></i>
           </button>
         </form>
+        <div v-else class="already-submitted card-glass" style="margin-top: 20px; text-align: center; padding: 30px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
+          <i class="fa-solid fa-circle-check" style="font-size: 3rem; color: #10b981; margin-bottom: 15px;"></i>
+          <h3 style="color: #10b981;">Proyek Telah Dikirim!</h3>
+          <p style="color: #cbd5e1; margin-top: 10px;">Terima kasih atas partisipasi Anda. Tim juri sedang meninjau proyek Anda. Pengumuman akan diinformasikan setelah masa event berakhir.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -92,6 +100,8 @@ const { isPremiumUser } = useUserAccount();
 const currentEvent = ref(null);
 const isSubmitting = ref(false);
 const showPremiumModal = ref(false);
+const userStatus = ref(null);
+const annualChallengeTask = ref('');
 
 const form = reactive({
   repoUrl: '',
@@ -108,9 +118,14 @@ const handleFileUpload = (e) => {
 
 const fetchAnnualEvent = async () => {
   try {
-    const res = await EventService.fetchEvents('annual');
-    if (res.data && res.data.data && res.data.data.length > 0) {
-      currentEvent.value = res.data.data[0];
+    const res = await EventService.getActiveAnnual();
+    if (res.data && res.data.event) {
+      currentEvent.value = res.data.event;
+      userStatus.value = res.data.user_status;
+      
+      if (res.data.event.challenges && res.data.event.challenges.length > 0) {
+        annualChallengeTask.value = res.data.event.challenges[0].custom_task || res.data.event.challenges[0].lesson?.explanation || '';
+      }
     } else {
       currentEvent.value = { id: 999 }; // Mock ID
     }
@@ -137,6 +152,11 @@ const submitProject = async () => {
     form.repoUrl = '';
     form.liveUrl = '';
     form.file = null;
+    if (userStatus.value) {
+      userStatus.value.is_participated = true;
+    } else {
+      userStatus.value = { is_participated: true };
+    }
   } catch (error) {
     // TANGKAP ERROR DARI BACKEND
     if (error.response && error.response.status === 403) {
