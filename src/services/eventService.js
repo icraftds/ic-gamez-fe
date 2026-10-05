@@ -12,6 +12,11 @@ export const EventService = {
     return api.get(`/events/${id}`);
   },
 
+  // Event Aktif Mingguan
+  getActiveWeekly() {
+    return api.get('/events/weekly/active');
+  },
+
   // Klasemen Speedrun Harian
   getDailyLeaderboard() {
     return api.get('/events/daily/leaderboard');

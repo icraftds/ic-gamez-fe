@@ -34,8 +34,14 @@
       </div>
       
       <div v-if="progressPercentage === 100" class="claim-section">
-        <button class="btn-submit-weekly" @click="claimWeeklyReward" :disabled="isSubmitting">
-          <i class="fa-solid fa-gift"></i> {{ isSubmitting ? 'Memproses...' : 'Klaim Partisipasi Mingguan!' }}
+        <button 
+          class="btn-submit-weekly" 
+          @click="claimWeeklyReward" 
+          :disabled="isSubmitting || userStatus?.is_participated"
+          :class="{'btn-disabled': userStatus?.is_participated}"
+        >
+          <i class="fa-solid fa-gift"></i> 
+          {{ userStatus?.is_participated ? 'Telah Diklaim!' : (isSubmitting ? 'Memproses...' : 'Klaim Partisipasi Mingguan!') }}
         </button>
       </div>
     </div>
@@ -101,6 +107,7 @@ const currentEvent = ref(null);
 const challenges = ref([]);
 const isSubmitting = ref(false);
 const showPremiumModal = ref(false);
+const userStatus = ref(null);
 
 const completedCount = computed(() => challenges.value.filter(c => c.status === 'completed').length);
 const totalChallenges = computed(() => challenges.value.length || 1);
@@ -108,32 +115,44 @@ const progressPercentage = computed(() => Math.floor((completedCount.value / tot
 
 const fetchWeeklyData = async () => {
   try {
-    const resList = await EventService.fetchEvents('weekly');
-    if (resList.data && resList.data.data && resList.data.data.length > 0) {
-      const eventId = resList.data.data[0].id;
-      const resDetail = await EventService.getEventDetail(eventId);
-      currentEvent.value = resDetail.data.data || resDetail.data;
-      challenges.value = currentEvent.value.challenges || [];
+    const res = await EventService.getActiveWeekly();
+    if (res.data && res.data.event) {
+      currentEvent.value = res.data.event;
+      userStatus.value = res.data.user_status;
+      
+      const backendChallenges = currentEvent.value.challenges || [];
+      const completedIds = res.data.user_status?.completed_challenges || [];
+      
+      let foundActive = false;
+      
+      challenges.value = backendChallenges.map((ch, index) => {
+        let status = 'locked';
+        let isCompleted = completedIds.includes(ch.id);
+        
+        if (isCompleted) {
+          status = 'completed';
+        } else if (!foundActive) {
+          status = 'active';
+          foundActive = true;
+        }
+        
+        return {
+          id: ch.id,
+          title: ch.lesson?.title || ch.custom_task || `Tantangan ${index + 1}`,
+          description: ch.lesson?.explanation || ch.custom_task || 'Selesaikan tantangan ini.',
+          difficulty: ch.lesson?.difficulty || 'medium',
+          status: status
+        };
+      });
     } else {
-      loadMockData();
+      currentEvent.value = null;
+      challenges.value = [];
     }
   } catch (error) {
-    console.warn('Backend API belum tersedia, menggunakan data statis.');
-    loadMockData();
+    console.error('Failed to load active weekly event', error);
+    currentEvent.value = null;
+    challenges.value = [];
   }
-};
-
-const loadMockData = () => {
-  currentEvent.value = {
-    id: 99,
-    description: 'Tantangan eksklusif dari CTO Icraft khusus untuk member Pro. Selesaikan studi kasus minggu ini untuk hadiah uang tunai.',
-    end_date: '2026-09-24T23:59:59'
-  };
-  challenges.value = [
-    { id: 1, title: 'Struktur Database e-Commerce', description: 'Rancang struktur tabel Relasional (SQL) untuk menyimpan riwayat transaksi dengan metode Normalisasi tingkat 3.', difficulty: 'medium', status: 'completed' },
-    { id: 2, title: 'API Rate Limiting', description: 'Implementasikan pembatasan akses API menggunakan Redis di Node.js untuk mencegah serangan DDoS ringan.', difficulty: 'hard', status: 'active' },
-    { id: 3, title: 'Frontend DOM Security', description: 'Perbaiki celah XSS (Cross-Site Scripting) pada form komentar ini dengan teknik sanitasi yang tepat.', difficulty: 'medium', status: 'locked' },
-  ];
 };
 
 const openTask = (task) => {
@@ -163,6 +182,7 @@ const claimWeeklyReward = async () => {
     if (currentEvent.value && currentEvent.value.id) {
       await EventService.submitWeekly(currentEvent.value.id);
       showToast('Selamat! Anda telah masuk kualifikasi hadiah mingguan.', 'success');
+      if (userStatus.value) userStatus.value.is_participated = true;
     }
   } catch (error) {
     // TANGKAP ERROR DARI BACKEND
