@@ -1,89 +1,85 @@
 <template>
   <div class="challenge-annual">
-    <div class="annual-banner">
-      <div class="banner-content">
-        <span class="tag-pro"><i class="fa-solid fa-crown"></i> Mega Project 2026</span>
-        <h2>{{ currentEvent?.title || 'Sistem Manajemen Rumah Sakit Terintegrasi' }}</h2>
-        <p v-html="currentEvent?.description || currentEvent?.description_html || 'Acara tahunan eksklusif dari CTO Icraft untuk member Pro. Bangun aplikasi full-stack menggunakan Laravel dan Vue.js yang akan dinilai oleh panel ahli dan bisa menjadi portofolio emas Anda.'"></p>
-        
-        <!-- MEGA PRIZE POOL SHOWCASE -->
-        <div class="mega-prize-pool">
-          <div class="prize-glow"></div>
-          <div class="prize-content">
-            <i class="fa-solid fa-trophy prize-icon gold"></i>
-            <div class="prize-text">
-              <span class="prize-label">PRIZE POOL</span>
-              <h1 class="prize-amount">{{ currentEvent?.prize_pool || 'Rp 5.000.000' }}<span class="plus" v-if="!currentEvent?.prize_pool">+</span></h1>
+    <div v-if="currentEvent" class="annual-active-container">
+      <div class="annual-banner">
+        <div class="banner-content">
+          <span class="tag-pro"><i class="fa-solid fa-crown"></i> Mega Project 2026</span>
+          <h2>{{ currentEvent.title }}</h2>
+          <p v-html="currentEvent.description || currentEvent.description_html"></p>
+          
+          <!-- MEGA PRIZE POOL SHOWCASE -->
+          <div class="mega-prize-pool">
+            <div class="prize-glow"></div>
+            <div class="prize-content">
+              <i class="fa-solid fa-trophy prize-icon gold"></i>
+              <div class="prize-text">
+                <span class="prize-label">PRIZE POOL</span>
+                <h1 class="prize-amount">{{ currentEvent.prize_pool || 'Menarik' }}</h1>
+              </div>
+              <i class="fa-solid fa-coins prize-icon silver"></i>
             </div>
-            <i class="fa-solid fa-coins prize-icon silver"></i>
+            <div class="prize-subtext-container">
+              <p class="prize-subtext"><i class="fa-solid fa-money-bills"></i> Uang Tunai Jutaan Rupiah</p>
+              <p class="prize-subtext"><i class="fa-solid fa-certificate"></i> Sertifikat Eksklusif Icraft</p>
+              <p class="prize-subtext"><i class="fa-solid fa-handshake"></i> Tawaran Tim Inti Icraft</p>
+            </div>
           </div>
-          <div class="prize-subtext-container">
-            <p class="prize-subtext"><i class="fa-solid fa-money-bills"></i> Uang Tunai Jutaan Rupiah</p>
-            <p class="prize-subtext"><i class="fa-solid fa-certificate"></i> Sertifikat Eksklusif Icraft</p>
-            <p class="prize-subtext"><i class="fa-solid fa-handshake"></i> Tawaran Tim Inti Icraft</p>
+
+          <div class="banner-meta">
+            <span><i class="fa-regular fa-clock"></i> Berakhir {{ new Date(currentEvent.end_date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) }}</span>
           </div>
         </div>
+      </div>
+      <PremiumModal v-model="showPremiumModal" />
 
-        <div class="banner-meta">
-          <span><i class="fa-regular fa-clock"></i> Berakhir {{ currentEvent?.end_date ? new Date(currentEvent.end_date).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) : '31 Des 2026' }}</span>
+      <div class="annual-content">
+        <div class="req-card">
+          <h3><i class="fa-solid fa-list-check"></i> Spesifikasi Proyek</h3>
+          <div v-if="annualChallengeTask" class="spec-list-dynamic" v-html="annualChallengeTask"></div>
+        </div>
+
+        <div class="submit-card">
+          <h3><i class="fa-solid fa-cloud-arrow-up"></i> Area Pengumpulan</h3>
+          <p class="submit-desc">Pastikan Anda mengumpulkan kode sumber (Repository) dan tautan aplikasi yang sudah online (Live URL).</p>
+          
+          <form v-if="!userStatus?.is_participated" class="submit-form" @submit.prevent="submitProject">
+            <div class="form-group">
+              <label>Link Repository (GitHub/GitLab)</label>
+              <input type="url" v-model="form.repoUrl" placeholder="https://github.com/username/project" required class="form-input" />
+            </div>
+            
+            <div class="form-group">
+              <label>Link Aplikasi Live (Opsional)</label>
+              <input type="url" v-model="form.liveUrl" placeholder="https://rs-kita.com" class="form-input" />
+            </div>
+
+            <div class="form-group">
+              <label>Atau Unggah Source Code (.ZIP)</label>
+              <div class="file-drop-area">
+                <i class="fa-solid fa-file-zipper"></i>
+                <span v-if="!form.file">Tarik dan lepas file ZIP di sini, atau klik untuk memilih</span>
+                <span v-else class="file-selected">{{ form.file.name }} ({{ (form.file.size / 1024 / 1024).toFixed(2) }} MB)</span>
+                <input type="file" accept=".zip,.rar" class="file-input" @change="handleFileUpload" />
+              </div>
+            </div>
+            
+            <button type="submit" class="btn-submit" :disabled="isSubmitting">
+              {{ isSubmitting ? 'Mengunggah...' : 'Kirim Proyek Tahunan' }} <i v-if="!isSubmitting" class="fa-solid fa-paper-plane"></i>
+            </button>
+          </form>
+          <div v-else class="already-submitted card-glass" style="margin-top: 20px; text-align: center; padding: 30px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
+            <i class="fa-solid fa-circle-check" style="font-size: 3rem; color: #10b981; margin-bottom: 15px;"></i>
+            <h3 style="color: #10b981;">Proyek Telah Dikirim!</h3>
+            <p style="color: #cbd5e1; margin-top: 10px;">Terima kasih atas partisipasi Anda. Tim juri sedang meninjau proyek Anda. Pengumuman akan diinformasikan setelah masa event berakhir.</p>
+          </div>
         </div>
       </div>
     </div>
-    <PremiumModal v-model="showPremiumModal" />
-
-    <div class="annual-content">
-      <div class="req-card">
-        <h3><i class="fa-solid fa-list-check"></i> Spesifikasi Proyek</h3>
-        <div v-if="annualChallengeTask" class="spec-list-dynamic" v-html="annualChallengeTask"></div>
-        <div v-else>
-          <ul class="spec-list">
-            <li><strong>Backend:</strong> REST API dengan Laravel 11.</li>
-            <li><strong>Frontend:</strong> SPA menggunakan Vue 3 & IcraftDS.</li>
-            <li><strong>Fitur Utama:</strong> Reservasi antrean realtime, rekam medis pasien, dan integrasi payment gateway.</li>
-            <li><strong>Deployment:</strong> Aplikasi harus dapat diakses secara publik (hosting/VPS).</li>
-          </ul>
-          <div class="alert-box">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <p>Dilarang menggunakan template siap pakai (AdminLTE, dll) atau hasil clone dari repository publik lain. Proyek harus orisinal.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="submit-card">
-        <h3><i class="fa-solid fa-cloud-arrow-up"></i> Area Pengumpulan</h3>
-        <p class="submit-desc">Pastikan Anda mengumpulkan kode sumber (Repository) dan tautan aplikasi yang sudah online (Live URL).</p>
-        
-        <form v-if="!userStatus?.is_participated" class="submit-form" @submit.prevent="submitProject">
-          <div class="form-group">
-            <label>Link Repository (GitHub/GitLab)</label>
-            <input type="url" v-model="form.repoUrl" placeholder="https://github.com/username/project" required class="form-input" />
-          </div>
-          
-          <div class="form-group">
-            <label>Link Aplikasi Live (Opsional)</label>
-            <input type="url" v-model="form.liveUrl" placeholder="https://rs-kita.com" class="form-input" />
-          </div>
-
-          <div class="form-group">
-            <label>Atau Unggah Source Code (.ZIP)</label>
-            <div class="file-drop-area">
-              <i class="fa-solid fa-file-zipper"></i>
-              <span v-if="!form.file">Tarik dan lepas file ZIP di sini, atau klik untuk memilih</span>
-              <span v-else class="file-selected">{{ form.file.name }} ({{ (form.file.size / 1024 / 1024).toFixed(2) }} MB)</span>
-              <input type="file" accept=".zip,.rar" class="file-input" @change="handleFileUpload" />
-            </div>
-          </div>
-          
-          <button type="submit" class="btn-submit" :disabled="isSubmitting">
-            {{ isSubmitting ? 'Mengunggah...' : 'Kirim Proyek Tahunan' }} <i v-if="!isSubmitting" class="fa-solid fa-paper-plane"></i>
-          </button>
-        </form>
-        <div v-else class="already-submitted card-glass" style="margin-top: 20px; text-align: center; padding: 30px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
-          <i class="fa-solid fa-circle-check" style="font-size: 3rem; color: #10b981; margin-bottom: 15px;"></i>
-          <h3 style="color: #10b981;">Proyek Telah Dikirim!</h3>
-          <p style="color: #cbd5e1; margin-top: 10px;">Terima kasih atas partisipasi Anda. Tim juri sedang meninjau proyek Anda. Pengumuman akan diinformasikan setelah masa event berakhir.</p>
-        </div>
-      </div>
+    
+    <div v-else class="empty-event-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
+      <i class="fa-solid fa-calendar-xmark" style="font-size: 4rem; color: #475569; margin-bottom: 20px;"></i>
+      <h3 style="color: #f8fafc; font-size: 1.5rem; margin-bottom: 10px;">Belum Ada Event Tahunan</h3>
+      <p style="color: #94a3b8; max-width: 500px; margin: 0 auto;">Saat ini belum ada Mega Project tahunan yang aktif. Nantikan informasi selanjutnya dari Icraft!</p>
     </div>
   </div>
 </template>
@@ -127,11 +123,10 @@ const fetchAnnualEvent = async () => {
         annualChallengeTask.value = res.data.event.challenges[0].custom_task || res.data.event.challenges[0].lesson?.explanation || '';
       }
     } else {
-      currentEvent.value = { id: 999 }; // Mock ID
+      currentEvent.value = null;
     }
   } catch (error) {
-    console.warn('Backend API belum tersedia, menggunakan data mock.');
-    currentEvent.value = { id: 999 };
+    currentEvent.value = null;
   }
 };
 

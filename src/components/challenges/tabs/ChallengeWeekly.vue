@@ -1,90 +1,98 @@
 <template>
   <div class="challenge-weekly">
-    <div class="weekly-header">
-      <h2>Tantangan <span class="gradient-text">Mingguan</span></h2>
-      <p>{{ currentEvent?.description || 'Tantangan eksklusif dari CTO Icraft khusus untuk member Pro. Selesaikan studi kasus minggu ini untuk hadiah uang tunai.' }}</p>
+    <div v-if="currentEvent" class="weekly-active-container">
+      <div class="weekly-header">
+        <h2>Tantangan <span class="gradient-text">Mingguan</span></h2>
+        <p>{{ currentEvent.description || 'Tantangan eksklusif dari CTO Icraft khusus untuk member Pro. Selesaikan studi kasus minggu ini untuk hadiah uang tunai.' }}</p>
 
-      <!-- VISUAL REWARD SHOWCASE -->
-      <div class="reward-showcase-weekly">
-        <div class="reward-glow"></div>
-        <div class="reward-content">
-          <div class="reward-icon-wrapper">
-            <i class="fa-solid fa-sack-dollar reward-icon"></i>
+        <!-- VISUAL REWARD SHOWCASE -->
+        <div class="reward-showcase-weekly">
+          <div class="reward-glow"></div>
+          <div class="reward-content">
+            <div class="reward-icon-wrapper">
+              <i class="fa-solid fa-sack-dollar reward-icon"></i>
+            </div>
+            <div class="reward-details">
+              <span class="reward-subtitle"><i class="fa-solid fa-star"></i> WEEKLY GRAND PRIZE</span>
+              <h3 class="reward-title">{{ currentEvent.prize_pool || 'Menarik' }}</h3>
+              <p class="reward-desc">Selesaikan semua tantangan minggu ini dan klaim uang tunai langsung ke rekening atau e-Wallet Anda!</p>
+            </div>
           </div>
-          <div class="reward-details">
-            <span class="reward-subtitle"><i class="fa-solid fa-star"></i> WEEKLY GRAND PRIZE</span>
-            <h3 class="reward-title">Rp 50.000 - Rp 100.000</h3>
-            <p class="reward-desc">Selesaikan semua tantangan minggu ini dan klaim uang tunai langsung ke rekening atau e-Wallet Anda!</p>
+        </div>
+        
+        <div class="progress-bar-container">
+          <div class="pb-label">
+            <span>Progres Anda</span>
+            <span>{{ completedCount }} / {{ totalChallenges }} Selesai</span>
           </div>
+          <div class="pb-bg">
+            <div class="pb-fill" :style="{ width: progressPercentage + '%' }"></div>
+          </div>
+          <p class="deadline">
+            <i class="fa-regular fa-calendar-xmark"></i> 
+            Berakhir: {{ new Date(currentEvent.end_date).toLocaleDateString('id-ID') }}
+          </p>
+        </div>
+        
+        <div v-if="progressPercentage === 100" class="claim-section">
+          <button 
+            class="btn-submit-weekly" 
+            @click="claimWeeklyReward" 
+            :disabled="isSubmitting || userStatus?.is_participated"
+            :class="{'btn-disabled': userStatus?.is_participated}"
+          >
+            <i class="fa-solid fa-gift"></i> 
+            {{ userStatus?.is_participated ? 'Telah Diklaim!' : (isSubmitting ? 'Memproses...' : 'Klaim Partisipasi Mingguan!') }}
+          </button>
         </div>
       </div>
-      
-      <div class="progress-bar-container">
-        <div class="pb-label">
-          <span>Progres Anda</span>
-          <span>{{ completedCount }} / {{ totalChallenges }} Selesai</span>
+
+      <div class="weekly-content">
+        <div class="sub-challenges">
+          <h3>Daftar Soal Minggu Ini</h3>
+          <div class="list-cards" v-if="challenges.length > 0">
+            <div 
+              v-for="(task, index) in challenges" 
+              :key="task.id"
+              class="q-card"
+              :class="{
+                'completed': task.status === 'completed',
+                'active': task.status === 'active',
+                'locked': task.status === 'locked'
+              }"
+            >
+              <div class="q-status" :class="{ 'pending': task.status === 'active', 'locked-st': task.status === 'locked' }">
+                <i :class="task.status === 'completed' ? 'fa-solid fa-circle-check' : (task.status === 'active' ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock')"></i> 
+                {{ task.status === 'completed' ? 'Selesai' : (task.status === 'active' ? 'Aktif' : 'Terkunci') }}
+              </div>
+              <h4>{{ index + 1 }}. {{ task.title }}</h4>
+              <p>{{ task.description }}</p>
+              <div class="q-footer">
+                <span class="diff" :class="task.difficulty === 'hard' ? 'hard' : 'medium'">
+                  {{ task.difficulty === 'hard' ? 'Sulit' : 'Sedang' }}
+                </span>
+                <button 
+                  class="btn-sm" 
+                  :class="task.status === 'active' ? 'primary' : 'outline'" 
+                  :disabled="task.status !== 'active'"
+                  @click="openTask(task)"
+                >
+                  {{ task.status === 'completed' ? 'Telah Dikerjakan' : (task.status === 'locked' ? 'Selesaikan soal sebelumnya' : 'Kerjakan') }}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="empty-state">
+            <p>Belum ada soal mingguan yang aktif.</p>
+          </div>
         </div>
-        <div class="pb-bg">
-          <div class="pb-fill" :style="{ width: progressPercentage + '%' }"></div>
-        </div>
-        <p class="deadline">
-          <i class="fa-regular fa-calendar-xmark"></i> 
-          Berakhir: {{ currentEvent?.end_date ? new Date(currentEvent.end_date).toLocaleDateString('id-ID') : 'Memuat...' }}
-        </p>
-      </div>
-      
-      <div v-if="progressPercentage === 100" class="claim-section">
-        <button 
-          class="btn-submit-weekly" 
-          @click="claimWeeklyReward" 
-          :disabled="isSubmitting || userStatus?.is_participated"
-          :class="{'btn-disabled': userStatus?.is_participated}"
-        >
-          <i class="fa-solid fa-gift"></i> 
-          {{ userStatus?.is_participated ? 'Telah Diklaim!' : (isSubmitting ? 'Memproses...' : 'Klaim Partisipasi Mingguan!') }}
-        </button>
       </div>
     </div>
-
-    <div class="weekly-content">
-      <div class="sub-challenges">
-        <h3>Daftar Soal Minggu Ini</h3>
-        <div class="list-cards" v-if="challenges.length > 0">
-          <div 
-            v-for="(task, index) in challenges" 
-            :key="task.id"
-            class="q-card"
-            :class="{
-              'completed': task.status === 'completed',
-              'active': task.status === 'active',
-              'locked': task.status === 'locked'
-            }"
-          >
-            <div class="q-status" :class="{ 'pending': task.status === 'active', 'locked-st': task.status === 'locked' }">
-              <i :class="task.status === 'completed' ? 'fa-solid fa-circle-check' : (task.status === 'active' ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock')"></i> 
-              {{ task.status === 'completed' ? 'Selesai' : (task.status === 'active' ? 'Aktif' : 'Terkunci') }}
-            </div>
-            <h4>{{ index + 1 }}. {{ task.title }}</h4>
-            <p>{{ task.description }}</p>
-            <div class="q-footer">
-              <span class="diff" :class="task.difficulty === 'hard' ? 'hard' : 'medium'">
-                {{ task.difficulty === 'hard' ? 'Sulit' : 'Sedang' }}
-              </span>
-              <button 
-                class="btn-sm" 
-                :class="task.status === 'active' ? 'primary' : 'outline'" 
-                :disabled="task.status !== 'active'"
-                @click="openTask(task)"
-              >
-                {{ task.status === 'completed' ? 'Telah Dikerjakan' : (task.status === 'locked' ? 'Selesaikan soal sebelumnya' : 'Kerjakan') }}
-              </button>
-            </div>
-          </div>
-        </div>
-        <div v-else class="empty-state">
-          <p>Belum ada soal mingguan yang aktif.</p>
-        </div>
-      </div>
+    
+    <div v-else class="empty-event-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
+      <i class="fa-solid fa-calendar-xmark" style="font-size: 4rem; color: #475569; margin-bottom: 20px;"></i>
+      <h3 style="color: #f8fafc; font-size: 1.5rem; margin-bottom: 10px;">Belum Ada Event Mingguan</h3>
+      <p style="color: #94a3b8; max-width: 500px; margin: 0 auto;">Saat ini belum ada event mingguan yang aktif. Silakan kembali lagi nanti untuk mengikuti tantangan terbaru!</p>
     </div>
     
     <PremiumModal v-model="showPremiumModal" />
