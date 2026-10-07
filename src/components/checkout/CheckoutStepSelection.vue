@@ -55,7 +55,10 @@
         <div class="method-badge">Instan</div>
       </div>
 
+    </div>
 
+    <div v-if="paymentError" class="payment-error-message">
+      <i class="fa-solid fa-circle-exclamation"></i> {{ paymentError }}
     </div>
 
     <button
@@ -90,6 +93,7 @@ const isValidatingCoupon = ref(false)
 const couponMessage = ref('')
 const couponStatus = ref(null)
 const discountedPrice = ref(null)
+const paymentError = ref('')
 
 const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
@@ -119,6 +123,7 @@ const validateCoupon = async () => {
 }
 
 const goToInstruction = async () => {
+  paymentError.value = ''
   isProcessingPayment.value = true
   emit('processing', true)
   
@@ -150,7 +155,7 @@ const goToInstruction = async () => {
   } catch (err) {
     console.error('Failed to create payment', err)
     const errMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Coba lagi.'
-    alert('Gagal memuat metode pembayaran: ' + errMessage)
+    paymentError.value = 'Gagal memuat metode pembayaran: ' + errMessage
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)
