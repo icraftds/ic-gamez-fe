@@ -20,7 +20,7 @@
       <!-- Filter Section (New) -->
       <div class="filter-section">
         <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
+          <i class="fa-solid fa-search"></i>
           <input type="text" v-model="searchQuery" placeholder="Cari alur belajar..." />
         </div>
         <div class="filter-pills">
