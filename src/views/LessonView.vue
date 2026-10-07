@@ -10,6 +10,7 @@
       :active-step="activeStep"
       :lesson="currentLesson"
       @back="router.push({ path: `/learning/${path?.slug || pathId}`, query: { chapter: currentChapter?.slug || currentChapter?.id } })"
+      @prev-lesson="goToPrevLesson"
     />
 
     <div class="workspace-body">

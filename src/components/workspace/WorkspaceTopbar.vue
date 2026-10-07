@@ -11,7 +11,7 @@
       <nav class="breadcrumb" aria-label="breadcrumb">
         <span class="breadcrumb-chapter clickable" @click="$emit('back')" title="Kembali ke Chapter">{{ chapterTitle }}</span>
         <i v-if="previousLessonTitle" class="fa-solid fa-chevron-right separator"></i>
-        <span v-if="previousLessonTitle" class="breadcrumb-lesson clickable" @click="$emit('back')" title="Kembali ke Materi Sebelumnya">{{ previousLessonTitle }}</span>
+        <span v-if="previousLessonTitle" class="breadcrumb-lesson clickable" @click="$emit('prev-lesson')" title="Kembali ke Materi Sebelumnya">{{ previousLessonTitle }}</span>
         <i class="fa-solid fa-chevron-right separator"></i>
         <span class="breadcrumb-lesson current">{{ lessonTitle }}</span>
       </nav>
@@ -133,7 +133,7 @@ const isStepDone = (stepNum, lessonObj, currentStep) => {
   return false;
 };
 
-defineEmits(["back"]);
+defineEmits(["back", "prev-lesson"]);
 
 const showUserDropdown = ref(false);
 
