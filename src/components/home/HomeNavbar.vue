@@ -92,29 +92,7 @@
           </div>
 
           <!-- 4. Profile Dropdown -->
-          <div class="dropdown-container dropdown-trigger" @click="!isLoading && (showUserDropdown = !showUserDropdown)">
-            <template v-if="isLoading">
-              <div class="skeleton-avatar"></div>
-              <div class="skeleton-name"></div>
-            </template>
-            <template v-else>
-              <img
-                :src="userProfile.avatar"
-                :alt="userProfile.name"
-                class="avatar-sm"
-                :class="avatarBorderClass"
-                :title="'Masuk sebagai ' + userProfile.name"
-              />
-              <span class="user-name-short" >{{ firstName }}</span>
-              <i class="fa-solid fa-chevron-down dropdown-icon"></i>
-            </template>
-            
-            <UserDropdownMenu 
-              v-if="showUserDropdown && !isLoading" 
-              @close="showUserDropdown = false" 
-              @logout-click="handleLogoutClick" 
-            />
-          </div>
+          <UserProfileDropdown />
         </template>
         
         <div v-else class="guest-actions" style="display: flex; align-items: center; gap: 15px;">
@@ -131,14 +109,7 @@
       </div>
     </div>
 
-    <ConfirmModal
-      v-model="showLogoutConfirm"
-      title="Konfirmasi Keluar"
-      message="Apakah Anda yakin ingin keluar dari akun Anda?"
-      confirmText="Ya, Keluar"
-      type="warning"
-      @confirm="performLogout"
-    />
+
   </nav>
 </template>
 
@@ -148,8 +119,7 @@ import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import { useTheme } from "../../composables/useTheme";
-import ConfirmModal from "../common/ConfirmModal.vue";
-import UserDropdownMenu from "../common/UserDropdownMenu.vue";
+import UserProfileDropdown from "../common/UserProfileDropdown.vue";
 
 const { isLightMode, toggleTheme } = useTheme();
 
@@ -158,9 +128,7 @@ const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, 
 const router = useRouter();
 const route = useRoute();
 
-const showLogoutConfirm = ref(false);
 const mobileMenuOpen = ref(false);
-const showUserDropdown = ref(false);
 
 const navCenter = ref(null);
 const indicatorStyle = ref({ width: '0px', left: '0px', opacity: 0 });
@@ -186,21 +154,9 @@ watch(() => route.path, () => {
   updateIndicator();
 });
 
-const firstName = computed(() => {
-  if (!userProfile.value || !userProfile.value.name) return '';
-  return userProfile.value.name.split(' ')[0];
-});
 
-const avatarBorderClass = computed(() => {
-  if (currentPlan.value === 'expert') return 'border-expert';
-  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'border-pro';
-  return 'border-gray';
-});
 
 const handleClickOutside = (e) => {
-  if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {
-    showUserDropdown.value = false;
-  }
   if (mobileMenuOpen.value && !e.target.closest('.nav-drawer') && !e.target.closest('.hamburger')) {
     mobileMenuOpen.value = false;
   }
@@ -210,22 +166,7 @@ const isLandingPage = computed(() => route.path === '/');
 const dashboardToggleText = computed(() => isLandingPage.value ? 'Kembali ke Dashboard' : 'Kembali ke Beranda');
 const dashboardToggleRoute = computed(() => isLandingPage.value ? '/dashboard' : '/');
 
-const handleLogoutClick = () => {
-  showLogoutConfirm.value = true;
-  mobileMenuOpen.value = false;
-  showUserDropdown.value = false;
-};
 
-const goToMarket = () => {
-  const marketUrl = ssoEnabled ? 'https://market.icraftds.id/auth/start?return_to=%2F' : (import.meta.env.VITE_MARKET_URL || 'https://market.icraftds.id/')
-  window.open(marketUrl, '_blank', 'noopener,noreferrer')
-  showUserDropdown.value = false;
-};
-
-const performLogout = async () => {
-  await logout();
-  router.push("/");
-};
 
 onMounted(() => {
   if (isLoggedIn.value) {

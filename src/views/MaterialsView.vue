@@ -12,18 +12,7 @@
       </div>
       <div class="topbar-right">
         <template v-if="isLoggedIn">
-          <div class="dropdown-trigger" ref="dropdownTriggerRef" @click.stop="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer;">
-            <div class="avatar-circle">
-              <img :src="userAvatar" alt="Avatar" />
-            </div>
-            <i class="fa-solid fa-chevron-down dropdown-icon" style="font-size: 0.8rem; color: #6b7280;"></i>
-            
-            <UserDropdownMenu 
-              v-if="showUserDropdown" 
-              @close="showUserDropdown = false" 
-              @logout-click="handleLogoutClick" 
-            />
-          </div>
+          <UserProfileDropdown />
         </template>
         <template v-else>
           <button class="auth-btn" @click="$router.push('/login')">Masuk/Daftar</button>
@@ -58,7 +47,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from '../composables/useToast'
-import UserDropdownMenu from '../components/common/UserDropdownMenu.vue'
+import UserProfileDropdown from '../components/common/UserProfileDropdown.vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import MaterialSidebar from '../components/materials/MaterialSidebar.vue'
 import MaterialContent from '../components/materials/MaterialContent.vue'
@@ -70,8 +59,7 @@ const { userProfile, isLoggedIn, logout } = useUserAccount()
 const router = useRouter()
 const { showToast } = useToast()
 
-const showUserDropdown = ref(false)
-const dropdownTriggerRef = ref(null)
+
 
 const activePathId = ref(null)
 const activeChapterId = ref(null)
@@ -79,38 +67,21 @@ const activeLessonId = ref(null)
 const isSidebarOpen = ref(false)
 const isMobile = ref(window.innerWidth <= 1024)
 
-const userAvatar = computed(() => {
-  return userProfile.value?.avatar || 'https://ui-avatars.com/api/?name=User&background=random'
-})
+
 
 window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth <= 1024
 })
 
-const handleClickOutside = (event) => {
-  if (showUserDropdown.value && dropdownTriggerRef.value && !dropdownTriggerRef.value.contains(event.target)) {
-    showUserDropdown.value = false
-  }
-}
+
 
 onMounted(async () => {
   await fetchAllPathsDetails()
-  document.addEventListener('click', handleClickOutside)
 })
 
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 
-const handleLogoutClick = async () => {
-  try {
-    await logout()
-    showToast('Berhasil keluar', 'success')
-    router.push('/login')
-  } catch (error) {
-    showToast('Gagal keluar', 'error')
-  }
-}
+
+
 
 const selectLesson = (pathId, chapterId, lessonId) => {
   activePathId.value = pathId

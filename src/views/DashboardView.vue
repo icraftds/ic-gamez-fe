@@ -7,7 +7,7 @@ import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
 import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
 import ConfirmModal from '../components/common/ConfirmModal.vue'
 import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
-import UserDropdownMenu from '../components/common/UserDropdownMenu.vue'
+import UserProfileDropdown from '../components/common/UserProfileDropdown.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useTheme } from '../composables/useTheme'
@@ -83,25 +83,7 @@ const saveProfile = async () => {
 const { isLoggedIn, userProfile, credits, coinz, walletStatus, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout, isLoading: isUserLoading } = useUserAccount()
 const { isLightMode, toggleTheme } = useTheme()
 
-const showUserDropdown = ref(false)
-
-const goToMarket = () => {
-  // Menggunakan VITE_MARKET_URL dari .env (fallback ke default jika tidak ada)
-  const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://ic-market.unikom.my.id'
-  window.open(marketUrl, '_blank', 'noopener,noreferrer')
-}
-const handleClickOutside = (e) => {
-  if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {
-    showUserDropdown.value = false
-  }
-}
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
 import { onUnmounted } from 'vue'
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 const { hasFetchedAllPaths, fetchAllPathsDetails, isLoading: isPathsLoading } = useLearningPaths()
 const isDataFetching = computed(() => isPathsLoading.value || isUserLoading.value)
 const route = useRoute()
@@ -231,24 +213,10 @@ const tabs = [
         </div>
 
         <div class="user-profile-group">
-          <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
-            <div class="user-profile-btn">
-              <div style="position: relative;">
-                <img :src="userProfile.avatar" alt="Avatar" class="avatar-sm" :class="{'avatar-pro': currentPlan === 'pro', 'avatar-expert': currentPlan === 'expert'}" />
-
-              </div>
-              <span style="margin-left: 8px;">{{ userProfile.name.split(' ')[0] }}</span>
-              <i class="fa-solid fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
-            </div>
-            
-            <UserDropdownMenu 
-              v-if="showUserDropdown" 
-              :allow-profile-edit="true" 
-              @close="showUserDropdown = false" 
-              @open-profile="openProfileModal" 
-              @logout-click="handleLogoutClick" 
-            />
-          </div>
+          <UserProfileDropdown 
+            :allow-profile-edit="true" 
+            @open-profile="openProfileModal" 
+          />
         </div>
       </div>
     </nav>
