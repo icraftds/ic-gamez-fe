@@ -300,7 +300,7 @@ body:not(.light-mode) .logo-dark { display: block; }
   .dash-nav-center::-webkit-scrollbar { display: none; }
   .dash-tab { white-space: nowrap; padding: 6px 12px; font-size: 0.8rem; }
   .dash-nav-right { gap: 8px; }
-  .btn-upgrade-nav { display: none; }
+  .btn-upgrade-nav { padding: 4px 8px; font-size: 0.8rem; }
   .user-profile-group { gap: 8px; margin-left: 0; }
   .dash-content { margin-top: 15px; }
   .card-center { padding: 40px 20px; }

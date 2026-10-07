@@ -26,9 +26,6 @@
         <i v-else :class="isLandingPage ? 'fa-solid fa-chart-pie' : 'fa-solid fa-home'"></i> 
         {{ dashboardToggleText }}
       </button>
-      <button v-if="!isPremiumUser" @click="goToPricing" class="text-warning" title="Berlangganan Premium">
-        <i class="fa-solid fa-crown"></i> Berlangganan
-      </button>
       <button v-if="allowProfileEdit" @click="emit('open-profile')" class="text-primary" title="Edit Profil Anda">
         <i class="fa-solid fa-user-pen"></i> Edit Profil
       </button>
@@ -98,11 +95,6 @@ const goToMarket = () => {
 
 const goToGlobalLogout = () => {
   window.location.assign('https://ic-auth.unikom.my.id/logout');
-};
-
-const goToPricing = () => {
-  router.push('/pricing');
-  emit('close');
 };
 </script>
 
