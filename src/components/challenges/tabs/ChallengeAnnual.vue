@@ -1,6 +1,12 @@
 <template>
   <div class="challenge-annual">
-    <div v-if="currentEvent && !isEventUpcoming" class="annual-active-container">
+    <div v-if="isLoading" class="loading-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 3rem; color: #38bdf8; margin-bottom: 20px;"></i>
+      <h3 style="color: #f8fafc; font-size: 1.5rem;">Memuat Data...</h3>
+      <p style="color: #94a3b8;">Tunggu sebentar, kami sedang menyiapkan event tahunan untuk Anda.</p>
+    </div>
+
+    <div v-else-if="currentEvent && !isEventUpcoming" class="annual-active-container">
       <div class="annual-banner">
         <div class="banner-content">
           <span class="tag-pro"><i class="fa-solid fa-crown"></i> Mega Project 2026</span>
@@ -14,7 +20,7 @@
               <i class="fa-solid fa-trophy prize-icon gold"></i>
               <div class="prize-text">
                 <span class="prize-label">PRIZE POOL</span>
-                <h1 class="prize-amount">{{ currentEvent.prize_pool || 'Menarik' }}</h1>
+                <h1 class="prize-amount">{{ formattedPrize }}</h1>
               </div>
               <i class="fa-solid fa-coins prize-icon silver"></i>
             </div>
@@ -109,12 +115,12 @@
       
       <div class="upcoming-footer" style="display: inline-block; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 10px 25px; border-radius: 20px; position: relative; z-index: 2;">
         <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
-          Total Hadiah: <span style="color: #fbbf24; font-weight: bold; font-size: 1.1rem; margin-left: 5px;"><i class="fa-solid fa-trophy"></i> {{ currentEvent.prize_pool || 'Menarik' }}</span>
+          Total Hadiah: <span style="color: #fbbf24; font-weight: bold; font-size: 1.1rem; margin-left: 5px;"><i class="fa-solid fa-trophy"></i> {{ formattedPrize }}</span>
         </p>
       </div>
     </div>
     
-    <div v-else class="empty-event-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
+    <div v-else-if="!isLoading && !currentEvent" class="empty-event-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
       <i class="fa-solid fa-calendar-xmark" style="font-size: 4rem; color: #475569; margin-bottom: 20px;"></i>
       <h3 style="color: #f8fafc; font-size: 1.5rem; margin-bottom: 10px;">Belum Ada Event Tahunan</h3>
       <p style="color: #94a3b8; max-width: 500px; margin: 0 auto;">Saat ini belum ada Mega Project tahunan yang aktif. Nantikan informasi selanjutnya dari Icraft!</p>
@@ -137,6 +143,16 @@ const isSubmitting = ref(false);
 const showPremiumModal = ref(false);
 const userStatus = ref(null);
 const annualChallengeTask = ref('');
+const isLoading = ref(true);
+
+const formattedPrize = computed(() => {
+  if (!currentEvent.value || !currentEvent.value.prize_pool) return 'Menarik';
+  const prize = currentEvent.value.prize_pool;
+  if (!isNaN(prize)) {
+    return 'Rp ' + Number(prize).toLocaleString('id-ID');
+  }
+  return prize;
+});
 
 const { isEventUpcoming, countdown } = useEventCountdown(currentEvent);
 
@@ -154,6 +170,7 @@ const handleFileUpload = (e) => {
 };
 
 const fetchAnnualEvent = async () => {
+  isLoading.value = true;
   try {
     const res = await EventService.getActiveAnnual();
     if (res.data && res.data.event) {
@@ -168,6 +185,8 @@ const fetchAnnualEvent = async () => {
     }
   } catch (error) {
     currentEvent.value = null;
+  } finally {
+    isLoading.value = false;
   }
 };
 

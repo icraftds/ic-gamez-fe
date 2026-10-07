@@ -1,6 +1,12 @@
 <template>
   <div class="challenge-weekly">
-    <div v-if="currentEvent && !isEventUpcoming" class="weekly-active-container">
+    <div v-if="isLoading" class="loading-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 3rem; color: #38bdf8; margin-bottom: 20px;"></i>
+      <h3 style="color: #f8fafc; font-size: 1.5rem;">Memuat Data...</h3>
+      <p style="color: #94a3b8;">Tunggu sebentar, kami sedang menyiapkan event mingguan untuk Anda.</p>
+    </div>
+
+    <div v-else-if="currentEvent && !isEventUpcoming" class="weekly-active-container">
       <div class="weekly-header">
         <h2>Tantangan <span class="gradient-text">Mingguan</span></h2>
         <p>{{ currentEvent.description || 'Tantangan eksklusif dari CTO Icraft khusus untuk member Pro. Selesaikan studi kasus minggu ini untuk hadiah uang tunai.' }}</p>
@@ -14,7 +20,7 @@
             </div>
             <div class="reward-details">
               <span class="reward-subtitle"><i class="fa-solid fa-star"></i> WEEKLY GRAND PRIZE</span>
-              <h3 class="reward-title">{{ currentEvent.prize_pool || 'Menarik' }}</h3>
+              <h3 class="reward-title">{{ formattedPrize }}</h3>
               <p class="reward-desc">Selesaikan semua tantangan minggu ini dan klaim uang tunai langsung ke rekening atau e-Wallet Anda!</p>
             </div>
           </div>
@@ -122,12 +128,12 @@
       
       <div class="upcoming-footer" style="display: inline-block; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 10px 25px; border-radius: 20px; position: relative; z-index: 2;">
         <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
-          Total Hadiah: <span style="color: #fbbf24; font-weight: bold; font-size: 1.1rem; margin-left: 5px;"><i class="fa-solid fa-trophy"></i> {{ currentEvent.prize_pool || 'Menarik' }}</span>
+          Total Hadiah: <span style="color: #fbbf24; font-weight: bold; font-size: 1.1rem; margin-left: 5px;"><i class="fa-solid fa-trophy"></i> {{ formattedPrize }}</span>
         </p>
       </div>
     </div>
     
-    <div v-else class="empty-event-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
+    <div v-else-if="!isLoading && !currentEvent" class="empty-event-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
       <i class="fa-solid fa-calendar-xmark" style="font-size: 4rem; color: #475569; margin-bottom: 20px;"></i>
       <h3 style="color: #f8fafc; font-size: 1.5rem; margin-bottom: 10px;">Belum Ada Event Mingguan</h3>
       <p style="color: #94a3b8; max-width: 500px; margin: 0 auto;">Saat ini belum ada event mingguan yang aktif. Silakan kembali lagi nanti untuk mengikuti tantangan terbaru!</p>
@@ -155,6 +161,16 @@ const challenges = ref([]);
 const isSubmitting = ref(false);
 const showPremiumModal = ref(false);
 const userStatus = ref(null);
+const isLoading = ref(true);
+
+const formattedPrize = computed(() => {
+  if (!currentEvent.value || !currentEvent.value.prize_pool) return 'Menarik';
+  const prize = currentEvent.value.prize_pool;
+  if (!isNaN(prize)) {
+    return 'Rp ' + Number(prize).toLocaleString('id-ID');
+  }
+  return prize;
+});
 
 const { isEventUpcoming, countdown } = useEventCountdown(currentEvent);
 
@@ -163,6 +179,7 @@ const totalChallenges = computed(() => challenges.value.length || 1);
 const progressPercentage = computed(() => Math.floor((completedCount.value / totalChallenges.value) * 100));
 
 const fetchWeeklyData = async () => {
+  isLoading.value = true;
   try {
     const res = await EventService.getActiveWeekly();
     if (res.data && res.data.event) {
@@ -201,6 +218,8 @@ const fetchWeeklyData = async () => {
     console.error('Failed to load active weekly event', error);
     currentEvent.value = null;
     challenges.value = [];
+  } finally {
+    isLoading.value = false;
   }
 };
 
