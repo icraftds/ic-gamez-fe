@@ -9,11 +9,11 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <span class="breadcrumb-path clickable" @click="$emit('back')" title="Kembali ke Alur Belajar">{{ pathTitle }}</span>
-        <i class="fa-solid fa-chevron-right separator"></i>
         <span class="breadcrumb-chapter clickable" @click="$emit('back')" title="Kembali ke Chapter">{{ chapterTitle }}</span>
+        <i v-if="previousLessonTitle" class="fa-solid fa-chevron-right separator"></i>
+        <span v-if="previousLessonTitle" class="breadcrumb-lesson clickable" @click="$emit('back')" title="Kembali ke Materi Sebelumnya">{{ previousLessonTitle }}</span>
         <i class="fa-solid fa-chevron-right separator"></i>
-        <span class="breadcrumb-lesson">{{ lessonTitle }}</span>
+        <span class="breadcrumb-lesson current">{{ lessonTitle }}</span>
       </nav>
     </div>
 
@@ -119,6 +119,7 @@ defineProps({
   pathTitle: { type: String, default: "" },
   chapterTitle: { type: String, default: "" },
   lessonTitle: { type: String, default: "" },
+  previousLessonTitle: { type: String, default: "" },
   activeStep: { type: Number, required: true },
   lesson: { type: Object, default: () => ({}) },
 });

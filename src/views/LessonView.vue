@@ -6,6 +6,7 @@
       :path-title="path?.title ?? ''"
       :chapter-title="currentChapter?.title ?? ''"
       :lesson-title="currentLesson?.title ?? ''"
+      :previous-lesson-title="previousLessonTitle"
       :active-step="activeStep"
       :lesson="currentLesson"
       @back="router.push({ path: `/learning/${path?.slug || pathId}`, query: { chapter: currentChapter?.slug || currentChapter?.id } })"
@@ -174,8 +175,15 @@ onMounted(async () => {
 })
 
 // ── Composables ───────────────────────────────────────────────────
-const { isFirstLesson, isLastLesson, goToPrevLesson, goToNextLesson, goToLesson, getNextLesson } =
+const { allLessons, currentIndex, isFirstLesson, isLastLesson, goToPrevLesson, goToNextLesson, goToLesson, getNextLesson } =
   useLessonNavigation(path, lessonId, pathId)
+
+const previousLessonTitle = computed(() => {
+  if (currentIndex.value > 0) {
+    return allLessons.value[currentIndex.value - 1].title;
+  }
+  return '';
+})
 
 const quiz = useQuiz()
 const runner = useCodeRunner()
