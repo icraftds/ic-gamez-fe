@@ -55,58 +55,7 @@
         <div class="method-badge">Instan</div>
       </div>
 
-      <div
-        class="method-card"
-        :class="{ selected: selectedMethod === 'va_bca' }"
-        @click="selectedMethod = 'va_bca'"
-      >
-        <div class="method-radio">
-          <div class="method-radio-inner"></div>
-        </div>
-        <div class="method-icon va">
-          <i class="fa-solid fa-building-columns"></i>
-        </div>
-        <div class="method-info">
-          <div class="method-name">Virtual Account BCA</div>
-          <div class="method-desc">Transfer melalui ATM, iBanking, atau mBanking</div>
-        </div>
-      </div>
 
-      <div
-        class="method-card"
-        :class="{ selected: selectedMethod === 'va_bni' }"
-        @click="selectedMethod = 'va_bni'"
-      >
-        <div class="method-radio">
-          <div class="method-radio-inner"></div>
-        </div>
-        <div class="method-icon va">
-          <i class="fa-solid fa-building-columns"></i>
-        </div>
-        <div class="method-info">
-          <div class="method-name">Virtual Account BNI</div>
-          <div class="method-desc">Transfer melalui ATM, iBanking, atau mBanking</div>
-        </div>
-      </div>
-
-      <!-- Payment Link Option -->
-      <div
-        class="method-card"
-        :class="{ selected: selectedMethod === 'payment_link' }"
-        @click="selectedMethod = 'payment_link'"
-      >
-        <div class="method-radio">
-          <div class="method-radio-inner"></div>
-        </div>
-        <div class="method-icon link">
-          <i class="fa-solid fa-link"></i>
-        </div>
-        <div class="method-info">
-          <div class="method-name">E-Wallet & Bank Lainnya</div>
-          <div class="method-desc">Ovo, Dana, LinkAja, Mandiri, dll. (Diarahkan)</div>
-        </div>
-        <div class="method-badge alt">Fleksibel</div>
-      </div>
     </div>
 
     <button
@@ -134,7 +83,7 @@ const props = defineProps({
 
 const emit = defineEmits(['instruction', 'success', 'processing'])
 
-const selectedMethod = ref(null)
+const selectedMethod = ref('qris')
 const isProcessingPayment = ref(false)
 const couponCode = ref('')
 const isValidatingCoupon = ref(false)
