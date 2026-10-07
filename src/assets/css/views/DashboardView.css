@@ -484,10 +484,10 @@
 }
 
 .avatar-pro {
-  border: 2px solid #3b82f6;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  border: 2px solid #fbbf24;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
 }
 .avatar-expert {
-  border: 2px solid #f59e0b;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+  border: 2px solid #a855f7;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
 }

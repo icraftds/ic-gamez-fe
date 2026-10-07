@@ -26,6 +26,9 @@
         <i :class="isLandingPage ? 'fa-solid fa-chart-pie' : 'fa-solid fa-home'"></i> 
         {{ dashboardToggleText }}
       </button>
+      <button v-if="allowProfileEdit" @click="emit('open-profile')" title="Edit Profil Anda">
+        <i class="fa-solid fa-user-pen"></i> Edit Profil
+      </button>
       <button @click="toggleTheme" title="Ganti Tema Warna">
         <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
         {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
