@@ -95,7 +95,10 @@ const couponStatus = ref(null)
 const discountedPrice = ref(null)
 const paymentError = ref('')
 
-const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+const formatNumber = (num) => {
+  if (num == null) return '0'
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+}
 
 const validateCoupon = async () => {
   if (!couponCode.value) return
@@ -110,7 +113,7 @@ const validateCoupon = async () => {
       plan_slug: props.planSlug
     })
     
-    discountedPrice.value = res.data.discounted_price
+    discountedPrice.value = res.data.data.final_price
     couponMessage.value = res.data.message || 'Kupon berhasil diterapkan!'
     couponStatus.value = 'success'
   } catch (err) {
