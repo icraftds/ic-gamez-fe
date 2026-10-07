@@ -55,7 +55,5 @@
   display: flex;
   flex: 1;
   overflow: hidden; /* the sidebar and content will scroll internally */
-  max-width: 1500px;
   width: 100%;
-  margin: 0 auto;
 }

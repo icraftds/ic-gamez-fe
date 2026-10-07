@@ -278,7 +278,12 @@
   border: 1px solid var(--white-alpha-0_05);
   border-radius: 20px;
   backdrop-filter: blur(12px);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.cyber-table-header, .cyber-table-row {
+  min-width: 600px;
 }
 
 .cyber-table-header {
@@ -409,6 +414,4 @@
   }
   .hud-center::before, .hud-center::after { display: none; }
   .hud-side.right { text-align: left; }
-  
-  .ct-level { display: none; }
 }
