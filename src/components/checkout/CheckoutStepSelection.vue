@@ -82,7 +82,7 @@
 
     <button
       class="btn-primary"
-      :disabled="!selectedMethod || isProcessingPayment || invoiceUncertain"
+      :disabled="!selectedMethod || isProcessingPayment"
       @click="goToInstruction"
     >
       <i class="fa-solid fa-spinner fa-spin" v-if="isProcessingPayment"></i>
@@ -199,7 +199,7 @@ const goToInstruction = async () => {
       errMsg = 'Tidak dapat terhubung ke server pembayaran. Periksa koneksi internet Anda.'
     }
     
-    paymentError.value = invoiceUncertain.value ? 'Pembuatan invoice belum pasti. Jangan membuat invoice baru; periksa pembayaran atau hubungi dukungan.' : errMsg
+    paymentError.value = errMsg
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)
