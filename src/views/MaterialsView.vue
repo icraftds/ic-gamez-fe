@@ -11,9 +11,17 @@
         <img src="/images/Logo iC GameZ darkmode.png" alt="iC GameZ" height="24" />
       </div>
       <div class="topbar-right">
-        <!-- We can just display the user avatar quickly without complex logic -->
-        <div class="avatar-circle">
-           <img :src="userAvatar" alt="Avatar" />
+        <div class="dropdown-trigger" @click.stop="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <div class="avatar-circle">
+            <img :src="userAvatar" alt="Avatar" />
+          </div>
+          <i class="fa-solid fa-chevron-down dropdown-icon" style="font-size: 0.8rem; color: #6b7280;"></i>
+          
+          <UserDropdownMenu 
+            v-if="showUserDropdown" 
+            @close="showUserDropdown = false" 
+            @logout-click="handleLogoutClick" 
+          />
         </div>
       </div>
     </div>
@@ -42,7 +50,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useToast } from '../composables/useToast'
+import UserDropdownMenu from '../components/common/UserDropdownMenu.vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import MaterialSidebar from '../components/materials/MaterialSidebar.vue'
 import MaterialContent from '../components/materials/MaterialContent.vue'
@@ -50,7 +61,11 @@ import { useLearningPaths } from '../composables/useLearningPaths'
 import { useUserAccount } from '../composables/useUserAccount'
 
 const { paths, isLoading, fetchAllPathsDetails, getPathById, getChapterById, getLessonById } = useLearningPaths()
-const { userProfile } = useUserAccount()
+const { userProfile, logout } = useUserAccount()
+const router = useRouter()
+const { showToast } = useToast()
+
+const showUserDropdown = ref(false)
 
 const activePathId = ref(null)
 const activeChapterId = ref(null)
@@ -66,9 +81,31 @@ window.addEventListener('resize', () => {
   isMobile.value = window.innerWidth <= 1024
 })
 
+const handleClickOutside = (event) => {
+  const trigger = document.querySelector('.dropdown-trigger')
+  if (showUserDropdown.value && trigger && !trigger.contains(event.target)) {
+    showUserDropdown.value = false
+  }
+}
+
 onMounted(async () => {
   await fetchAllPathsDetails()
+  document.addEventListener('click', handleClickOutside)
 })
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+
+const handleLogoutClick = async () => {
+  try {
+    await logout()
+    showToast('Berhasil keluar', 'success')
+    router.push('/login')
+  } catch (error) {
+    showToast('Gagal keluar', 'error')
+  }
+}
 
 const selectLesson = (pathId, chapterId, lessonId) => {
   activePathId.value = pathId
