@@ -54,7 +54,7 @@ import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 
 const router = useRouter()
 const route  = useRoute()
-const { fetchUser, fetchWallet, isPremiumUser, currentPlan, isLoggedIn, userProfile } = useUserAccount()
+const { bootstrapSession, fetchUser, fetchWallet, isPremiumUser, currentPlan, isLoggedIn, userProfile } = useUserAccount()
 
 const isLoading  = ref(true)
 const isSuccess  = ref(false)
@@ -84,7 +84,14 @@ const poll = createPaymentPoll(async (isCurrent) => {
   }
   return false
 }, { isAuthenticated: () => isLoggedIn.value, onTimeout: () => { isLoading.value = false } })
-const startPolling = () => { isLoading.value = true; poll.start() }
+let disposed = false
+const startPolling = async () => {
+  isLoading.value = true
+  const ready = await bootstrapSession()
+  if (disposed) return
+  if (!ready) { isLoading.value = false; return }
+  poll.start()
+}
 const stopPolling = () => poll.stop()
 
 const fireConfetti = async () => {
@@ -102,7 +109,7 @@ const goToDashboard = () => {
 }
 
 onMounted(() => { startPolling() })
-onUnmounted(() => { poll.dispose() })
+onUnmounted(() => { disposed = true; poll.dispose() })
 </script>
 
 

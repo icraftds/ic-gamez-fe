@@ -84,7 +84,7 @@ import CheckoutStepSuccess from '../components/checkout/CheckoutStepSuccess.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { userProfile, isPremiumUser, currentPlan, fetchUser, fetchWallet, isLoggedIn } = useUserAccount()
+const { userProfile, isPremiumUser, currentPlan, bootstrapSession, fetchUser, fetchWallet, isLoggedIn } = useUserAccount()
 
 const planName = ref(route.query.plan || 'Pro')
 const planPrice = ref(Number(route.query.price) || 49000)
@@ -179,7 +179,7 @@ const startPolling = () => { pollingMessage.value = ''; poll.start() }
 const stopPolling = () => poll.stop()
 
 onMounted(async () => {
-  await fetchUser(true)
+  await bootstrapSession()
   if (localStorage.getItem('ic_returning_from_payment') === 'true') {
     localStorage.removeItem('ic_returning_from_payment')
     router.replace('/payment/success')
