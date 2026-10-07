@@ -109,36 +109,11 @@
               <i class="fa-solid fa-chevron-down dropdown-icon"></i>
             </template>
             
-            <div v-if="showUserDropdown && !isLoading" class="user-dropdown-menu" @click.stop>
-              <div class="dropdown-header">
-                <img :src="userProfile.avatar" class="dropdown-avatar" :class="avatarBorderClass" />
-                <div class="dropdown-user-info">
-                  <div class="user-name">{{ userProfile.name }}</div>
-                  <div class="user-email">{{ userProfile.email }}</div>
-                </div>
-              </div>
-              <div class="dropdown-stats">
-                <div class="stat-item" title="Level Anda">
-                  <i class="fa-solid fa-star text-warning"></i> Lvl {{ userProfile.level }}
-                </div>
-                <div class="stat-item" title="Total XP Anda">
-                  <i class="fa-solid fa-arrow-trend-up text-primary"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
-                </div>
-                <div class="stat-item" title="Sisa Energi">
-                  <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
-                </div>
-              </div>
-              <div class="dropdown-actions">
-                <button @click="$router.push(dashboardToggleRoute)"><i class="fa-solid fa-chart-pie"></i> {{ dashboardToggleText }}</button>
-                <button @click="toggleTheme" title="Ganti Tema Warna">
-                  <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
-                  {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
-                </button>
-                <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
-                <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
-                <button v-if="globalLogoutEnabled" type="button" @click="goToGlobalLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar dari semua aplikasi</button>
-              </div>
-            </div>
+            <UserDropdownMenu 
+              v-if="showUserDropdown && !isLoading" 
+              @close="showUserDropdown = false" 
+              @logout-click="handleLogoutClick" 
+            />
           </div>
         </template>
         
@@ -174,6 +149,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import { useTheme } from "../../composables/useTheme";
 import ConfirmModal from "../common/ConfirmModal.vue";
+import UserDropdownMenu from "../common/UserDropdownMenu.vue";
 
 const { isLightMode, toggleTheme } = useTheme();
 

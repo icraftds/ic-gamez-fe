@@ -1,6 +1,6 @@
 <template>
   <div class="challenge-weekly">
-    <div v-if="currentEvent" class="weekly-active-container">
+    <div v-if="currentEvent && !isEventUpcoming" class="weekly-active-container">
       <div class="weekly-header">
         <h2>Tantangan <span class="gradient-text">Mingguan</span></h2>
         <p>{{ currentEvent.description || 'Tantangan eksklusif dari CTO Icraft khusus untuk member Pro. Selesaikan studi kasus minggu ini untuk hadiah uang tunai.' }}</p>
@@ -89,6 +89,44 @@
       </div>
     </div>
     
+    <div v-else-if="currentEvent && isEventUpcoming" class="upcoming-event-state card-glass" style="text-align: center; padding: 50px 20px; margin-top: 20px; background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8)); border: 1px solid var(--glass-border); border-radius: 16px; position: relative; overflow: hidden;">
+      <div class="upcoming-glow" style="position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 200px; height: 200px; background: radial-gradient(circle, rgba(14,165,233,0.3) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+      
+      <div class="upcoming-header" style="position: relative; z-index: 2;">
+        <i class="fa-solid fa-rocket" style="font-size: 3rem; color: #38bdf8; margin-bottom: 15px; animation: float 3s ease-in-out infinite;"></i>
+        <h3 style="color: #f8fafc; font-size: 1.8rem; margin-bottom: 8px;">Tantangan Segera Hadir!</h3>
+        <p style="color: #cbd5e1; font-size: 1.1rem; margin-bottom: 30px;">Bersiaplah untuk Tantangan Mingguan: <strong style="color: #38bdf8;">{{ currentEvent.title }}</strong></p>
+      </div>
+      
+      <div class="countdown-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; position: relative; z-index: 2;">
+        <div class="countdown-box" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 20px; min-width: 90px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+          <div class="countdown-value" style="font-size: 2.5rem; font-weight: 800; color: #f8fafc; font-family: 'Courier New', monospace; line-height: 1;">{{ countdown.days }}</div>
+          <div class="countdown-label" style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Hari</div>
+        </div>
+        <div class="countdown-separator" style="font-size: 2.5rem; font-weight: bold; color: #475569; align-self: center; margin-top: -20px;">:</div>
+        <div class="countdown-box" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 20px; min-width: 90px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+          <div class="countdown-value" style="font-size: 2.5rem; font-weight: 800; color: #f8fafc; font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.hours).padStart(2, '0') }}</div>
+          <div class="countdown-label" style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Jam</div>
+        </div>
+        <div class="countdown-separator" style="font-size: 2.5rem; font-weight: bold; color: #475569; align-self: center; margin-top: -20px;">:</div>
+        <div class="countdown-box" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 20px; min-width: 90px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+          <div class="countdown-value" style="font-size: 2.5rem; font-weight: 800; color: #f8fafc; font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.minutes).padStart(2, '0') }}</div>
+          <div class="countdown-label" style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Menit</div>
+        </div>
+        <div class="countdown-separator" style="font-size: 2.5rem; font-weight: bold; color: #475569; align-self: center; margin-top: -20px;">:</div>
+        <div class="countdown-box" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 20px; min-width: 90px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+          <div class="countdown-value" style="font-size: 2.5rem; font-weight: 800; color: #38bdf8; font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.seconds).padStart(2, '0') }}</div>
+          <div class="countdown-label" style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Detik</div>
+        </div>
+      </div>
+      
+      <div class="upcoming-footer" style="display: inline-block; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 10px 25px; border-radius: 20px; position: relative; z-index: 2;">
+        <p style="color: #94a3b8; font-size: 0.9rem; margin: 0;">
+          Total Hadiah: <span style="color: #fbbf24; font-weight: bold; font-size: 1.1rem; margin-left: 5px;"><i class="fa-solid fa-trophy"></i> {{ currentEvent.prize_pool || 'Menarik' }}</span>
+        </p>
+      </div>
+    </div>
+    
     <div v-else class="empty-event-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
       <i class="fa-solid fa-calendar-xmark" style="font-size: 4rem; color: #475569; margin-bottom: 20px;"></i>
       <h3 style="color: #f8fafc; font-size: 1.5rem; margin-bottom: 10px;">Belum Ada Event Mingguan</h3>
@@ -100,12 +138,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { EventService } from '../../../services/eventService';
 import { useToast } from '../../../composables/useToast';
 import { useUserAccount } from '../../../composables/useUserAccount';
 import PremiumModal from '../../common/PremiumModal.vue';
+import { useEventCountdown } from '../../../composables/useEventCountdown';
 
 const router = useRouter();
 const { showToast } = useToast();
@@ -116,6 +155,8 @@ const challenges = ref([]);
 const isSubmitting = ref(false);
 const showPremiumModal = ref(false);
 const userStatus = ref(null);
+
+const { isEventUpcoming, countdown } = useEventCountdown(currentEvent);
 
 const completedCount = computed(() => challenges.value.filter(c => c.status === 'completed').length);
 const totalChallenges = computed(() => challenges.value.length || 1);

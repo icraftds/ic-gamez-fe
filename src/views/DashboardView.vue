@@ -7,6 +7,7 @@ import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
 import DashboardSubscription from '../components/dashboard/DashboardSubscription.vue'
 import ConfirmModal from '../components/common/ConfirmModal.vue'
 import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
+import UserDropdownMenu from '../components/common/UserDropdownMenu.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useTheme } from '../composables/useTheme'
@@ -241,40 +242,13 @@ const tabs = [
               <i class="fa-solid fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
             </div>
             
-            <!-- User Dropdown Menu -->
-            <div v-if="showUserDropdown" class="user-dropdown-menu" @click.stop>
-              <div class="dropdown-header" @click="openProfileModal" style="cursor: pointer;" title="Edit Profil">
-                <img :src="userProfile.avatar" class="dropdown-avatar" :class="{'avatar-pro': currentPlan === 'pro', 'avatar-expert': currentPlan === 'expert'}" />
-                <div class="dropdown-user-info">
-                  <div class="user-name">{{ userProfile.name }} <i class="fa-solid fa-pen" style="font-size: 0.7rem; color: #9ca3af; margin-left: 4px;"></i></div>
-                  <div class="user-email">{{ userProfile.email }}</div>
-                </div>
-              </div>
-              <div class="dropdown-stats">
-                <div class="stat-item" title="Level Anda">
-                  <i class="fa-solid fa-star text-warning"></i> Lvl {{ userProfile.level }}
-                </div>
-                <div class="stat-item" title="Total XP Anda">
-                  <i class="fa-solid fa-arrow-trend-up text-primary"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
-                </div>
-                <div class="stat-item" title="Sisa Energi">
-                  <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
-                </div>
-              </div>
-              <div class="dropdown-actions">
-                <button @click="$router.push('/')" title="Kembali ke Beranda">
-                  <i class="fa-solid fa-home"></i> Kembali ke Beranda
-                </button>
-                <button @click="toggleTheme" title="Ganti Tema Warna">
-                  <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
-                  {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
-                </button>
-                <button @click="goToMarket" class="text-primary" title="Buka iC-Market">
-                  <i class="fa-solid fa-store"></i> Buka iC-Market
-                </button>
-                <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
-              </div>
-            </div>
+            <UserDropdownMenu 
+              v-if="showUserDropdown" 
+              :allow-profile-edit="true" 
+              @close="showUserDropdown = false" 
+              @open-profile="openProfileModal" 
+              @logout-click="handleLogoutClick" 
+            />
           </div>
         </div>
       </div>

@@ -21,6 +21,14 @@
         <p>Mempersiapkan materi belajar...</p>
       </div>
     </div>
+
+    <!-- Initial App Loader for SSO -->
+    <div v-if="ssoEnabled && ssoState.status.value === 'idle'" class="global-loading-overlay" style="z-index: 9999999; background: var(--bg-main, #0f172a);">
+      <div class="loader-content">
+        <div class="spinner-large"></div>
+        <p>Memuat sesi...</p>
+      </div>
+    </div>
     <AppToast />
     
     <!-- Global WIP Modal -->
