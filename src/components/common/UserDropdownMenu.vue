@@ -83,3 +83,5 @@ const goToGlobalLogout = () => {
   window.location.assign('https://ic-auth.unikom.my.id/logout');
 };
 </script>
+
+<style scoped src="../../assets/css/components/common/UserDropdownMenu.css"></style>
