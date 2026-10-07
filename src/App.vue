@@ -1,18 +1,21 @@
 <template>
   <div class="app-layout" :class="{ 'workspace-mode': isWorkspacePage }">
     <p v-if="cooldownSeconds" role="status" style="position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:999999;background:#222;color:white;padding:12px;border-radius:8px;">Terlalu banyak permintaan. Tunggu {{ cooldownSeconds }} detik.</p>
-    <HomeNavbar v-if="showHomeNavbar" />
-    <p v-if="ssoEnabled && ssoState.status.value === 'unavailable'" role="status">Layanan sesi belum tersedia. Coba kembali sebentar lagi.</p>
-    <div v-if="!ssoEnabled || ssoState.status.value !== 'guest' || !route.meta.requiresAuth" class="app-content">
-      <router-view v-slot="{ Component, route }">
-        <transition name="page-fade" mode="out-in">
-          <div :key="route.path" class="route-wrapper">
-            <component :is="Component" />
-          </div>
-        </transition>
-      </router-view>
-    </div>
-    <AppFooter v-if="!isWorkspacePage && !isAuthPage && route.name !== 'materials'" />
+    
+    <template v-if="!isBootstrapping">
+      <HomeNavbar v-if="showHomeNavbar" />
+      <p v-if="ssoEnabled && ssoState.status.value === 'unavailable'" role="status">Layanan sesi belum tersedia. Coba kembali sebentar lagi.</p>
+      <div v-if="!ssoEnabled || ssoState.status.value !== 'guest' || !route.meta.requiresAuth" class="app-content">
+        <router-view v-slot="{ Component, route }">
+          <transition name="page-fade" mode="out-in">
+            <div :key="route.path" class="route-wrapper">
+              <component :is="Component" />
+            </div>
+          </transition>
+        </router-view>
+      </div>
+      <AppFooter v-if="!isWorkspacePage && !isAuthPage && route.name !== 'materials'" />
+    </template>
     
     <!-- Global Loading Overlay -->
     <div v-if="isPreparingLesson" class="global-loading-overlay">
@@ -22,8 +25,8 @@
       </div>
     </div>
 
-    <!-- Initial App Loader for SSO -->
-    <div v-if="ssoEnabled && ssoState.status.value === 'idle'" class="global-loading-overlay" style="z-index: 9999999; background: var(--bg-main, #0f172a);">
+    <!-- Initial App Loader for Session Bootstrap -->
+    <div v-if="isBootstrapping" class="global-loading-overlay" style="z-index: 9999999; background: var(--bg-main, #0f172a);">
       <div class="loader-content">
         <div class="spinner-large"></div>
         <p>Memuat sesi...</p>
@@ -64,7 +67,7 @@ const showHomeNavbar = computed(() => {
   return !hiddenRoutes.includes(route.name) && !route.path.startsWith('/dashboard')
 })
 
-const { bootstrapSession, fetchUser, isLoggedIn } = useUserAccount()
+const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping } = useUserAccount()
 const { isPreparingLesson } = useLearningPaths()
 const { showWipModal } = useWipModal()
 const { isLightMode, toggleTheme } = useTheme()

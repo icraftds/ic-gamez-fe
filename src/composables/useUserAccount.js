@@ -21,6 +21,7 @@ const maxCredits = computed(() => {
 const currentPlan = ref('free')
 const isLoggedIn = ref(!!authIdentity())
 const isLoading = ref(false)
+const isBootstrapping = ref(true)
 
 const userProfile = ref({
   id: null,
@@ -130,15 +131,20 @@ export function useUserAccount() {
   }
 
   const bootstrapSession = async () => {
-    if (ssoEnabled) {
-      try { if (!await loadSsoSession()) return false } catch { return false }
+    isBootstrapping.value = true
+    try {
+      if (ssoEnabled) {
+        try { if (!await loadSsoSession()) return false } catch { return false }
+      }
+      const user = await fetchUser(true)
+      if (!user) return false
+      if (!ssoEnabled) await initializeWallet()
+      else walletInitializationPending.value = ssoState.walletPending.value
+      await fetchWallet()
+      return true
+    } finally {
+      isBootstrapping.value = false
     }
-    const user = await fetchUser(true)
-    if (!user) return false
-    if (!ssoEnabled) await initializeWallet()
-    else walletInitializationPending.value = ssoState.walletPending.value
-    await fetchWallet()
-    return true
   }
 
   /**
@@ -363,6 +369,7 @@ export function useUserAccount() {
   return {
     isLoggedIn,
     isLoading,
+    isBootstrapping,
     userProfile,
     userStats,
     login,
