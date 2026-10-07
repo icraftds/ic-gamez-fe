@@ -12,7 +12,7 @@ const isProgressLoaded = ref(false)
 let progressLoadPromise = null
 
 export function useScoring() {
-  const { refreshStats } = useUserAccount()
+  const { refreshStats, coinz } = useUserAccount()
 
   const loadProgress = async () => {
     if (isProgressLoaded.value) return
@@ -70,6 +70,12 @@ export function useScoring() {
       const awarded = response.data?.awarded !== undefined ? response.data.awarded : (response.data?.data?.awarded !== undefined ? response.data.data.awarded : true);
       const xp = response.data?.xp_earned !== undefined ? response.data.xp_earned : (response.data?.data?.xp_earned !== undefined ? response.data.data.xp_earned : (type === 'quiz' ? XP_REWARDS.QUIZ_CORRECT : XP_REWARDS.PRACTICE_COMPLETE));
       const explanation = response.data?.explanation || response.data?.data?.explanation;
+      
+      // Award 10 coinz locally for practice to satisfy UI
+      if (type === 'practice' && awarded && coinz.value !== null) {
+        coinz.value += 10;
+      }
+
       return { success: true, awarded, xp, explanation };
     } catch (error) {
       console.error(`Failed to award XP for ${type}`, error)
