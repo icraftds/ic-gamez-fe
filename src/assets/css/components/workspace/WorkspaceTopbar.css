@@ -52,6 +52,15 @@
 .breadcrumb-chapter { color: #64748b; flex-shrink: 0; }
 .breadcrumb-lesson { color: var(--text-main-hex); font-weight: 500; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 
+.breadcrumb .clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.breadcrumb .clickable:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
 /* ── Right: progress steps ── */
 .progress-steps {
   display: flex;

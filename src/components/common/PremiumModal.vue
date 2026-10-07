@@ -37,7 +37,7 @@ const close = () => {
 const subscribe = () => {
   emit('update:modelValue', false)
   if (isLoggedIn.value) {
-    router.push('/dashboard?tab=langganan')
+    router.push('/pricing')
   } else {
     router.push('/?auth=login')
   }

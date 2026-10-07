@@ -1,7 +1,7 @@
 <template>
   <div class="user-dropdown-menu" @click.stop>
     <div class="dropdown-header" @click="emit('open-profile')" :style="{ cursor: allowProfileEdit ? 'pointer' : 'default' }" :title="allowProfileEdit ? 'Edit Profil' : ''">
-      <img :src="userProfile.avatar" class="dropdown-avatar" :class="avatarBorderClass" />
+      <img v-if="!isLandingPage" :src="userProfile.avatar" class="dropdown-avatar" :class="avatarBorderClass" />
       <div class="dropdown-user-info">
         <div class="user-name">
           {{ userProfile.name }}
@@ -22,14 +22,15 @@
       </div>
     </div>
     <div class="dropdown-actions">
-      <button @click="$router.push(dashboardToggleRoute)">
-        <i :class="isLandingPage ? 'fa-solid fa-chart-pie' : 'fa-solid fa-home'"></i> 
+      <button @click="handleDashboardClick" class="text-primary" :disabled="isNavigating">
+        <i v-if="isNavigating" class="fa-solid fa-spinner fa-spin"></i>
+        <i v-else :class="isLandingPage ? 'fa-solid fa-chart-pie' : 'fa-solid fa-home'"></i> 
         {{ dashboardToggleText }}
       </button>
-      <button v-if="allowProfileEdit" @click="emit('open-profile')" title="Edit Profil Anda">
+      <button v-if="allowProfileEdit" @click="emit('open-profile')" class="text-primary" title="Edit Profil Anda">
         <i class="fa-solid fa-user-pen"></i> Edit Profil
       </button>
-      <button @click="toggleTheme" title="Ganti Tema Warna">
+      <button @click="toggleTheme" class="text-primary" title="Ganti Tema Warna">
         <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
         {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
       </button>
@@ -47,8 +48,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useUserAccount } from '../../composables/useUserAccount';
 import { useTheme } from '../../composables/useTheme';
 import { ssoEnabled, globalLogoutEnabled } from '../../services/sso';
@@ -75,6 +76,17 @@ const avatarBorderClass = computed(() => {
 const isLandingPage = computed(() => route.path === '/');
 const dashboardToggleText = computed(() => isLandingPage.value ? 'Kembali ke Dashboard' : 'Kembali ke Beranda');
 const dashboardToggleRoute = computed(() => isLandingPage.value ? '/dashboard' : '/');
+
+const isNavigating = ref(false);
+const router = useRouter();
+
+const handleDashboardClick = async () => {
+  if (isNavigating.value) return;
+  isNavigating.value = true;
+  await router.push(dashboardToggleRoute.value);
+  isNavigating.value = false;
+  emit('close');
+};
 
 const goToMarket = () => {
   const marketUrl = ssoEnabled ? 'https://market.icraftds.id/auth/start?return_to=%2F' : 'https://market.icraftds.id/';

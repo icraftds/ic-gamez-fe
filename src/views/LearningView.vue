@@ -7,7 +7,7 @@
         <div class="hero-badge">
           <i class="fa-solid fa-map"></i> Peta Kurikulum
         </div>
-        <h1 class="hero-title">Learning <span class="gradient-text">Paths</span></h1>
+        <h1 class="hero-title">Alur <span class="gradient-text">Belajar</span></h1>
         <p class="hero-desc">Ikuti roadmap pembelajaran terstruktur kami dari dasar pemrograman hingga penguasaan algoritma tingkat lanjut.</p>
         
         <div class="hero-actions">
@@ -20,7 +20,7 @@
       <!-- Filter Section (New) -->
       <div class="filter-section">
         <div class="search-box">
-          <i class="fa-solid fa-search"></i>
+          <i class="fa-solid fa-magnifying-glass"></i>
           <input type="text" v-model="searchQuery" placeholder="Cari alur belajar..." />
         </div>
         <div class="filter-pills">

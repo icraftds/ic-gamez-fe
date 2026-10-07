@@ -27,10 +27,6 @@
 .quiz-header p { color: #64748b; font-size: 0.9rem; }
 
 /* ── Question card ── */
-.quiz-container {
-  /* user-select: none; */
-  /* -webkit-user-select: none; */
-}
 
 .question-card { margin-bottom: 28px; }
 .question-text {
@@ -200,10 +196,7 @@
 
 /* ── Mobile Responsiveness ── */
 @media (max-width: 768px) {
-  .quiz-panel {
-    /* Keep default flex and hidden overflow to fit viewport */
-  }
-  
+
   .panel-content {
     padding: 20px 16px;
     /* Let it scroll naturally */

@@ -68,8 +68,8 @@
   .welcome-heading { font-size: 1.8rem; }
   .welcome-avatar { width: 60px; height: 60px; }
   .btn-hero { padding: 12px 24px; font-size: 1rem; }
-  .hero-actions-logged { flex-direction: column; align-items: center; gap: 12px; }
-  .hero-actions-logged .btn-start { width: 100%; justify-content: center; }
+  .hero-actions-logged, .hero-actions { flex-direction: column; align-items: center; gap: 12px; }
+  .hero-actions-logged .btn-start, .hero-actions .btn-start { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 480px) {

@@ -115,7 +115,7 @@
         <div class="cyber-table-container">
           <div class="cyber-table-header">
             <div class="ct-col ct-rank">#</div>
-            <div class="ct-col ct-user">CODER</div>
+            <div class="ct-col ct-user">CODERZ</div>
             <div class="ct-col ct-xp">POWER (XP)</div>
             <div class="ct-col ct-level">TIER</div>
           </div>

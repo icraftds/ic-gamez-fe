@@ -11,18 +11,23 @@
         <img src="/images/Logo iC GameZ darkmode.png" alt="iC GameZ" height="24" />
       </div>
       <div class="topbar-right">
-        <div class="dropdown-trigger" ref="dropdownTriggerRef" @click.stop="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer;">
-          <div class="avatar-circle">
-            <img :src="userAvatar" alt="Avatar" />
+        <template v-if="isLoggedIn">
+          <div class="dropdown-trigger" ref="dropdownTriggerRef" @click.stop="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <div class="avatar-circle">
+              <img :src="userAvatar" alt="Avatar" />
+            </div>
+            <i class="fa-solid fa-chevron-down dropdown-icon" style="font-size: 0.8rem; color: #6b7280;"></i>
+            
+            <UserDropdownMenu 
+              v-if="showUserDropdown" 
+              @close="showUserDropdown = false" 
+              @logout-click="handleLogoutClick" 
+            />
           </div>
-          <i class="fa-solid fa-chevron-down dropdown-icon" style="font-size: 0.8rem; color: #6b7280;"></i>
-          
-          <UserDropdownMenu 
-            v-if="showUserDropdown" 
-            @close="showUserDropdown = false" 
-            @logout-click="handleLogoutClick" 
-          />
-        </div>
+        </template>
+        <template v-else>
+          <button class="auth-btn" @click="$router.push('/login')">Masuk/Daftar</button>
+        </template>
       </div>
     </div>
 
@@ -61,7 +66,7 @@ import { useLearningPaths } from '../composables/useLearningPaths'
 import { useUserAccount } from '../composables/useUserAccount'
 
 const { paths, isLoading, fetchAllPathsDetails, getPathById, getChapterById, getLessonById } = useLearningPaths()
-const { userProfile, logout } = useUserAccount()
+const { userProfile, isLoggedIn, logout } = useUserAccount()
 const router = useRouter()
 const { showToast } = useToast()
 

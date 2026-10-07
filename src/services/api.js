@@ -113,7 +113,7 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 403) {
       const message = error.response.data?.message || '';
       if (message.toLowerCase().includes('berlangganan') || message.toLowerCase().includes('premium')) {
-        window.location.href = '/dashboard?tab=langganan';
+        window.location.href = '/pricing';
         return Promise.reject(error);
       }
     }

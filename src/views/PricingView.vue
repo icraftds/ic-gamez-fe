@@ -79,7 +79,10 @@
           
           <div class="plan-action">
             <div v-if="currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro')" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
-            <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="handlePlanClick(plan.slug, plan)">Pilih {{ plan.name }}</button>
+            <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="handlePlanClick(plan.slug, plan)" :disabled="isNavigating">
+              <span v-if="isNavigating && navTargetSlug === plan.slug"><i class="fa-solid fa-spinner fa-spin"></i> Memproses...</span>
+              <span v-else>Pilih {{ plan.name }}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -114,6 +117,8 @@ const showAuthModal = ref(false)
 const pendingStepLabel = ref('')
 
 const pendingCheckout = ref(null)
+const isNavigating = ref(false)
+const navTargetSlug = ref(null)
 
 onMounted(async () => {
   const saved = localStorage.getItem('ic_pending_checkout')
@@ -190,7 +195,9 @@ const formatPrice = (price) => {
  * Navigasi ke halaman checkout jika sudah login,
  * atau tampilkan modal auth jika belum.
  */
-const handlePlanClick = (slug, plan = null) => {
+const handlePlanClick = async (slug, plan = null) => {
+  if (isNavigating.value) return;
+
   if (slug === 'free') {
     if (isLoggedIn.value) {
       alert('Anda sudah berada di Free Plan saat ini.')
@@ -203,15 +210,22 @@ const handlePlanClick = (slug, plan = null) => {
       pendingStepLabel.value = 'melakukan pembayaran'
       showAuthModal.value = true
     } else {
+      isNavigating.value = true
+      navTargetSlug.value = slug
       // Arahkan ke halaman checkout dengan query params
-      router.push({
-        name: 'checkout',
-        query: {
-          plan: plan ? plan.name : slug,
-          price: plan ? plan.price : 0,
-          slug: plan ? plan.slug : slug
-        }
-      })
+      try {
+        await router.push({
+          name: 'checkout',
+          query: {
+            plan: plan ? plan.name : slug,
+            price: plan ? plan.price : 0,
+            slug: plan ? plan.slug : slug
+          }
+        })
+      } finally {
+        isNavigating.value = false
+        navTargetSlug.value = null
+      }
     }
   }
 }

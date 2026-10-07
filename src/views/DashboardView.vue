@@ -143,7 +143,7 @@ const closePromoModal = () => {
 
 const goToSubscription = () => {
   showPromoModal.value = false
-  activeTab.value = 'langganan'
+  router.push('/pricing')
 }
 
 const closeCoinzModal = () => {
@@ -184,7 +184,7 @@ const tabs = [
   { id: 'beranda', label: 'Beranda' },
   { id: 'statistik', label: 'Statistik' },
   { id: 'medali', label: 'Medali' },
-  { id: 'langganan', label: 'Langganan' }
+
 ]
 </script>
 
@@ -214,7 +214,7 @@ const tabs = [
       </div>
 
       <div class="dash-nav-right">
-        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="activeTab = 'langganan'"><i class="fa-solid fa-crown text-warning"></i> Upgrade</button>
+        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="$router.push('/pricing')"><i class="fa-solid fa-crown text-warning"></i> Upgrade</button>
         
         <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)">
           <i class="fa-solid fa-cart-plus"></i>
@@ -294,7 +294,7 @@ const tabs = [
       <DashboardStats v-else-if="activeTab === 'statistik'" />
       <DashboardMedals v-else-if="activeTab === 'medali'" />
       <LeaderboardTable v-else-if="activeTab === 'leaderboard'" :isFullView="true" />
-      <DashboardSubscription v-else-if="activeTab === 'langganan'" />
+
       </template>
     </div>
 

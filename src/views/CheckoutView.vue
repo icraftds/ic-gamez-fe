@@ -138,7 +138,7 @@ const onInstruction = (data) => {
 }
 
 const goBackToSelection = () => {
-  router.push('/dashboard?tab=langganan')
+  router.push('/pricing')
 }
 
 const handlePaymentSuccess = async () => {

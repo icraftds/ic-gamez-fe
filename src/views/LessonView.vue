@@ -110,6 +110,11 @@
       :label="toast.label.value"
       :type="toast.type.value"
     />
+
+    <CoinzRewardModal
+      v-model="showCoinzReward"
+      :amount="coinzRewardAmount"
+    />
   </div>
 </template>
 
@@ -134,6 +139,7 @@ const PracticePanel = defineAsyncComponent(() => import('../components/workspace
 const AuthRequiredModal = defineAsyncComponent(() => import('../components/common/AuthRequiredModal.vue'))
 const PremiumModal = defineAsyncComponent(() => import('../components/common/PremiumModal.vue'))
 import XpToast from '../components/common/XpToast.vue'
+import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 
 // ── Enums ─────────────────────────────────────────────────────────
 const STEP = Object.freeze({ THEORY: 1, QUIZ: 2, PRACTICE: 3 })
@@ -213,6 +219,8 @@ const activeStep = ref(STEP.THEORY)
 const sidebarCollapsed = ref(false)
 const showAuthModal = ref(false)
 const showPremiumModal = ref(false)
+const showCoinzReward = ref(false)
+const coinzRewardAmount = ref(10)
 const pendingStepLabel = ref('Tes Pertanyaan')
 
 // ── Initialise step from query param (preview navigation) ─────────
@@ -379,6 +387,10 @@ const onPracticeRun = async () => {
         const result = await scoring.awardXp('practice', currentLesson.value.id, extraData)
         if (result.awarded) {
           showXpToast(result.xp, 'Praktik Berhasil!', 'practice')
+          setTimeout(() => {
+            showCoinzReward.value = true
+            coinzRewardAmount.value = 10
+          }, 1500)
         }
       }
     } else {

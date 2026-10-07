@@ -9,9 +9,9 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <span class="breadcrumb-path">{{ pathTitle }}</span>
+        <span class="breadcrumb-path clickable" @click="$emit('back')" title="Kembali ke Alur Belajar">{{ pathTitle }}</span>
         <i class="fa-solid fa-chevron-right separator"></i>
-        <span class="breadcrumb-chapter">{{ chapterTitle }}</span>
+        <span class="breadcrumb-chapter clickable" @click="$emit('back')" title="Kembali ke Chapter">{{ chapterTitle }}</span>
         <i class="fa-solid fa-chevron-right separator"></i>
         <span class="breadcrumb-lesson">{{ lessonTitle }}</span>
       </nav>

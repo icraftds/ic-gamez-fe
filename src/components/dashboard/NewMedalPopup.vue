@@ -1,5 +1,6 @@
 <template>
-  <div v-if="show" class="medal-popup-overlay">
+  <Teleport to="body">
+    <div v-if="show" class="medal-popup-overlay">
     <div class="medal-popup-content">
       <div class="confetti-bg"></div>
       <h2 class="popup-title">Pencapaian Baru!</h2>
@@ -16,7 +17,8 @@
       
       <button class="btn-claim" @click="closePopup">Keren!</button>
     </div>
-  </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
