@@ -84,9 +84,9 @@
           </div>
           <div class="dropdown-actions">
             <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Beranda</button>
-            <a v-if="globalLogoutEnabled" href="https://ic-auth.unikom.my.id/logout" class="text-primary">Keluar dari semua aplikasi</a>
             <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
             <button @click="handleLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+            <button v-if="globalLogoutEnabled" type="button" @click="goToGlobalLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar dari semua aplikasi</button>
           </div>
         </div>
       </div>
@@ -160,6 +160,9 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
 });
+function goToGlobalLogout() {
+  window.location.assign('https://ic-auth.unikom.my.id/logout');
+}
 </script>
 
 

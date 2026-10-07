@@ -134,9 +134,9 @@
                   <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
                   {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
                 </button>
-                <a v-if="globalLogoutEnabled" href="https://ic-auth.unikom.my.id/logout" class="text-primary">Keluar dari semua aplikasi</a>
-            <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
+                <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+                <button v-if="globalLogoutEnabled" type="button" @click="goToGlobalLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar dari semua aplikasi</button>
               </div>
             </div>
           </div>
@@ -264,6 +264,9 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
   window.removeEventListener('resize', updateIndicator);
 });
+function goToGlobalLogout() {
+  window.location.assign('https://ic-auth.unikom.my.id/logout');
+}
 </script>
 
 
