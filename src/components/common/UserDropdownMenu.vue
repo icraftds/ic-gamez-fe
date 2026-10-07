@@ -1,8 +1,7 @@
 <template>
   <div class="user-dropdown-menu" @click.stop>
     <div class="dropdown-header" @click="emit('open-profile')" :style="{ cursor: allowProfileEdit ? 'pointer' : 'default' }" :title="allowProfileEdit ? 'Edit Profil' : ''">
-      <img :src="userProfile.avatar" class="dropdown-avatar" :class="avatarBorderClass" />
-      <div class="dropdown-user-info">
+      <div class="dropdown-user-info" style="margin-left: 0; align-items: flex-start;">
         <div class="user-name">
           {{ userProfile.name }}
         </div>
