@@ -7,7 +7,7 @@
     <div class="order-summary">
       <div class="order-plan-name">
         <i :class="planIcon"></i>
-        <span>{{ planName }}</span>
+        <span>{{ planName }} Plan</span>
       </div>
       <div class="order-price">
         <div v-if="discountedPrice !== null" class="discount-price-wrap">
@@ -55,9 +55,42 @@
         <div class="method-badge">Instan</div>
       </div>
 
+      <div
+        class="method-card"
+        :class="{ selected: selectedMethod === 'va_bca' }"
+        @click="selectedMethod = 'va_bca'"
+      >
+        <div class="method-radio">
+          <div class="method-radio-inner"></div>
+        </div>
+        <div class="method-icon va">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <div class="method-info">
+          <div class="method-name">Virtual Account BCA</div>
+          <div class="method-desc">Transfer melalui ATM, iBanking, atau mBanking</div>
+        </div>
+      </div>
 
-      <!-- Payment Link Option (E-Wallet) - Dinonaktifkan sementara -->
-      <!-- <div
+      <div
+        class="method-card"
+        :class="{ selected: selectedMethod === 'va_bni' }"
+        @click="selectedMethod = 'va_bni'"
+      >
+        <div class="method-radio">
+          <div class="method-radio-inner"></div>
+        </div>
+        <div class="method-icon va">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <div class="method-info">
+          <div class="method-name">Virtual Account BNI</div>
+          <div class="method-desc">Transfer melalui ATM, iBanking, atau mBanking</div>
+        </div>
+      </div>
+
+      <!-- Payment Link Option -->
+      <div
         class="method-card"
         :class="{ selected: selectedMethod === 'payment_link' }"
         @click="selectedMethod = 'payment_link'"
@@ -73,16 +106,12 @@
           <div class="method-desc">Ovo, Dana, LinkAja, Mandiri, dll. (Diarahkan)</div>
         </div>
         <div class="method-badge alt">Fleksibel</div>
-      </div> -->
-    </div>
-    
-    <div v-if="paymentError" class="payment-error-message">
-      <i class="fa-solid fa-circle-exclamation"></i> {{ paymentError }}
+      </div>
     </div>
 
     <button
       class="btn-primary"
-      :disabled="!selectedMethod || isProcessingPayment || invoiceUncertain"
+      :disabled="!selectedMethod || isProcessingPayment"
       @click="goToInstruction"
     >
       <i class="fa-solid fa-spinner fa-spin" v-if="isProcessingPayment"></i>
@@ -95,33 +124,23 @@
 <script setup>
 import { ref } from 'vue'
 import api from '../../services/api'
-import { useUserAccount } from '../../composables/useUserAccount'
-
-const { userProfile, fetchUser, fetchWallet } = useUserAccount()
 
 const props = defineProps({
   planName: String,
   planIcon: String,
   formattedPrice: String,
-  planSlug: String,
-  planId: Number,
-  rawPrice: Number
+  planSlug: String
 })
 
 const emit = defineEmits(['instruction', 'success', 'processing'])
 
-const selectedMethod = ref('qris')
+const selectedMethod = ref(null)
 const isProcessingPayment = ref(false)
 const couponCode = ref('')
 const isValidatingCoupon = ref(false)
 const couponMessage = ref('')
 const couponStatus = ref(null)
 const discountedPrice = ref(null)
-const paymentError = ref('')
-const invoiceKey = `ic_invoice_uncertain:${userProfile.value.id}`
-const invoiceUncertain = ref(!!localStorage.getItem(invoiceKey))
-
-if (invoiceUncertain.value) paymentError.value = 'Invoice sebelumnya belum dapat dikonfirmasi. Periksa pembayaran atau hubungi dukungan.'
 
 const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
@@ -138,7 +157,7 @@ const validateCoupon = async () => {
       plan_slug: props.planSlug
     })
     
-    discountedPrice.value = res.data.data.final_price
+    discountedPrice.value = res.data.discounted_price
     couponMessage.value = res.data.message || 'Kupon berhasil diterapkan!'
     couponStatus.value = 'success'
   } catch (err) {
@@ -151,64 +170,38 @@ const validateCoupon = async () => {
 }
 
 const goToInstruction = async () => {
-  if (isProcessingPayment.value || invoiceUncertain.value) return
-  paymentError.value = ''
   isProcessingPayment.value = true
   emit('processing', true)
   
   try {
-    if (isProcessingPayment.value === false || invoiceUncertain.value) return
-    const plansResponse = await api.get('/plans')
-    const plan = plansResponse.data.data.find(item => item.slug === props.planSlug && item.is_active)
-    if (!plan) throw new Error('Paket tidak tersedia')
-    if (Number(plan.price) === 0 || (couponStatus.value === 'success' && discountedPrice.value === 0)) {
-      await api.post('/subscription/checkout', { plan_id: plan.id, coupon_code: couponCode.value || null })
-      await Promise.all([fetchUser(true), fetchWallet()])
+    const res = await api.post('/payments/create', {
+      item_type: 'premium_plan',
+      payment_method: selectedMethod.value,
+      plan_slug: props.planSlug,
+      coupon_code: couponCode.value
+    })
+    
+    const tx = res.data?.data
+    if (!tx) throw new Error('Data transaksi tidak ditemukan dari server.')
+
+    if (tx.status === 'completed' || tx.amount === 0) {
       emit('success')
       return
     }
-    const subscriptionResponse = await api.get('/subscription')
-    const baselineSubscription = subscriptionResponse.data.data
-    // Persist before POST: a lost response may still have created an invoice.
-    localStorage.setItem(invoiceKey, JSON.stringify({ plan_slug: plan.slug, status: 'pending' }))
-    invoiceUncertain.value = true
-    const res = await api.post('/payments/create', {
-      item_type: 'premium_plan', plan_slug: plan.slug,
-      payment_method: selectedMethod.value, coupon_code: couponCode.value || null
-    })
-    const tx = { ...res.data.data?.payment_details, order_id: res.data.data?.order_id, baselineSubscription }
-    if (!tx.order_id) throw new Error('Invoice belum dapat dikonfirmasi. Periksa pembayaran Anda sebelum membuat invoice lain.')
-    localStorage.setItem(`ic_pending_invoice:${userProfile.value.id}`, JSON.stringify(tx))
-    localStorage.removeItem(invoiceKey)
-    invoiceUncertain.value = false
-    // Untuk QRIS dan VA, teruskan data (termasuk qr_string / va_number) ke layar instruksi
+
+    if (tx.payment_method === 'payment_link' && tx.payment_details?.payment_link) {
+      window.location.href = tx.payment_details.payment_link
+      return
+    }
+
     emit('instruction', {
-      paymentDetails: tx,
-      selectedMethod: selectedMethod.value,
-      discountedPrice: discountedPrice.value
+      paymentDetails: tx.payment_details || {},
+      selectedMethod: selectedMethod.value
     })
   } catch (err) {
-    if ([400, 401, 403, 409, 422, 429].includes(err.response?.status)) {
-      localStorage.removeItem(invoiceKey)
-      invoiceUncertain.value = false
-    }
-    
-    let errMsg = 'Gagal memproses pembayaran. Silakan coba lagi.'
-    
-    if (err.response) {
-      const status = err.response.status
-      const dataMsg = err.response.data?.message || ''
-      
-      if (status >= 500 || dataMsg.includes('522')) {
-        errMsg = 'Server pembayaran saat ini sedang sibuk atau mengalami gangguan. Mohon tunggu beberapa menit lalu coba lagi.'
-      } else {
-        errMsg = dataMsg || errMsg
-      }
-    } else if (err.request) {
-      errMsg = 'Tidak dapat terhubung ke server pembayaran. Periksa koneksi internet Anda.'
-    }
-    
-    paymentError.value = invoiceUncertain.value ? 'Pembuatan invoice belum pasti. Jangan membuat invoice baru; periksa pembayaran atau hubungi dukungan.' : errMsg
+    console.error('Failed to create payment', err)
+    const errMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Coba lagi.'
+    alert('Gagal memuat metode pembayaran: ' + errMessage)
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)
@@ -217,4 +210,3 @@ const goToInstruction = async () => {
 </script>
 
 <style scoped src="../../assets/css/components/checkout/CheckoutStepSelection.css"></style>
-
