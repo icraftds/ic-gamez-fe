@@ -13,7 +13,7 @@
 
           <!-- Coin image -->
           <div class="coin-image-wrap">
-            <img src="/images/coinz-reward.jpg" alt="iCoinZ" class="coin-img" />
+            <img src="/images/icoinz.svg" alt="iCoinZ" class="coin-img" />
             <div class="coin-shine"></div>
           </div>
 

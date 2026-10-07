@@ -56,12 +56,10 @@
   animation: floatCoin 3s ease-in-out infinite;
 }
 .coin-img {
-  width: 160px;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 50%;
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
   filter: drop-shadow(0 0 24px rgba(245, 158, 11, 0.65));
-  border: 3px solid rgba(245, 158, 11, 0.4);
 }
 .coin-shine {
   position: absolute;
