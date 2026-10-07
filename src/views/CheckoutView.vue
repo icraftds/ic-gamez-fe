@@ -28,6 +28,8 @@
         </div>
       </div>
 
+      <p v-if="pollingMessage" role="status">{{ pollingMessage }}</p>
+      <button v-if="currentStep === 2" class="btn-outline" @click="startPolling">Cek ulang pembayaran</button>
       <!-- Main Card -->
       <div class="checkout-card">
         <Transition name="fade-slide" mode="out-in">
@@ -72,6 +74,8 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
+import api from '../services/api'
+import { createPaymentPoll } from '../utils/paymentPoll'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 
 import CheckoutStepSelection from '../components/checkout/CheckoutStepSelection.vue'
@@ -80,7 +84,7 @@ import CheckoutStepSuccess from '../components/checkout/CheckoutStepSuccess.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { userProfile, isPremiumUser, fetchUser } = useUserAccount()
+const { userProfile, isPremiumUser, currentPlan, fetchUser, fetchWallet, isLoggedIn } = useUserAccount()
 
 const planName = ref(route.query.plan || 'Pro')
 const planPrice = ref(Number(route.query.price) || 49000)
@@ -126,6 +130,7 @@ const onInstruction = (data) => {
     paymentDetails: paymentDetails.value,
     selectedMethod: selectedMethod.value,
     expiryTime: expiryTime.value,
+    userId: userProfile.value.id,
     savedAt: Date.now()
   }))
   
@@ -133,10 +138,7 @@ const onInstruction = (data) => {
 }
 
 const goBackToSelection = () => {
-  localStorage.removeItem('ic_pending_checkout')
-  expiryTime.value = null
-  discountedPrice.value = null
-  currentStep.value = 1
+  router.push('/dashboard?tab=langganan')
 }
 
 const handlePaymentSuccess = async () => {
@@ -159,45 +161,25 @@ const handlePaymentSuccess = async () => {
   }
 }
 
-let pollingInterval = null
-const startPolling = () => {
-  stopPolling()
-  
-  // Catat state awal sebelum polling
-  const initialIsPremium = isPremiumUser.value
-  // credits didefinisikan dari useUserAccount
-  const initialCredits = userProfile.value?.credits || 0
-  const initialPlan = userProfile.value?.current_plan?.slug || userProfile.value?.current_plan || 'free'
-  
-  pollingInterval = setInterval(async () => {
-    try {
-      await fetchUser(true)
-      
-      // Pembayaran sukses HANYA JIKA:
-      // 1. Sebelumnya Free, sekarang jadi Premium (untuk paket berlangganan)
-      // 2. Atau paketnya berubah (misal dari pro ke expert)
-      // 3. Atau credits bertambah (jika nanti ada topup koin)
-      const newPlan = userProfile.value?.current_plan || 'free'
-      const becamePremium = !initialIsPremium && isPremiumUser.value
-      const planChanged = isPremiumUser.value && initialPlan !== newPlan
-      const gainedCredits = (userProfile.value?.credits || 0) > initialCredits
-      
-      if (becamePremium || planChanged || gainedCredits) {
-        handlePaymentSuccess()
-      }
-    } catch (e) {
-      // Ignore polling errors
-    }
-  }, 3000)
-}
-const stopPolling = () => {
-  if (pollingInterval) {
-    clearInterval(pollingInterval)
-    pollingInterval = null
+const pollingMessage = ref('')
+const poll = createPaymentPoll(async (isCurrent) => {
+  const [user, subscription] = await Promise.all([fetchUser(true), api.get('/subscription')])
+  if (!isCurrent()) return false
+  const active = subscription.data.data
+  const baseline = paymentDetails.value.baselineSubscription
+  const newGrant = !baseline || (active && (active.id !== baseline.id || active.expires_at !== baseline.expires_at))
+  if (newGrant && user && isPremiumUser.value && currentPlan.value === planSlug.value && active?.status === 'active') {
+    await fetchWallet()
+    await handlePaymentSuccess()
+    return true
   }
-}
+  return false
+}, { isAuthenticated: () => isLoggedIn.value, onTimeout: () => { pollingMessage.value = 'Pembayaran masih diproses. Cek ulang untuk melihat aktivasi paket.' } })
+const startPolling = () => { pollingMessage.value = ''; poll.start() }
+const stopPolling = () => poll.stop()
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchUser(true)
   if (localStorage.getItem('ic_returning_from_payment') === 'true') {
     localStorage.removeItem('ic_returning_from_payment')
     router.replace('/payment/success')
@@ -209,7 +191,7 @@ onMounted(() => {
   if (saved) {
     try {
       const data = JSON.parse(saved)
-      if (data.expiryTime > Date.now()) {
+      if (data.userId === userProfile.value.id) {
         planName.value = data.planName || planName.value
         planPrice.value = data.planPrice || planPrice.value
         planSlug.value = data.planSlug || planSlug.value
@@ -234,7 +216,7 @@ watch(currentStep, (step) => {
 })
 
 onUnmounted(() => {
-  stopPolling()
+  poll.dispose()
 })
 
 const goToDashboard = () => {

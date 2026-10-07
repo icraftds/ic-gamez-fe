@@ -1,5 +1,9 @@
 <template>
   <div class="shop-view-wrapper">
+    <p v-if="walletStatus !== 'fresh' || walletInitializationPending" role="status">
+      Saldo belum dapat diperbarui.
+      <button @click="async () => { await initializeWallet(true); await fetchWallet() }">Coba lagi</button>
+    </p>
     <!-- Compact Header -->
     <div class="shop-compact-header container">
       <div class="header-content-left">
@@ -16,7 +20,7 @@
       <div class="header-content-right">
         <div class="wallet-compact-badge" title="Saldo iCoinZ">
           <img src="/images/icoinz.svg" alt="iCoinZ" class="icoinz-icon" />
-          <span class="coin-amount">{{ coinz }}</span>
+          <span class="coin-amount">{{ coinz === null ? '—' : coinz }}</span>
         </div>
       </div>
     </div>
@@ -58,7 +62,7 @@
                 <button 
                   class="btn-buy coinz-buy" 
                   @click="purchaseWithCoinz(pkg)"
-                  :disabled="isProcessing || coinz < pkg.price_icoinz"
+                  :disabled="isProcessing || walletStatus !== 'fresh' || coinz < pkg.price_icoinz"
                   title="Beli dengan iCoinZ"
                 >
                   <img src="/images/icoinz.svg" alt="iCoinZ" class="icoinz-icon-small" /> {{ pkg.price_icoinz }}
@@ -66,9 +70,7 @@
                 <div class="or-divider"><span>ATAU</span></div>
                 <button 
                   class="btn-buy idr-buy" 
-                  @click="purchaseWithGateway(pkg)"
-                  :disabled="isProcessing"
-                  title="Beli dengan Uang Tunai"
+                  :disabled="true" title="Pembayaran energi QRIS menunggu konfirmasi"
                 >
                   Rp {{ formatPrice(pkg.price_idr) }}
                 </button>
@@ -98,7 +100,7 @@ import { useUserAccount } from '../composables/useUserAccount'
 import confetti from 'canvas-confetti'
 
 const router = useRouter()
-const { coinz, fetchUser } = useUserAccount()
+const { coinz, fetchUser, fetchWallet, walletStatus, walletInitializationPending, initializeWallet } = useUserAccount()
 
 const packages = ref([])
 const isLoading = ref(false)
@@ -112,7 +114,7 @@ const fetchPackages = async () => {
     const res = await api.get('/shop/packages')
     packages.value = res.data.data
   } catch (error) {
-    console.error('Failed to fetch packages:', error)
+    console.error('Failed to fetch packages:', error.response?.status || 'request_failed')
   } finally {
     isLoading.value = false
   }
@@ -120,6 +122,7 @@ const fetchPackages = async () => {
 
 onMounted(() => {
   fetchPackages()
+  fetchWallet()
 })
 
 const formatPrice = (price) => {

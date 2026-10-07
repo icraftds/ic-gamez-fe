@@ -82,7 +82,7 @@
 
     <button
       class="btn-primary"
-      :disabled="!selectedMethod || isProcessingPayment"
+      :disabled="!selectedMethod || isProcessingPayment || invoiceUncertain"
       @click="goToInstruction"
     >
       <i class="fa-solid fa-spinner fa-spin" v-if="isProcessingPayment"></i>
@@ -94,11 +94,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
 import api from '../../services/api'
 import { useUserAccount } from '../../composables/useUserAccount'
 
-const { userProfile } = useUserAccount()
+const { userProfile, fetchUser, fetchWallet } = useUserAccount()
 
 const props = defineProps({
   planName: String,
@@ -119,6 +118,10 @@ const couponMessage = ref('')
 const couponStatus = ref(null)
 const discountedPrice = ref(null)
 const paymentError = ref('')
+const invoiceKey = `ic_invoice_uncertain:${userProfile.value.id}`
+const invoiceUncertain = ref(!!localStorage.getItem(invoiceKey))
+
+if (invoiceUncertain.value) paymentError.value = 'Invoice sebelumnya belum dapat dikonfirmasi. Periksa pembayaran atau hubungi dukungan.'
 
 const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
@@ -148,47 +151,36 @@ const validateCoupon = async () => {
 }
 
 const goToInstruction = async () => {
+  if (isProcessingPayment.value || invoiceUncertain.value) return
+  paymentError.value = ''
   isProcessingPayment.value = true
   emit('processing', true)
   
   try {
-    const userId = userProfile.value?.id || 1 // fallback to 1 if not found
-    
-    const amountToPay = discountedPrice.value !== null ? discountedPrice.value : props.rawPrice
-
-    const payload = { 
-      item_type: "premium_plan", 
-      plan_slug: props.planSlug || "pro", 
-      payment_method: selectedMethod.value, 
-      coupon_code: couponCode.value || null,
-      user_id: userId,
-      plan_id: props.planId,
-      amount: amountToPay
-    }
-    // Hit Payment Gateway Service Directly
-    const paymentBaseUrl = (import.meta.env.VITE_PAYMENT_GATEWAY_URL || 'https://ic-pg.unikom.my.id/api').replace(/\/+$/, '')
-    const res = await axios.post(`${paymentBaseUrl}/payment/checkout`, payload, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    
-    const tx = res.data?.data || {}
-    
-    let redirectUrl = tx.checkout_url || tx.payment_url;
-    
-    // Jika metode adalah payment_link tapi URL kosong, coba konstruksi manual
-    if (selectedMethod.value === 'payment_link' && !redirectUrl && tx.pakasir_txn_id) {
-      redirectUrl = `https://app.pakasir.com/pay-v2/${tx.pakasir_txn_id}`
-    }
-
-    if (redirectUrl && selectedMethod.value === 'payment_link') {
-      localStorage.setItem('ic_returning_from_payment', 'true')
-      window.location.href = redirectUrl
+    if (isProcessingPayment.value === false || invoiceUncertain.value) return
+    const plansResponse = await api.get('/plans')
+    const plan = plansResponse.data.data.find(item => item.slug === props.planSlug && item.is_active)
+    if (!plan) throw new Error('Paket tidak tersedia')
+    if (Number(plan.price) === 0 || (couponStatus.value === 'success' && discountedPrice.value === 0)) {
+      await api.post('/subscription/checkout', { plan_id: plan.id, coupon_code: couponCode.value || null })
+      await Promise.all([fetchUser(true), fetchWallet()])
+      emit('success')
       return
     }
-
+    const subscriptionResponse = await api.get('/subscription')
+    const baselineSubscription = subscriptionResponse.data.data
+    // Persist before POST: a lost response may still have created an invoice.
+    localStorage.setItem(invoiceKey, JSON.stringify({ plan_slug: plan.slug, status: 'pending' }))
+    invoiceUncertain.value = true
+    const res = await api.post('/payments/create', {
+      item_type: 'premium_plan', plan_slug: plan.slug,
+      payment_method: selectedMethod.value, coupon_code: couponCode.value || null
+    })
+    const tx = { ...res.data.data?.payment_details, order_id: res.data.data?.order_id, baselineSubscription }
+    if (!tx.order_id) throw new Error('Invoice belum dapat dikonfirmasi. Periksa pembayaran Anda sebelum membuat invoice lain.')
+    localStorage.setItem(`ic_pending_invoice:${userProfile.value.id}`, JSON.stringify(tx))
+    localStorage.removeItem(invoiceKey)
+    invoiceUncertain.value = false
     // Untuk QRIS dan VA, teruskan data (termasuk qr_string / va_number) ke layar instruksi
     emit('instruction', {
       paymentDetails: tx,
@@ -196,7 +188,10 @@ const goToInstruction = async () => {
       discountedPrice: discountedPrice.value
     })
   } catch (err) {
-    console.error('Failed to create payment in Payment Gateway:', err)
+    if ([400, 401, 403, 409, 422, 429].includes(err.response?.status)) {
+      localStorage.removeItem(invoiceKey)
+      invoiceUncertain.value = false
+    }
     
     let errMsg = 'Gagal memproses pembayaran. Silakan coba lagi.'
     
@@ -213,7 +208,7 @@ const goToInstruction = async () => {
       errMsg = 'Tidak dapat terhubung ke server pembayaran. Periksa koneksi internet Anda.'
     }
     
-    paymentError.value = errMsg
+    paymentError.value = invoiceUncertain.value ? 'Pembuatan invoice belum pasti. Jangan membuat invoice baru; periksa pembayaran atau hubungi dukungan.' : errMsg
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)

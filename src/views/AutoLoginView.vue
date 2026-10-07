@@ -9,29 +9,36 @@
 </template>
 
 <script setup>
+import { ssoEnabled } from '../services/sso'
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 
 const route = useRoute()
 const router = useRouter()
-const { fetchUser } = useUserAccount()
+const { bootstrapSession } = useUserAccount()
 
 onMounted(async () => {
+  if (ssoEnabled) {
+    await router.replace({ path: route.path, query: {} })
+    window.location.replace('/auth/start?return_to=%2Fdashboard')
+    return
+  }
   const token = route.query.token
   
   if (token) {
+    await router.replace({ path: route.path, query: {} })
     // 1. Simpan token ke localStorage
     localStorage.setItem('auth_token', token)
     
     // 2. Fetch data user terbaru agar status login di state Vue terupdate
     try {
-      await fetchUser()
+      if (!await bootstrapSession()) throw new Error('Profil belum tersedia')
       // 3. Arahkan ke dashboard
       sessionStorage.setItem('just_logged_in', 'true')
       router.replace('/dashboard')
     } catch (e) {
-      console.error('Auto login failed to fetch user', e)
+      console.error('Auto login failed to fetch user', e.response?.status || 'request_failed')
       router.replace('/login?error=auto_login_failed')
     }
   } else {

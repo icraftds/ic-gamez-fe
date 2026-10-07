@@ -38,7 +38,7 @@
             <div class="form-group">
               <label>Nama Lengkap</label>
               <div class="input-wrapper">
-                <input type="text" v-model="registerForm.name" placeholder="John Doe" required :disabled="isLoading" />
+                <input type="text" v-model="registerForm.name" placeholder="John Doe" required :disabled="isLoading || authCooldown > 0" />
                 <i class="fa-regular fa-user"></i>
               </div>
               <span v-if="validationErrors.name" class="error-text text-danger">{{ validationErrors.name[0] }}</span>
@@ -47,7 +47,7 @@
                         <div class="form-group">
               <label>Email</label>
               <div class="input-wrapper">
-                <input type="email" v-model="registerForm.email" placeholder="john@example.com" required :disabled="isLoading" />
+                <input type="email" v-model="registerForm.email" placeholder="john@example.com" required :disabled="isLoading || authCooldown > 0" />
                 <i class="fa-regular fa-envelope"></i>
               </div>
               <span v-if="validationErrors.email" class="error-text text-danger">{{ validationErrors.email[0] }}</span>
@@ -56,7 +56,7 @@
             <div class="form-group">
               <label>No. Telepon</label>
               <div class="input-wrapper">
-                <input type="tel" v-model="registerForm.phone" placeholder="081234567890" required :disabled="isLoading" />
+                <input type="tel" v-model="registerForm.phone" placeholder="081234567890" required :disabled="isLoading || authCooldown > 0" />
                 <i class="fa-solid fa-phone"></i>
               </div>
               <span v-if="validationErrors.phone" class="error-text text-danger">{{ validationErrors.phone[0] }}</span>
@@ -65,7 +65,7 @@
             <div class="form-group">
               <label>Password</label>
               <div class="input-wrapper">
-                <input type="password" v-model="registerForm.password" placeholder="Minimal 8 karakter" required minlength="8" :disabled="isLoading" />
+                <input type="password" v-model="registerForm.password" placeholder="Minimal 8 karakter" required minlength="8" :disabled="isLoading || authCooldown > 0" />
                 <i class="fa-solid fa-lock"></i>
               </div>
               <span v-if="validationErrors.password" class="error-text text-danger">{{ validationErrors.password[0] }}</span>
@@ -74,13 +74,13 @@
             <div class="form-group">
               <label>Konfirmasi Password</label>
               <div class="input-wrapper">
-                <input type="password" v-model="registerForm.password_confirmation" placeholder="Ulangi password" required minlength="8" :disabled="isLoading" />
+                <input type="password" v-model="registerForm.password_confirmation" placeholder="Ulangi password" required minlength="8" :disabled="isLoading || authCooldown > 0" />
                 <i class="fa-solid fa-lock"></i>
               </div>
               <span v-if="validationErrors.password_confirmation" class="error-text text-danger">{{ validationErrors.password_confirmation[0] }}</span>
             </div>
 
-            <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading">
+            <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading || authCooldown > 0">
               <span v-if="!isLoading">Daftar Akun</span>
               <div v-else class="spinner"></div>
             </button>
@@ -105,18 +105,18 @@
                   @input="handleOtpInput(index, $event)"
                   @keydown="handleOtpKeydown(index, $event)"
                   @paste="handleOtpPaste"
-                  :disabled="isLoading || otpStatus === 'success'"
+                  :disabled="isLoading || authCooldown > 0 || otpStatus === 'success'"
                   class="otp-input"
                 />
               </div>
             </div>
 
-            <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading">
+            <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading || authCooldown > 0">
               <span v-if="!isLoading">Verifikasi OTP</span>
               <div v-else class="spinner"></div>
             </button>
             
-            <button type="button" @click="handleResendOtp" :disabled="isLoading" style="background: transparent; color: var(--text-sub-hex); border: none; margin-top: 15px; cursor: pointer; text-decoration: underline; width: 100%; text-align: center;">
+            <button type="button" @click="handleResendOtp" :disabled="isLoading || authCooldown > 0" style="background: transparent; color: var(--text-sub-hex); border: none; margin-top: 15px; cursor: pointer; text-decoration: underline; width: 100%; text-align: center;">
               Kirim Ulang OTP
             </button>
           </form>
@@ -126,7 +126,7 @@
               <span>ATAU</span>
             </div>
 
-            <button class="btn-google" @click="handleGoogleLogin" :disabled="isLoading">
+            <button class="btn-google" @click="handleGoogleLogin" :disabled="isLoading || authCooldown > 0">
               <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="google-logo" />
               <span>Daftar dengan Google</span>
             </button>
@@ -142,7 +142,8 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onUnmounted } from 'vue'
+import { rateLimitUntil } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useToast } from '../composables/useToast'
@@ -150,6 +151,10 @@ import { useToast } from '../composables/useToast'
 const { register, verifyOtp, resendOtp, isLoading } = useUserAccount()
 const { showToast } = useToast()
 const router = useRouter()
+const cooldownNow = ref(Date.now())
+const authCooldown = computed(() => Math.max(0, Math.ceil((rateLimitUntil.value - cooldownNow.value) / 1000)))
+const cooldownTimer = setInterval(() => { cooldownNow.value = Date.now() }, 1000)
+onUnmounted(() => clearInterval(cooldownTimer))
 
 const step = ref(1)
 const otpDigits = ref(['', '', '', '', '', ''])

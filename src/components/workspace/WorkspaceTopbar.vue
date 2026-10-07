@@ -84,6 +84,7 @@
           </div>
           <div class="dropdown-actions">
             <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Beranda</button>
+            <a v-if="globalLogoutEnabled" href="https://ic-auth.unikom.my.id/logout" class="text-primary">Keluar dari semua aplikasi</a>
             <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
             <button @click="handleLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
           </div>
@@ -94,6 +95,7 @@
 </template>
 
 <script setup>
+import { ssoEnabled, globalLogoutEnabled } from '../../services/sso';
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
@@ -135,13 +137,12 @@ defineEmits(["back"]);
 const showUserDropdown = ref(false);
 
 const goToMarket = () => {
-  const token = localStorage.getItem('auth_token') || '';
-  const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://market.icraftds.id/';
-  window.open(`${marketUrl}/auto-login?token=${token}`, '_blank');
+  const marketUrl = ssoEnabled ? 'https://market.icraftds.id/auth/start?return_to=%2F' : (import.meta.env.VITE_MARKET_URL || 'https://market.icraftds.id/');
+  window.open(marketUrl, '_blank', 'noopener,noreferrer');
 };
 
-const handleLogout = () => {
-  logout();
+const handleLogout = async () => {
+  await logout();
   router.push('/login');
 };
 

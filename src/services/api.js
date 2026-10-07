@@ -1,10 +1,13 @@
 import axios from 'axios';
+import { ref } from 'vue';
+export const rateLimitUntil = ref(0);
 import router from '../router';
 import { useWipModal } from '../composables/useWipModal';
+import { ssoEnabled, ssoState, loadSsoSession, clearSsoSession } from './sso';
 
 // Konfigurasi instance Axios
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL || 'https://icgamez.unikom.my.id/api',
   
   // -- KODE UNTUK MODE SANCTUM SPA (COOKIE) --
   // Jika Anda menggunakan domain yang sama (misal app.unikom.my.id dan api.unikom.my.id), 
@@ -19,11 +22,38 @@ const api = axios.create({
   }
 });
 
+const cooldowns = new Map();
+
+export const retrySeconds = (value) => {
+  const seconds = Number(value);
+  return Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds) : Math.max(1, Math.ceil((Date.parse(value) - Date.now()) / 1000) || 60);
+};
+
 // Request Interceptor untuk menyisipkan Bearer Token (Mode API Token)
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(async config => {
+  const until = cooldowns.get(config.url) || 0;
+  if (until > Date.now()) {
+    const retryAfter = Math.ceil((until - Date.now()) / 1000);
+    return Promise.reject({ retryAfter, response: { status: 429, data: { message: `Tunggu ${retryAfter} detik sebelum mencoba kembali.` } }, config });
+  }
+  if (ssoEnabled) {
+    config.ssoGeneration = ssoState.generation;
+    const path = config.url || '';
+    if (!path.startsWith('/') || path.startsWith('//') || path.includes('://')) return Promise.reject(new Error('Invalid product path'));
+    config.headers.delete('Authorization');
+    const method = (config.method || 'get').toUpperCase();
+    const privatePath = /^\/(?:auth\/me|user|payments|subscription|coupons)(?:\/|$)/.test(path);
+    if (ssoState.user.value || privatePath || !['GET', 'HEAD'].includes(method)) {
+      config.baseURL = '/api/bff';
+      config.withCredentials = true;
+      if (!['GET', 'HEAD'].includes(method)) {
+        if (!ssoState.csrf.value) await loadSsoSession();
+        config.headers['X-CSRF-Token'] = ssoState.csrf.value || '';
+      }
+    }
+  } else {
+    const token = localStorage.getItem('auth_token');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
   }
   
   const locale = localStorage.getItem('user_locale') || 'id';
@@ -34,8 +64,17 @@ api.interceptors.request.use(config => {
 
 // Interceptor Response
 api.interceptors.response.use(
-  response => response,
+  response => {
+    if (ssoEnabled && response.config.baseURL === '/api/bff' && response.config.ssoGeneration !== ssoState.generation) return Promise.reject({ response: { status: 409, data: { message: 'Sesi pengguna telah berubah.' } } });
+    return response;
+  },
   error => {
+    if (error.response?.status === 429) {
+      error.retryAfter = retrySeconds(error.response.headers?.['retry-after']);
+      cooldowns.set(error.config?.url, Date.now() + error.retryAfter * 1000);
+      rateLimitUntil.value = Date.now() + error.retryAfter * 1000;
+      error.response.data.message = `Terlalu banyak permintaan. Tunggu ${error.retryAfter} detik.`;
+    }
     // 1. Cek apakah ini fitur yang belum jadi / belum di-push (404 Not Found, 501 Not Implemented, atau Server Mati)
     const isNetworkError = !error.response;
     const isWipError = error.response && (error.response.status === 404 || error.response.status === 501);
@@ -67,7 +106,7 @@ api.interceptors.response.use(
       }
       
       // Return a pending promise so the app doesn't crash on unhandled rejection
-      return new Promise(() => {});
+      return Promise.reject(error);
     }
 
     // Tangani error 403 Forbidden secara global (misal: akses konten premium ditolak)
@@ -80,7 +119,8 @@ api.interceptors.response.use(
     }
 
     // Tangani error 401 Unauthorized secara global
-    if (error.response && error.response.status === 401) {
+    if (error.response && error.response.status === 401 && !['/auth/login', '/auth/register', '/auth/verify-otp', '/auth/resend-otp'].includes(error.config?.url)) {
+      if (ssoEnabled) clearSsoSession();
       // Jika error 401 berasal dari '/auth/me', abaikan redirect karena wajar saat init App.vue
       if (error.config && error.config.url === '/auth/me') {
         return Promise.reject(error);

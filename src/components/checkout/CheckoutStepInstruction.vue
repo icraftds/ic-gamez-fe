@@ -24,6 +24,7 @@
       </div>
     </div>
 
+    <a v-if="paymentDetails.payment_link" :href="paymentDetails.payment_link" target="_blank" rel="noopener noreferrer" class="btn-outline">Buka tautan pembayaran</a>
     <!-- QRIS Display -->
     <div v-if="selectedMethod === 'qris'" class="qr-display" :class="{ 'is-expired': countdown === 0 }">
       <div class="qr-box-wrapper">
@@ -67,11 +68,11 @@
         Waktu Pembayaran Habis
       </div>
       <p v-if="countdown > 0" class="awaiting-timer">Selesaikan dalam <span class="timer-value">{{ formattedCountdown }}</span></p>
-      <p v-else class="awaiting-timer text-muted">Silakan ulangi proses atau ganti metode pembayaran.</p>
+      <p v-else class="awaiting-timer text-muted">Cek status aktivasi paket sebelum membuat pembayaran lain.</p>
     </div>
 
     <button class="btn-outline" @click="$emit('back')">
-      <i class="fa-solid fa-arrow-left"></i> Ganti Metode Pembayaran
+      <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
     </button>
   </div>
 </template>

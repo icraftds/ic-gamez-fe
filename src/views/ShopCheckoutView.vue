@@ -53,7 +53,7 @@
 
             <div class="checkout-actions">
               <button class="btn-cancel" @click="$router.push('/shop')">Batal</button>
-              <button class="btn-primary" @click="processPayment">
+              <button class="btn-primary" :disabled="method !== 'coinz' || state === 'processing'" @click="processPayment">
                 <i class="fa-solid fa-check"></i> Konfirmasi & Bayar
               </button>
             </div>
@@ -149,148 +149,54 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import api from '../services/api'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 
-const router = useRouter()
 const route = useRoute()
-const { fetchUser, userProfile } = useUserAccount()
-
+const { fetchUser, fetchWallet, userProfile } = useUserAccount()
 const pkgId = route.query.pkgId
 const pkgName = route.query.name || 'Paket'
 const pkgEnergy = route.query.energy || 0
 const method = route.query.method || 'gateway'
 const price = route.query.price || 0
-
-const state = ref('confirm') // confirm, processing, success, qris
-const errorMsg = ref('')
+const state = ref('confirm')
+const errorMsg = ref(method !== 'coinz' ? 'Pembayaran energi melalui QRIS belum tersedia. Gunakan iCoinz.' : '')
 const qrString = ref('')
-
-// Countdown timer for QRIS (15 minutes)
-const countdown = ref(900)
-let countdownTimer = null
-
-const formattedCountdown = computed(() => {
-  const m = Math.floor(countdown.value / 60)
-  const s = countdown.value % 60
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-})
-
-let pollingInterval = null
-
-const stopPolling = () => {
-  if (pollingInterval) clearInterval(pollingInterval)
-}
-
-const startPolling = () => {
-  stopPolling()
-  const initialCredits = userProfile.value?.credits || 0
-  
-  pollingInterval = setInterval(async () => {
-    try {
-      await fetchUser(true)
-      const currentCredits = userProfile.value?.credits || 0
-      
-      if (currentCredits > initialCredits) {
-        handlePaymentSuccess()
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }, 5000)
-}
-
-const handlePaymentSuccess = () => {
-  stopPolling()
-  localStorage.removeItem('ic_shop_pending')
-  state.value = 'success'
-}
-
-const startCountdown = (duration = 900) => {
-  countdown.value = duration
-  countdownTimer = setInterval(() => {
-    if (countdown.value > 0) {
-      countdown.value--
-    } else {
-      clearInterval(countdownTimer)
-      stopPolling()
-      localStorage.removeItem('ic_shop_pending')
-      state.value = 'confirm'
-      errorMsg.value = 'Waktu pembayaran telah habis'
-    }
-  }, 1000)
-}
-
-onMounted(() => {
-  const pending = localStorage.getItem('ic_shop_pending')
-  if (pending) {
-    try {
-      const data = JSON.parse(pending)
-      if (data.expiry && new Date().getTime() < data.expiry) {
-        qrString.value = data.qr_string
-        state.value = 'qris'
-        startCountdown(Math.floor((data.expiry - new Date().getTime()) / 1000))
-        startPolling()
-      } else {
-        localStorage.removeItem('ic_shop_pending')
-      }
-    } catch (e) {
-      localStorage.removeItem('ic_shop_pending')
-    }
-  }
-})
-
-onUnmounted(() => {
-  if (countdownTimer) clearInterval(countdownTimer)
-  stopPolling()
-})
-
-const formattedPrice = computed(() => {
-  if (method === 'coinz') return price.toString()
-  return Number(price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-})
+const countdown = ref(0)
+const formattedCountdown = computed(() => '00:00')
+const formattedPrice = computed(() => Number(price).toLocaleString('id-ID'))
+const intentKey = computed(() => `ic_energy_purchase:${userProfile.value.id}`)
 
 const processPayment = async () => {
+  if (state.value === 'processing' || method !== 'coinz') return
+  if (!userProfile.value.id) { errorMsg.value = 'Silakan masuk kembali.'; return }
   errorMsg.value = ''
   state.value = 'processing'
-  
   try {
-    if (method === 'coinz') {
-      // Coinz: hit backend which deducts wallet + grants credits
-      await api.post('/shop/purchase/coinz', { package_id: pkgId })
-      await fetchUser(true)
-      handlePaymentSuccess()
-    } else {
-      // QRIS: hit PG via backend, get qr_string, show QR code
-      const res = await api.post('/shop/purchase/gateway', { 
-        package_id: pkgId,
-        payment_method: 'qris'
-      })
-      
-      const tx = res.data?.data || {}
-      qrString.value = tx.qr_string || ''
-      
-      if (!qrString.value) {
-        throw new Error('QR string tidak ditemukan dari Payment Gateway.')
-      }
-
-      state.value = 'qris'
-      const expiry = new Date().getTime() + (15 * 60 * 1000)
-      localStorage.setItem('ic_shop_pending', JSON.stringify({
-        qr_string: qrString.value,
-        expiry: expiry
-      }))
-      
-      startCountdown(900)
-      startPolling()
+    let intent = JSON.parse(localStorage.getItem(intentKey.value) || 'null')
+    if (intent && String(intent.package_id) !== String(pkgId)) {
+      throw new Error('Pembelian sebelumnya belum pasti. Cek kembali paket sebelumnya sebelum membeli paket lain.')
     }
+    if (!intent) {
+      intent = { key: crypto.randomUUID(), package_id: pkgId, status: 'pending' }
+      localStorage.setItem(intentKey.value, JSON.stringify(intent))
+    }
+    const response = await api.post('/shop/purchase/coinz', { package_id: intent.package_id }, {
+      headers: { 'Idempotency-Key': intent.key }
+    })
+    if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian belum dapat dikonfirmasi')
+    localStorage.removeItem(intentKey.value)
+    await Promise.all([fetchUser(true), fetchWallet()])
+    state.value = 'success'
   } catch (error) {
+    // Only a definitive rejection permits a new purchase intent.
+    if (error.response?.status === 400 && error.response?.data?.success === false) localStorage.removeItem(intentKey.value)
     state.value = 'confirm'
-    errorMsg.value = error.response?.data?.message || error.message || 'Gagal memproses pembayaran'
+    errorMsg.value = error.response?.data?.message || error.message || 'Pembelian belum pasti. Coba kembali dengan referensi yang sama.'
   }
 }
 </script>

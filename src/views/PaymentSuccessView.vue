@@ -15,7 +15,7 @@
           <div class="icon-circle">
             <i class="fa-solid fa-check"></i>
           </div>
-          <h2>Berhasil! Koin/Akses Pro sudah aktif.</h2>
+          <h2>Akses paket sudah aktif.</h2>
           <p>Pembayaran Anda telah diverifikasi. Selamat menikmati layanan iCraft!</p>
           <button class="btn-primary" @click="goToDashboard">
             Kembali ke Dashboard
@@ -25,11 +25,10 @@
           <div class="icon-circle error">
             <i class="fa-solid fa-xmark"></i>
           </div>
-          <h2>Terjadi Kesalahan / Waktu Habis</h2>
-          <p>Pembayaran belum terdeteksi setelah beberapa saat. Jika saldo Anda terpotong, silakan hubungi tim support kami.</p>
-          <button class="btn-primary" @click="goToDashboard">
-            Kembali ke Dashboard
-          </button>
+          <h2>Pembayaran masih diproses</h2>
+          <p>Aktivasi paket belum dapat dikonfirmasi. Cek ulang atau hubungi dukungan; jangan membuat pembayaran baru.</p>
+          <button class="btn-primary" @click="startPolling">Cek ulang</button>
+          <button class="btn-primary" @click="goToDashboard">Kembali ke Dashboard</button>
         </div>
       </div>
     </div>
@@ -48,12 +47,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
+import api from '../services/api'
+import { createPaymentPoll } from '../utils/paymentPoll'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 
 const router = useRouter()
 const route  = useRoute()
-const { fetchUser, isPremiumUser, userProfile, credits } = useUserAccount()
+const { fetchUser, fetchWallet, isPremiumUser, currentPlan, isLoggedIn, userProfile } = useUserAccount()
 
 const isLoading  = ref(true)
 const isSuccess  = ref(false)
@@ -63,82 +64,28 @@ const showCoinzModal  = ref(false)
 const coinzAmount     = ref(0)
 const coinzPlan       = ref('pro')
 
-// Map plan_id (passed via query) → coinz amount & plan label
-const PLAN_COINZ = {
-  '1': { amount: 200000, plan: 'pro' },
-  '2': { amount: 300000, plan: 'expert' },
-  '3': { amount: null,   plan: 'topup' }, // amount = credits gained (dynamic)
-}
-
-let pollingInterval = null
-let maxAttempts     = 15
-let attempts        = 0
-
-const checkPaymentStatus = async () => {
-  attempts++
-  try {
-    const initialIsPremium = isPremiumUser.value
-    const initialCredits   = userProfile.value?.credits ?? credits.value ?? 0
-    const initialPlan      = userProfile.value?.current_plan?.slug ?? userProfile.value?.current_plan ?? 'free'
-
-    await fetchUser()
-
-    const newPlan      = userProfile.value?.current_plan?.slug ?? userProfile.value?.current_plan ?? 'free'
-    const newCredits   = userProfile.value?.credits ?? credits.value ?? 0
-    const becamePremium = !initialIsPremium && isPremiumUser.value
-    const planChanged   = isPremiumUser.value && initialPlan !== newPlan
-    const gainedCredits = newCredits > initialCredits
-
-    if (becamePremium || planChanged || gainedCredits) {
-      isLoading.value = false
-      isSuccess.value = true
-      stopPolling()
-      fireConfetti()
-
-      // Determine coinz reward details
-      const planIdParam = route.query.plan_id ?? null
-      const planConfig  = planIdParam ? PLAN_COINZ[String(planIdParam)] : null
-
-      if (planConfig) {
-        coinzPlan.value   = planConfig.plan
-        coinzAmount.value = planConfig.plan === 'topup'
-          ? (newCredits - initialCredits)  // dynamic for topup
-          : planConfig.amount
-      } else if (becamePremium || planChanged) {
-        // Fallback: detect from plan name
-        coinzPlan.value   = newPlan === 'expert' ? 'expert' : 'pro'
-        coinzAmount.value = newPlan === 'expert' ? 300000 : 200000
-      } else if (gainedCredits) {
-        coinzPlan.value   = 'topup'
-        coinzAmount.value = newCredits - initialCredits
-      }
-
-      // Show reward modal after short delay (let success card render first)
-      setTimeout(() => { showCoinzModal.value = true }, 1200)
-    }
-  } catch (err) {
-    console.error('Failed to verify payment', err)
-  }
-
-  if (attempts >= maxAttempts && isLoading.value) {
+const poll = createPaymentPoll(async (isCurrent) => {
+  const saved = JSON.parse(localStorage.getItem('ic_pending_checkout') || 'null')
+  await fetchUser(true)
+  const expectedPlan = saved?.userId === userProfile.value.id ? saved.planSlug : null
+  if (!expectedPlan) return false
+  const [user, response] = await Promise.all([fetchUser(true), api.get('/subscription')])
+  if (!isCurrent()) return false
+  const active = response.data.data
+  const baseline = saved?.paymentDetails?.baselineSubscription
+  const newGrant = !baseline || (active && (active.id !== baseline.id || active.expires_at !== baseline.expires_at))
+  if (newGrant && user && isPremiumUser.value && currentPlan.value === expectedPlan && response.data.data?.status === 'active') {
+    await fetchWallet()
+    localStorage.removeItem('ic_pending_checkout')
     isLoading.value = false
-    isSuccess.value = false
-    stopPolling()
+    isSuccess.value = true
+    fireConfetti()
+    return true
   }
-}
-
-const startPolling = () => {
-  stopPolling()
-  checkPaymentStatus()
-  pollingInterval = setInterval(checkPaymentStatus, 4000)
-}
-
-const stopPolling = () => {
-  if (pollingInterval) {
-    clearInterval(pollingInterval)
-    pollingInterval = null
-  }
-}
+  return false
+}, { isAuthenticated: () => isLoggedIn.value, onTimeout: () => { isLoading.value = false } })
+const startPolling = () => { isLoading.value = true; poll.start() }
+const stopPolling = () => poll.stop()
 
 const fireConfetti = async () => {
   try {
@@ -151,11 +98,11 @@ const fireConfetti = async () => {
 }
 
 const goToDashboard = () => {
-  router.push('/dashboard?pro_success=1')
+  router.push('/dashboard')
 }
 
 onMounted(() => { startPolling() })
-onUnmounted(() => { stopPolling() })
+onUnmounted(() => { poll.dispose() })
 </script>
 
 

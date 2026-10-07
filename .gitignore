@@ -25,3 +25,9 @@ dist-ssr
 
 # Environment Variables
 .env
+
+# Vercel local configuration and generated server artifacts
+.vercel/
+
+.env.*
+!.env.example

@@ -79,16 +79,15 @@ const saveProfile = async () => {
   }
 }
 
-const { isLoggedIn, userProfile, credits, coinz, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout, isLoading: isUserLoading } = useUserAccount()
+const { isLoggedIn, userProfile, credits, coinz, walletStatus, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout, isLoading: isUserLoading } = useUserAccount()
 const { isLightMode, toggleTheme } = useTheme()
 
 const showUserDropdown = ref(false)
 
 const goToMarket = () => {
-  const token = localStorage.getItem('auth_token') || ''
   // Menggunakan VITE_MARKET_URL dari .env (fallback ke default jika tidak ada)
   const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://ic-market.unikom.my.id'
-  window.open(`${marketUrl}/auto-login?token=${token}`, '_blank')
+  window.open(marketUrl, '_blank', 'noopener,noreferrer')
 }
 const handleClickOutside = (e) => {
   if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {
@@ -127,10 +126,7 @@ onMounted(() => {
   if (!hasFetchedAllPaths.value) {
     fetchAllPathsDetails()
   }
-  if (route.query.pro_success === '1') {
-    // Show CoinZ reward modal instead of old static modal
-    showCoinzModal.value = true
-  }
+
 
   if (sessionStorage.getItem('just_logged_in') === 'true') {
     sessionStorage.removeItem('just_logged_in')
@@ -229,7 +225,7 @@ const tabs = [
             <span class="coinz-label">ICOINZ</span>
             <span class="coinz-amount">
               <i v-if="isUserLoading" class="fa-solid fa-circle-notch fa-spin" style="font-size: 0.9rem; opacity: 0.7;"></i>
-              <span v-else>{{ coinz.toLocaleString('id-ID') }}</span>
+              <span v-else>{{ coinz === null ? '—' : coinz.toLocaleString('id-ID') }}<small v-if="walletStatus !== 'fresh'"> · belum diperbarui</small></span>
             </span>
           </div>
         </div>

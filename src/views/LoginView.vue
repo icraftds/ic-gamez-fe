@@ -39,7 +39,7 @@
             <div class="form-group">
               <label>Email</label>
               <div class="input-wrapper">
-                <input type="email" v-model="loginForm.email" placeholder="admin@example.com" required :disabled="isLoading" />
+                <input type="email" v-model="loginForm.email" placeholder="admin@example.com" required :disabled="isLoading || authCooldown > 0" />
                 <i class="fa-regular fa-envelope"></i>
               </div>
             </div>
@@ -47,7 +47,7 @@
             <div class="form-group">
               <label>Password</label>
               <div class="input-wrapper">
-                <input type="password" v-model="loginForm.password" placeholder="••••••••" required :disabled="isLoading" />
+                <input type="password" v-model="loginForm.password" placeholder="••••••••" required :disabled="isLoading || authCooldown > 0" />
                 <i class="fa-solid fa-lock"></i>
               </div>
             </div>
@@ -59,7 +59,7 @@
               <a href="#" class="forgot-password" @click.prevent="openWipModal">Lupa Password?</a>
             </div>
 
-            <button type="submit" class="btn-submit" :disabled="isLoading">
+            <button type="submit" class="btn-submit" :disabled="isLoading || authCooldown > 0">
               <span v-if="!isLoading">Masuk ke Akun</span>
               <div v-else class="spinner"></div>
             </button>
@@ -85,18 +85,18 @@
                   @input="handleOtpInput(index, $event)"
                   @keydown="handleOtpKeydown(index, $event)"
                   @paste="handleOtpPaste"
-                  :disabled="isLoading || otpStatus === 'success'"
+                  :disabled="isLoading || authCooldown > 0 || otpStatus === 'success'"
                   class="otp-input"
                 />
               </div>
             </div>
 
-            <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading">
+            <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading || authCooldown > 0">
               <span v-if="!isLoading">Verifikasi OTP</span>
               <div v-else class="spinner"></div>
             </button>
             
-            <button type="button" @click="handleResendOtp" :disabled="isLoading" style="background: transparent; color: var(--text-sub-hex); border: none; margin-top: 15px; cursor: pointer; text-decoration: underline; width: 100%; text-align: center;">
+            <button type="button" @click="handleResendOtp" :disabled="isLoading || authCooldown > 0" style="background: transparent; color: var(--text-sub-hex); border: none; margin-top: 15px; cursor: pointer; text-decoration: underline; width: 100%; text-align: center;">
               Kirim Ulang OTP
             </button>
           </form>
@@ -106,7 +106,7 @@
               <span>ATAU</span>
             </div>
 
-            <button class="btn-google" @click="openWipModal" :disabled="isLoading">
+            <button class="btn-google" @click="openWipModal" :disabled="isLoading || authCooldown > 0">
               <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="google-logo" />
               <span>Lanjutkan dengan Google</span>
             </button>
@@ -122,7 +122,8 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onUnmounted } from 'vue'
+import { rateLimitUntil } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useWipModal } from '../composables/useWipModal'
@@ -132,6 +133,10 @@ const { login, verifyOtp, resendOtp, isLoading } = useUserAccount()
 const { openWipModal } = useWipModal()
 const { showToast } = useToast()
 const router = useRouter()
+const cooldownNow = ref(Date.now())
+const authCooldown = computed(() => Math.max(0, Math.ceil((rateLimitUntil.value - cooldownNow.value) / 1000)))
+const cooldownTimer = setInterval(() => { cooldownNow.value = Date.now() }, 1000)
+onUnmounted(() => clearInterval(cooldownTimer))
 
 const errorMessage = ref('')
 const step = ref(1)

@@ -1,8 +1,17 @@
 import { ref, computed } from 'vue'
 import api, { initCsrf } from '../services/api'
+import { ssoEnabled, ssoState, loadSsoSession, logoutSso } from '../services/sso'
+
+const authIdentity = () => ssoEnabled ? ssoState.user.value?.id ?? null : localStorage.getItem('auth_token')
 
 const credits = ref(10)
-const coinz = ref(0)
+const coinz = ref(null)
+const walletStatus = ref('unavailable')
+const walletInitializationPending = ref(false)
+let userRequest = null
+let walletRequest = null
+let initializeRequest = null
+let initializedToken = null
 const isPremiumUser = ref(false)
 const maxCredits = computed(() => {
   if (currentPlan.value === 'expert') return 25
@@ -10,7 +19,7 @@ const maxCredits = computed(() => {
   return 10
 })
 const currentPlan = ref('free')
-const isLoggedIn = ref(!!localStorage.getItem('auth_token'))
+const isLoggedIn = ref(!!authIdentity())
 const isLoading = ref(false)
 
 const userProfile = ref({
@@ -28,16 +37,26 @@ const userProfile = ref({
   joinDate: ''
 })
 
+export function clearUserAccount() {
+  isLoggedIn.value = false
+  userProfile.value = { id: null, name: '', email: '', phone: '', avatar: '', level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: '' }
+  coinz.value = null; walletStatus.value = 'unavailable'; walletInitializationPending.value = false
+  currentPlan.value = 'free'; isPremiumUser.value = false; credits.value = 10; initializedToken = null
+}
+
 export function useUserAccount() {
   /**
    * Fetch current user data from the backend
    */
-  const fetchUser = async (silent = false) => {
+  const loadUser = async (silent = false) => {
+    const token = authIdentity()
     try {
       if (!silent) isLoading.value = true
       const response = await api.get('/auth/me')
+      if (token !== authIdentity()) return null
       const data = response.data.data
       
+      if (userProfile.value.id !== data.id) { coinz.value = null; walletStatus.value = 'unavailable' }
       isLoggedIn.value = true
       userProfile.value = {
         id: data.id,
@@ -60,20 +79,66 @@ export function useUserAccount() {
         ? data.current_plan.slug 
         : (data.current_plan || 'free')
 
-      // Fetch Coinz
-      try {
-        const walletRes = await api.get('/user/wallet')
-        coinz.value = walletRes.data.data?.balance || walletRes.data.data?.coinz || 0
-      } catch(e) {
-        console.error('Wallet fetch error:', e.response?.data || e)
-        coinz.value = 0
-      }
+      return data
     } catch (error) {
-      isLoggedIn.value = false
-      // Clear user data on failure (e.g. 401)
+      if (token === authIdentity() && error.response?.status === 401) {
+        localStorage.removeItem('auth_token')
+        clearUserAccount()
+      }
+      return null
     } finally {
       if (!silent) isLoading.value = false
     }
+  }
+
+  const fetchUser = (silent = false) => {
+    if (!userRequest) userRequest = loadUser(silent).finally(() => { userRequest = null })
+    return userRequest
+  }
+
+  const fetchWallet = () => {
+    if (walletRequest) return walletRequest
+    const token = authIdentity()
+    walletRequest = api.get('/user/wallet', { params: { include_histories: 0 } }).then(response => {
+      if (token !== authIdentity()) return false
+      const balance = response.data.data?.balance
+      if (balance === null || balance === undefined || !Number.isFinite(Number(balance))) throw new Error('Saldo tidak tersedia')
+      coinz.value = Number(balance)
+      walletStatus.value = 'fresh'
+      return true
+    }).catch(() => {
+      if (token === authIdentity()) walletStatus.value = coinz.value === null ? 'unavailable' : 'stale'
+      return false
+    }).finally(() => { walletRequest = null })
+    return walletRequest
+  }
+
+  const initializeWallet = (retry = false) => {
+    const token = authIdentity()
+    if (!token) return Promise.resolve(false)
+    if (initializeRequest) return initializeRequest
+    if (!retry && initializedToken === token) return Promise.resolve(!walletInitializationPending.value)
+    initializedToken = token
+    initializeRequest = api.post('/user/wallet/initialize', {}).then(() => {
+      if (token === authIdentity()) walletInitializationPending.value = false
+      return true
+    }).catch(() => {
+      if (token === authIdentity()) walletInitializationPending.value = true
+      return false
+    }).finally(() => { initializeRequest = null })
+    return initializeRequest
+  }
+
+  const bootstrapSession = async () => {
+    if (ssoEnabled) {
+      try { if (!await loadSsoSession()) return false } catch { return false }
+    }
+    const user = await fetchUser(true)
+    if (!user) return false
+    if (!ssoEnabled) await initializeWallet()
+    else walletInitializationPending.value = ssoState.walletPending.value
+    await fetchWallet()
+    return true
   }
 
   /**
@@ -81,6 +146,8 @@ export function useUserAccount() {
    * For testing, defaults to seeded user if no credentials provided.
    */
   const login = async (email = 'admin@example.com', password = 'password') => {
+    if (ssoEnabled) { window.location.assign('/auth/start?return_to=%2Fdashboard'); return { success: false } }
+    if (isLoading.value) return { success: false, message: 'Permintaan sedang diproses.' }
     try {
       isLoading.value = true
       await initCsrf()
@@ -92,15 +159,15 @@ export function useUserAccount() {
         localStorage.setItem('auth_token', token)
       }
       
-      await fetchUser()
+      await bootstrapSession()
       return { success: true }
     } catch (error) {
-      console.error('Login failed:', error)
+
       if (error.response?.status === 429) {
-        return { success: false, message: 'Terlalu banyak percobaan masuk. Mohon tunggu 1 menit sebelum mencoba lagi.' }
+        return { success: false, message: error.response.data.message, retryAfter: error.retryAfter }
       }
       const message = error.response?.data?.message || 'Email atau kata sandi salah'
-      return { success: false, message }
+      return { success: false, message, retryAfter: error.retryAfter, data: error.response?.data }
     } finally {
       isLoading.value = false
     }
@@ -110,6 +177,8 @@ export function useUserAccount() {
    * Register a new user
    */
   const register = async (name, email, phone, password, password_confirmation) => {
+    if (ssoEnabled) return login()
+    if (isLoading.value) return { success: false, message: 'Permintaan sedang diproses.' }
     try {
       isLoading.value = true
       await initCsrf()
@@ -119,9 +188,9 @@ export function useUserAccount() {
       
       return { success: true }
     } catch (error) {
-      console.error('Register failed:', error)
+
       if (error.response?.status === 429) {
-        return { success: false, message: 'Terlalu banyak percobaan pendaftaran. Mohon tunggu 1 menit sebelum mencoba lagi.' }
+        return { success: false, message: error.response.data.message, retryAfter: error.retryAfter }
       }
       const message = error.response?.data?.message || 'Pendaftaran gagal'
       const errors = error.response?.data?.errors || {}
@@ -135,9 +204,12 @@ export function useUserAccount() {
    * Verify OTP
    */
   const verifyOtp = async (email, otp) => {
+    if (ssoEnabled) return login()
+    if (isLoading.value) return { success: false, message: 'Permintaan sedang diproses.' }
+    if (!/^\d{6}$/.test(String(otp))) return { success: false, message: 'OTP harus enam digit.' }
     try {
       isLoading.value = true
-      const response = await api.post('/auth/verify-otp', { email, otp })
+      const response = await api.post('/auth/verify-otp', { email, otp: String(otp) })
       
       // Simpan token bawaan SSO
       const token = response.data?.data?.token || response.data?.token
@@ -145,12 +217,12 @@ export function useUserAccount() {
         localStorage.setItem('auth_token', token)
       }
       
-      await fetchUser() // Auto login
+      await bootstrapSession() // Auto login
       return { success: true }
     } catch (error) {
-      console.error('Verify OTP failed:', error)
+
       const message = error.response?.data?.message || 'OTP tidak valid atau kadaluarsa'
-      return { success: false, message }
+      return { success: false, message, retryAfter: error.retryAfter, data: error.response?.data }
     } finally {
       isLoading.value = false
     }
@@ -160,14 +232,16 @@ export function useUserAccount() {
    * Resend OTP
    */
   const resendOtp = async (email) => {
+    if (ssoEnabled) return { success: false, message: 'Lanjutkan melalui IC Auth.' }
+    if (isLoading.value) return { success: false, message: 'Permintaan sedang diproses.' }
     try {
       isLoading.value = true
       const response = await api.post('/auth/resend-otp', { email })
       return { success: true, message: response.data?.message || 'OTP berhasil dikirim ulang' }
     } catch (error) {
-      console.error('Resend OTP failed:', error)
+
       const message = error.response?.data?.message || 'Gagal mengirim ulang OTP'
-      return { success: false, message }
+      return { success: false, message, retryAfter: error.retryAfter, data: error.response?.data }
     } finally {
       isLoading.value = false
     }
@@ -177,11 +251,12 @@ export function useUserAccount() {
    * Perform logout
    */
   const logout = async () => {
+    if (ssoEnabled) await logoutSso()
     try {
       isLoading.value = true
-      await api.post('/auth/logout')
+      if (!ssoEnabled) await api.post('/auth/logout')
     } catch (error) {
-      console.error('Logout error:', error)
+      console.error('Logout error:', error.response?.status || 'request_failed')
     } finally {
       // Hapus token dari localStorage saat logout
       localStorage.removeItem('auth_token')
@@ -192,6 +267,11 @@ export function useUserAccount() {
         id: null, name: '', email: '', avatar: '',
         level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: ''
       }
+      coinz.value = null
+      walletStatus.value = 'unavailable'
+      walletInitializationPending.value = false
+      initializedToken = null
+      currentPlan.value = 'free'
       credits.value = 10
       isPremiumUser.value = false
       isLoading.value = false
@@ -202,7 +282,7 @@ export function useUserAccount() {
    * Trigger backend to refresh stats (used after completing activities)
    */
   const refreshStats = async () => {
-    await fetchUser()
+    await Promise.all([fetchUser(), fetchWallet()])
   }
 
   // Deprecated: used to add XP locally. Now it just refreshes from backend.
@@ -218,7 +298,7 @@ export function useUserAccount() {
       try {
         await api.post('/user/deduct-credits', { amount })
       } catch (error) {
-        console.error('Failed to deduct credits on backend', error)
+        console.error('Failed to deduct credits on backend', error.response?.status || 'request_failed')
       }
       return true
     }
@@ -243,10 +323,10 @@ export function useUserAccount() {
       
       return { success: true, message: response.data.message || `Selamat! Pembayaran berhasil.` }
     } catch (error) {
-      console.error('Checkout failed', error)
+      console.error('Checkout failed', error.response?.status || 'request_failed')
       const message = error.response?.data?.message || 'Pembayaran gagal. Silakan coba lagi.'
       // alert(message) // Opsional, UI akan menangani error ini
-      return { success: false, message }
+      return { success: false, message, retryAfter: error.retryAfter, data: error.response?.data }
     } finally {
       isLoading.value = false
     }
@@ -276,7 +356,7 @@ export function useUserAccount() {
         userStats.value = response.data.data
       }
     } catch (error) {
-      console.error('Failed to fetch user stats', error)
+      console.error('Failed to fetch user stats', error.response?.status || 'request_failed')
     }
   }
 
@@ -291,6 +371,11 @@ export function useUserAccount() {
     resendOtp,
     logout,
     fetchUser,
+    fetchWallet,
+    initializeWallet,
+    bootstrapSession,
+    walletStatus,
+    walletInitializationPending,
     fetchUserStats,
     refreshStats,
     addXp,

@@ -3,6 +3,10 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    __SSO_ENABLED__: JSON.stringify(process.env.SSO_ENABLED === 'true'),
+    __SSO_GLOBAL_LOGOUT_ENABLED__: JSON.stringify(process.env.SSO_GLOBAL_LOGOUT_ENABLED === 'true'),
+  },
   plugins: [vue()],
   resolve: {
     dedupe: [
@@ -18,4 +22,3 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   }
 })
-

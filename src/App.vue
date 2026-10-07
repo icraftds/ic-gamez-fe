@@ -1,7 +1,9 @@
 <template>
   <div class="app-layout" :class="{ 'workspace-mode': isWorkspacePage }">
+    <p v-if="cooldownSeconds" role="status" style="position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:999999;background:#222;color:white;padding:12px;border-radius:8px;">Terlalu banyak permintaan. Tunggu {{ cooldownSeconds }} detik.</p>
     <HomeNavbar v-if="showHomeNavbar" />
-    <div class="app-content">
+    <p v-if="ssoEnabled && ssoState.status.value === 'unavailable'" role="status">Layanan sesi belum tersedia. Coba kembali sebentar lagi.</p>
+    <div v-if="!ssoEnabled || ssoState.status.value !== 'guest' || !route.meta.requiresAuth" class="app-content">
       <router-view v-slot="{ Component, route }">
         <transition name="page-fade" mode="out-in">
           <div :key="route.path" class="route-wrapper">
@@ -28,17 +30,24 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { rateLimitUntil } from './services/api'
 import { useRoute } from 'vue-router'
 import HomeNavbar from './components/home/HomeNavbar.vue'
 import AppFooter from './components/common/AppFooter.vue'
 import AppToast from './components/common/AppToast.vue'
 import CoffeeModal from './components/common/CoffeeModal.vue'
-import { useUserAccount } from './composables/useUserAccount'
+import { useUserAccount, clearUserAccount } from './composables/useUserAccount'
+import { ssoEnabled, ssoState, loadSsoSession } from './services/sso'
 import { useLearningPaths } from './composables/useLearningPaths'
 import { useWipModal } from './composables/useWipModal'
 import { useTheme } from './composables/useTheme'
 
+const now = ref(Date.now())
+const cooldownSeconds = computed(() => Math.max(0, Math.ceil((rateLimitUntil.value - now.value) / 1000)))
+let cooldownTimer
+onMounted(() => { cooldownTimer = setInterval(() => { now.value = Date.now() }, 1000) })
+onUnmounted(() => clearInterval(cooldownTimer))
 const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
 const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
@@ -47,7 +56,7 @@ const showHomeNavbar = computed(() => {
   return !hiddenRoutes.includes(route.name) && !route.path.startsWith('/dashboard')
 })
 
-const { fetchUser } = useUserAccount()
+const { bootstrapSession, fetchUser, isLoggedIn } = useUserAccount()
 const { isPreparingLesson } = useLearningPaths()
 const { showWipModal } = useWipModal()
 const { isLightMode, toggleTheme } = useTheme()
@@ -55,7 +64,7 @@ const { isLightMode, toggleTheme } = useTheme()
 onMounted(() => {
 
   // Fetch user session when app loads
-  fetchUser()
+  bootstrapSession()
 
   // Anti-Cheat Basic: Cegah Klik Kanan
   window.addEventListener('contextmenu', function (e) {
@@ -75,6 +84,27 @@ onMounted(() => {
   //     e.preventDefault()
   //   }
   // })
+})
+
+let sessionTimer
+const clearAccount = () => clearUserAccount()
+const checkSession = async () => {
+  if (!ssoEnabled || !isLoggedIn.value || document.visibilityState !== 'visible') return
+  try { if (await loadSsoSession()) await fetchUser(true) } catch { /* Retain unavailable state. */ }
+}
+onMounted(() => {
+  if (!ssoEnabled) return
+  localStorage.removeItem('auth_token'); localStorage.removeItem('sso_token')
+  window.addEventListener('gamez-session-cleared', clearAccount)
+  window.addEventListener('focus', checkSession)
+  document.addEventListener('visibilitychange', checkSession)
+  sessionTimer = setInterval(checkSession, 30000)
+})
+onUnmounted(() => {
+  clearInterval(sessionTimer)
+  window.removeEventListener('gamez-session-cleared', clearAccount)
+  window.removeEventListener('focus', checkSession)
+  document.removeEventListener('visibilitychange', checkSession)
 })
 </script>
 

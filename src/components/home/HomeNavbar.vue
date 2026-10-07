@@ -88,7 +88,7 @@
           <div class="nav-coinz" title="Saldo iCoinZ">
             <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
             <i v-if="isLoading" class="fa-solid fa-circle-notch fa-spin" style="margin-left: 4px; font-size: 0.9rem; opacity: 0.7;"></i>
-            <span v-else class="nav-coinz-val">{{ (coinz || 0).toLocaleString('id-ID') }}</span>
+            <span v-else class="nav-coinz-val">{{ coinz === null ? '—' : coinz.toLocaleString('id-ID') }}<small v-if="walletStatus !== 'fresh'"> · belum diperbarui</small></span>
           </div>
 
           <!-- 4. Profile Dropdown -->
@@ -134,7 +134,8 @@
                   <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
                   {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
                 </button>
-                <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
+                <a v-if="globalLogoutEnabled" href="https://ic-auth.unikom.my.id/logout" class="text-primary">Keluar dari semua aplikasi</a>
+            <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
                 <button @click="handleLogoutClick" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
               </div>
             </div>
@@ -167,6 +168,7 @@
 </template>
 
 <script setup>
+import { ssoEnabled, globalLogoutEnabled } from '../../services/sso';
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
@@ -175,7 +177,7 @@ import ConfirmModal from "../common/ConfirmModal.vue";
 
 const { isLightMode, toggleTheme } = useTheme();
 
-const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz } =
+const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz, walletStatus } =
   useUserAccount();
 const router = useRouter();
 const route = useRoute();
@@ -239,9 +241,8 @@ const handleLogoutClick = () => {
 };
 
 const goToMarket = () => {
-  const token = localStorage.getItem('auth_token') || ''
-  const marketUrl = import.meta.env.VITE_MARKET_URL || 'https://market.icraftds.id/'
-  window.open(`${marketUrl}/auto-login?token=${token}`, '_blank')
+  const marketUrl = ssoEnabled ? 'https://market.icraftds.id/auth/start?return_to=%2F' : (import.meta.env.VITE_MARKET_URL || 'https://market.icraftds.id/')
+  window.open(marketUrl, '_blank', 'noopener,noreferrer')
   showUserDropdown.value = false;
 };
 

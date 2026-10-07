@@ -1,3 +1,4 @@
+import { ssoEnabled, loadSsoSession } from './services/sso'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 
@@ -107,7 +108,23 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  if (ssoEnabled) {
+    if (['login', 'register', 'auto-login'].includes(to.name)) {
+      const target = typeof to.query.redirect === 'string' ? to.query.redirect : '/dashboard'
+      window.location.replace('/auth/start?return_to=' + encodeURIComponent(target))
+      return next(false)
+    }
+    if (to.meta.requiresAuth) {
+      try {
+        if (!await loadSsoSession()) {
+          window.location.assign('/auth/start?return_to=' + encodeURIComponent(to.fullPath))
+          return next(false)
+        }
+      } catch { return next(false) }
+    }
+    return next()
+  }
   const token = localStorage.getItem('auth_token')
   if (to.meta.requiresAuth && !token) {
     next('/login')

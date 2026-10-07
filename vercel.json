@@ -1,5 +1,11 @@
 {
-  "rewrites": [{ 
+  "rewrites": [
+    { "source": "/auth/start", "destination": "/api/sso?__sso_route=start" },
+    { "source": "/auth/callback", "destination": "/api/sso?__sso_route=callback" },
+    { "source": "/api/session", "destination": "/api/sso?__sso_route=session" },
+    { "source": "/api/auth/logout", "destination": "/api/sso?__sso_route=logout" },
+    { "source": "/api/bff/:path*", "destination": "/api/sso?__sso_route=bff&__sso_path=:path*" },
+    {
       "source": "/(.*)",
       "destination": "/" }]
 }
