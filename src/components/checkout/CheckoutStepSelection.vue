@@ -82,7 +82,7 @@
 
     <button
       class="btn-primary"
-      :disabled="!selectedMethod || isProcessingPayment"
+      :disabled="!selectedMethod || isProcessingPayment || invoiceUncertain"
       @click="goToInstruction"
     >
       <i class="fa-solid fa-spinner fa-spin" v-if="isProcessingPayment"></i>
@@ -119,6 +119,9 @@ const couponStatus = ref(null)
 const discountedPrice = ref(null)
 const paymentError = ref('')
 const invoiceKey = `ic_invoice_uncertain:${userProfile.value.id}`
+const invoiceUncertain = ref(!!localStorage.getItem(invoiceKey))
+
+if (invoiceUncertain.value) paymentError.value = 'Invoice sebelumnya belum dapat dikonfirmasi. Periksa pembayaran atau hubungi dukungan.'
 
 const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
@@ -148,13 +151,13 @@ const validateCoupon = async () => {
 }
 
 const goToInstruction = async () => {
-  if (isProcessingPayment.value) return
+  if (isProcessingPayment.value || invoiceUncertain.value) return
   paymentError.value = ''
   isProcessingPayment.value = true
   emit('processing', true)
   
   try {
-    if (isProcessingPayment.value === false) return
+    if (isProcessingPayment.value === false || invoiceUncertain.value) return
     const plansResponse = await api.get('/plans')
     const plan = plansResponse.data.data.find(item => item.slug === props.planSlug && item.is_active)
     if (!plan) throw new Error('Paket tidak tersedia')
@@ -166,15 +169,18 @@ const goToInstruction = async () => {
     }
     const subscriptionResponse = await api.get('/subscription')
     const baselineSubscription = subscriptionResponse.data.data
-
+    // Persist before POST: a lost response may still have created an invoice.
+    localStorage.setItem(invoiceKey, JSON.stringify({ plan_slug: plan.slug, status: 'pending' }))
+    invoiceUncertain.value = true
     const res = await api.post('/payments/create', {
       item_type: 'premium_plan', plan_slug: plan.slug,
       payment_method: selectedMethod.value, coupon_code: couponCode.value || null
     })
     const tx = { ...res.data.data?.payment_details, order_id: res.data.data?.order_id, baselineSubscription }
-    if (!tx.order_id) throw new Error('Gagal membuat invoice. Silakan coba lagi.')
+    if (!tx.order_id) throw new Error('Invoice belum dapat dikonfirmasi. Periksa pembayaran Anda sebelum membuat invoice lain.')
     localStorage.setItem(`ic_pending_invoice:${userProfile.value.id}`, JSON.stringify(tx))
     localStorage.removeItem(invoiceKey)
+    invoiceUncertain.value = false
     // Untuk QRIS dan VA, teruskan data (termasuk qr_string / va_number) ke layar instruksi
     emit('instruction', {
       paymentDetails: tx,
@@ -182,7 +188,10 @@ const goToInstruction = async () => {
       discountedPrice: discountedPrice.value
     })
   } catch (err) {
-    localStorage.removeItem(invoiceKey)
+    if ([400, 401, 403, 409, 422, 429].includes(err.response?.status)) {
+      localStorage.removeItem(invoiceKey)
+      invoiceUncertain.value = false
+    }
     
     let errMsg = 'Gagal memproses pembayaran. Silakan coba lagi.'
     
@@ -199,7 +208,7 @@ const goToInstruction = async () => {
       errMsg = 'Tidak dapat terhubung ke server pembayaran. Periksa koneksi internet Anda.'
     }
     
-    paymentError.value = errMsg
+    paymentError.value = invoiceUncertain.value ? 'Pembuatan invoice belum pasti. Jangan membuat invoice baru; periksa pembayaran atau hubungi dukungan.' : errMsg
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)

@@ -173,3 +173,12 @@
   :deep(.section-title) { font-size: 1.25rem; }
   .step-line { width: 36px; }
 }
+
+@media (max-width: 480px) {
+  .checkout-wrapper {
+    padding: 80px 16px 40px;
+  }
+  .checkout-card {
+    padding: 24px 16px;
+  }
+}

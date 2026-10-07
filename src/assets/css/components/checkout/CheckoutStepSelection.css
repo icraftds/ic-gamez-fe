@@ -275,5 +275,38 @@ body.light-mode .method-icon.qris {
   display: flex;
   align-items: center;
   gap: 10px;
+  gap: 10px;
   font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .method-card {
+    padding: 16px;
+    gap: 12px;
+  }
+  .method-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  .order-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .order-price {
+    text-align: left;
+  }
+  .discount-price-wrap {
+    align-items: flex-start;
+  }
+  .coupon-input-wrapper {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .btn-apply-coupon {
+    width: 100%;
+  }
 }
