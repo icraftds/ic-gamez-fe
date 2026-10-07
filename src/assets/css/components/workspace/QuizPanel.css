@@ -28,8 +28,8 @@
 
 /* ── Question card ── */
 .quiz-container {
-  user-select: none;
-  -webkit-user-select: none;
+  /* user-select: none; */
+  /* -webkit-user-select: none; */
 }
 
 .question-card { margin-bottom: 28px; }

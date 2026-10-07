@@ -7,7 +7,7 @@
       </header>
 
       <!-- Quiz questions -->
-      <div v-if="hasQuestions" class="quiz-container" @copy.prevent @cut.prevent @paste.prevent>
+      <div v-if="hasQuestions" class="quiz-container">
         <div v-for="(question, qIndex) in quiz" :key="qIndex" class="question-card">
           <p class="question-text">{{ question.question }}</p>
 

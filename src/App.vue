@@ -74,13 +74,13 @@ onMounted(() => {
   // Fetch user session when app loads
   bootstrapSession()
 
-  // Anti-Cheat Basic: Cegah Klik Kanan
-  window.addEventListener('contextmenu', function (e) {
-    // Kecualikan input text dan textarea agar user tetap bisa klik kanan untuk paste (jika dibutuhkan)
-    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-      e.preventDefault()
-    }
-  }, false)
+  // Anti-Cheat Basic: Cegah Klik Kanan (Dinonaktifkan sementara)
+  // window.addEventListener('contextmenu', function (e) {
+  //   // Kecualikan input text dan textarea agar user tetap bisa klik kanan untuk paste (jika dibutuhkan)
+  //   if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+  //     e.preventDefault()
+  //   }
+  // }, false)
 
   // Anti-Cheat Basic: Cegah shortcut DevTools (F12, Ctrl+Shift+I/J, Ctrl+U)
   // window.addEventListener('keydown', function(e) {

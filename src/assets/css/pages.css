@@ -304,7 +304,7 @@
         color: #475569;
         text-align: right;
         padding: 20px 10px 20px 0;
-        user-select: none;
+        /* user-select: none; */
       }
       .mockup-editor .code-content {
         padding-left: 30px;

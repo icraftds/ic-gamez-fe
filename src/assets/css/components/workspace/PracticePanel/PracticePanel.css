@@ -147,7 +147,7 @@
   opacity: 0.5;
   font-size: 0.75rem;
   transition: opacity 0.2s, color 0.2s;
-  user-select: none;
+  /* user-select: none; */
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
