@@ -220,6 +220,8 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
+  z-index: 2;
+  pointer-events: none;
 }
 .search-box input {
   width: 100%;

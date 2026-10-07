@@ -44,6 +44,8 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-sub-hex);
+  z-index: 2;
+  pointer-events: none;
 }
 
 .search-box input {

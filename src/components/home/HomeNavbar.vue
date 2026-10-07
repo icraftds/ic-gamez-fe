@@ -75,7 +75,7 @@
       <div class="nav-right">
         <template v-if="isLoggedIn">
           <!-- 1. Upgrade Button (Khusus Free User) -->
-          <button v-if="!isPremiumUser" class="nav-btn upgrade-btn" @click="$router.push('/pricing')" title="Upgrade ke Premium">
+          <button v-if="currentPlan !== 'expert'" class="nav-btn upgrade-btn" @click="$router.push('/pricing')" title="Upgrade ke Premium">
             <i class="fa-solid fa-crown text-warning"></i> Upgrade
           </button>
           
