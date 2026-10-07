@@ -184,8 +184,7 @@ const tabs = [
   { id: 'beranda', label: 'Beranda' },
   { id: 'statistik', label: 'Statistik' },
   { id: 'medali', label: 'Medali' },
-
-]
+  { id: 'langganan', label: 'Langganan' }]
 </script>
 
 <template>
@@ -214,7 +213,7 @@ const tabs = [
       </div>
 
       <div class="dash-nav-right">
-        <button class="btn-upgrade-nav" @click="$router.push('/pricing')"><i class="fa-solid fa-crown text-warning"></i> Upgrade</button>
+        <button class="btn-upgrade-nav" v-if="!isPremiumUser" @click="$router.push('/pricing')"><i class="fa-solid fa-crown text-warning"></i> Upgrade</button>
         
         <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)">
           <i class="fa-solid fa-cart-plus"></i>
@@ -293,8 +292,8 @@ const tabs = [
       <DashboardHome v-if="activeTab === 'beranda'" />
       <DashboardStats v-else-if="activeTab === 'statistik'" />
       <DashboardMedals v-else-if="activeTab === 'medali'" />
+      <DashboardSubscription v-else-if="activeTab === 'langganan'" />
       <LeaderboardTable v-else-if="activeTab === 'leaderboard'" :isFullView="true" />
-
       </template>
     </div>
 
