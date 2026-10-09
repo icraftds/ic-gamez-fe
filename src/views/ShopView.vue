@@ -148,7 +148,7 @@
         <div v-else class="shop-item-grid">
           <div v-for="item in items" :key="item.id" class="border-shop-card">
             <div class="border-preview-box" style="margin: 5px 0;">
-               <img v-if="item.image_url" :src="item.image_url" alt="Icon" style="width: 100px; height: 100px; object-fit: contain;" />
+               <img v-if="item.image_url" :src="getImageUrl(item.image_url)" alt="Icon" style="width: 200px; height: 200px; object-fit: contain;" />
                <img v-else-if="item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" style="width: 100px; height: 100px; object-fit: contain;" />
                <i v-else class="fa-solid fa-gift" style="font-size: 5rem; color: #fbbf24;"></i>
             </div>
@@ -191,6 +191,13 @@ import confetti from 'canvas-confetti'
 import { TIERS } from '../utils/tiers.js'
 import CyberBorder from '../components/ui/CyberBorder.vue'
 import CyberEnergy from '../components/ui/CyberEnergy.vue'
+
+const getImageUrl = (url) => {
+  if (!url) return null
+  if (url.startsWith('http')) return url
+  const baseUrl = import.meta.env.VITE_BASE_URL || 'https://icgamez.unikom.my.id/api'
+  return baseUrl.replace(/\/api\/?$/, '') + url
+}
 
 const router = useRouter()
 const { coinz, fetchWallet, walletStatus, walletInitializationPending, initializeWallet } = useUserAccount()
