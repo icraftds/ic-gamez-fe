@@ -25,11 +25,11 @@
                     <h1 class="greeting-text" style="margin: 0;">
                       <span class="highlight-name">{{ userProfile.name }}</span>
                     </h1>
-                    <button v-if="loggedInUser && loggedInUser.id !== userProfile.id" @click="handleAddFriend" class="add-friend-btn" :disabled="isAddingFriend || hasAdded">
+                    <button v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend" @click="handleAddFriend" class="add-friend-btn" :disabled="isAddingFriend || isPendingFriend">
                       <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
-                      <i v-else-if="hasAdded" class="fa-solid fa-clock"></i>
+                      <i v-else-if="isPendingFriend" class="fa-solid fa-clock"></i>
                       <i v-else class="fa-solid fa-user-plus"></i>
-                      <span class="btn-text">{{ hasAdded ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
+                      <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
                     </button>
                     <button v-else-if="loggedInUser && loggedInUser.id === userProfile.id" disabled class="add-friend-btn" style="opacity: 0.6; cursor: not-allowed; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #ccc;">
                       <i class="fa-solid fa-user"></i>
@@ -155,19 +155,35 @@ import CyberXp from '../components/ui/CyberXp.vue'
 import CyberMedal from '../components/ui/CyberMedal.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import { useUserAccount } from '../composables/useUserAccount'
+import { useFriends } from '../composables/useFriends'
 
 const route = useRoute()
 const router = useRouter()
 const { userProfile: loggedInUser } = useUserAccount()
+const { friends, fetchFriends } = useFriends()
 
 const isLoading = ref(true)
 const isAddingFriend = ref(false)
 const hasAdded = ref(false)
+const isFriendFromApi = ref(false)
+const isPendingFromApi = ref(false)
 const userProfile = ref(null)
 const stats = ref(null)
 const heatmapData = ref(null)
 
 const activeTab = ref('medali')
+
+const isAlreadyFriend = computed(() => {
+  if (isFriendFromApi.value) return true
+  if (userProfile.value && friends.value?.length > 0) {
+    return friends.value.some(f => f.id === userProfile.value.id)
+  }
+  return false
+})
+
+const isPendingFriend = computed(() => {
+  return hasAdded.value || isPendingFromApi.value
+})
 
 const fetchProfile = async () => {
   isLoading.value = true
@@ -178,6 +194,12 @@ const fetchProfile = async () => {
       userProfile.value = res.data.data.user
       stats.value = res.data.data.stats
       heatmapData.value = res.data.data.heatmap
+      if (res.data.data.is_friend !== undefined) {
+        isFriendFromApi.value = Boolean(res.data.data.is_friend)
+      }
+      if (res.data.data.is_pending !== undefined) {
+        isPendingFromApi.value = Boolean(res.data.data.is_pending)
+      }
     }
   } catch (error) {
     console.error('Failed to fetch profile', error)
@@ -188,6 +210,9 @@ const fetchProfile = async () => {
 
 onMounted(() => {
   fetchProfile()
+  if (loggedInUser.value && (!friends.value || friends.value.length === 0)) {
+    fetchFriends()
+  }
 })
 
 const handleAddFriend = async () => {
@@ -196,7 +221,12 @@ const handleAddFriend = async () => {
   try {
     const res = await api.post('/user/friends', { friend_id: userProfile.value.id })
     if (res.data.success || res.status === 200) {
-      hasAdded.value = true
+      if (res.data.message === 'Already friends') {
+        isFriendFromApi.value = true
+      } else {
+        hasAdded.value = true
+      }
+      fetchFriends()
     }
   } catch (error) {
     if (error.response?.status === 400 && error.response?.data?.message?.includes('yourself')) {
