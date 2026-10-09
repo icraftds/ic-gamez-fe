@@ -51,14 +51,17 @@
             <div class="podium-card-cyber p-second">
               <div class="cyber-rank-badge silver">2</div>
               <div class="podium-avatar-wrapper plan-badge-wrapper">
-                <img :src="topUsers[1].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[1].name + '&background=random'" :class="getPlanBorderClass(topUsers[1])" />
-                <div v-if="getPlanBadge(topUsers[1])" class="plan-badge" :class="getPlanBadge(topUsers[1]).class">
-                  {{ getPlanBadge(topUsers[1]).text }}
-                </div>
+                <CyberBorder 
+                  class="cyber-border-leaderboard"
+                  :tierId="getUserBorderId(topUsers[1])"
+                  :accountBadge="getUserBadgeStatus(topUsers[1])"
+                  :avatarUrl="topUsers[1].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[1].name + '&background=random'"
+                />
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[1].name }}</h4>
                 <div class="xp-glitch">{{ topUsers[1].xp.toLocaleString() }} XP</div>
+                <button v-if="topUsers[1].slug" @click="$router.push('/coderz/' + topUsers[1].slug)" class="visit-btn">Visit</button>
               </div>
             </div>
 
@@ -67,14 +70,17 @@
               <div class="cyber-crown"><i class="fa-solid fa-crown"></i></div>
               <div class="cyber-rank-badge gold">1</div>
               <div class="podium-avatar-wrapper big-avatar plan-badge-wrapper">
-                <img :src="topUsers[0].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[0].name + '&background=random'" :class="getPlanBorderClass(topUsers[0])" />
-                <div v-if="getPlanBadge(topUsers[0])" class="plan-badge" :class="getPlanBadge(topUsers[0]).class">
-                  {{ getPlanBadge(topUsers[0]).text }}
-                </div>
+                <CyberBorder 
+                  class="cyber-border-leaderboard"
+                  :tierId="getUserBorderId(topUsers[0])"
+                  :accountBadge="getUserBadgeStatus(topUsers[0])"
+                  :avatarUrl="topUsers[0].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[0].name + '&background=random'"
+                />
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[0].name }}</h4>
                 <div class="xp-glitch gold-text">{{ topUsers[0].xp.toLocaleString() }} XP</div>
+                <button v-if="topUsers[0].slug" @click="$router.push('/coderz/' + topUsers[0].slug)" class="visit-btn">Visit</button>
               </div>
             </div>
 
@@ -82,14 +88,17 @@
             <div class="podium-card-cyber p-third">
               <div class="cyber-rank-badge bronze">3</div>
               <div class="podium-avatar-wrapper plan-badge-wrapper">
-                <img :src="topUsers[2].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[2].name + '&background=random'" :class="getPlanBorderClass(topUsers[2])" />
-                <div v-if="getPlanBadge(topUsers[2])" class="plan-badge" :class="getPlanBadge(topUsers[2]).class">
-                  {{ getPlanBadge(topUsers[2]).text }}
-                </div>
+                <CyberBorder 
+                  class="cyber-border-leaderboard"
+                  :tierId="getUserBorderId(topUsers[2])"
+                  :accountBadge="getUserBadgeStatus(topUsers[2])"
+                  :avatarUrl="topUsers[2].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[2].name + '&background=random'"
+                />
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[2].name }}</h4>
                 <div class="xp-glitch">{{ topUsers[2].xp.toLocaleString() }} XP</div>
+                <button v-if="topUsers[2].slug" @click="$router.push('/coderz/' + topUsers[2].slug)" class="visit-btn">Visit</button>
               </div>
             </div>
           </div>
@@ -99,7 +108,7 @@
         <div class="your-rank-hud" v-if="isFullView && isLoggedIn">
           <div class="hud-side">
             <span class="hud-label">TARGET XP ANDA</span>
-            <span class="hud-value"><i class="fa-solid fa-bolt text-cyan"></i> {{ activeTab === 'monthly' ? myRankMonthly : myRankGlobal }}</span>
+            <span class="hud-value"><CyberEnergy :pkgId="1" :isAnimated="false" /> {{ activeTab === 'monthly' ? myRankMonthly : myRankGlobal }}</span>
           </div>
           <div class="hud-center">
             STATUS PERINGKAT <br />
@@ -117,24 +126,27 @@
             <div class="ct-col ct-rank">#</div>
             <div class="ct-col ct-user">CODERZ</div>
             <div class="ct-col ct-xp">POWER (XP)</div>
-            <div class="ct-col ct-level">TIER</div>
+            <div class="ct-col ct-level">LVL</div>
+            <div class="ct-col ct-action"></div>
           </div>
           <div class="cyber-table-body">
             <div
-              v-for="(user, i) in isFullView ? currentRanking : allTimeRanking.slice(0, 5)"
-              :key="i"
+              v-for="user in tableUsers"
+              :key="user.id || user.rank"
               class="cyber-table-row"
-              :class="{ 'top-3-row': i < 3 && isFullView }"
+              :class="{ 'top-3-row': user.rank <= 3 && isFullView }"
             >
               <div class="ct-col ct-rank">
-                <span class="cyber-rank-num" :class="'r-' + (i + 1)">{{ i + 1 }}</span>
+                <span class="cyber-rank-num" :class="'r-' + user.rank">{{ user.rank }}</span>
               </div>
               <div class="ct-col ct-user">
                 <div class="ct-avatar plan-badge-wrapper">
-                  <img :src="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'" :class="getPlanBorderClass(user)" />
-                  <div v-if="getPlanBadge(user)" class="plan-badge" :class="getPlanBadge(user).class" style="bottom: -10px;">
-                    {{ getPlanBadge(user).text }}
-                  </div>
+                  <CyberBorder 
+                    class="cyber-border-leaderboard"
+                    :tierId="getUserBorderId(user)"
+                    :accountBadge="getUserBadgeStatus(user)"
+                    :avatarUrl="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'"
+                  />
                 </div>
                 <span class="ct-name">{{ user.name }}</span>
               </div>
@@ -143,6 +155,9 @@
               </div>
               <div class="ct-col ct-level">
                 <span class="ct-badge-level">Lvl {{ user.level }}</span>
+              </div>
+              <div class="ct-col ct-action">
+                <button v-if="user.slug" @click="$router.push('/coderz/' + user.slug)" class="visit-btn-small">Visit</button>
               </div>
             </div>
           </div>
@@ -156,24 +171,20 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useUserAccount } from "../../composables/useUserAccount";
-import api from "../../services/api";
+import CyberBorder from '../ui/CyberBorder.vue';
+import api from '../../services/api';
 
-const getPlanHexClass = (user) => {
-  if (user?.current_plan === 'expert') return 'bg-expert';
-  if (user?.current_plan === 'pro' || user?.is_premium) return 'bg-pro';
-  return '';
+const getUserBadgeStatus = (user) => {
+  if (user?.current_plan === 'expert') return 'EXPERT';
+  if (user?.current_plan === 'pro' || user?.is_premium) return 'PRO';
+  return 'FREE';
 };
 
-const getPlanBorderClass = (user) => {
-  if (user?.current_plan === 'expert') return 'border-expert';
-  if (user?.current_plan === 'pro' || user?.is_premium) return 'border-pro';
-  return 'border-gray';
-};
-
-const getPlanBadge = (user) => {
-  if (user?.current_plan === 'expert') return { text: 'Expert', class: 'expert' };
-  if (user?.current_plan === 'pro' || user?.is_premium) return { text: 'Pro', class: 'pro' };
-  return null;
+const getUserBorderId = (user) => {
+  if (user?.active_border_id) return user.active_border_id;
+  if (user?.current_plan === 'expert') return 'D_EXPERT';
+  if (user?.current_plan === 'pro' || user?.is_premium) return 'D_PRO';
+  return 'D_FREE';
 };
 
 const props = defineProps({
@@ -202,6 +213,19 @@ const topUsers = computed(() => {
     users.push({ name: "-", xp: 0, avatar_url: null });
   }
   return users.slice(0, 3);
+});
+
+const tableUsers = computed(() => {
+  if (props.isFullView) {
+    return currentRanking.value.slice(3).map((user, index) => ({
+      ...user,
+      rank: index + 4
+    }));
+  }
+  return allTimeRanking.value.slice(0, 5).map((user, index) => ({
+    ...user,
+    rank: index + 1
+  }));
 });
 
 const fetchLeaderboard = async () => {

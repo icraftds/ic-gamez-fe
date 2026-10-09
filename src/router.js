@@ -4,6 +4,13 @@ import HomeView from './views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { top: 0 };
+    }
+  },
   routes: [
     {
       path: '/',
@@ -77,6 +84,11 @@ const router = createRouter({
       path: '/leaderboard',
       name: 'leaderboard',
       component: () => import('./views/LeaderboardView.vue')
+    },
+    {
+      path: '/coderz/:slug',
+      name: 'visit-profile',
+      component: () => import('./views/VisitProfileView.vue')
     },
     {
       path: '/pricing',
