@@ -201,3 +201,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 768px) {
+  .dashboard-hero {
+    padding: 20px 15px;
+  }
+  .avatar-wrapper {
+    margin-left: 0;
+    margin-bottom: 20px;
+  }
+  .greeting-text {
+    font-size: 1.5rem;
+    word-break: break-word;
+  }
+  .user-info-section {
+    gap: 15px;
+  }
+}

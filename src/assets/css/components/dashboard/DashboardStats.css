@@ -1,8 +1,11 @@
 .gh-stats-container {
   color: var(--text-main-hex);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  max-width: 1000px;
+  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .loading-state {
@@ -20,13 +23,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .gh-header h2 {
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 500;
   margin: 0;
+  color: var(--text-main-hex);
 }
 
 .gh-header-actions {
@@ -47,15 +51,62 @@
   overflow: hidden;
   margin-bottom: 32px;
   transition: transform 0.3s ease, border-color 0.3s ease;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
+
 .gh-box:hover {
   border-color: rgba(34, 211, 238, 0.3);
 }
 
 .gh-heatmap-wrapper {
-  padding: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Horizontal scrollable track for heatmap */
+.gh-heatmap-scroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 211, 238, 0.4) transparent;
+}
+
+.gh-heatmap-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.gh-heatmap-scroll::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 4px;
+}
+
+.gh-heatmap-scroll::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.35);
+  border-radius: 4px;
+}
+
+.gh-heatmap-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.65);
+}
+
+.gh-heatmap-matrix {
+  width: max-content;
+  min-width: 880px;
+  padding-right: 16px;
+  box-sizing: border-box;
 }
 
 .gh-heatmap-months {
@@ -66,11 +117,13 @@
   margin-left: 28px;
   margin-bottom: 8px;
   color: var(--text-main-hex);
+  width: max-content;
 }
 
 .gh-heatmap-inner {
   display: flex;
   align-items: flex-start;
+  width: max-content;
 }
 
 .gh-heatmap-days {
@@ -83,6 +136,7 @@
   padding-top: 17px; /* Align with Mon (row 2) */
   padding-bottom: 17px;
   color: var(--text-main-hex);
+  flex-shrink: 0;
 }
 
 .gh-heatmap-grid {
@@ -117,14 +171,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 16px;
-  margin-left: 28px;
+  margin-top: 14px;
   font-size: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .gh-heatmap-footer a {
   color: var(--text-sub-hex);
   text-decoration: none;
+  transition: color 0.2s;
 }
 
 .gh-heatmap-footer a:hover {
@@ -146,27 +204,37 @@
 .gh-overview-divider {
   height: 1px;
   background-color: #30363d;
+  width: 100%;
 }
 
 .gh-overview-section {
   display: flex;
-  padding: 16px 24px;
-  gap: 40px;
+  padding: 18px 24px;
+  gap: 32px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .gh-overview-left {
   flex: 1;
+  min-width: 0;
 }
 
 .gh-overview-left h3 {
   font-size: 14px;
-  margin: 0 0 16px 0;
-  font-weight: 400;
+  margin: 0 0 12px 0;
+  font-weight: 500;
 }
 
 .gh-contributed-text {
   font-size: 14px;
   color: var(--text-main-hex);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .gh-contributed-text i {
@@ -179,43 +247,55 @@
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
+  transition: color 0.2s;
 }
 
 .gh-highlight-link:hover {
   text-decoration: underline;
+  color: #79c0ff;
 }
 
 .gh-overview-right {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
 }
 
 .gh-chart-bars {
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .gh-chart-item {
   display: flex;
   align-items: center;
   font-size: 12px;
+  width: 100%;
+  min-width: 0;
 }
 
 .gh-chart-label {
-  width: 80px;
+  width: 90px;
+  min-width: 75px;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--text-sub-hex);
   text-transform: capitalize;
 }
 
 .gh-chart-bar-bg {
   flex: 1;
+  min-width: 40px;
   height: 8px;
   background-color: #30363d;
   border-radius: 4px;
-  margin: 0 12px;
+  margin: 0 10px;
   overflow: hidden;
 }
 
@@ -226,25 +306,31 @@
 }
 
 .gh-chart-pct {
-  width: 30px;
+  width: 32px;
   text-align: right;
   color: var(--text-sub-hex);
+  font-size: 12px;
+  flex-shrink: 0;
 }
 
 .gh-timeline-section {
-  padding-bottom: 40px;
+  padding-bottom: 32px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .gh-timeline-title {
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 500;
   margin: 0 0 16px 0;
+  color: var(--text-main-hex);
 }
 
 .gh-timeline-period {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   font-size: 12px;
   color: var(--text-sub-hex);
 }
@@ -262,6 +348,8 @@
 .gh-timeline-event {
   display: flex;
   gap: 16px;
+  width: 100%;
+  min-width: 0;
 }
 
 .gh-event-icon-wrapper {
@@ -269,6 +357,7 @@
   flex-direction: column;
   align-items: center;
   width: 32px;
+  flex-shrink: 0;
 }
 
 .gh-event-icon {
@@ -294,6 +383,7 @@
 
 .gh-event-body {
   flex: 1;
+  min-width: 0;
   padding-top: 6px;
 }
 
@@ -301,14 +391,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
   margin-bottom: 8px;
 }
 
 .gh-event-header h4 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 400;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .gh-event-header i {
@@ -326,27 +415,35 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
+  width: 100%;
+  min-width: 0;
+  gap: 12px;
 }
 
 .gh-event-list-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   font-size: 14px;
+  min-width: 0;
+  flex: 1;
 }
 
 .gh-event-list-count {
   color: var(--text-sub-hex);
   font-size: 12px;
+  flex-shrink: 0;
 }
 
 .gh-event-list-right {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .gh-mini-bar {
-  width: 150px;
+  width: 130px;
+  max-width: 100%;
   height: 8px;
   background-color: #30363d;
   border-radius: 4px;
@@ -358,55 +455,55 @@
   background: linear-gradient(90deg, #10b981, #22d3ee);
 }
 
-@media (max-width: 768px) {
-  .gh-overview-section {
-    flex-direction: column;
-    gap: 24px;
-  }
-  
-  .gh-heatmap-wrapper {
-    overflow-x: auto;
-  }
-}
-
 .gh-top-stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+  width: 100%;
+  box-sizing: border-box;
 }
+
 .gh-stat-card, .gh-rank-card {
   border: 1px solid var(--white-alpha-0_05);
   border-radius: 12px;
   background-color: var(--glass-bg-input-0_7);
   backdrop-filter: blur(10px);
-  padding: 24px;
+  padding: 22px;
   transition: transform 0.3s ease, border-color 0.3s ease;
+  min-width: 0;
+  box-sizing: border-box;
 }
+
 .gh-stat-card:hover, .gh-rank-card:hover {
   transform: translateY(-2px);
   border-color: rgba(34, 211, 238, 0.3);
 }
+
 .gh-stat-value {
   font-size: 28px;
   font-weight: 600;
   display: block;
   margin-bottom: 4px;
 }
+
 .text-cyan { color: #58a6ff; }
 .text-orange { color: #f0883e; }
+
 .gh-stat-label {
   font-size: 14px;
   color: var(--text-sub-hex);
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
+
 .gh-xp-mini {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
   margin-bottom: 8px;
 }
+
 .gh-xp-bar-bg {
   height: 8px;
   background-color: #30363d;
@@ -414,72 +511,123 @@
   overflow: hidden;
   margin-bottom: 8px;
 }
+
 .gh-xp-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #10b981, #22d3ee);
 }
+
 .gh-xp-hint, .gh-streak-sub {
   font-size: 12px;
   color: var(--text-sub-hex);
   margin: 0;
 }
+
 .gh-rank-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
+
 .gh-rank-period {
   font-size: 12px;
   color: var(--text-sub-hex);
   display: block;
   margin-bottom: 8px;
 }
+
 .gh-rank-number {
   font-size: 24px;
   font-weight: 600;
   color: var(--text-main-hex);
   display: block;
 }
+
 .gh-rank-empty {
   font-size: 14px;
   color: var(--text-sub-hex);
   margin: 0;
 }
+
 .gh-rank-xp {
   font-size: 14px;
   color: #22d3ee;
   margin-left: 8px;
 }
+
+/* ═════════ RESPONSIVE BREAKPOINTS ═════════ */
 @media (max-width: 768px) {
-  .gh-top-stats-grid, .gh-rank-grid {
+  .gh-overview-section {
+    flex-direction: column;
+    padding: 16px;
+    gap: 18px;
+  }
+  
+  .gh-overview-left,
+  .gh-overview-right {
+    width: 100%;
+    min-width: 0;
+    flex: auto;
+  }
+  
+  .gh-heatmap-wrapper {
+    padding: 14px 12px;
+  }
+  
+  .gh-heatmap-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .gh-timeline-event {
+    gap: 12px;
+  }
+
+  .gh-event-list li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .gh-event-list-right {
+    width: 100%;
+  }
+
+  .gh-mini-bar {
+    width: 100%;
+  }
+
+  .gh-top-stats-grid,
+  .gh-rank-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
+  }
+
+  .gh-stat-card,
+  .gh-rank-card {
+    padding: 16px;
   }
 }
 
+@media (max-width: 480px) {
+  .gh-header h2 {
+    font-size: 14px;
+  }
 
+  .gh-chart-label {
+    width: 75px;
+    font-size: 11px;
+  }
 
+  .gh-chart-bar-bg {
+    margin: 0 6px;
+  }
 
-.gh-box {
-  min-width: 0;
-  overflow: hidden;
-}
-
-.gh-heatmap-wrapper {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.gh-overview-section {
-  flex-wrap: wrap;
-}
-
-.gh-overview-left, .gh-overview-right {
-  min-width: 250px;
-  flex: 1;
-}
-
-.gh-contributed-text {
-  white-space: normal;
-  word-break: break-word;
+  .gh-chart-pct {
+    font-size: 11px;
+    width: 28px;
+  }
 }
