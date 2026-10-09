@@ -15,9 +15,9 @@
           <h1 class="greeting-text">
             Welcome back, <br />
             <div style="display: flex; flex-direction: column; gap: 4px;">
-              <span class="highlight-name">{{ userProfile.name }}</span>
-              <span v-if="userProfile.username" style="font-size: 1.1rem; color: #94a3b8; font-weight: 500;">
-                @{{ userProfile.username }}<span style="color: #64748b;">#{{ userProfile.tag_id }}</span>
+              <span class="highlight-name">{{ userProfile.username ? userProfile.username + '#' + userProfile.tag_id : userProfile.name }}</span>
+              <span style="font-size: 1.1rem; color: #94a3b8; font-weight: 500;">
+                {{ userProfile.username ? userProfile.name : '@' + (userProfile.slug || userProfile.id) }}
               </span>
             </div>
           </h1>

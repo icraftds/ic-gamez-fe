@@ -70,30 +70,26 @@ const currentBadgeStatus = ref('PRO')
 const showNewMedal = ref(false)
 const newMedalData = ref(null)
 
-const getSqlCount = () => {
-  const paths = userStats.value?.completed_exercises?.breakdown?.sql || 0
-  const daily = userStats.value?.events?.daily || 0
-  return paths + daily
-}
-const getFrontendCount = () => userStats.value?.completed_exercises?.breakdown?.frontend || 0
-const getStreak = () => userProfile.value?.longest_streak || 0
-const getLevel = () => userProfile.value?.level || 1
+const getPathCount = (slug) => userStats.value?.completed_exercises?.breakdown?.[slug] || 0
 
 const unlockedTiers = computed(() => {
-  const sqlCount = getSqlCount()
-  const feCount = getFrontendCount()
-  const streakCount = getStreak()
-  const lvlCount = getLevel()
+  const dpCount = getPathCount('dasar-pemrograman')
+  const feCount = getPathCount('frontend-web')
+  const sqlCount = getPathCount('database-sql')
+  const jsCount = getPathCount('javascript-pemula')
+  const beCount = getPathCount('backend-development')
 
   const allMedalsArr = [
-    // SQL
-    { tierId: 1, earned: sqlCount >= 1 }, { tierId: 2, earned: sqlCount >= 5 }, { tierId: 3, earned: sqlCount >= 10 }, { tierId: 4, earned: sqlCount >= 25 }, { tierId: 5, earned: sqlCount >= 50 }, { tierId: 6, earned: sqlCount >= 75 }, { tierId: 7, earned: sqlCount >= 100 },
-    // Frontend
+    // Dasar Pemrograman
+    { tierId: 1, earned: dpCount >= 1 }, { tierId: 2, earned: dpCount >= 5 }, { tierId: 3, earned: dpCount >= 10 }, { tierId: 4, earned: dpCount >= 25 }, { tierId: 5, earned: dpCount >= 50 }, { tierId: 6, earned: dpCount >= 75 }, { tierId: 7, earned: dpCount >= 100 },
+    // Frontend Web
     { tierId: 1, earned: feCount >= 1 }, { tierId: 2, earned: feCount >= 5 }, { tierId: 3, earned: feCount >= 10 }, { tierId: 4, earned: feCount >= 25 }, { tierId: 5, earned: feCount >= 50 }, { tierId: 6, earned: feCount >= 75 }, { tierId: 7, earned: feCount >= 100 },
-    // Streak
-    { tierId: 1, earned: streakCount >= 3 }, { tierId: 2, earned: streakCount >= 7 }, { tierId: 3, earned: streakCount >= 14 }, { tierId: 4, earned: streakCount >= 30 }, { tierId: 5, earned: streakCount >= 60 }, { tierId: 6, earned: streakCount >= 100 }, { tierId: 7, earned: streakCount >= 365 },
-    // Level
-    { tierId: 1, earned: lvlCount >= 5 }, { tierId: 2, earned: lvlCount >= 25 }, { tierId: 3, earned: lvlCount >= 50 }, { tierId: 4, earned: lvlCount >= 75 }, { tierId: 5, earned: lvlCount >= 100 }, { tierId: 6, earned: lvlCount >= 125 }, { tierId: 7, earned: lvlCount >= 150 },
+    // Database & SQL
+    { tierId: 1, earned: sqlCount >= 1 }, { tierId: 2, earned: sqlCount >= 5 }, { tierId: 3, earned: sqlCount >= 10 }, { tierId: 4, earned: sqlCount >= 25 }, { tierId: 5, earned: sqlCount >= 50 }, { tierId: 6, earned: sqlCount >= 75 }, { tierId: 7, earned: sqlCount >= 100 },
+    // JavaScript untuk Pemula
+    { tierId: 1, earned: jsCount >= 1 }, { tierId: 2, earned: jsCount >= 5 }, { tierId: 3, earned: jsCount >= 10 }, { tierId: 4, earned: jsCount >= 25 }, { tierId: 5, earned: jsCount >= 50 }, { tierId: 6, earned: jsCount >= 75 }, { tierId: 7, earned: jsCount >= 100 },
+    // Backend Development
+    { tierId: 1, earned: beCount >= 1 }, { tierId: 2, earned: beCount >= 5 }, { tierId: 3, earned: beCount >= 10 }, { tierId: 4, earned: beCount >= 25 }, { tierId: 5, earned: beCount >= 50 }, { tierId: 6, earned: beCount >= 75 }, { tierId: 7, earned: beCount >= 100 },
   ]
 
   const unlocked = {}

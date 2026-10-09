@@ -95,6 +95,33 @@
           <circle cx="65" cy="78" r="3.5" fill="#FFFFFF"/>
           <circle cx="135" cy="78" r="3.5" fill="#FFFFFF"/>
         </template>
+        <template v-else-if="iconType === 'logic'">
+          <rect x="85" y="50" width="30" height="20" rx="4" :fill="tier.accent" opacity="0.8"/>
+          <line x1="100" y1="70" x2="100" y2="90" :stroke="tier.accent" stroke-width="3"/>
+          <polygon points="100,90 120,110 100,130 80,110" fill="none" :stroke="tier.accent" stroke-width="4"/>
+          <line x1="120" y1="110" x2="135" y2="110" :stroke="tier.accent" stroke-width="3"/>
+          <circle cx="145" cy="110" r="10" :fill="tier.color1"/>
+          
+          <line x1="80" y1="110" x2="65" y2="110" :stroke="tier.accent" stroke-width="3"/>
+          <circle cx="55" cy="110" r="10" :fill="tier.color1"/>
+        </template>
+        <template v-else-if="iconType === 'js'">
+          <rect x="65" y="60" width="70" height="70" rx="8" :fill="tier.accent" opacity="0.9"/>
+          <text x="117" y="122" font-family="Arial, sans-serif" font-size="44" font-weight="900" fill="#090E17" text-anchor="end">JS</text>
+        </template>
+        <template v-else-if="iconType === 'backend'">
+          <rect x="65" y="55" width="70" height="24" rx="4" fill="none" :stroke="tier.accent" stroke-width="4"/>
+          <circle cx="75" cy="67" r="4" :fill="tier.accent"/>
+          <line x1="85" y1="67" x2="125" y2="67" :stroke="tier.accent" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+          
+          <rect x="65" y="85" width="70" height="24" rx="4" fill="none" :stroke="tier.accent" stroke-width="4"/>
+          <circle cx="75" cy="97" r="4" :fill="tier.accent"/>
+          <line x1="85" y1="97" x2="125" y2="97" :stroke="tier.accent" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+          
+          <rect x="65" y="115" width="70" height="24" rx="4" fill="none" :stroke="tier.accent" stroke-width="4"/>
+          <circle cx="75" cy="127" r="4" :fill="tier.accent"/>
+          <line x1="85" y1="127" x2="125" y2="127" :stroke="tier.accent" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+        </template>
         <template v-else>
           <!-- none -->
           <circle cx="100" cy="95" r="28" fill="none" :stroke="tier.accent" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>

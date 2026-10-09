@@ -43,10 +43,11 @@ const visitProfile = (slugOrId) => {
   }
 }
 
+const pendingAddRequests = ref(new Set())
+
 const handleAddFriend = async (userId) => {
+  pendingAddRequests.value.add(userId)
   await addFriend(userId)
-  searchQuery.value = ''
-  searchResults.value = []
 }
 
 const handleRemoveFriend = async (userId) => {
@@ -68,8 +69,8 @@ const handleRemoveFriend = async (userId) => {
     </div>
 
     <div class="fs-tabs">
-      <button class="fs-tab-btn" :class="{ active: activeTab === 'teman' }" @click="activeTab = 'teman'">Teman</button>
-      <button class="fs-tab-btn" :class="{ active: activeTab === 'permintaan' }" @click="activeTab = 'permintaan'">Permintaan</button>
+      <button class="fs-tab-btn" :class="{ active: activeTab === 'teman' }" @click="activeTab = 'teman'">Teman ({{ friends.length }})</button>
+      <button class="fs-tab-btn" :class="{ active: activeTab === 'permintaan' }" @click="activeTab = 'permintaan'">Permintaan ({{ friendRequests.length }})</button>
     </div>
 
     <div class="fs-search-container">
@@ -90,19 +91,21 @@ const handleRemoveFriend = async (userId) => {
         <div v-else-if="!isSearching && searchResults.length === 0" class="fs-search-msg">Tidak ditemukan.</div>
         <div v-else class="fs-search-results">
           <div v-for="user in searchResults" :key="user.id" class="fs-user-item">
-            <img :src="user.avatar_url || '/images/default-avatar.png'" alt="Avatar" class="fs-avatar">
+            <img :src="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'" alt="Avatar" class="fs-avatar">
             <div class="fs-user-info">
-              <div class="fs-user-name">{{ user.name }}</div>
-              <div class="fs-user-slug">@{{ user.slug || user.id }}</div>
+              <div class="fs-user-name">{{ user.username ? user.username + '#' + user.tag_id : user.name }}</div>
+              <div class="fs-user-slug">{{ user.username ? user.name : '@' + (user.slug || user.id) }}</div>
             </div>
             <div class="fs-user-actions">
               <button 
                 class="fs-btn fs-btn-add" 
                 @click="handleAddFriend(user.id)"
                 v-if="!friends.find(f => f.id === user.id)"
-                title="Tambah Teman"
+                :title="pendingAddRequests.has(user.id) ? 'Permintaan Terkirim' : 'Tambah Teman'"
+                :disabled="pendingAddRequests.has(user.id)"
+                :style="pendingAddRequests.has(user.id) ? 'opacity: 0.5; cursor: not-allowed;' : ''"
               >
-                <i class="fa-solid fa-user-plus"></i>
+                <i class="fa-solid" :class="pendingAddRequests.has(user.id) ? 'fa-clock' : 'fa-user-plus'"></i>
               </button>
               <button 
                 class="fs-btn fs-btn-visit" 
@@ -130,10 +133,10 @@ const handleRemoveFriend = async (userId) => {
         <div v-else class="fs-friends-list">
           <div v-for="friend in friends" :key="friend.id" class="fs-friend-card">
             <div class="fs-friend-avatar-wrap">
-              <img :src="friend.avatar_url || '/images/default-avatar.png'" alt="Avatar" class="fs-friend-avatar">
+              <img :src="friend.avatar_url || 'https://ui-avatars.com/api/?name=' + friend.name + '&background=random'" alt="Avatar" class="fs-friend-avatar">
             </div>
             <div class="fs-friend-details">
-              <div class="fs-friend-name">{{ friend.name }}</div>
+              <div class="fs-friend-name">{{ friend.username ? friend.username + '#' + friend.tag_id : friend.name }}</div>
               <div class="fs-friend-meta">
                 <div style="width: 24px; height: 24px; display: inline-block;">
                   <CyberLevel :level="friend.level" :size="'small'" />
@@ -164,10 +167,10 @@ const handleRemoveFriend = async (userId) => {
         <div v-else class="fs-friends-list">
           <div v-for="request in friendRequests" :key="request.id" class="fs-friend-card">
             <div class="fs-friend-avatar-wrap">
-              <img :src="request.avatar_url || '/images/default-avatar.png'" alt="Avatar" class="fs-friend-avatar">
+              <img :src="request.avatar_url || 'https://ui-avatars.com/api/?name=' + request.name + '&background=random'" alt="Avatar" class="fs-friend-avatar">
             </div>
             <div class="fs-friend-details">
-              <div class="fs-friend-name">{{ request.name }}</div>
+              <div class="fs-friend-name">{{ request.username ? request.username + '#' + request.tag_id : request.name }}</div>
               <div class="fs-friend-meta">
                 <div style="width: 24px; height: 24px; display: inline-block;">
                   <CyberLevel :level="request.level" :size="'small'" />

@@ -44,7 +44,7 @@ const userProfile = ref({
 
 export function clearUserAccount() {
   isLoggedIn.value = false
-  userProfile.value = { id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '', level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: '' }
+  userProfile.value = { id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '', level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, showcase_medals: null, joinDate: '' }
   coinz.value = null; walletStatus.value = 'unavailable'; walletInitializationPending.value = false
   currentPlan.value = 'free'; isPremiumUser.value = false; credits.value = 10; initializedToken = null
   activeBorderId.value = null
@@ -80,6 +80,7 @@ export function useUserAccount() {
         streak: data.current_streak,
         longest_streak: data.longest_streak,
         is_admin: data.is_admin || false,
+        showcase_medals: data.showcase_medals || null,
         joinDate: new Date(data.created_at).toLocaleDateString()
       }
       credits.value = data.credits
@@ -281,7 +282,7 @@ export function useUserAccount() {
       isLoggedIn.value = false
       userProfile.value = {
         id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '',
-        level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: ''
+        level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, showcase_medals: null, joinDate: ''
       }
       coinz.value = null
       walletStatus.value = 'unavailable'

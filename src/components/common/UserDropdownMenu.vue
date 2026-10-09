@@ -3,10 +3,10 @@
     <div class="dropdown-header" @click="allowProfileEdit ? handleProfileClick() : null" :style="{ cursor: allowProfileEdit ? 'pointer' : 'default' }" :title="allowProfileEdit ? 'Edit Profil' : ''">
       <div class="dropdown-user-info" style="margin-left: 0; align-items: flex-start;">
         <div class="user-name">
-          {{ userProfile.name }}
+          {{ userProfile.username ? userProfile.username + '#' + userProfile.tag_id : userProfile.name }}
         </div>
-        <div class="user-username" v-if="userProfile.username" style="font-size: 0.85rem; color: #94A3B8; margin-top: -2px; margin-bottom: 2px;">
-          @{{ userProfile.username }}#{{ userProfile.tag_id }}
+        <div class="user-username" style="font-size: 0.85rem; color: #94A3B8; margin-top: -2px; margin-bottom: 2px;">
+          {{ userProfile.username ? userProfile.name : '@' + (userProfile.slug || userProfile.id) }}
         </div>
         <div class="user-email">{{ userProfile.email }}</div>
       </div>

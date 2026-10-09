@@ -37,9 +37,9 @@
                 <div class="user-details" style="position: relative; width: 100%;">
                   <div class="vp-header-row">
                     <h1 class="greeting-text" style="margin: 0; display: flex; flex-direction: column; gap: 5px;">
-                      <span class="highlight-name">{{ userProfile.name }}</span>
-                      <span class="user-tag" v-if="userProfile.username" style="font-size: 1rem; color: #94a3b8; font-weight: 500;">
-                        @{{ userProfile.username }}<span style="color: #64748b;">#{{ userProfile.tag_id }}</span>
+                      <span class="highlight-name">{{ userProfile.username ? userProfile.username + '#' + userProfile.tag_id : userProfile.name }}</span>
+                      <span class="user-tag" style="font-size: 1rem; color: #94a3b8; font-weight: 500;">
+                        {{ userProfile.username ? userProfile.name : '@' + (userProfile.slug || userProfile.id) }}
                       </span>
                     </h1>
                   </div>
@@ -106,7 +106,7 @@
                 </div>
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <span style="font-size: 0.85rem; color: #94a3b8;">Menampilkan pencapaian tertinggi</span>
+                <span style="font-size: 0.85rem; color: #94a3b8;">{{ hasSavedShowcase ? 'Pencapaian pilihan' : 'Menampilkan pencapaian tertinggi' }}</span>
               </div>
 
               <div class="badges-empty" v-if="displayBadges.length === 0">
@@ -163,6 +163,7 @@ import CyberMedal from '../components/ui/CyberMedal.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useFriends } from '../composables/useFriends'
+import { buildMedals } from '../composables/useAchievements'
 
 const route = useRoute()
 const router = useRouter()
@@ -270,49 +271,28 @@ const borderId = computed(() => {
   return 'D_FREE';
 });
 
-// Calculate badges identically to useAchievements
-const allMedals = computed(() => {
-  if (!stats.value || !userProfile.value) return [];
-  const sqlCount = (stats.value.completed_exercises?.breakdown?.sql || 0) + (stats.value.events?.daily || 0);
-  const feCount = stats.value.completed_exercises?.breakdown?.frontend || 0;
-  const streakCount = userProfile.value.longest_streak || 0;
-  const lvlCount = userProfile.value.level || 1;
-  
-  return [
-    { id: 'sql-1', category: 'sql', iconType: 'sql', tierId: 1, name: 'Halo, SELECT!', earned: sqlCount >= 1 },
-    { id: 'sql-2', category: 'sql', iconType: 'sql', tierId: 2, name: 'Lagi Anget-Angetnya', earned: sqlCount >= 5 },
-    { id: 'sql-3', category: 'sql', iconType: 'sql', tierId: 3, name: 'Mulai Ketagihan Ngulik', earned: sqlCount >= 10 },
-    { id: 'sql-4', category: 'sql', iconType: 'sql', tierId: 4, name: 'Pendekar Query', earned: sqlCount >= 25 },
-    { id: 'sql-5', category: 'sql', iconType: 'sql', tierId: 5, name: 'Suhu SQL', earned: sqlCount >= 50 },
-    { id: 'sql-6', category: 'sql', iconType: 'sql', tierId: 6, name: 'Master Data', earned: sqlCount >= 75 },
-    { id: 'sql-7', category: 'sql', iconType: 'sql', tierId: 7, name: 'Legenda Ngulik SQL', earned: sqlCount >= 100 },
-    { id: 'fe-1', category: 'frontend', iconType: 'frontend', tierId: 1, name: 'Hello, World!', earned: feCount >= 1 },
-    { id: 'fe-2', category: 'frontend', iconType: 'frontend', tierId: 2, name: 'CSS Wizard', earned: feCount >= 5 },
-    { id: 'fe-3', category: 'frontend', iconType: 'frontend', tierId: 3, name: 'DOM Tamer', earned: feCount >= 10 },
-    { id: 'fe-4', category: 'frontend', iconType: 'frontend', tierId: 4, name: 'JS Manipulator', earned: feCount >= 25 },
-    { id: 'fe-5', category: 'frontend', iconType: 'frontend', tierId: 5, name: 'Frontend Ninja', earned: feCount >= 50 },
-    { id: 'fe-6', category: 'frontend', iconType: 'frontend', tierId: 6, name: 'React Architect', earned: feCount >= 75 },
-    { id: 'fe-7', category: 'frontend', iconType: 'frontend', tierId: 7, name: 'Dewa Frontend', earned: feCount >= 100 },
-    { id: 'st-1', category: 'streak', iconType: 'streak', tierId: 1, name: 'Pemanasan', earned: streakCount >= 3 },
-    { id: 'st-2', category: 'streak', iconType: 'streak', tierId: 2, name: 'Konsisten 7 Hari', earned: streakCount >= 7 },
-    { id: 'st-3', category: 'streak', iconType: 'streak', tierId: 3, name: 'Pecandu Belajar', earned: streakCount >= 14 },
-    { id: 'st-4', category: 'streak', iconType: 'streak', tierId: 4, name: 'Maraton 30 Hari', earned: streakCount >= 30 },
-    { id: 'st-5', category: 'streak', iconType: 'streak', tierId: 5, name: 'Mesin Pembelajaran', earned: streakCount >= 60 },
-    { id: 'st-6', category: 'streak', iconType: 'streak', tierId: 6, name: 'Satu Abad Streak', earned: streakCount >= 100 },
-    { id: 'st-7', category: 'streak', iconType: 'streak', tierId: 7, name: 'Tahun Kejayaan', earned: streakCount >= 365 },
-    { id: 'lv-1', category: 'level', iconType: 'level', tierId: 1, name: 'Pendatang Baru', earned: lvlCount >= 5 },
-    { id: 'lv-2', category: 'level', iconType: 'level', tierId: 2, name: 'Petualang Muda', earned: lvlCount >= 25 },
-    { id: 'lv-3', category: 'level', iconType: 'level', tierId: 3, name: 'Ksatria Kode', earned: lvlCount >= 50 },
-    { id: 'lv-4', category: 'level', iconType: 'level', tierId: 4, name: 'Veteran Tempur', earned: lvlCount >= 75 },
-    { id: 'lv-5', category: 'level', iconType: 'level', tierId: 5, name: 'Master GameZ', earned: lvlCount >= 100 },
-    { id: 'lv-6', category: 'level', iconType: 'level', tierId: 6, name: 'Grandmaster', earned: lvlCount >= 125 },
-    { id: 'lv-7', category: 'level', iconType: 'level', tierId: 7, name: 'Legenda iC GameZ', earned: lvlCount >= 150 },
-  ];
-});
+// Katalog medali sama persis dengan dashboard pemilik akun (useAchievements)
+const earnedByTab = computed(() => {
+  if (!stats.value || !userProfile.value) return { medali: [], piala: [], sertifikat: [] }
+  const earned = buildMedals(userProfile.value, stats.value).filter(m => m.earned)
+  return { medali: earned, piala: earned, sertifikat: [] }
+})
+
+const MAX_SHOWCASE = 4
+
+// Pilihan showcase milik user yang dikunjungi (dari DB, bukan localStorage)
+const hasSavedShowcase = computed(() => Array.isArray(userProfile.value?.showcase_medals?.[activeTab.value]))
 
 const displayBadges = computed(() => {
-  if (activeTab.value === 'sertifikat') return [];
-  return allMedals.value.filter(m => m.earned).sort((a, b) => b.tierId - a.tierId).slice(0, 4);
+  const earned = earnedByTab.value[activeTab.value] || []
+  const ids = userProfile.value?.showcase_medals?.[activeTab.value]
+  if (Array.isArray(ids)) {
+    return ids
+      .map(id => earned.find(item => item.id === id))
+      .filter(Boolean)
+      .slice(0, MAX_SHOWCASE)
+  }
+  return [...earned].sort((a, b) => b.tierId - a.tierId).slice(0, MAX_SHOWCASE)
 });
 </script>
 

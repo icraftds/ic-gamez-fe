@@ -191,8 +191,11 @@ const categories = computed(() => {
   const medals = allMedals.value
   return [
     { id: 'all', label: 'Semua', earned: medals.filter(m => m.earned).length, total: medals.length },
-    { id: 'sql', label: 'SQL', earned: medals.filter(m => m.category === 'sql' && m.earned).length, total: medals.filter(m => m.category === 'sql').length },
-    { id: 'frontend', label: 'Frontend', earned: medals.filter(m => m.category === 'frontend' && m.earned).length, total: medals.filter(m => m.category === 'frontend').length },
+    { id: 'dasar-pemrograman', label: 'Dasar Pemrograman', earned: medals.filter(m => m.category === 'dasar-pemrograman' && m.earned).length, total: medals.filter(m => m.category === 'dasar-pemrograman').length },
+    { id: 'frontend-web', label: 'Frontend Web', earned: medals.filter(m => m.category === 'frontend-web' && m.earned).length, total: medals.filter(m => m.category === 'frontend-web').length },
+    { id: 'database-sql', label: 'Database & SQL', earned: medals.filter(m => m.category === 'database-sql' && m.earned).length, total: medals.filter(m => m.category === 'database-sql').length },
+    { id: 'javascript-pemula', label: 'JavaScript Pemula', earned: medals.filter(m => m.category === 'javascript-pemula' && m.earned).length, total: medals.filter(m => m.category === 'javascript-pemula').length },
+    { id: 'backend-development', label: 'Backend Dev', earned: medals.filter(m => m.category === 'backend-development' && m.earned).length, total: medals.filter(m => m.category === 'backend-development').length },
     { id: 'streak', label: 'Streak', earned: medals.filter(m => m.category === 'streak' && m.earned).length, total: medals.filter(m => m.category === 'streak').length },
     { id: 'level', label: 'Level', earned: medals.filter(m => m.category === 'level' && m.earned).length, total: medals.filter(m => m.category === 'level').length }
   ]

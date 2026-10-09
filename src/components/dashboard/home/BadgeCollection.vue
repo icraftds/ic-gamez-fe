@@ -90,6 +90,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useAchievements } from '../../../composables/useAchievements'
 import { useToast } from '../../../composables/useToast'
 import CyberMedal from '../../ui/CyberMedal.vue'
+import api from '../../../services/api'
 
 const {
   userProfile,
@@ -120,18 +121,9 @@ const earnedByTab = computed(() => ({
   sertifikat: earnedSertifikat.value
 }))
 
-// --- Persisted showcase selection (stored as IDs per user) ---
-const storageKey = computed(() => `achievement_showcase_${userProfile.value?.id || 'guest'}`)
-
-const loadSavedIds = () => {
-  try {
-    return JSON.parse(localStorage.getItem(storageKey.value) || 'null')
-  } catch {
-    return null
-  }
-}
-
-const savedIds = ref(loadSavedIds())
+// --- Persisted showcase selection (disimpan di DB: users.showcase_medals) ---
+const savedIds = computed(() => userProfile.value?.showcase_medals || null)
+const isSaving = ref(false)
 
 // Resolve saved IDs into earned items; fallback = 4 pencapaian dengan tier tertinggi
 const resolveShowcase = (tab) => {
@@ -173,7 +165,6 @@ const toggleSelection = (item) => {
 }
 
 const openModal = () => {
-  savedIds.value = loadSavedIds()
   modalTab.value = activeTab.value
   tempSelections.value = {
     medali: resolveShowcase('medali').map(i => i.id),
@@ -187,16 +178,25 @@ const closeModal = () => {
   isModalOpen.value = false
 }
 
-const saveSelection = () => {
+const saveSelection = async () => {
+  if (isSaving.value) return
   const payload = {
     medali: [...tempSelections.value.medali],
     piala: [...tempSelections.value.piala],
     sertifikat: [...tempSelections.value.sertifikat]
   }
-  localStorage.setItem(storageKey.value, JSON.stringify(payload))
-  savedIds.value = payload
-  isModalOpen.value = false
-  showToast('Tampilan pencapaian berhasil diperbarui!', 'success')
+  isSaving.value = true
+  try {
+    const res = await api.put('/user/showcase', payload)
+    const saved = res.data?.data?.showcase_medals || payload
+    userProfile.value = { ...userProfile.value, showcase_medals: saved }
+    isModalOpen.value = false
+    showToast('Tampilan pencapaian berhasil diperbarui!', 'success')
+  } catch (error) {
+    showToast('Gagal menyimpan tampilan pencapaian.', 'error')
+  } finally {
+    isSaving.value = false
+  }
 }
 </script>
 

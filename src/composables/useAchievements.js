@@ -5,42 +5,66 @@ import { useUserAccount } from './useUserAccount'
  * Shared source of truth for user achievements (medali, piala, sertifikat).
  * Used by the Pencapaian page (DashboardMedals) and the dashboard showcase (BadgeCollection).
  */
-export function useAchievements() {
-  const { userProfile, userStats, fetchUserStats } = useUserAccount()
+/**
+ * Pure builder for the medal catalog, so other users' profiles (VisitProfileView)
+ * can compute achievements from their own profile + stats payload.
+ */
+export function buildMedals(profile, stats) {
+  const getPathCount = (slug) => stats?.completed_exercises?.breakdown?.[slug] || 0
 
-  const getSqlCount = () => {
-    const paths = userStats.value?.completed_exercises?.breakdown?.sql || 0
-    const daily = userStats.value?.events?.daily || 0
-    return paths + daily
-  }
-  const getFrontendCount = () => userStats.value?.completed_exercises?.breakdown?.frontend || 0
-  const getStreak = () => userProfile.value?.longest_streak || 0
-  const getLevel = () => userProfile.value?.level || 1
-
-  const allMedals = computed(() => {
-    const sqlCount = getSqlCount()
-    const feCount = getFrontendCount()
-    const streakCount = getStreak()
-    const lvlCount = getLevel()
+    const dpCount = getPathCount('dasar-pemrograman')
+    const feCount = getPathCount('frontend-web')
+    const sqlCount = getPathCount('database-sql')
+    const jsCount = getPathCount('javascript-pemula')
+    const beCount = getPathCount('backend-development')
+    const streakCount = profile?.longest_streak || 0
+    const lvlCount = profile?.level || 1
 
     return [
-      // SQL Medals
-      { id: 'sql-1', category: 'sql', iconType: 'sql', tierId: 1, name: 'Halo, SELECT!', description: 'Challenge SQL pertamamu beres! Query pertama emang paling...', target: 1, current: Math.min(sqlCount, 1), earned: sqlCount >= 1 },
-      { id: 'sql-2', category: 'sql', iconType: 'sql', tierId: 2, name: 'Lagi Anget-Angetnya', description: '5 challenge kelar. Jarimu mulai hafal WHERE tanpa mikir.', target: 5, current: Math.min(sqlCount, 5), earned: sqlCount >= 5 },
-      { id: 'sql-3', category: 'sql', iconType: 'sql', tierId: 3, name: 'Mulai Ketagihan Ngulik', description: '10 challenge SQL! Udah mulai nagih kan?', target: 10, current: Math.min(sqlCount, 10), earned: sqlCount >= 10 },
-      { id: 'sql-4', category: 'sql', iconType: 'sql', tierId: 4, name: 'Pendekar Query', description: '25 challenge kamu libas. JOIN sama GROUP BY udah jago.', target: 25, current: Math.min(sqlCount, 25), earned: sqlCount >= 25 },
-      { id: 'sql-5', category: 'sql', iconType: 'sql', tierId: 5, name: 'Suhu SQL', description: '50 challenge! Level analis beneran nih.', target: 50, current: Math.min(sqlCount, 50), earned: sqlCount >= 50 },
-      { id: 'sql-6', category: 'sql', iconType: 'sql', tierId: 6, name: 'Master Data', description: '75 challenge SQL diselesaikan. Tidak ada relasi yang terlalu rumit.', target: 75, current: Math.min(sqlCount, 75), earned: sqlCount >= 75 },
-      { id: 'sql-7', category: 'sql', iconType: 'sql', tierId: 7, name: 'Legenda Ngulik SQL', description: '100 challenge SQL tamat. Kamu resmi legenda.', target: 100, current: Math.min(sqlCount, 100), earned: sqlCount >= 100 },
+      // Dasar Pemrograman Medals
+      { id: 'dp-1', category: 'dasar-pemrograman', iconType: 'logic', tierId: 1, name: 'Langkah Pertama', description: 'Tantangan Dasar Pemrograman pertamamu beres!', target: 1, current: Math.min(dpCount, 1), earned: dpCount >= 1 },
+      { id: 'dp-2', category: 'dasar-pemrograman', iconType: 'logic', tierId: 2, name: 'Mulai Paham Logika', description: '5 tantangan selesai. Logika komputermu makin terasah.', target: 5, current: Math.min(dpCount, 5), earned: dpCount >= 5 },
+      { id: 'dp-3', category: 'dasar-pemrograman', iconType: 'logic', tierId: 3, name: 'Algoritma Pemula', description: '10 tantangan! Udah mulai jago mikir ala programmer.', target: 10, current: Math.min(dpCount, 10), earned: dpCount >= 10 },
+      { id: 'dp-4', category: 'dasar-pemrograman', iconType: 'logic', tierId: 4, name: 'Pendekar Logika', description: '25 tantangan kamu libas. Nggak ada masalah yang nggak bisa dipecahkan.', target: 25, current: Math.min(dpCount, 25), earned: dpCount >= 25 },
+      { id: 'dp-5', category: 'dasar-pemrograman', iconType: 'logic', tierId: 5, name: 'Suhu Algoritma', description: '50 tantangan! Pola pikirmu sudah seperti mesin.', target: 50, current: Math.min(dpCount, 50), earned: dpCount >= 50 },
+      { id: 'dp-6', category: 'dasar-pemrograman', iconType: 'logic', tierId: 6, name: 'Master Struktur', description: '75 tantangan Dasar Pemrograman diselesaikan.', target: 75, current: Math.min(dpCount, 75), earned: dpCount >= 75 },
+      { id: 'dp-7', category: 'dasar-pemrograman', iconType: 'logic', tierId: 7, name: 'Legenda Logika', description: '100 tantangan tamat. Dasar pemrogramanmu tak tertandingi.', target: 100, current: Math.min(dpCount, 100), earned: dpCount >= 100 },
 
-      // Frontend Medals
-      { id: 'fe-1', category: 'frontend', iconType: 'frontend', tierId: 1, name: 'Hello, World!', description: 'Buat halaman HTML pertamamu. Langkah pertama selalu spesial.', target: 1, current: Math.min(feCount, 1), earned: feCount >= 1 },
-      { id: 'fe-2', category: 'frontend', iconType: 'frontend', tierId: 2, name: 'CSS Wizard', description: 'Selesaikan 5 tantangan CSS. Layoutmu mulai rapih!', target: 5, current: Math.min(feCount, 5), earned: feCount >= 5 },
-      { id: 'fe-3', category: 'frontend', iconType: 'frontend', tierId: 3, name: 'DOM Tamer', description: '10 challenge DOM Javascript ditaklukkan.', target: 10, current: Math.min(feCount, 10), earned: feCount >= 10 },
-      { id: 'fe-4', category: 'frontend', iconType: 'frontend', tierId: 4, name: 'JS Manipulator', description: '25 challenge beres. DOM bukan lagi masalah buatmu.', target: 25, current: Math.min(feCount, 25), earned: feCount >= 25 },
-      { id: 'fe-5', category: 'frontend', iconType: 'frontend', tierId: 5, name: 'Frontend Ninja', description: '50 challenge diselesaikan. Web responsif dalam hitungan menit.', target: 50, current: Math.min(feCount, 50), earned: feCount >= 50 },
-      { id: 'fe-6', category: 'frontend', iconType: 'frontend', tierId: 6, name: 'React Architect', description: '75 challenge Frontend. Komponenmu sangat modular dan bersih!', target: 75, current: Math.min(feCount, 75), earned: feCount >= 75 },
-      { id: 'fe-7', category: 'frontend', iconType: 'frontend', tierId: 7, name: 'Dewa Frontend', description: '100 challenge Frontend. UX dan UI di tanganmu adalah keajaiban.', target: 100, current: Math.min(feCount, 100), earned: feCount >= 100 },
+      // Frontend Web Medals
+      { id: 'fe-1', category: 'frontend-web', iconType: 'frontend', tierId: 1, name: 'Hello, World!', description: 'Buat halaman web pertamamu. Langkah pertama selalu spesial.', target: 1, current: Math.min(feCount, 1), earned: feCount >= 1 },
+      { id: 'fe-2', category: 'frontend-web', iconType: 'frontend', tierId: 2, name: 'CSS Wizard', description: 'Selesaikan 5 tantangan Frontend. Layoutmu mulai rapih!', target: 5, current: Math.min(feCount, 5), earned: feCount >= 5 },
+      { id: 'fe-3', category: 'frontend-web', iconType: 'frontend', tierId: 3, name: 'Responsive Tamer', description: '10 challenge UI/UX ditaklukkan.', target: 10, current: Math.min(feCount, 10), earned: feCount >= 10 },
+      { id: 'fe-4', category: 'frontend-web', iconType: 'frontend', tierId: 4, name: 'Web Manipulator', description: '25 challenge beres. Tampilan bukan lagi masalah buatmu.', target: 25, current: Math.min(feCount, 25), earned: feCount >= 25 },
+      { id: 'fe-5', category: 'frontend-web', iconType: 'frontend', tierId: 5, name: 'Frontend Ninja', description: '50 challenge diselesaikan. Desain modern dalam hitungan menit.', target: 50, current: Math.min(feCount, 50), earned: feCount >= 50 },
+      { id: 'fe-6', category: 'frontend-web', iconType: 'frontend', tierId: 6, name: 'UI Architect', description: '75 challenge Frontend. Komponenmu sangat modular dan bersih!', target: 75, current: Math.min(feCount, 75), earned: feCount >= 75 },
+      { id: 'fe-7', category: 'frontend-web', iconType: 'frontend', tierId: 7, name: 'Dewa Frontend', description: '100 challenge Frontend. UX dan UI di tanganmu adalah keajaiban.', target: 100, current: Math.min(feCount, 100), earned: feCount >= 100 },
+
+      // Database & SQL Medals
+      { id: 'sql-1', category: 'database-sql', iconType: 'sql', tierId: 1, name: 'Halo, SELECT!', description: 'Challenge SQL pertamamu beres! Query pertama emang paling...', target: 1, current: Math.min(sqlCount, 1), earned: sqlCount >= 1 },
+      { id: 'sql-2', category: 'database-sql', iconType: 'sql', tierId: 2, name: 'Lagi Anget-Angetnya', description: '5 challenge kelar. Jarimu mulai hafal WHERE tanpa mikir.', target: 5, current: Math.min(sqlCount, 5), earned: sqlCount >= 5 },
+      { id: 'sql-3', category: 'database-sql', iconType: 'sql', tierId: 3, name: 'Mulai Ketagihan Ngulik', description: '10 challenge SQL! Udah mulai nagih kan?', target: 10, current: Math.min(sqlCount, 10), earned: sqlCount >= 10 },
+      { id: 'sql-4', category: 'database-sql', iconType: 'sql', tierId: 4, name: 'Pendekar Query', description: '25 challenge kamu libas. JOIN sama GROUP BY udah jago.', target: 25, current: Math.min(sqlCount, 25), earned: sqlCount >= 25 },
+      { id: 'sql-5', category: 'database-sql', iconType: 'sql', tierId: 5, name: 'Suhu SQL', description: '50 challenge! Level analis beneran nih.', target: 50, current: Math.min(sqlCount, 50), earned: sqlCount >= 50 },
+      { id: 'sql-6', category: 'database-sql', iconType: 'sql', tierId: 6, name: 'Master Data', description: '75 challenge SQL diselesaikan. Tidak ada relasi yang terlalu rumit.', target: 75, current: Math.min(sqlCount, 75), earned: sqlCount >= 75 },
+      { id: 'sql-7', category: 'database-sql', iconType: 'sql', tierId: 7, name: 'Legenda Ngulik SQL', description: '100 challenge SQL tamat. Kamu resmi legenda.', target: 100, current: Math.min(sqlCount, 100), earned: sqlCount >= 100 },
+
+      // JavaScript untuk Pemula Medals
+      { id: 'js-1', category: 'javascript-pemula', iconType: 'js', tierId: 1, name: 'JS Newbie', description: 'Console.log() pertamamu berhasil!', target: 1, current: Math.min(jsCount, 1), earned: jsCount >= 1 },
+      { id: 'js-2', category: 'javascript-pemula', iconType: 'js', tierId: 2, name: 'Variabel & Fungsi', description: '5 tantangan JS. Kamu mulai paham scope.', target: 5, current: Math.min(jsCount, 5), earned: jsCount >= 5 },
+      { id: 'js-3', category: 'javascript-pemula', iconType: 'js', tierId: 3, name: 'Array Tamer', description: '10 tantangan JS! Mulai bisa memanipulasi data.', target: 10, current: Math.min(jsCount, 10), earned: jsCount >= 10 },
+      { id: 'js-4', category: 'javascript-pemula', iconType: 'js', tierId: 4, name: 'JS Scripter', description: '25 tantangan selesai. Mulai asik ngoding dinamis.', target: 25, current: Math.min(jsCount, 25), earned: jsCount >= 25 },
+      { id: 'js-5', category: 'javascript-pemula', iconType: 'js', tierId: 5, name: 'DOM Manipulator', description: '50 tantangan JS. Interaksi jadi mainanmu.', target: 50, current: Math.min(jsCount, 50), earned: jsCount >= 50 },
+      { id: 'js-6', category: 'javascript-pemula', iconType: 'js', tierId: 6, name: 'Async Master', description: '75 tantangan. Callbacks dan Promises tunduk padamu.', target: 75, current: Math.min(jsCount, 75), earned: jsCount >= 75 },
+      { id: 'js-7', category: 'javascript-pemula', iconType: 'js', tierId: 7, name: 'Dewa JavaScript', description: '100 tantangan. V8 Engine berjalan di nadimu.', target: 100, current: Math.min(jsCount, 100), earned: jsCount >= 100 },
+
+      // Backend Development Medals
+      { id: 'be-1', category: 'backend-development', iconType: 'backend', tierId: 1, name: 'Server Starter', description: 'Server pertamamu berjalan tanpa error!', target: 1, current: Math.min(beCount, 1), earned: beCount >= 1 },
+      { id: 'be-2', category: 'backend-development', iconType: 'backend', tierId: 2, name: 'API Builder', description: '5 challenge backend. Mulai bikin route sendiri.', target: 5, current: Math.min(beCount, 5), earned: beCount >= 5 },
+      { id: 'be-3', category: 'backend-development', iconType: 'backend', tierId: 3, name: 'Data Handler', description: '10 challenge. Mulai bisa nyambungin database dan server.', target: 10, current: Math.min(beCount, 10), earned: beCount >= 10 },
+      { id: 'be-4', category: 'backend-development', iconType: 'backend', tierId: 4, name: 'Backend Architect', description: '25 challenge. Struktur kodemu makin kokoh.', target: 25, current: Math.min(beCount, 25), earned: beCount >= 25 },
+      { id: 'be-5', category: 'backend-development', iconType: 'backend', tierId: 5, name: 'Auth Master', description: '50 challenge. Middleware dan Security aman terkendali.', target: 50, current: Math.min(beCount, 50), earned: beCount >= 50 },
+      { id: 'be-6', category: 'backend-development', iconType: 'backend', tierId: 6, name: 'Performance Tuner', description: '75 challenge. Aplikasimu kenceng dan scalable.', target: 75, current: Math.min(beCount, 75), earned: beCount >= 75 },
+      { id: 'be-7', category: 'backend-development', iconType: 'backend', tierId: 7, name: 'Dewa Backend', description: '100 challenge. Sistem distributed bukan masalah besar!', target: 100, current: Math.min(beCount, 100), earned: beCount >= 100 },
 
       // Streak Medals
       { id: 'st-1', category: 'streak', iconType: 'streak', tierId: 1, name: 'Pemanasan', description: 'Belajar 3 hari berturut-turut. Permulaan yang bagus!', target: 3, current: Math.min(streakCount, 3), earned: streakCount >= 3 },
@@ -60,7 +84,12 @@ export function useAchievements() {
       { id: 'lv-6', category: 'level', iconType: 'level', tierId: 6, name: 'Grandmaster', description: 'Level 125! Hanya segelintir orang yang mencapai ini.', target: 125, current: Math.min(lvlCount, 125), earned: lvlCount >= 125 },
       { id: 'lv-7', category: 'level', iconType: 'level', tierId: 7, name: 'Dewa Kode', description: 'Level 150! Kamu adalah entitas tertinggi di dunia GameZ.', target: 150, current: Math.min(lvlCount, 150), earned: lvlCount >= 150 },
     ]
-  })
+}
+
+export function useAchievements() {
+  const { userProfile, userStats, fetchUserStats } = useUserAccount()
+
+  const allMedals = computed(() => buildMedals(userProfile.value, userStats.value))
 
   // Piala: mengikuti tab Piala di halaman Pencapaian (saat ini memakai daftar yang sama dengan medali)
   const allPiala = computed(() => allMedals.value)
