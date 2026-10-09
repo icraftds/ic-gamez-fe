@@ -175,17 +175,40 @@ body:not(.light-mode) .logo-light { display: none; }
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 184, 0, 0.3);
-  color: #FFB800;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fbbf24;
+  font-size: 1.1rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
 }
 .shop-btn:hover {
-  background: rgba(255, 184, 0, 0.1);
-  border-color: #FFB800;
-  box-shadow: 0 0 12px rgba(255, 184, 0, 0.4);
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+}
+
+.friends-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main-hex);
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  cursor: pointer;
+}
+.friends-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .credits-indicator {
@@ -518,27 +541,7 @@ body:not(.light-mode) .logo-light { display: none; }
 .dropdown-actions button.text-primary:hover { background: rgba(59, 130, 246, 0.1); }
 
 
-.nav-shop-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fbbf24;
-  font-size: 1.1rem;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-  margin: 0;
-}
-.nav-shop-btn:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
-}
+
 
 /* Skeleton Loaders */
 .skeleton-avatar {
