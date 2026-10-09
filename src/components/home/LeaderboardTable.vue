@@ -62,7 +62,7 @@
                 <h4>{{ topUsers[1].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch" style="margin: 0;">{{ topUsers[1].xp.toLocaleString() }} XP</div>
-                  <span class="ct-badge-level">Lvl {{ topUsers[1].level }}</span>
+                  <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[1])">Lvl {{ topUsers[1].level }}</span>
                 </div>
                 <button v-if="topUsers[1].slug" @click="$router.push('/coderz/' + topUsers[1].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
@@ -84,7 +84,7 @@
                 <h4>{{ topUsers[0].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch gold-text" style="margin: 0;">{{ topUsers[0].xp.toLocaleString() }} XP</div>
-                  <span class="ct-badge-level" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">Lvl {{ topUsers[0].level }}</span>
+                  <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[0])">Lvl {{ topUsers[0].level }}</span>
                 </div>
                 <button v-if="topUsers[0].slug" @click="$router.push('/coderz/' + topUsers[0].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
@@ -105,7 +105,7 @@
                 <h4>{{ topUsers[2].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch" style="margin: 0;">{{ topUsers[2].xp.toLocaleString() }} XP</div>
-                  <span class="ct-badge-level">Lvl {{ topUsers[2].level }}</span>
+                  <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[2])">Lvl {{ topUsers[2].level }}</span>
                 </div>
                 <button v-if="topUsers[2].slug" @click="$router.push('/coderz/' + topUsers[2].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
@@ -160,7 +160,7 @@
               <div class="ct-col ct-stats" style="flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; justify-content: center;">
                 <div style="display: flex; gap: 10px; align-items: center;">
                   <span class="xp-text">{{ user.xp.toLocaleString() }} XP</span>
-                  <span class="ct-badge-level">Lvl {{ user.level }}</span>
+                  <span class="ct-badge-level" :class="getLevelBadgeClass(user)">Lvl {{ user.level }}</span>
                 </div>
                 <button v-if="user.slug" @click="$router.push('/coderz/' + user.slug)" class="visit-btn-small">Kunjungi Profil</button>
               </div>
@@ -183,6 +183,13 @@ const getUserBadgeStatus = (user) => {
   if (user?.current_plan === 'expert') return 'EXPERT';
   if (user?.current_plan === 'pro' || user?.is_premium) return 'PRO';
   return 'FREE';
+};
+
+const getLevelBadgeClass = (user) => {
+  const status = getUserBadgeStatus(user);
+  if (status === 'EXPERT') return 'badge-expert';
+  if (status === 'PRO') return 'badge-pro';
+  return '';
 };
 
 const getUserBorderId = (user) => {
