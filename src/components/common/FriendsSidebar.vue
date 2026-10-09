@@ -43,10 +43,7 @@ const visitProfile = (slugOrId) => {
   }
 }
 
-const pendingAddRequests = ref(new Set())
-
 const handleAddFriend = async (userId) => {
-  pendingAddRequests.value.add(userId)
   await addFriend(userId)
 }
 
@@ -97,16 +94,26 @@ const handleRemoveFriend = async (userId) => {
               <div class="fs-user-slug">{{ user.username ? user.name : '@' + (user.slug || user.id) }}</div>
             </div>
             <div class="fs-user-actions">
-              <button 
-                class="fs-btn fs-btn-add" 
-                @click="handleAddFriend(user.id)"
-                v-if="!friends.find(f => f.id === user.id)"
-                :title="pendingAddRequests.has(user.id) ? 'Permintaan Terkirim' : 'Tambah Teman'"
-                :disabled="pendingAddRequests.has(user.id)"
-                :style="pendingAddRequests.has(user.id) ? 'opacity: 0.5; cursor: not-allowed;' : ''"
-              >
-                <i class="fa-solid" :class="pendingAddRequests.has(user.id) ? 'fa-clock' : 'fa-user-plus'"></i>
-              </button>
+              <template v-if="!user.is_friend">
+                <button 
+                  v-if="user.has_incoming_request"
+                  class="fs-btn fs-btn-add" 
+                  @click="acceptFriendRequest(user.id); toggleFriendsSidebar()"
+                  title="Terima Permintaan"
+                >
+                  <i class="fa-solid fa-check"></i>
+                </button>
+                <button 
+                  v-else
+                  class="fs-btn fs-btn-add" 
+                  @click="handleAddFriend(user.id)"
+                  :title="user.is_pending ? 'Permintaan Terkirim' : 'Tambah Teman'"
+                  :disabled="user.is_pending"
+                  :style="user.is_pending ? 'opacity: 0.5; cursor: not-allowed;' : ''"
+                >
+                  <i class="fa-solid" :class="user.is_pending ? 'fa-clock' : 'fa-user-plus'"></i>
+                </button>
+              </template>
               <button 
                 class="fs-btn fs-btn-visit" 
                 @click="visitProfile(user.slug || user.id)"

@@ -10,12 +10,19 @@
               <i class="fa-solid fa-arrow-left"></i> Kembali
             </button>
             
-            <button v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend" @click="handleAddFriend" class="add-friend-btn vp-add-friend-top" :disabled="isAddingFriend || isPendingFriend">
-              <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
-              <i v-else-if="isPendingFriend" class="fa-solid fa-clock"></i>
-              <i v-else class="fa-solid fa-user-plus"></i>
-              <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
-            </button>
+            <template v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend">
+              <button v-if="hasIncomingRequest" @click="handleAcceptFriend" class="add-friend-btn vp-add-friend-top" :disabled="isAddingFriend">
+                <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
+                <i v-else class="fa-solid fa-check"></i>
+                <span class="btn-text">Terima Pertemanan</span>
+              </button>
+              <button v-else @click="handleAddFriend" class="add-friend-btn vp-add-friend-top" :disabled="isAddingFriend || isPendingFriend">
+                <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
+                <i v-else-if="isPendingFriend" class="fa-solid fa-clock"></i>
+                <i v-else class="fa-solid fa-user-plus"></i>
+                <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
+              </button>
+            </template>
             <button v-else-if="loggedInUser && loggedInUser.id === userProfile.id" disabled class="add-friend-btn vp-add-friend-top" style="opacity: 0.6; cursor: not-allowed; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #ccc;">
               <i class="fa-solid fa-user"></i>
               <span class="btn-text">Profil Anda</span>
@@ -175,6 +182,7 @@ const isAddingFriend = ref(false)
 const hasAdded = ref(false)
 const isFriendFromApi = ref(false)
 const isPendingFromApi = ref(false)
+const hasIncomingRequest = ref(false)
 const userProfile = ref(null)
 const stats = ref(null)
 const heatmapData = ref(null)
@@ -207,6 +215,9 @@ const fetchProfile = async () => {
       }
       if (res.data.data.is_pending !== undefined) {
         isPendingFromApi.value = Boolean(res.data.data.is_pending)
+      }
+      if (res.data.data.has_incoming_request !== undefined) {
+        hasIncomingRequest.value = Boolean(res.data.data.has_incoming_request)
       }
     }
   } catch (error) {
@@ -242,6 +253,23 @@ const handleAddFriend = async () => {
     } else {
       alert('Gagal menambah teman')
     }
+  } finally {
+    isAddingFriend.value = false
+  }
+}
+
+const handleAcceptFriend = async () => {
+  if (!userProfile.value) return
+  isAddingFriend.value = true
+  try {
+    const res = await api.post(`/user/friend-requests/${userProfile.value.id}/accept`)
+    if (res.data.success || res.status === 200) {
+      isFriendFromApi.value = true
+      hasIncomingRequest.value = false
+      fetchFriends()
+    }
+  } catch (error) {
+    alert('Gagal menerima pertemanan')
   } finally {
     isAddingFriend.value = false
   }

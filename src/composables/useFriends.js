@@ -65,6 +65,10 @@ export function useFriends() {
   const addFriend = async (friendId) => {
     try {
       await api.post('/user/friends', { friend_id: friendId })
+      const userIdx = searchResults.value.findIndex(u => u.id === friendId)
+      if (userIdx !== -1) {
+        searchResults.value[userIdx].is_pending = true
+      }
       await fetchFriends()
     } catch (err) {
       console.error('Failed to add friend', err)

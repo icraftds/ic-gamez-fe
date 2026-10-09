@@ -58,6 +58,11 @@ api.interceptors.request.use(async config => {
   
   const locale = localStorage.getItem('user_locale') || 'id';
   config.headers['Accept-Language'] = locale;
+
+  // Upload file: jangan paksa JSON, biarkan browser set multipart/form-data + boundary
+  if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+    config.headers.setContentType ? config.headers.setContentType(false) : delete config.headers['Content-Type'];
+  }
   
   return config;
 });
