@@ -15,10 +15,18 @@
                   />
                 </div>
               </div>
-              <div class="user-details">
-                <h1 class="greeting-text">
-                  <span class="highlight-name">{{ userProfile.name }}</span>
-                </h1>
+              <div class="user-details" style="position: relative; width: 100%;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <h1 class="greeting-text" style="margin: 0;">
+                    <span class="highlight-name">{{ userProfile.name }}</span>
+                  </h1>
+                  <button v-if="loggedInUser && loggedInUser.id !== userProfile.id" @click="handleAddFriend" class="add-friend-btn" :disabled="isAddingFriend || hasAdded">
+                    <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
+                    <i v-else-if="hasAdded" class="fa-solid fa-check"></i>
+                    <i v-else class="fa-solid fa-user-plus"></i>
+                    <span class="btn-text">{{ hasAdded ? 'Berteman' : 'Add Friend' }}</span>
+                  </button>
+                </div>
                 <p class="motivational-text">Pemain aktif di iC GameZ</p>
                 
                 <div class="tier-progress">
@@ -258,14 +266,17 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
-import CyberBorder from '../components/ui/CyberBorder.vue'
 import CyberXp from '../components/ui/CyberXp.vue'
 import CyberMedal from '../components/ui/CyberMedal.vue'
+import { useUserAccount } from '../composables/useUserAccount'
 
 const route = useRoute()
 const router = useRouter()
+const { userProfile: loggedInUser } = useUserAccount()
 
 const isLoading = ref(true)
+const isAddingFriend = ref(false)
+const hasAdded = ref(false)
 const userProfile = ref(null)
 const stats = ref(null)
 const heatmapData = ref(null)
@@ -292,6 +303,25 @@ const fetchProfile = async () => {
 onMounted(() => {
   fetchProfile()
 })
+
+const handleAddFriend = async () => {
+  if (!userProfile.value) return
+  isAddingFriend.value = true
+  try {
+    const res = await api.post('/friends/add', { friend_id: userProfile.value.id })
+    if (res.data.success || res.status === 200) {
+      hasAdded.value = true
+    }
+  } catch (error) {
+    if (error.response?.status === 400 && error.response?.data?.message?.includes('yourself')) {
+      alert('Tidak bisa menambah diri sendiri.')
+    } else {
+      alert('Gagal menambah teman')
+    }
+  } finally {
+    isAddingFriend.value = false
+  }
+}
 
 const xpPercentage = computed(() => {
   if (!userProfile.value) return 0
@@ -530,5 +560,48 @@ const displayBadges = computed(() => {
   font-weight: bold;
   cursor: pointer;
   margin-top: 20px;
+}
+
+/* Add Friend Button */
+.add-friend-btn {
+  background: rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  color: #0ea5e9;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.add-friend-btn:hover:not(:disabled) {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: #0ea5e9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+.add-friend-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.add-friend-btn .fa-check {
+  color: #10b981;
+}
+
+@media (max-width: 600px) {
+  .add-friend-btn .btn-text {
+    display: none;
+  }
+  .add-friend-btn {
+    padding: 10px;
+    border-radius: 50%;
+  }
 }
 </style>
