@@ -91,6 +91,12 @@ const router = createRouter({
       component: () => import('./views/VisitProfileView.vue')
     },
     {
+      path: '/profile/edit',
+      name: 'profile-edit',
+      component: () => import('./views/ProfileEditView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/pricing',
       name: 'pricing',
       component: () => import('./views/PricingView.vue')

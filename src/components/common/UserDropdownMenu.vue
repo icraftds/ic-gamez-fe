@@ -1,6 +1,6 @@
 <template>
   <div class="user-dropdown-menu" @click.stop>
-    <div class="dropdown-header" @click="emit('open-profile')" :style="{ cursor: allowProfileEdit ? 'pointer' : 'default' }" :title="allowProfileEdit ? 'Edit Profil' : ''">
+    <div class="dropdown-header" @click="allowProfileEdit ? handleProfileClick() : null" :style="{ cursor: allowProfileEdit ? 'pointer' : 'default' }" :title="allowProfileEdit ? 'Edit Profil' : ''">
       <div class="dropdown-user-info" style="margin-left: 0; align-items: flex-start;">
         <div class="user-name">
           {{ userProfile.name }}
@@ -25,7 +25,7 @@
         <i v-else class="fa-solid fa-chart-pie"></i> 
         {{ dashboardToggleText }}
       </button>
-      <button v-if="allowProfileEdit" @click="emit('open-profile')" class="text-primary" title="Edit Profil Anda">
+      <button v-if="allowProfileEdit" @click="handleProfileClick" class="text-primary" title="Edit Profil Anda">
         <i class="fa-solid fa-user-pen"></i> Edit Profil
       </button>
       <button @click="toggleTheme" class="text-primary" title="Ganti Tema Warna">
@@ -95,6 +95,11 @@ const handleDashboardClick = async () => {
     await router.push(dashboardToggleRoute.value);
   }
   isNavigating.value = false;
+  emit('close');
+};
+
+const handleProfileClick = () => {
+  router.push('/profile/edit');
   emit('close');
 };
 

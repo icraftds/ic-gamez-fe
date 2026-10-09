@@ -67,7 +67,7 @@ const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
 const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
 const showHomeNavbar = computed(() => {
-  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials']
+  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials', 'profile-edit']
   return !hiddenRoutes.includes(route.name)
 })
 
