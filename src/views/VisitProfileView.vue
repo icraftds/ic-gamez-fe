@@ -614,25 +614,34 @@ const displayBadges = computed(() => {
 }
 
 .vp-back-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  padding: 10px 20px;
+  border-radius: 30px;
   cursor: pointer;
   margin-bottom: 20px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: max-content;
+  align-self: flex-start;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .vp-back-btn:hover {
   background: rgba(14, 165, 233, 0.15);
-  border-color: #0ea5e9;
+  border-color: rgba(14, 165, 233, 0.5);
+  color: #fff;
+  transform: translateX(-5px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.25);
+}
+.vp-back-btn i {
   color: #0ea5e9;
-  transform: translateX(-3px);
+  font-size: 1.1rem;
 }
 </style>
