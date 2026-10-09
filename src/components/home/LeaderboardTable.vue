@@ -125,9 +125,7 @@
           <div class="cyber-table-header">
             <div class="ct-col ct-rank">#</div>
             <div class="ct-col ct-user">CODERZ</div>
-            <div class="ct-col ct-xp">POWER (XP)</div>
-            <div class="ct-col ct-level">LVL</div>
-            <div class="ct-col ct-action"></div>
+            <div class="ct-col ct-stats" style="flex: 1; justify-content: flex-end;">STATISTIK & AKSI</div>
           </div>
           <div class="cyber-table-body">
             <div
@@ -150,14 +148,12 @@
                 </div>
                 <span class="ct-name">{{ user.name }}</span>
               </div>
-              <div class="ct-col ct-xp">
-                <span class="xp-text">{{ user.xp.toLocaleString() }}</span>
-              </div>
-              <div class="ct-col ct-level">
-                <span class="ct-badge-level">Lvl {{ user.level }}</span>
-              </div>
-              <div class="ct-col ct-action">
-                <button v-if="user.slug" @click="$router.push('/coderz/' + user.slug)" class="visit-btn-small">Visit</button>
+              <div class="ct-col ct-stats" style="flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; justify-content: center;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <span class="xp-text">{{ user.xp.toLocaleString() }} XP</span>
+                  <span class="ct-badge-level">Lvl {{ user.level }}</span>
+                </div>
+                <button v-if="user.slug" @click="$router.push('/coderz/' + user.slug)" class="visit-btn-small">Kunjungi Profil</button>
               </div>
             </div>
           </div>
