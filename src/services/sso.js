@@ -20,7 +20,8 @@ export async function sessionRequest(path, options = {}) {
     return data
 }
 
-export function loadSsoSession() {
+export function loadSsoSession(force = false) {
+    if (ssoState.status.value === 'authenticated' && !force) return Promise.resolve(ssoState.user.value)
     if (inFlight) return inFlight
     const generation = ssoState.generation
     inFlight = sessionRequest('/api/session').then(data => {
