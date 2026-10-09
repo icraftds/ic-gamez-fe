@@ -19,7 +19,7 @@
                 </div>
               </div>
               <div class="user-details" style="position: relative; width: 100%;">
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <div class="vp-header-row">
                   <h1 class="greeting-text" style="margin: 0;">
                     <span class="highlight-name">{{ userProfile.name }}</span>
                   </h1>
@@ -520,6 +520,23 @@ const displayBadges = computed(() => {
 @media (max-width: 1024px) {
   .dash-home-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+.vp-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .vp-header-row {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
   }
 }
 
