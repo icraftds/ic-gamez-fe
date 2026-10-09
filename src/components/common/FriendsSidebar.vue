@@ -142,5 +142,5 @@ const handleRemoveFriend = async (userId) => {
 </template>
 
 <style scoped>
-@import '@/assets/css/components/common/FriendsSidebar.css';
+@import '../../assets/css/components/common/FriendsSidebar.css';
 </style>
