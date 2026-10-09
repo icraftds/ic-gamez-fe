@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container" style="padding-top: 100px; padding-bottom: 50px;">
+  <div class="dashboard-container" style="padding: 100px 15px 50px 15px;">
     <div class="dash-home-grid" v-if="!isLoading && userProfile">
       <!-- MAIN COLUMN: GREETING CARD & STATS -->
       <div class="dash-main-col" style="position: relative;">
@@ -515,6 +515,7 @@ const displayBadges = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 @media (max-width: 1024px) {

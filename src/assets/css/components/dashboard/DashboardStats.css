@@ -459,3 +459,13 @@
 
 
 
+
+.gh-box {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.gh-heatmap-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
