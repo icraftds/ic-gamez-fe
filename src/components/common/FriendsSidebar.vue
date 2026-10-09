@@ -176,6 +176,9 @@ const handleRemoveFriend = async (userId) => {
               </div>
             </div>
             <div class="fs-friend-actions">
+              <button class="fs-btn fs-btn-visit" @click="visitProfile(request.slug)" v-if="request.slug" title="Kunjungi Profil">
+                <i class="fa-solid fa-eye"></i>
+              </button>
               <button class="fs-btn fs-btn-add" @click="acceptFriendRequest(request.id)" title="Terima">
                 <i class="fa-solid fa-check"></i>
               </button>
