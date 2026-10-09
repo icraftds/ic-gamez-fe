@@ -22,11 +22,11 @@
     </div>
     <div v-else class="inventory-grid">
       <div v-for="userItem in activeInventory" :key="userItem.id" class="inventory-item">
-        <div class="item-icon">
+        
           <img v-if="userItem.item.image_url" :src="getImageUrl(userItem.item.image_url)" alt="Icon" />
           <img v-else-if="userItem.item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" />
           <i v-else class="fa-solid fa-gift"></i>
-        </div>
+        
         <div class="item-details">
           <h3>{{ userItem.item.name }}</h3>
           <p>{{ userItem.item.description }}</p>
@@ -37,7 +37,7 @@
     </div>
 
     <div v-else-if="activeTab === 'borders'" class="tab-content border-tab-wrapper">
-      <DashboardBorders />
+      <DashboardBorders :inventory="inventory" />
     </div>
   </div>
 </template>
@@ -59,7 +59,7 @@ const getImageUrl = (url) => {
 }
 
 const activeInventory = computed(() => {
-  return inventory.value.filter(item => item.quantity > 0)
+  return inventory.value.filter(item => item.quantity > 0 && item.item.type !== 'border')
 })
 
 onMounted(async () => {
@@ -177,19 +177,19 @@ onMounted(async () => {
   transform: translateY(-5px);
   border-color: rgba(255, 255, 255, 0.15);
 }
-.item-icon {
-  width: 80px;
-  height: 80px;
+/* .item-icon {
+  width: 150px;
+  height: 150px;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 15px;
-}
+} */
 .item-icon img {
-  width: 50px;
-  height: 50px;
+  width: 150px;
+  height: 150px;
   object-fit: contain;
 }
 .item-icon i {

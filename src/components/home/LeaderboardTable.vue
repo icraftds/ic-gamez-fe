@@ -56,6 +56,7 @@
                   :tierId="getUserBorderId(topUsers[1])"
                   :accountBadge="getUserBadgeStatus(topUsers[1])"
                   :avatarUrl="topUsers[1].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[1].name + '&background=random'"
+                  :imageUrl="topUsers[1].active_border_url"
                 />
               </div>
               <div class="cyber-podium-info">
@@ -78,6 +79,7 @@
                   :tierId="getUserBorderId(topUsers[0])"
                   :accountBadge="getUserBadgeStatus(topUsers[0])"
                   :avatarUrl="topUsers[0].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[0].name + '&background=random'"
+                  :imageUrl="topUsers[0].active_border_url"
                 />
               </div>
               <div class="cyber-podium-info">
@@ -99,6 +101,7 @@
                   :tierId="getUserBorderId(topUsers[2])"
                   :accountBadge="getUserBadgeStatus(topUsers[2])"
                   :avatarUrl="topUsers[2].avatar_url || 'https://ui-avatars.com/api/?name=' + topUsers[2].name + '&background=random'"
+                  :imageUrl="topUsers[2].active_border_url"
                 />
               </div>
               <div class="cyber-podium-info">
@@ -153,6 +156,7 @@
                     :tierId="getUserBorderId(user)"
                     :accountBadge="getUserBadgeStatus(user)"
                     :avatarUrl="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'"
+                    :imageUrl="user.active_border_url"
                   />
                 </div>
                 <span class="ct-name">{{ user.username ? user.username + '#' + user.tag_id : user.name }}</span>

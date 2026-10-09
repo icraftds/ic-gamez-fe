@@ -1,5 +1,8 @@
 <template>
-  <div class="cyber-border-wrapper" v-html="svgMarkup"></div>
+  <div class="cyber-border-wrapper" v-if="imageUrl">
+    <img :src="getImageUrl(imageUrl)" alt="Border" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" />
+  </div>
+  <div class="cyber-border-wrapper" v-else v-html="svgMarkup"></div>
 </template>
 
 <script setup>
@@ -24,8 +27,19 @@ const props = defineProps({
   avatarUrl: {
     type: String,
     default: ''
+  },
+  imageUrl: {
+    type: String,
+    default: ''
   }
 })
+
+const getImageUrl = (url) => {
+  if (!url) return null
+  if (url.startsWith('http')) return url
+  const baseUrl = import.meta.env.VITE_BASE_URL || 'https://icgamez.unikom.my.id/api'
+  return baseUrl.replace(/\/api\/?$/, '') + url
+}
 
 const tier = computed(() => {
   return TIERS.find(t => t.id === props.tierId) || TIERS[0]

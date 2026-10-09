@@ -377,9 +377,13 @@ export function useUserAccount() {
     }
   }
 
-  const setActiveBorder = async (borderId) => {
+  const setActiveBorder = async (borderId, imageUrl = null) => {
     // Optimistic update
     activeBorderId.value = borderId;
+    if (userProfile.value) {
+      userProfile.value.active_border_id = borderId;
+      userProfile.value.active_border_url = imageUrl;
+    }
     
     try {
       await api.put('/user/active-border', { border_id: borderId });

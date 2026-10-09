@@ -28,6 +28,7 @@
               :tierId="borderId"
               :accountBadge="currentBadgeStatus"
               :avatarUrl="userProfile.avatar"
+              :imageUrl="userProfile.active_border_url"
             />
           </div>
         </div>

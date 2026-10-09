@@ -14,7 +14,8 @@
       >
         <div class="badge-icon-container" style="margin: 5px 0;">
           <div class="badge-hexagon">
-            <CyberBorder :tierId="border.tierId" class="badge-svg-comp" style="transform: scale(0.95); transform-origin: center;" />
+            <img v-if="border.image_url" :src="getImageUrl(border.image_url)" style="width: 100%; height: 100%; object-fit: contain; transform: scale(0.95);" />
+            <CyberBorder v-else :tierId="border.tierId" class="badge-svg-comp" style="transform: scale(0.95); transform-origin: center;" />
           </div>
         </div>
         <div class="badge-info">
@@ -45,12 +46,27 @@ import { TIERS } from '../../utils/tiers.js'
 import { useUserAccount } from '../../composables/useUserAccount'
 import { useRouter } from 'vue-router'
 import { useToast } from '../../composables/useToast'
+import api from '../../services/api'
 
 const { setActiveBorder, userProfile, userStats, currentPlan, fetchUserStats, activeBorderId } = useUserAccount()
 const router = useRouter()
 const { showToast } = useToast()
 
+const props = defineProps({
+  inventory: {
+    type: Array,
+    default: () => []
+  }
+})
+
 const userBorders = ref([])
+
+const getImageUrl = (url) => {
+  if (!url) return null
+  if (url.startsWith('http')) return url
+  const baseUrl = import.meta.env.VITE_BASE_URL || 'https://icgamez.unikom.my.id/api'
+  return baseUrl.replace(/\/api\/?$/, '') + url
+}
 
 onMounted(async () => {
   if (!userStats.value.completed_exercises) {
@@ -135,7 +151,21 @@ const allBorders = computed(() => {
     earned: isBorderEarned(t.id),
   }));
 
-  return borders.sort((a, b) => {
+  const customBorders = (props.inventory || [])
+    .filter(u => u.item.type === 'border')
+    .map(u => ({
+      id: `custom-border-${u.item.id}`,
+      category: 'borders',
+      tierId: u.item.id.toString(),
+      name: u.item.name,
+      description: u.item.description,
+      earned: true,
+      image_url: u.item.image_url
+    }));
+
+  const combined = [...borders, ...customBorders];
+
+  return combined.sort((a, b) => {
     // 1. Yang digunakan (active border) paling atas (index 0)
     const isActiveA = a.tierId === activeBorderId.value;
     const isActiveB = b.tierId === activeBorderId.value;
@@ -172,7 +202,7 @@ const parseName = (name) => {
 }
 
 const useBorder = (border) => {
-  setActiveBorder(border.tierId)
+  setActiveBorder(border.tierId, border.image_url)
   showToast(`Berhasil memakai border: ${parseName(border.name)}!`, 'success')
 }
 
