@@ -53,15 +53,11 @@
           <i class="fa-solid fa-arrow-left"></i> Kembali
         </button>
         
-        <button 
+        <HintButton 
           v-if="!isCorrect && !hintText && hasQuestions" 
-          class="nav-btn hint-btn" 
+          :isLoading="isHintLoading"
           @click="openHint" 
-          :disabled="isHintLoading"
-        >
-          <i v-if="isHintLoading" class="fa-solid fa-spinner fa-spin"></i>
-          <i v-else class="fa-solid fa-lightbulb"></i> Buka Hint (⚡1)
-        </button>
+        />
       </div>
 
       <div class="footer-right">
@@ -101,6 +97,7 @@
 import { ref, computed } from 'vue'
 import { marked } from 'marked'
 import api from '../../services/api'
+import HintButton from './HintButton.vue'
 import { useUserAccount } from '../../composables/useUserAccount'
 import { useToast } from '../../composables/useToast'
 

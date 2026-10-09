@@ -48,48 +48,14 @@
       <div class="separator-vertical"></div>
       
       <!-- Energy Display -->
-      <div class="nav-energy" title="Sisa Energi">
-        <i class="fa-solid fa-bolt text-warning"></i>
-        <span>{{ credits }}</span>
+      <div class="nav-energy" title="Sisa Energi" style="gap: 0; padding-left: 2px;">
+        <div style="width: 25px; height: 30px; display: flex; align-items: center; justify-content: flex-end; overflow: visible;">
+          <CyberEnergy :pkgId="1" :isAnimated="false" style="min-width: 30px; min-height: 30px; width: 30px; height: 30px; transform: translateX(5px);" />
+        </div>
+        <span style="z-index: 1;">{{ credits }}</span>
       </div>
 
-      <div class="dropdown-container" @click="showUserDropdown = !showUserDropdown" style="position: relative; display: flex; align-items: center; cursor: pointer;">
-        <img
-          :src="userProfile.avatar"
-          :alt="userProfile.name"
-          class="avatar-sm"
-          :class="avatarBorderClass"
-          :title="'Masuk sebagai ' + userProfile.name"
-        />
-        <i class="fa-solid fa-chevron-down" style="margin-left: 8px; font-size: 0.8rem; color: #6b7280;"></i>
-        
-        <div v-if="showUserDropdown" class="user-dropdown-menu" @click.stop>
-          <div class="dropdown-header">
-            <img :src="userProfile.avatar" class="dropdown-avatar" :class="avatarBorderClass" />
-            <div class="dropdown-user-info">
-              <div class="user-name">{{ userProfile.name }}</div>
-              <div class="user-email">{{ userProfile.email }}</div>
-            </div>
-          </div>
-          <div class="dropdown-stats">
-            <div class="stat-item" title="Level Anda">
-              <i class="fa-solid fa-star text-warning"></i> Lvl {{ userProfile.level }}
-            </div>
-            <div class="stat-item" title="Total XP Anda">
-              <i class="fa-solid fa-arrow-trend-up text-primary"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
-            </div>
-            <div class="stat-item" title="Sisa Energi">
-              <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
-            </div>
-          </div>
-          <div class="dropdown-actions">
-            <button @click="$router.push('/dashboard')"><i class="fa-solid fa-chart-pie"></i> Kembali ke Beranda</button>
-            <button @click="goToMarket" class="text-primary" title="Buka iC-Market"><i class="fa-solid fa-store"></i> Buka iC-Market</button>
-            <button @click="handleLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
-            <button v-if="globalLogoutEnabled" type="button" @click="goToGlobalLogout" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Keluar dari semua aplikasi</button>
-          </div>
-        </div>
-      </div>
+      <UserProfileDropdown />
     </div>
   </header>
 </template>
@@ -99,15 +65,10 @@ import { ssoEnabled, globalLogoutEnabled } from '../../services/sso';
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
+import UserProfileDropdown from "../common/UserProfileDropdown.vue";
 
 const router = useRouter();
-const { isLoggedIn, userProfile, isPremiumUser, currentPlan, credits, logout, fetchUser } = useUserAccount();
-
-const avatarBorderClass = computed(() => {
-  if (currentPlan.value === 'expert') return 'border-expert';
-  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'border-pro';
-  return 'border-gray';
-});
+const { isLoggedIn, credits, fetchUser } = useUserAccount();
 
 const STEPS = [
   { number: 1, label: "Materi" },
@@ -135,35 +96,9 @@ const isStepDone = (stepNum, lessonObj, currentStep) => {
 
 defineEmits(["back", "prev-lesson"]);
 
-const showUserDropdown = ref(false);
-
-const goToMarket = () => {
-  const marketUrl = ssoEnabled ? 'https://market.icraftds.id/auth/start?return_to=%2F' : (import.meta.env.VITE_MARKET_URL || 'https://market.icraftds.id/');
-  window.open(marketUrl, '_blank', 'noopener,noreferrer');
-};
-
-const handleLogout = async () => {
-  await logout();
-  router.push('/login');
-};
-
-const handleClickOutside = (e) => {
-  if (showUserDropdown.value && !e.target.closest('.dropdown-container')) {
-    showUserDropdown.value = false;
-  }
-};
-
 onMounted(() => {
   fetchUser();
-  document.addEventListener('click', handleClickOutside);
 });
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
-});
-function goToGlobalLogout() {
-  window.location.assign('https://ic-auth.unikom.my.id/logout');
-}
 </script>
 
 

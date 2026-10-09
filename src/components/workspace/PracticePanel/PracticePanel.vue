@@ -43,15 +43,11 @@
             <i class="fa-solid fa-arrow-left"></i> Kembali
           </button>
           
-          <button 
-            v-if="!hintText" 
-            class="nav-btn hint-btn" 
+          <HintButton 
+            v-if="!hintText && runStatus !== 'success'" 
+            :isLoading="isHintLoading"
             @click="openHint" 
-            :disabled="isHintLoading"
-          >
-            <i v-if="isHintLoading" class="fa-solid fa-spinner fa-spin"></i>
-            <i v-else class="fa-solid fa-lightbulb"></i> Buka Hint (⚡1)
-          </button>
+          />
         </div>
 
         <button class="nav-btn finish-btn" @click="handleFinishClick">
@@ -165,6 +161,7 @@ import { basicSetup } from 'codemirror'
 import { useUserAccount } from '../../../composables/useUserAccount'
 import { useToast } from '../../../composables/useToast'
 import api from '../../../services/api'
+import HintButton from '../HintButton.vue'
 
 const { showToast } = useToast()
 
