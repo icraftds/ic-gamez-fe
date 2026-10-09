@@ -5,9 +5,23 @@
       <div class="dash-home-grid">
         <!-- MAIN COLUMN: GREETING CARD -->
         <div class="dash-main-col" style="position: relative;">
-          <button class="vp-back-btn" @click="$router.back()">
-            <i class="fa-solid fa-arrow-left"></i> Kembali
-          </button>
+          <div class="vp-top-actions">
+            <button class="vp-back-btn" @click="$router.back()">
+              <i class="fa-solid fa-arrow-left"></i> Kembali
+            </button>
+            
+            <button v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend" @click="handleAddFriend" class="add-friend-btn vp-add-friend-top" :disabled="isAddingFriend || isPendingFriend">
+              <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
+              <i v-else-if="isPendingFriend" class="fa-solid fa-clock"></i>
+              <i v-else class="fa-solid fa-user-plus"></i>
+              <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
+            </button>
+            <button v-else-if="loggedInUser && loggedInUser.id === userProfile.id" disabled class="add-friend-btn vp-add-friend-top" style="opacity: 0.6; cursor: not-allowed; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #ccc;">
+              <i class="fa-solid fa-user"></i>
+              <span class="btn-text">Profil Anda</span>
+            </button>
+          </div>
+          
           <div class="dashboard-hero" style="margin-bottom: 0;">
             <div class="hero-content">
               <div class="user-info-section">
@@ -22,19 +36,12 @@
                 </div>
                 <div class="user-details" style="position: relative; width: 100%;">
                   <div class="vp-header-row">
-                    <h1 class="greeting-text" style="margin: 0;">
+                    <h1 class="greeting-text" style="margin: 0; display: flex; flex-direction: column; gap: 5px;">
                       <span class="highlight-name">{{ userProfile.name }}</span>
+                      <span class="user-tag" v-if="userProfile.username" style="font-size: 1rem; color: #94a3b8; font-weight: 500;">
+                        @{{ userProfile.username }}<span style="color: #64748b;">#{{ userProfile.tag_id }}</span>
+                      </span>
                     </h1>
-                    <button v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend" @click="handleAddFriend" class="add-friend-btn" :disabled="isAddingFriend || isPendingFriend">
-                      <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
-                      <i v-else-if="isPendingFriend" class="fa-solid fa-clock"></i>
-                      <i v-else class="fa-solid fa-user-plus"></i>
-                      <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
-                    </button>
-                    <button v-else-if="loggedInUser && loggedInUser.id === userProfile.id" disabled class="add-friend-btn" style="opacity: 0.6; cursor: not-allowed; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #ccc;">
-                      <i class="fa-solid fa-user"></i>
-                      <span class="btn-text">Profil Anda</span>
-                    </button>
                   </div>
                   <p class="motivational-text">Pemain aktif di iC GameZ</p>
                   
@@ -477,11 +484,18 @@ const displayBadges = computed(() => {
   }
 }
 
-.vp-back-btn {
+.vp-top-actions {
   position: absolute;
   top: -55px;
   left: 0;
   z-index: 10;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  width: 100%;
+}
+
+.vp-back-btn {
   background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -495,8 +509,6 @@ const displayBadges = computed(() => {
   font-size: 0.95rem;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: max-content;
-  align-self: flex-start;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -512,11 +524,22 @@ const displayBadges = computed(() => {
   font-size: 1.1rem;
 }
 
+.vp-add-friend-top {
+  padding: 10px 20px !important;
+  border-radius: 30px !important;
+  font-size: 0.95rem !important;
+  gap: 10px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
 @media (max-width: 768px) {
-  .vp-back-btn {
+  .vp-top-actions {
     top: -48px;
-    padding: 8px 16px;
-    font-size: 0.85rem;
+    gap: 10px;
+  }
+  .vp-back-btn, .vp-add-friend-top {
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
   }
 }
 </style>

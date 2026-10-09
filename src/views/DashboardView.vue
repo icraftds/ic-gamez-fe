@@ -4,7 +4,7 @@ import SimpleBackground from '../components/common/SimpleBackground.vue'
 import DashboardHome from '../components/dashboard/DashboardHome.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import DashboardMedals from '../components/dashboard/DashboardMedals.vue'
-import DashboardBorders from '../components/dashboard/DashboardBorders.vue'
+import DashboardInventory from '../components/dashboard/DashboardInventory.vue'
 import PricingView from './PricingView.vue'
 import ConfirmModal from '../components/common/ConfirmModal.vue'
 import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
@@ -104,13 +104,13 @@ const tabs = [
   { id: 'beranda', label: 'Beranda' },
   { id: 'statistik', label: 'Statistik' },
   { id: 'pencapaian', label: 'Pencapaian' },
-  { id: 'borders', label: 'Border' },
+  { id: 'inventory', label: 'Inventory' },
   { id: 'langganan', label: 'Langganan' }]
 
 // Mobile bottom nav: Beranda (home) sits in the middle as the raised button.
 // Desktop sidebar order stays the same; mobile order is applied via CSS `order`.
 const centerTabId = 'beranda'
-const mobileTabOrder = ['statistik', 'pencapaian', 'beranda', 'borders', 'langganan']
+const mobileTabOrder = ['statistik', 'pencapaian', 'beranda', 'inventory', 'langganan']
 const getMobileOrder = (id) => {
   const idx = mobileTabOrder.indexOf(id)
   return idx === -1 ? mobileTabOrder.length : idx
@@ -121,7 +121,7 @@ const getTabIcon = (id) => {
   if (id === 'beranda') return 'fa-solid fa-house'
   if (id === 'statistik') return 'fa-solid fa-chart-line'
   if (id === 'pencapaian') return 'fa-solid fa-medal'
-  if (id === 'borders') return 'fa-solid fa-shield-halved'
+  if (id === 'inventory') return 'fa-solid fa-box-open'
   if (id === 'langganan') return 'fa-solid fa-crown'
   return 'fa-solid fa-circle'
 }
@@ -167,7 +167,7 @@ const getTabIcon = (id) => {
       <DashboardHome v-if="activeTab === 'beranda'" />
       <DashboardStats v-else-if="activeTab === 'statistik'" />
       <DashboardMedals v-else-if="activeTab === 'pencapaian'" />
-      <DashboardBorders v-else-if="activeTab === 'borders'" />
+      <DashboardInventory v-else-if="activeTab === 'inventory'" />
       <PricingView v-else-if="activeTab === 'langganan'" :isEmbedded="true" />
       <LeaderboardTable v-else-if="activeTab === 'leaderboard'" :isFullView="true" />
       </template>

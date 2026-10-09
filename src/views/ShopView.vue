@@ -42,6 +42,9 @@
             </div>
             Border Premium
           </button>
+          <button class="shop-tab" :class="{ active: activeTab === 'item' }" @click="activeTab = 'item'">
+            <i class="fa-solid fa-gift" style="font-size: 24px; margin-right: 8px;"></i> Items
+          </button>
         </div>
 
         <div class="shop-sort">
@@ -73,13 +76,13 @@
           <p>Belum ada paket yang tersedia saat ini. Silakan kembali lagi nanti.</p>
         </div>
 
-        <div v-else class="packages-grid">
+        <div v-else class="shop-item-grid">
           <div 
             v-for="pkg in sortedPackages" 
             :key="pkg.id" 
-            class="package-card border-shop-card"
+            class="border-shop-card energy-card"
           >
-            <div class="border-preview-box" style="flex-direction: column;">
+            <div class="border-preview-box" style="flex-direction: column; margin: 5px 0;">
                <div class="energy-giant-icon" style="width: 120px; height: 120px;">
                  <CyberEnergy :pkgId="pkg.id" :isAnimated="true" style="width: 100%; height: 100%;" />
                </div>
@@ -104,7 +107,7 @@
 
       <!-- BORDER TAB -->
       <div v-if="activeTab === 'border'" class="tab-content border-tab">
-        <div class="borders-grid">
+        <div class="shop-item-grid">
           <div v-for="border in sortedBorders" :key="border.id" class="border-shop-card">
             <div class="border-preview-box" style="margin: 5px 0;">
                <CyberBorder :tierId="border.id" class="shop-border-svg" style="transform: scale(0.95); transform-origin: center;" />
@@ -123,6 +126,42 @@
               </button>
               <button v-else class="btn-buy coinz-buy" :class="{ 'disabled-buy': coinz < getBorderPrice(border.id) || walletStatus !== 'fresh' }" @click="buyBorder(border.id)">
                 Beli Border
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITEMS TAB -->
+      <div v-if="activeTab === 'item'" class="tab-content border-tab">
+        <div v-if="isLoading" class="loading-state">
+          <img src="/images/icoinz.svg" alt="Loading" class="icoinz-loading-icon" />
+          <p>Memuat item...</p>
+        </div>
+        <div v-else-if="items.length === 0" class="empty-state">
+          <div class="empty-icon-wrapper">
+            <i class="fa-solid fa-box-open"></i>
+          </div>
+          <h3>Toko Item Sedang Kosong</h3>
+          <p>Belum ada item yang tersedia saat ini.</p>
+        </div>
+        <div v-else class="shop-item-grid">
+          <div v-for="item in items" :key="item.id" class="border-shop-card">
+            <div class="border-preview-box" style="margin: 5px 0;">
+               <img v-if="item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" style="width: 100px; height: 100px; object-fit: contain;" />
+               <i v-else class="fa-solid fa-gift" style="font-size: 5rem; color: #fbbf24;"></i>
+            </div>
+            <div class="border-info-box">
+              <h4>{{ item.name }}</h4>
+              <p class="border-desc">{{ item.description }}</p>
+              
+              <div class="border-price-row">
+                <span class="price-label">Harga:</span>
+                <span class="price-value"><img src="/images/icoinz.svg" class="icoinz-icon-xs"/> {{ formatPrice(item.price) }}</span>
+              </div>
+              
+              <button class="btn-buy coinz-buy" :class="{ 'disabled-buy': isProcessing || walletStatus !== 'fresh' || coinz < item.price }" @click="buyItem(item)">
+                Beli Item
               </button>
             </div>
           </div>
@@ -159,6 +198,7 @@ const activeTab = ref('energy')
 const sortOrder = ref('default')
 const filterOwnership = ref('all')
 const packages = ref([])
+const items = ref([])
 const isLoading = ref(false)
 const isProcessing = ref(false)
 
@@ -212,8 +252,12 @@ const isBought = (id) => boughtBorders.value.includes(id)
 const fetchPackages = async () => {
   try {
     isLoading.value = true
-    const res = await api.get('/shop/packages')
-    packages.value = res.data.data
+    const [resPackages, resItems] = await Promise.all([
+      api.get('/shop/packages'),
+      api.get('/shop/items')
+    ])
+    packages.value = resPackages.data.data
+    items.value = resItems.data.data
   } catch (error) {
     console.error('Failed to fetch packages:', error.response?.status || 'request_failed')
   } finally {
@@ -221,8 +265,15 @@ const fetchPackages = async () => {
   }
 }
 
-const loadBoughtBorders = () => {
-  boughtBorders.value = JSON.parse(localStorage.getItem('bought_borders') || '[]')
+const loadBoughtBorders = async () => {
+  try {
+    const res = await api.get('/user/borders')
+    if (res.data.success) {
+      boughtBorders.value = res.data.data
+    }
+  } catch (err) {
+    console.error('Failed to load borders', err)
+  }
 }
 
 onMounted(() => {
@@ -288,6 +339,25 @@ const buyBorder = (id) => {
       type: 'border',
       method: 'coinz',
       price: price
+    }
+  })
+}
+
+const buyItem = (item) => {
+  if (coinz.value < item.price) {
+    alert('Saldo iCoinZ tidak cukup untuk membeli item ini.')
+    return
+  }
+  
+  router.push({
+    path: '/shop/checkout',
+    query: {
+      pkgId: item.id,
+      name: item.name,
+      energy: 0,
+      type: 'item',
+      method: 'coinz',
+      price: item.price
     }
   })
 }
@@ -460,20 +530,14 @@ const buyBorder = (id) => {
 }
 
 /* Grids */
-.packages-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
-}
-
-.borders-grid {
+.shop-item-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 30px;
 }
 
 /* Common Card Base */
-.package-card, .border-shop-card {
+.border-shop-card {
   background: rgba(15, 23, 42, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
@@ -490,15 +554,15 @@ const buyBorder = (id) => {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* Package specific */
-.package-card::before {
+/* Energy Shop Specific */
+.energy-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 4px;
   background: linear-gradient(90deg, #f59e0b, #fbbf24);
   opacity: 0; transition: opacity 0.3s;
 }
-.package-card:hover::before { opacity: 1; }
+.energy-card:hover::before { opacity: 1; }
 
 .energy-giant-icon {
   font-size: 5rem;
@@ -746,6 +810,6 @@ const buyBorder = (id) => {
     flex-direction: column; gap: 20px; text-align: center;
   }
   .title-with-icon { flex-direction: column; }
-  .packages-grid, .borders-grid { grid-template-columns: 1fr; }
+  .shop-item-grid { grid-template-columns: 1fr; }
 }
 </style>

@@ -27,6 +27,9 @@ const activeBorderId = ref(null)
 const userProfile = ref({
   id: null,
   name: '',
+  username: '',
+  tag_id: '',
+  last_username_change_at: null,
   email: '',
   phone: '',
   avatar: '',
@@ -41,7 +44,7 @@ const userProfile = ref({
 
 export function clearUserAccount() {
   isLoggedIn.value = false
-  userProfile.value = { id: null, name: '', email: '', phone: '', avatar: '', level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: '' }
+  userProfile.value = { id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '', level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: '' }
   coinz.value = null; walletStatus.value = 'unavailable'; walletInitializationPending.value = false
   currentPlan.value = 'free'; isPremiumUser.value = false; credits.value = 10; initializedToken = null
   activeBorderId.value = null
@@ -64,6 +67,9 @@ export function useUserAccount() {
       userProfile.value = {
         id: data.id,
         name: data.name,
+        username: data.username,
+        tag_id: data.tag_id,
+        last_username_change_at: data.last_username_change_at,
         email: data.email,
         phone: data.phone || '',
         avatar: (data.avatar_url && !data.avatar_url.includes('dicebear.com')) ? data.avatar_url : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.name || 'User') + '&background=random',
@@ -274,7 +280,7 @@ export function useUserAccount() {
       
       isLoggedIn.value = false
       userProfile.value = {
-        id: null, name: '', email: '', avatar: '',
+        id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '',
         level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: ''
       }
       coinz.value = null

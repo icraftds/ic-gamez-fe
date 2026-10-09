@@ -50,9 +50,19 @@ const { setActiveBorder, userProfile, userStats, currentPlan, fetchUserStats, ac
 const router = useRouter()
 const { showToast } = useToast()
 
+const userBorders = ref([])
+
 onMounted(async () => {
   if (!userStats.value.completed_exercises) {
     await fetchUserStats()
+  }
+  try {
+    const res = await api.get('/user/borders')
+    if (res.data.success) {
+      userBorders.value = res.data.data
+    }
+  } catch (err) {
+    console.error('Failed to load user borders', err)
   }
 })
 
@@ -104,8 +114,7 @@ const isBorderEarned = (tierId) => {
   }
   
   // Custom or Premium Bought borders
-  const bought = JSON.parse(localStorage.getItem('bought_borders') || '[]');
-  if (bought.includes(tierId)) {
+  if (userBorders.value.includes(tierId)) {
     return true;
   }
   

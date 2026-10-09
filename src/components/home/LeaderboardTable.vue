@@ -59,7 +59,7 @@
                 />
               </div>
               <div class="cyber-podium-info">
-                <h4>{{ topUsers[1].name }}</h4>
+                <h4>{{ topUsers[1].username ? topUsers[1].username + '#' + topUsers[1].tag_id : topUsers[1].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch" style="margin: 0;">{{ topUsers[1].xp.toLocaleString() }} XP</div>
                   <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[1])">Lvl {{ topUsers[1].level }}</span>
@@ -81,7 +81,7 @@
                 />
               </div>
               <div class="cyber-podium-info">
-                <h4>{{ topUsers[0].name }}</h4>
+                <h4>{{ topUsers[0].username ? topUsers[0].username + '#' + topUsers[0].tag_id : topUsers[0].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch gold-text" style="margin: 0;">{{ topUsers[0].xp.toLocaleString() }} XP</div>
                   <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[0])">Lvl {{ topUsers[0].level }}</span>
@@ -102,7 +102,7 @@
                 />
               </div>
               <div class="cyber-podium-info">
-                <h4>{{ topUsers[2].name }}</h4>
+                <h4>{{ topUsers[2].username ? topUsers[2].username + '#' + topUsers[2].tag_id : topUsers[2].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch" style="margin: 0;">{{ topUsers[2].xp.toLocaleString() }} XP</div>
                   <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[2])">Lvl {{ topUsers[2].level }}</span>
@@ -155,7 +155,7 @@
                     :avatarUrl="user.avatar_url || 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'"
                   />
                 </div>
-                <span class="ct-name">{{ user.name }}</span>
+                <span class="ct-name">{{ user.username ? user.username + '#' + user.tag_id : user.name }}</span>
               </div>
               <div class="ct-col ct-stats" style="flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; justify-content: center;">
                 <div style="display: flex; gap: 10px; align-items: center;">

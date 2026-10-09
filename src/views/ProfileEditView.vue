@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import api from '../services/api'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
+import ChangeNameUsn from '../components/common/ChangeNameUsn.vue'
 
 const router = useRouter()
 const { userProfile, fetchUser } = useUserAccount()
@@ -75,11 +76,7 @@ const saveProfile = async () => {
     if (profileForm.value.password) formData.append('password', profileForm.value.password)
     if (profileForm.value.avatar) formData.append('avatar', profileForm.value.avatar)
 
-    const response = await api.post('/user/profile', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
+    const response = await api.post('/user/profile', formData)
     
     userProfile.value.name = profileForm.value.name
     
@@ -99,6 +96,13 @@ const saveProfile = async () => {
     alert('Gagal memperbarui profil: ' + (err.response?.data?.message || err.message))
   } finally {
     isSavingProfile.value = false
+  }
+}
+
+const handleUsernameUpdate = (updatedUser) => {
+  if (userProfile.value) {
+    userProfile.value.username = updatedUser.username
+    userProfile.value.tag_id = updatedUser.tag_id
   }
 }
 </script>
@@ -137,15 +141,19 @@ const saveProfile = async () => {
           </div>
           
           <hr class="pe-divider" />
-          
+
           <!-- Name Field -->
           <div class="pe-form-group">
-            <label>Nama Lengkap</label>
-            <div class="pe-input-wrapper">
+            <label>Nama Lengkap <span class="pe-badge-locked"><i class="fa-solid fa-lock"></i> Terkunci</span></label>
+            <div class="pe-input-wrapper is-disabled">
               <i class="fa-solid fa-id-card pe-input-icon"></i>
-              <input type="text" v-model="profileForm.name" class="pe-input" :class="{ 'is-success': isSuccess }" required placeholder="Masukkan nama lengkap Anda">
+              <input type="text" :value="profileForm.name" class="pe-input" disabled placeholder="Nama dari SSO">
             </div>
+            <small class="pe-help-text">Nama disinkronisasi dari akun pusat dan tidak dapat diubah di sini.</small>
           </div>
+          
+          <!-- Change Username Component -->
+          <ChangeNameUsn @updated="handleUsernameUpdate" />
           
           <!-- Phone Field (Disabled) -->
           <div class="pe-form-group">

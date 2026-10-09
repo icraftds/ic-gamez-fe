@@ -14,7 +14,12 @@
         <div class="user-details">
           <h1 class="greeting-text">
             Welcome back, <br />
-            <span class="highlight-name">{{ userProfile.name }}</span> 👋
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span class="highlight-name">{{ userProfile.name }}</span>
+              <span v-if="userProfile.username" style="font-size: 1.1rem; color: #94a3b8; font-weight: 500;">
+                @{{ userProfile.username }}<span style="color: #64748b;">#{{ userProfile.tag_id }}</span>
+              </span>
+            </div>
           </h1>
           <p class="motivational-text">Lanjutkan misimu hari ini! Konsistensi adalah kunci menguasai pemrograman.</p>
           

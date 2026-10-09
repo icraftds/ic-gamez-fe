@@ -5,6 +5,9 @@
         <div class="user-name">
           {{ userProfile.name }}
         </div>
+        <div class="user-username" v-if="userProfile.username" style="font-size: 0.85rem; color: #94A3B8; margin-top: -2px; margin-bottom: 2px;">
+          @{{ userProfile.username }}#{{ userProfile.tag_id }}
+        </div>
         <div class="user-email">{{ userProfile.email }}</div>
       </div>
     </div>

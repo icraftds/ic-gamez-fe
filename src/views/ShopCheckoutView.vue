@@ -22,8 +22,9 @@
             <div class="order-summary shop-order">
               <div class="order-plan-name">
                 <i v-if="type === 'border'" class="fa-solid fa-hexagon-nodes text-warning"></i>
-                <CyberEnergy :pkgId="1" :isAnimated="false" />
-                <span>{{ pkgName }} <span v-if="type !== 'border'">(+{{ pkgEnergy }} Energi)</span></span>
+                <i v-else-if="type === 'item'" class="fa-solid fa-box text-info"></i>
+                <CyberEnergy v-else :pkgId="1" :isAnimated="false" />
+                <span>{{ pkgName }} <span v-if="type === 'energy'">(+{{ pkgEnergy }} Energi)</span></span>
               </div>
               <div class="order-price">
                 <span v-if="method === 'coinz'" style="display: flex; align-items: center; gap: 6px;">
@@ -79,6 +80,7 @@
             <h2 class="success-title">Pembayaran Berhasil!</h2>
             <p class="success-desc">Anda telah berhasil membeli <strong>{{ pkgName }}</strong>.<br>
             <span v-if="type === 'border'">Border telah ditambahkan ke koleksi Anda.</span>
+            <span v-else-if="type === 'item'">Item telah ditambahkan ke inventory Anda.</span>
             <span v-else>Energi Anda telah ditambahkan.</span>
             </p>
             
@@ -107,8 +109,9 @@
             <div class="order-summary shop-order">
               <div class="order-plan-name">
                 <i v-if="type === 'border'" class="fa-solid fa-hexagon-nodes text-warning"></i>
-                <CyberEnergy :pkgId="1" :isAnimated="false" />
-                <span>{{ pkgName }} <span v-if="type !== 'border'">(+{{ pkgEnergy }} Energi)</span></span>
+                <i v-else-if="type === 'item'" class="fa-solid fa-box text-info"></i>
+                <CyberEnergy v-else :pkgId="1" :isAnimated="false" />
+                <span>{{ pkgName }} <span v-if="type === 'energy'">(+{{ pkgEnergy }} Energi)</span></span>
               </div>
               <div class="order-price">
                 <span>Rp {{ formattedPrice }}</span>
@@ -192,14 +195,16 @@ const processPayment = async () => {
       localStorage.setItem(intentKey.value, JSON.stringify(intent))
     }
     if (type === 'border') {
-      // Simulate API call for Border
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      const bought = JSON.parse(localStorage.getItem('bought_borders') || '[]')
-      if (!bought.includes(pkgId)) {
-        bought.push(pkgId)
-        localStorage.setItem('bought_borders', JSON.stringify(bought))
-      }
+      const response = await api.post('/shop/purchase/border', { border_id: intent.package_id, price: price })
+      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian belum dapat dikonfirmasi')
+
       localStorage.removeItem(intentKey.value)
+      await Promise.all([fetchUser(true), fetchWallet()])
+    } else if (type === 'item') {
+      const response = await api.post('/shop/purchase/item', { item_id: intent.package_id })
+      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian belum dapat dikonfirmasi')
+      localStorage.removeItem(intentKey.value)
+      await Promise.all([fetchUser(true), fetchWallet()])
     } else {
       const response = await api.post('/shop/purchase/coinz', { package_id: intent.package_id }, {
         headers: { 'Idempotency-Key': intent.key }

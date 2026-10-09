@@ -97,7 +97,7 @@
           </button>
           
           <!-- 2. GameZ Shop -->
-          <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)" >
+          <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)" style="cursor: pointer;">
             <i class="fa-solid fa-cart-plus"></i>
           </button>
           
