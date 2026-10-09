@@ -26,6 +26,10 @@
                     <i v-else class="fa-solid fa-user-plus"></i>
                     <span class="btn-text">{{ hasAdded ? 'Berteman' : 'Add Friend' }}</span>
                   </button>
+                  <button v-else-if="loggedInUser && loggedInUser.id === userProfile.id" disabled class="add-friend-btn" style="opacity: 0.6; cursor: not-allowed; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #ccc;">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="btn-text">Profil Anda</span>
+                  </button>
                 </div>
                 <p class="motivational-text">Pemain aktif di iC GameZ</p>
                 
