@@ -266,6 +266,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
+import CyberBorder from '../components/ui/CyberBorder.vue'
 import CyberXp from '../components/ui/CyberXp.vue'
 import CyberMedal from '../components/ui/CyberMedal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
