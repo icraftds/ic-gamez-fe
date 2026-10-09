@@ -65,6 +65,15 @@
           @click="mobileMenuOpen = false"
           >Leaderboard</router-link
         >
+        <!-- Mobile only Friends button -->
+        <a 
+          href="#"
+          v-if="isLoggedIn"
+          class="nav-link mobile-only-friends"
+          @click.prevent="openFriendsSidebarMobile"
+        >
+          <i class="fa-solid fa-user-group"></i> Teman
+        </a>
         <router-link
           v-if="!isLoggedIn"
           to="/pricing"
@@ -80,6 +89,11 @@
           <!-- 1. Upgrade Button (Khusus Free User) -->
           <button v-if="!isPremiumUser" class="nav-btn upgrade-btn" @click="$router.push('/pricing')" title="Upgrade ke Premium">
             <i class="fa-solid fa-crown text-warning"></i> Upgrade
+          </button>
+          
+          <!-- Friends Button (Desktop only) -->
+          <button class="nav-btn friends-btn" @click="toggleFriendsSidebar" title="Teman">
+            <i class="fa-solid fa-user-group"></i>
           </button>
           
           <!-- 2. GameZ Shop -->
@@ -123,8 +137,15 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import { useTheme } from "../../composables/useTheme";
 import UserProfileDropdown from "../common/UserProfileDropdown.vue";
+import { useFriends } from "../../composables/useFriends";
 
 const { isLightMode, toggleTheme } = useTheme();
+const { toggleFriendsSidebar } = useFriends();
+
+const openFriendsSidebarMobile = () => {
+  mobileMenuOpen.value = false;
+  toggleFriendsSidebar();
+};
 
 const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz, walletStatus } =
   useUserAccount();

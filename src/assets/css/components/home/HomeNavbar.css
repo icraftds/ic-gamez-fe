@@ -563,3 +563,18 @@ body:not(.light-mode) .logo-light { display: none; }
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Friends Sidebar Buttons */
+.mobile-only-friends {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .friends-btn {
+    display: none !important;
+  }
+  
+  .mobile-only-friends {
+    display: block !important;
+  }
+}
