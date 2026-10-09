@@ -36,10 +36,10 @@ watch(searchQuery, (newVal) => {
   }, 300)
 })
 
-const visitProfile = (slug) => {
-  if (slug) {
+const visitProfile = (slugOrId) => {
+  if (slugOrId) {
     toggleFriendsSidebar() // close sidebar
-    router.push(`/coderz/${slug}`)
+    router.push(`/coderz/${slugOrId}`)
   }
 }
 
@@ -106,8 +106,8 @@ const handleRemoveFriend = async (userId) => {
               </button>
               <button 
                 class="fs-btn fs-btn-visit" 
-                @click="visitProfile(user.slug)"
-                v-if="user.slug"
+                @click="visitProfile(user.slug || user.id)"
+                v-if="user.slug || user.id"
                 title="Kunjungi Profil"
               >
                 <i class="fa-solid fa-eye"></i>
@@ -142,7 +142,7 @@ const handleRemoveFriend = async (userId) => {
               </div>
             </div>
             <div class="fs-friend-actions">
-              <button class="fs-btn fs-btn-visit" @click="visitProfile(friend.slug)" v-if="friend.slug" title="Kunjungi Profil">
+              <button class="fs-btn fs-btn-visit" @click="visitProfile(friend.slug || friend.id)" v-if="friend.slug || friend.id" title="Kunjungi Profil">
                 <i class="fa-solid fa-eye"></i>
               </button>
               <button class="fs-btn fs-btn-remove" @click="handleRemoveFriend(friend.id)" title="Hapus Teman">
