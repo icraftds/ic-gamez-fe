@@ -23,7 +23,7 @@
         color: var(--text-light);
         text-decoration: none;
         font-weight: 600;
-        font-family: "Fredoka", sans-serif;
+        font-family: "Poppins", sans-serif;
         backdrop-filter: blur(10px);
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);

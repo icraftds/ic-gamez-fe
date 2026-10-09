@@ -12,8 +12,15 @@ app.config.errorHandler = (err, instance, info) => {
   console.error('[IC Game-Z Error]', err, info)
 }
 
+import CyberEnergy from './components/ui/CyberEnergy.vue'
+import CyberXp from './components/ui/CyberXp.vue'
+import CyberLevel from './components/ui/CyberLevel.vue'
+
 app.use(createPinia())
 app.use(router)
+app.component('CyberEnergy', CyberEnergy)
+app.component('CyberXp', CyberXp)
+app.component('CyberLevel', CyberLevel)
 
 initCsrf().then(() => {
   app.mount('#app')

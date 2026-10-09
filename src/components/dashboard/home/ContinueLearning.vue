@@ -1,7 +1,46 @@
 <template>
   <div class="section-card">
-    <h2>Teruskan Perjalanan Belajarmu</h2>
-    <div class="continue-grid">
+    <div class="cl-header">
+      <h2>Teruskan Perjalanan Belajarmu</h2>
+      <div class="view-toggle" role="group" aria-label="Ubah tampilan">
+        <button
+          id="cl-view-grid"
+          :class="{ active: viewMode === 'grid' }"
+          @click="setViewMode('grid')"
+          title="Tampilan Kotak"
+          aria-label="Tampilan Kotak"
+        >
+          <i class="fa-solid fa-table-cells-large"></i>
+        </button>
+        <button
+          id="cl-view-list"
+          :class="{ active: viewMode === 'list' }"
+          @click="setViewMode('list')"
+          title="Tampilan List"
+          aria-label="Tampilan List"
+        >
+          <i class="fa-solid fa-list"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- List View -->
+    <div v-if="viewMode === 'list'" class="continue-list">
+      <div class="cl-item" v-for="path in paths" :key="path.id">
+        <div class="cc-icon cl-icon"><i :class="path.icon"></i></div>
+        <div class="cl-body">
+          <h4 class="cl-title">{{ path.title }}</h4>
+          <span class="cl-percent">{{ getPathProgress(path) }}%</span>
+          <div class="cc-bar-bg cl-bar"><div class="cc-bar-fill" :style="{ width: getPathProgress(path) + '%' }"></div></div>
+          <router-link :to="`/learning/${path.id}`" class="btn-continue cl-btn">
+            Lanjutkan Materi
+          </router-link>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid View -->
+    <div v-else class="continue-grid">
       <div class="continue-card" v-for="path in paths" :key="path.id">
         <div class="cc-header">
           <div class="cc-icon"><i :class="path.icon"></i></div>
@@ -24,9 +63,17 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useLearningPaths } from '../../../composables/useLearningPaths'
 
 const { paths } = useLearningPaths()
+
+const VIEW_KEY = 'continue_learning_view'
+const viewMode = ref(localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'grid')
+const setViewMode = (mode) => {
+  viewMode.value = mode
+  localStorage.setItem(VIEW_KEY, mode)
+}
 
 const getPathProgress = (path) => {
   const total = getTotalLessonsForPath(path)

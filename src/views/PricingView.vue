@@ -1,6 +1,6 @@
 <template>
-  <div class="pricing-view">
-    <SimpleBackground />
+  <div class="pricing-view" :class="{ 'is-embedded': isEmbedded }">
+    <SimpleBackground v-if="!isEmbedded" />
     
     <div class="pricing-content">
       <div class="header-section">
@@ -106,6 +106,13 @@ import api from '../services/api'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import AuthRequiredModal from '../components/common/AuthRequiredModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
+
+const props = defineProps({
+  isEmbedded: {
+    type: Boolean,
+    default: false
+  }
+})
 
 const router = useRouter()
 const { isLoggedIn, isPremiumUser, currentPlan } = useUserAccount()

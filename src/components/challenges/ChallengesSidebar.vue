@@ -76,7 +76,7 @@
       <h3>Riwayat Event</h3>
       <div class="history-stats">
         <div class="stat-row">
-          <span><i class="fa-solid fa-bolt" style="color: #f59e0b; width: 20px;"></i> Harian</span>
+          <span><CyberEnergy :pkgId="1" :isAnimated="false" /> Harian</span>
           <span class="count" style="color: white; font-weight: 600;">{{ userStats?.events?.daily || 0 }}x</span>
         </div>
         <div class="stat-row">

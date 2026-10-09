@@ -22,7 +22,15 @@
 
     <template v-else>
       <div class="welcome-row">
-        <img :src="userProfile.avatar" alt="Avatar" class="welcome-avatar" />
+        <div class="welcome-avatar">
+          <div class="welcome-avatar-wrapper">
+            <CyberBorder
+              :tierId="borderId"
+              :accountBadge="currentBadgeStatus"
+              :avatarUrl="userProfile.avatar"
+            />
+          </div>
+        </div>
         <div class="welcome-text">
           <h1 class="welcome-heading">
             Selamat datang kembali,<br /><span class="gradient-text"
@@ -47,8 +55,24 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useUserAccount } from "../../composables/useUserAccount";
-const { isLoggedIn, userProfile } = useUserAccount();
+import CyberBorder from '../ui/CyberBorder.vue';
+
+const { isLoggedIn, userProfile, currentPlan, isPremiumUser, activeBorderId } = useUserAccount();
+
+const currentBadgeStatus = computed(() => {
+  if (currentPlan.value === 'expert') return 'EXPERT';
+  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'PRO';
+  return 'FREE';
+});
+
+const borderId = computed(() => {
+  if (activeBorderId.value) return activeBorderId.value;
+  if (currentPlan.value === 'expert') return 'D_EXPERT';
+  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'D_PRO';
+  return 'D_FREE';
+});
 </script>
 
 <style scoped src="../../assets/css/components/home/HeroSection.css"></style>

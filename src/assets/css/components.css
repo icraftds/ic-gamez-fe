@@ -241,7 +241,7 @@
         cursor: pointer;
         width: fit-content;
         transition: all 0.3s;
-        font-family: "Fredoka", sans-serif;
+        font-family: "Poppins", sans-serif;
         font-size: 0.95rem;
         box-shadow: 0 0 20px var(--text-glow);
         display: inline-flex;

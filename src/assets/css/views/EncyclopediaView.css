@@ -55,7 +55,7 @@
   border-radius: 99px;
   padding: 10px 15px 10px 40px;
   color: var(--text-main-hex);
-  font-family: 'Fredoka', sans-serif;
+  font-family: "Poppins", sans-serif;
   outline: none;
   transition: all 0.3s;
 }

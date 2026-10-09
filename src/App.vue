@@ -63,8 +63,8 @@ const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
 const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
 const showHomeNavbar = computed(() => {
-  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'dashboard', 'not-found', 'materials']
-  return !hiddenRoutes.includes(route.name) && !route.path.startsWith('/dashboard')
+  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials']
+  return !hiddenRoutes.includes(route.name)
 })
 
 const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping } = useUserAccount()

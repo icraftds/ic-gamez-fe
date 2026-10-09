@@ -168,7 +168,7 @@ function getButtonContent(stage) {
   if (stage < unlockedStage.value) {
     return 'Selesai <i class="fa-solid fa-check"></i>'
   } else if (stage === unlockedStage.value) {
-    return 'Mulai Kode <i class="fa-solid fa-bolt"></i>'
+    return 'Mulai Kode <CyberEnergy :pkgId="1" :isAnimated="false" />'
   }
   return '<i class="fa-solid fa-lock"></i> Terkunci'
 }

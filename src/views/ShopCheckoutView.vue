@@ -21,8 +21,9 @@
             
             <div class="order-summary shop-order">
               <div class="order-plan-name">
-                <i class="fa-solid fa-bolt text-warning"></i>
-                <span>{{ pkgName }} (+{{ pkgEnergy }} Energi)</span>
+                <i v-if="type === 'border'" class="fa-solid fa-hexagon-nodes text-warning"></i>
+                <CyberEnergy :pkgId="1" :isAnimated="false" />
+                <span>{{ pkgName }} <span v-if="type !== 'border'">(+{{ pkgEnergy }} Energi)</span></span>
               </div>
               <div class="order-price">
                 <span v-if="method === 'coinz'" style="display: flex; align-items: center; gap: 6px;">
@@ -76,7 +77,10 @@
               <div class="success-check-badge"><i class="fa-solid fa-check"></i></div>
             </div>
             <h2 class="success-title">Pembayaran Berhasil!</h2>
-            <p class="success-desc">Anda telah berhasil membeli <strong>{{ pkgName }}</strong>.<br>Energi Anda telah ditambahkan.</p>
+            <p class="success-desc">Anda telah berhasil membeli <strong>{{ pkgName }}</strong>.<br>
+            <span v-if="type === 'border'">Border telah ditambahkan ke koleksi Anda.</span>
+            <span v-else>Energi Anda telah ditambahkan.</span>
+            </p>
             
             <div class="success-actions">
               <button class="btn-primary" @click="$router.push('/dashboard')">
@@ -102,8 +106,9 @@
             <!-- Order Summary -->
             <div class="order-summary shop-order">
               <div class="order-plan-name">
-                <i class="fa-solid fa-bolt text-warning"></i>
-                <span>{{ pkgName }} (+{{ pkgEnergy }} Energi)</span>
+                <i v-if="type === 'border'" class="fa-solid fa-hexagon-nodes text-warning"></i>
+                <CyberEnergy :pkgId="1" :isAnimated="false" />
+                <span>{{ pkgName }} <span v-if="type !== 'border'">(+{{ pkgEnergy }} Energi)</span></span>
               </div>
               <div class="order-price">
                 <span>Rp {{ formattedPrice }}</span>
@@ -161,10 +166,11 @@ const { fetchUser, fetchWallet, userProfile } = useUserAccount()
 const pkgId = route.query.pkgId
 const pkgName = route.query.name || 'Paket'
 const pkgEnergy = route.query.energy || 0
+const type = route.query.type || 'energy'
 const method = route.query.method || 'gateway'
 const price = route.query.price || 0
 const state = ref('confirm')
-const errorMsg = ref(method !== 'coinz' ? 'Pembayaran energi melalui QRIS belum tersedia. Gunakan iCoinz.' : '')
+const errorMsg = ref(method !== 'coinz' ? 'Pembayaran menggunakan QRIS belum tersedia. Gunakan iCoinz.' : '')
 const qrString = ref('')
 const countdown = ref(0)
 const formattedCountdown = computed(() => '00:00')
@@ -185,12 +191,23 @@ const processPayment = async () => {
       intent = { key: crypto.randomUUID(), package_id: pkgId, status: 'pending' }
       localStorage.setItem(intentKey.value, JSON.stringify(intent))
     }
-    const response = await api.post('/shop/purchase/coinz', { package_id: intent.package_id }, {
-      headers: { 'Idempotency-Key': intent.key }
-    })
-    if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian belum dapat dikonfirmasi')
-    localStorage.removeItem(intentKey.value)
-    await Promise.all([fetchUser(true), fetchWallet()])
+    if (type === 'border') {
+      // Simulate API call for Border
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      const bought = JSON.parse(localStorage.getItem('bought_borders') || '[]')
+      if (!bought.includes(pkgId)) {
+        bought.push(pkgId)
+        localStorage.setItem('bought_borders', JSON.stringify(bought))
+      }
+      localStorage.removeItem(intentKey.value)
+    } else {
+      const response = await api.post('/shop/purchase/coinz', { package_id: intent.package_id }, {
+        headers: { 'Idempotency-Key': intent.key }
+      })
+      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian belum dapat dikonfirmasi')
+      localStorage.removeItem(intentKey.value)
+      await Promise.all([fetchUser(true), fetchWallet()])
+    }
     state.value = 'success'
   } catch (error) {
     // Only a definitive rejection permits a new purchase intent.

@@ -1,9 +1,9 @@
 <template>
   <div class="recent-activity-wrapper">
-    <h2 class="section-title">Jejak Aktivitasmu</h2>
     <div class="section-card">
+      <h2 class="section-title" style="margin-top: 0; margin-bottom: 20px;">Jejak Aktivitasmu</h2>
       <div class="activity-empty" v-if="recentActivity.length === 0">
-        <i class="fa-solid fa-bolt" style="font-size: 2.5rem; color: #475569; margin-bottom: 15px;"></i>
+        <CyberEnergy :pkgId="1" :isAnimated="false" />
         <p><strong>Belum Ada Riwayat Aktivitas</strong></p>
         <p class="sub-text">Aktivitas belajarmu akan tercatat secara otomatis di sini.</p>
         <button @click="$router.push('/learning')" class="btn-accent">Mulai Sesi Belajar Pertamamu</button>
