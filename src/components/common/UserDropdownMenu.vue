@@ -55,7 +55,7 @@ import { ssoEnabled, globalLogoutEnabled } from '../../services/sso';
 const props = defineProps({
   allowProfileEdit: {
     type: Boolean,
-    default: false
+    default: true
   }
 });
 

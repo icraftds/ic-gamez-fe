@@ -44,7 +44,7 @@ import CyberBorder from '../ui/CyberBorder.vue';
 const props = defineProps({
   allowProfileEdit: {
     type: Boolean,
-    default: false
+    default: true
   }
 });
 
