@@ -469,3 +469,17 @@
   overflow-x: auto;
   max-width: 100%;
 }
+
+.gh-overview-section {
+  flex-wrap: wrap;
+}
+
+.gh-overview-left, .gh-overview-right {
+  min-width: 250px;
+  flex: 1;
+}
+
+.gh-contributed-text {
+  white-space: normal;
+  word-break: break-word;
+}

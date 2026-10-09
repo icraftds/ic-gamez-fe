@@ -504,7 +504,7 @@ const displayBadges = computed(() => {
 
 .dash-home-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 1.5rem;
   padding-bottom: 2rem;
   max-width: 1200px;
