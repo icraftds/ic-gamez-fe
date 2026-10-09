@@ -7,13 +7,17 @@ import CyberLevel from '../ui/CyberLevel.vue'
 const {
   isFriendsSidebarOpen,
   friends,
+  friendRequests,
   searchResults,
   isSearching,
   isLoadingFriends,
+  isLoadingRequests,
   toggleFriendsSidebar,
   searchUsers,
   addFriend,
-  removeFriend
+  removeFriend,
+  acceptFriendRequest,
+  rejectFriendRequest
 } = useFriends()
 
 const router = useRouter()
@@ -131,7 +135,10 @@ const handleRemoveFriend = async (userId) => {
             <div class="fs-friend-details">
               <div class="fs-friend-name">{{ friend.name }}</div>
               <div class="fs-friend-meta">
-                <CyberLevel :level="friend.level" :size="'small'" />
+                <div style="width: 24px; height: 24px; display: inline-block;">
+                  <CyberLevel :level="friend.level" :size="'small'" />
+                </div>
+                <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">Lv. {{ friend.level }}</span>
               </div>
             </div>
             <div class="fs-friend-actions">
@@ -147,9 +154,36 @@ const handleRemoveFriend = async (userId) => {
       </div>
 
       <div v-if="activeTab === 'permintaan'">
-        <div class="fs-empty-msg">
+        <div v-if="isLoadingRequests" class="fs-loading">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Memuat permintaan...
+        </div>
+        <div v-else-if="friendRequests.length === 0" class="fs-empty-msg">
           <i class="fa-solid fa-envelope-open-text" style="font-size: 2rem; opacity: 0.5; margin-bottom: 10px; display: block;"></i>
           Belum ada permintaan pertemanan.
+        </div>
+        <div v-else class="fs-friends-list">
+          <div v-for="request in friendRequests" :key="request.id" class="fs-friend-card">
+            <div class="fs-friend-avatar-wrap">
+              <img :src="request.avatar_url || '/images/default-avatar.png'" alt="Avatar" class="fs-friend-avatar">
+            </div>
+            <div class="fs-friend-details">
+              <div class="fs-friend-name">{{ request.name }}</div>
+              <div class="fs-friend-meta">
+                <div style="width: 24px; height: 24px; display: inline-block;">
+                  <CyberLevel :level="request.level" :size="'small'" />
+                </div>
+                <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">Lv. {{ request.level }}</span>
+              </div>
+            </div>
+            <div class="fs-friend-actions">
+              <button class="fs-btn fs-btn-add" @click="acceptFriendRequest(request.id)" title="Terima">
+                <i class="fa-solid fa-check"></i>
+              </button>
+              <button class="fs-btn fs-btn-remove" @click="rejectFriendRequest(request.id)" title="Tolak">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

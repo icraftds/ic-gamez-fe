@@ -4,9 +4,11 @@ import { useUserAccount } from './useUserAccount'
 
 const isFriendsSidebarOpen = ref(false)
 const friends = ref([])
+const friendRequests = ref([])
 const searchResults = ref([])
 const isSearching = ref(false)
 const isLoadingFriends = ref(false)
+const isLoadingRequests = ref(false)
 
 export function useFriends() {
   const { isLoggedIn } = useUserAccount()
@@ -14,8 +16,9 @@ export function useFriends() {
   const toggleFriendsSidebar = () => {
     if (!isLoggedIn.value) return
     isFriendsSidebarOpen.value = !isFriendsSidebarOpen.value
-    if (isFriendsSidebarOpen.value && friends.value.length === 0) {
-      fetchFriends()
+    if (isFriendsSidebarOpen.value) {
+      if (friends.value.length === 0) fetchFriends()
+      if (friendRequests.value.length === 0) fetchFriendRequests()
     }
   }
 
@@ -28,6 +31,18 @@ export function useFriends() {
       console.error('Failed to fetch friends', err)
     } finally {
       isLoadingFriends.value = false
+    }
+  }
+
+  const fetchFriendRequests = async () => {
+    try {
+      isLoadingRequests.value = true
+      const res = await api.get('/user/friend-requests')
+      friendRequests.value = res.data.data
+    } catch (err) {
+      console.error('Failed to fetch friend requests', err)
+    } finally {
+      isLoadingRequests.value = false
     }
   }
 
@@ -65,16 +80,40 @@ export function useFriends() {
     }
   }
 
+  const acceptFriendRequest = async (friendId) => {
+    try {
+      await api.post(`/user/friend-requests/${friendId}/accept`)
+      friendRequests.value = friendRequests.value.filter(f => f.id !== friendId)
+      await fetchFriends()
+    } catch (err) {
+      console.error('Failed to accept request', err)
+    }
+  }
+
+  const rejectFriendRequest = async (friendId) => {
+    try {
+      await api.post(`/user/friend-requests/${friendId}/reject`)
+      friendRequests.value = friendRequests.value.filter(f => f.id !== friendId)
+    } catch (err) {
+      console.error('Failed to reject request', err)
+    }
+  }
+
   return {
     isFriendsSidebarOpen,
     friends,
+    friendRequests,
     searchResults,
     isSearching,
     isLoadingFriends,
+    isLoadingRequests,
     toggleFriendsSidebar,
     fetchFriends,
+    fetchFriendRequests,
     searchUsers,
     addFriend,
-    removeFriend
+    removeFriend,
+    acceptFriendRequest,
+    rejectFriendRequest
   }
 }
