@@ -7,7 +7,7 @@
             <CyberBorder
               :tierId="borderId"
               :accountBadge="currentBadgeStatus"
-              :avatarUrl="userProfile.avatar_url || 'https://ui-avatars.com/api/?name=' + userProfile.name + '&background=random'"
+              :avatarUrl="userProfile.avatar || 'https://ui-avatars.com/api/?name=' + userProfile.name + '&background=random'"
             />
           </div>
         </div>
