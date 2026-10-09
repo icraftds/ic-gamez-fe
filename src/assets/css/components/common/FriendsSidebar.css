@@ -313,3 +313,38 @@
   background: var(--border-color, #334155);
   border-radius: 10px;
 }
+
+.fs-tabs {
+  display: flex;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-color, #334155);
+}
+
+.fs-tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  padding: 15px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.fs-tab-btn:hover {
+  color: var(--text-primary, #fff);
+}
+
+.fs-tab-btn.active {
+  color: var(--accent-color, #0ea5e9);
+  border-bottom-color: var(--accent-color, #0ea5e9);
+}
+
+.fs-empty-msg {
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.95rem;
+}
