@@ -60,8 +60,11 @@
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[1].name }}</h4>
-                <div class="xp-glitch">{{ topUsers[1].xp.toLocaleString() }} XP</div>
-                <button v-if="topUsers[1].slug" @click="$router.push('/coderz/' + topUsers[1].slug)" class="visit-btn">Visit</button>
+                <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
+                  <div class="xp-glitch" style="margin: 0;">{{ topUsers[1].xp.toLocaleString() }} XP</div>
+                  <span class="ct-badge-level">Lvl {{ topUsers[1].level }}</span>
+                </div>
+                <button v-if="topUsers[1].slug" @click="$router.push('/coderz/' + topUsers[1].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
             </div>
 
@@ -79,8 +82,11 @@
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[0].name }}</h4>
-                <div class="xp-glitch gold-text">{{ topUsers[0].xp.toLocaleString() }} XP</div>
-                <button v-if="topUsers[0].slug" @click="$router.push('/coderz/' + topUsers[0].slug)" class="visit-btn">Visit</button>
+                <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
+                  <div class="xp-glitch gold-text" style="margin: 0;">{{ topUsers[0].xp.toLocaleString() }} XP</div>
+                  <span class="ct-badge-level" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">Lvl {{ topUsers[0].level }}</span>
+                </div>
+                <button v-if="topUsers[0].slug" @click="$router.push('/coderz/' + topUsers[0].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
             </div>
 
@@ -97,8 +103,11 @@
               </div>
               <div class="cyber-podium-info">
                 <h4>{{ topUsers[2].name }}</h4>
-                <div class="xp-glitch">{{ topUsers[2].xp.toLocaleString() }} XP</div>
-                <button v-if="topUsers[2].slug" @click="$router.push('/coderz/' + topUsers[2].slug)" class="visit-btn">Visit</button>
+                <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
+                  <div class="xp-glitch" style="margin: 0;">{{ topUsers[2].xp.toLocaleString() }} XP</div>
+                  <span class="ct-badge-level">Lvl {{ topUsers[2].level }}</span>
+                </div>
+                <button v-if="topUsers[2].slug" @click="$router.push('/coderz/' + topUsers[2].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
             </div>
           </div>
