@@ -2,7 +2,7 @@
   <div class="dashboard-container" style="padding-top: 100px; padding-bottom: 50px;">
     <div class="dash-home-grid" v-if="!isLoading && userProfile">
       <!-- MAIN COLUMN: GREETING CARD & STATS -->
-      <div class="dash-main-col">
+      <div class="dash-main-col" style="position: relative;">
         <button class="vp-back-btn" @click="$router.back()">
           <i class="fa-solid fa-arrow-left"></i> Kembali
         </button>
@@ -614,6 +614,10 @@ const displayBadges = computed(() => {
 }
 
 .vp-back-btn {
+  position: absolute;
+  top: -55px;
+  left: 0;
+  z-index: 10;
   background: rgba(30, 41, 59, 0.7);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -621,7 +625,6 @@ const displayBadges = computed(() => {
   padding: 10px 20px;
   border-radius: 30px;
   cursor: pointer;
-  margin-bottom: 20px;
   display: inline-flex;
   align-items: center;
   gap: 10px;
