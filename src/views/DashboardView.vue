@@ -251,8 +251,8 @@ const getTabIcon = (id) => {
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border-right: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.2) 2%, black 10%, black 90%, rgba(0,0,0,0.2) 98%, transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.2) 2%, black 10%, black 90%, rgba(0,0,0,0.2) 98%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 2%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0.2) 98%, rgba(0,0,0,0) 100%);
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 2%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0.2) 98%, rgba(0,0,0,0) 100%);
 }
 .dash-sidebar.is-collapsed {
   width: 80px;
@@ -361,8 +361,8 @@ const getTabIcon = (id) => {
     border-bottom: none;
     border-radius: 24px 24px 0 0;
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.4);
-    -webkit-mask-image: radial-gradient(circle 40px at 50% 0, transparent 39px, #000 40px);
-    mask-image: radial-gradient(circle 40px at 50% 0, transparent 39px, #000 40px);
+    -webkit-mask-image: radial-gradient(circle 40px at 50% 0, rgba(0,0,0,0) 39px, rgba(0,0,0,1) 40px);
+    mask-image: radial-gradient(circle 40px at 50% 0, rgba(0,0,0,0) 39px, rgba(0,0,0,1) 40px);
   }
 
   .sidebar-header {
