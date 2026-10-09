@@ -313,7 +313,7 @@ const handleAddFriend = async () => {
   if (!userProfile.value) return
   isAddingFriend.value = true
   try {
-    const res = await api.post('/friends/add', { friend_id: userProfile.value.id })
+    const res = await api.post('/user/friends', { friend_id: userProfile.value.id })
     if (res.data.success || res.status === 200) {
       hasAdded.value = true
     }
