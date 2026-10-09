@@ -5,15 +5,13 @@
       <div class="skeleton-name"></div>
     </template>
     <template v-else>
-      <img
-        :src="userProfile.avatar"
-        :alt="userProfile.name"
-        class="avatar-sm"
-        :class="avatarBorderClass"
-        :title="'Masuk sebagai ' + userProfile.name"
-      />
-      <span class="user-name-short">{{ firstName }}</span>
-      <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+      <div class="avatar-sm avatar-cyber">
+        <CyberBorder
+          :tierId="borderId"
+          :accountBadge="currentBadgeStatus"
+          :avatarUrl="userProfile.avatar"
+        />
+      </div>
     </template>
     
     <UserDropdownMenu 
@@ -41,6 +39,7 @@ import { useRouter } from 'vue-router';
 import { useUserAccount } from '../../composables/useUserAccount';
 import UserDropdownMenu from './UserDropdownMenu.vue';
 import ConfirmModal from './ConfirmModal.vue';
+import CyberBorder from '../ui/CyberBorder.vue';
 
 const props = defineProps({
   allowProfileEdit: {
@@ -51,7 +50,7 @@ const props = defineProps({
 
 const emit = defineEmits(['open-profile']);
 
-const { isLoading, userProfile, currentPlan, isPremiumUser, logout } = useUserAccount();
+const { isLoading, userProfile, currentPlan, isPremiumUser, logout, activeBorderId } = useUserAccount();
 const router = useRouter();
 
 const showUserDropdown = ref(false);
@@ -62,10 +61,17 @@ const firstName = computed(() => {
   return userProfile.value.name.split(' ')[0];
 });
 
-const avatarBorderClass = computed(() => {
-  if (currentPlan.value === 'expert') return 'border-expert';
-  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'border-pro';
-  return 'border-gray';
+const currentBadgeStatus = computed(() => {
+  if (currentPlan.value === 'expert') return 'EXPERT';
+  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'PRO';
+  return 'FREE';
+});
+
+const borderId = computed(() => {
+  if (activeBorderId.value) return activeBorderId.value;
+  if (currentPlan.value === 'expert') return 'D_EXPERT';
+  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'D_PRO';
+  return 'D_FREE';
 });
 
 const handleLogoutClick = () => {
@@ -98,35 +104,33 @@ onUnmounted(() => {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 4px 16px 4px 6px;
-  border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  background: transparent;
+  padding: 0;
+  border-radius: 50%;
+  border: none;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   height: 48px;
-  box-sizing: border-box;
+  width: 48px;
 }
 .dropdown-trigger:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-.dropdown-icon {
-  font-size: 0.8rem;
-  color: #6b7280;
+  transform: scale(1.05);
 }
 
 .avatar-sm {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background: #333;
+  flex-shrink: 0;
+}
+.avatar-cyber {
+  transform: scale(1.6);
+  transform-origin: center;
+  margin-right: 8px;
+  margin-left: 2px;
 }
 
-.user-name-short {
-  font-weight: 600;
-  color: var(--text-main-hex, #f3f4f6);
-}
+
 
 .skeleton-avatar {
   width: 32px;
@@ -151,13 +155,5 @@ onUnmounted(() => {
   100% { background-position: -200% 0; }
 }
 
-@media (max-width: 1024px) {
-  .user-name-short, .dropdown-icon {
-    display: none;
-  }
-  .dropdown-trigger {
-    padding: 4px;
-    gap: 0;
-  }
-}
+
 </style>

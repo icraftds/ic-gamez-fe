@@ -10,19 +10,19 @@
     </div>
     <div class="dropdown-stats">
       <div class="stat-item" title="Level Anda">
-        <i class="fa-solid fa-star text-warning"></i> Lvl {{ userProfile.level }}
+        <CyberLevel style="width: 30px; height: 30px; margin-right: 8px; flex-shrink: 0;" /> Lvl {{ userProfile.level }}
       </div>
       <div class="stat-item" title="Total XP Anda">
-        <i class="fa-solid fa-arrow-trend-up text-primary"></i> {{ userProfile.totalXp ?? userProfile.xp }} XP
+        <CyberXp style="width: 30px; height: 30px; margin-right: 8px; flex-shrink: 0;" /> {{ userProfile.totalXp ?? userProfile.xp }} XP
       </div>
       <div class="stat-item" title="Sisa Energi">
-        <i class="fa-solid fa-bolt text-warning"></i> {{ credits }}
+        <CyberEnergy :pkgId="1" :isAnimated="false" style="width: 30px; height: 30px; margin-right: 8px; flex-shrink: 0;" /> {{ credits }}
       </div>
     </div>
     <div class="dropdown-actions">
       <button @click="handleDashboardClick" class="text-primary" :disabled="isNavigating">
         <i v-if="isNavigating" class="fa-solid fa-spinner fa-spin"></i>
-        <i v-else :class="isLandingPage ? 'fa-solid fa-chart-pie' : 'fa-solid fa-home'"></i> 
+        <i v-else class="fa-solid fa-chart-pie"></i> 
         {{ dashboardToggleText }}
       </button>
       <button v-if="allowProfileEdit" @click="emit('open-profile')" class="text-primary" title="Edit Profil Anda">
@@ -71,9 +71,19 @@ const avatarBorderClass = computed(() => {
   return 'border-gray';
 });
 
-const isLandingPage = computed(() => route.path === '/');
-const dashboardToggleText = computed(() => isLandingPage.value ? 'Kembali ke Dashboard' : 'Kembali ke Beranda');
-const dashboardToggleRoute = computed(() => isLandingPage.value ? '/dashboard' : '/');
+const levelTierId = computed(() => {
+  const lvl = userProfile.value?.level || 1;
+  if (lvl >= 150) return 7;
+  if (lvl >= 125) return 6;
+  if (lvl >= 100) return 5;
+  if (lvl >= 75) return 4;
+  if (lvl >= 50) return 3;
+  if (lvl >= 25) return 2;
+  return 1;
+});
+
+const dashboardToggleText = computed(() => 'Dashboard');
+const dashboardToggleRoute = computed(() => '/dashboard');
 
 const isNavigating = ref(false);
 const router = useRouter();
@@ -81,7 +91,9 @@ const router = useRouter();
 const handleDashboardClick = async () => {
   if (isNavigating.value) return;
   isNavigating.value = true;
-  await router.push(dashboardToggleRoute.value);
+  if (route.path !== dashboardToggleRoute.value) {
+    await router.push(dashboardToggleRoute.value);
+  }
   isNavigating.value = false;
   emit('close');
 };

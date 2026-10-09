@@ -22,6 +22,7 @@ const currentPlan = ref('free')
 const isLoggedIn = ref(!!authIdentity())
 const isLoading = ref(false)
 const isBootstrapping = ref(true)
+const activeBorderId = ref(null)
 
 const userProfile = ref({
   id: null,
@@ -43,6 +44,7 @@ export function clearUserAccount() {
   userProfile.value = { id: null, name: '', email: '', phone: '', avatar: '', level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, joinDate: '' }
   coinz.value = null; walletStatus.value = 'unavailable'; walletInitializationPending.value = false
   currentPlan.value = 'free'; isPremiumUser.value = false; credits.value = 10; initializedToken = null
+  activeBorderId.value = null
 }
 
 export function useUserAccount() {
@@ -79,6 +81,8 @@ export function useUserAccount() {
       currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
         ? data.current_plan.slug 
         : (data.current_plan || 'free')
+
+      if (data.active_border_id) activeBorderId.value = data.active_border_id;
 
       return data
     } catch (error) {
@@ -366,11 +370,25 @@ export function useUserAccount() {
     }
   }
 
+  const setActiveBorder = async (borderId) => {
+    // Optimistic update
+    activeBorderId.value = borderId;
+    
+    try {
+      await api.put('/user/active-border', { border_id: borderId });
+    } catch (error) {
+      console.error('Failed to update active border', error);
+      // Fallback in case of error could be implemented here
+    }
+  }
+
   return {
     isLoggedIn,
     isLoading,
     isBootstrapping,
     userProfile,
+    activeBorderId,
+    setActiveBorder,
     userStats,
     login,
     register,

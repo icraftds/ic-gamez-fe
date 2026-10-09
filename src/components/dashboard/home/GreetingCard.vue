@@ -1,16 +1,67 @@
 <template>
-  <div class="greeting-card">
-    <div class="greeting-left">
-      <h1>Selamat datang, <span class="highlight-name">{{ userProfile.name }}</span> 🚀</h1>
-      <p>Terus tingkatkan kemampuan coding kamu hari ini. Konsistensi adalah kunci keberhasilan.</p>
-      <div class="quick-stats">
-        <div class="qs-item"><span class="qs-value text-cyan">{{ userProfile.xp }}</span> <span class="qs-label">Poin Pengalaman</span></div>
-        <div class="qs-item"><span class="qs-value text-orange">{{ userProfile.streak }}</span> <span class="qs-label">Hari Berturut-turut</span></div>
-        <div class="qs-item"><span class="qs-value">{{ completedLessons }}</span> <span class="qs-label">Materi Diselesaikan</span></div>
-        <div class="qs-item"><span class="qs-value">0</span> <span class="qs-label">Sertifikat Diraih</span></div>
+  <div class="dashboard-hero">
+    <div class="hero-content">
+      <div class="user-info-section">
+        <div class="avatar-wrapper">
+          <div class="user-avatar-cyber-wrapper">
+            <CyberBorder
+              :tierId="borderId"
+              :accountBadge="currentBadgeStatus"
+              :avatarUrl="userProfile.avatar_url || 'https://ui-avatars.com/api/?name=' + userProfile.name + '&background=random'"
+            />
+          </div>
+        </div>
+        <div class="user-details">
+          <h1 class="greeting-text">
+            Welcome back, <br />
+            <span class="highlight-name">{{ userProfile.name }}</span> 👋
+          </h1>
+          <p class="motivational-text">Lanjutkan misimu hari ini! Konsistensi adalah kunci menguasai pemrograman.</p>
+          
+          <div class="tier-progress">
+            <div class="tier-labels">
+              <span class="current-tier">Lv. {{ userProfile.level }}</span>
+              <span class="xp-text">{{ userProfile.xp }} / {{ (userProfile.level * 1000) }} XP</span>
+              <span class="next-tier">Lv. {{ userProfile.level + 1 }}</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" :style="{ width: xpPercentage + '%' }"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card xp-stat">
+          <div class="stat-icon"><CyberXp style="width: 24px; height: 24px;" /></div>
+          <div class="stat-info">
+            <span class="stat-value">{{ userProfile.xp }}</span>
+            <span class="stat-label">Total XP</span>
+          </div>
+        </div>
+        <div class="stat-card streak-stat">
+          <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">{{ userProfile.streak || 0 }} Hari</span>
+            <span class="stat-label">Streak Aktif</span>
+          </div>
+        </div>
+        <div class="stat-card lesson-stat">
+          <div class="stat-icon"><i class="fa-solid fa-book-open"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">{{ completedLessons }}</span>
+            <span class="stat-label">Materi Selesai</span>
+          </div>
+        </div>
+        <div class="stat-card cert-stat">
+          <div class="stat-icon"><i class="fa-solid fa-certificate"></i></div>
+          <div class="stat-info">
+            <span class="stat-value">0</span>
+            <span class="stat-label">Sertifikat</span>
+          </div>
+        </div>
       </div>
     </div>
-    <button v-if="!isPremiumUser" class="btn-upgrade-sm" @click="goToSubscription">Upgrade Premium</button>
   </div>
 </template>
 
@@ -20,9 +71,10 @@ import { useRouter } from 'vue-router'
 import { useUserAccount } from '../../../composables/useUserAccount'
 import { useLearningPaths } from '../../../composables/useLearningPaths'
 
-const { userProfile, isPremiumUser } = useUserAccount()
+const { userProfile, isPremiumUser, currentPlan, activeBorderId } = useUserAccount()
 const { paths } = useLearningPaths()
 const router = useRouter()
+import CyberBorder from '../../ui/CyberBorder.vue'
 
 const completedLessons = computed(() => {
   let count = 0
@@ -30,9 +82,24 @@ const completedLessons = computed(() => {
   return count
 })
 
-const goToSubscription = () => {
-  router.push({ path: '/dashboard', query: { tab: 'langganan' } })
-}
+const xpPercentage = computed(() => {
+  const current = userProfile.value.xp || 0
+  const max = (userProfile.value.level || 1) * 1000
+  return Math.min(100, Math.max(0, (current / max) * 100))
+})
+
+const currentBadgeStatus = computed(() => {
+  if (currentPlan.value === 'expert') return 'EXPERT';
+  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'PRO';
+  return 'FREE';
+});
+
+const borderId = computed(() => {
+  if (activeBorderId.value) return activeBorderId.value;
+  if (currentPlan.value === 'expert') return 'D_EXPERT';
+  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'D_PRO';
+  return 'D_FREE';
+});
 </script>
 
 <style scoped src="../../../assets/css/components/dashboard/home/GreetingCard.css"></style>

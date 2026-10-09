@@ -7,14 +7,17 @@
       </router-link>
     </div>
 
-    <!-- Hamburger Button (mobile only) -->
-    <button
-      class="hamburger"
-      @click="mobileMenuOpen = !mobileMenuOpen"
-      aria-label="Toggle menu"
-    >
-      <i :class="mobileMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
-    </button>
+    <!-- Mobile Nav Actions (Profile + Hamburger) -->
+    <div class="mobile-nav-actions">
+      <UserProfileDropdown v-if="isLoggedIn" class="mobile-only-profile" />
+      <button
+        class="hamburger"
+        @click="mobileMenuOpen = !mobileMenuOpen"
+        aria-label="Toggle menu"
+      >
+        <i :class="mobileMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
+      </button>
+    </div>
 
     <!-- Mobile Overlay -->
     <div
@@ -28,11 +31,11 @@
       <div class="nav-center" ref="navCenter">
         <div class="nav-indicator" :style="indicatorStyle"></div>
         <router-link
-          to="/"
+          :to="$route.path === '/' ? '/' : '/dashboard'"
           class="nav-link"
-          :class="{ active: $route.path === '/' }"
+          :class="{ active: $route.path === '/' || $route.path.startsWith('/dashboard') }"
           @click="mobileMenuOpen = false"
-          >Beranda</router-link
+          >{{ $route.path === '/' ? 'Beranda' : 'Dashboard' }}</router-link
         >
         <router-link
           to="/learning"
@@ -92,7 +95,7 @@
           </div>
 
           <!-- 4. Profile Dropdown -->
-          <UserProfileDropdown />
+          <UserProfileDropdown class="desktop-only-profile" />
         </template>
         
         <div v-else class="guest-actions" style="display: flex; align-items: center; gap: 15px;">
