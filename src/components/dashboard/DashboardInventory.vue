@@ -23,7 +23,8 @@
     <div v-else class="inventory-grid">
       <div v-for="userItem in activeInventory" :key="userItem.id" class="inventory-item">
         <div class="item-icon">
-          <img v-if="userItem.item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" />
+          <img v-if="userItem.item.image_url" :src="userItem.item.image_url" alt="Icon" />
+          <img v-else-if="userItem.item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" />
           <i v-else class="fa-solid fa-gift"></i>
         </div>
         <div class="item-details">

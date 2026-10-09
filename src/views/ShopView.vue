@@ -148,7 +148,8 @@
         <div v-else class="shop-item-grid">
           <div v-for="item in items" :key="item.id" class="border-shop-card">
             <div class="border-preview-box" style="margin: 5px 0;">
-               <img v-if="item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" style="width: 100px; height: 100px; object-fit: contain;" />
+               <img v-if="item.image_url" :src="item.image_url" alt="Icon" style="width: 100px; height: 100px; object-fit: contain;" />
+               <img v-else-if="item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" style="width: 100px; height: 100px; object-fit: contain;" />
                <i v-else class="fa-solid fa-gift" style="font-size: 5rem; color: #fbbf24;"></i>
             </div>
             <div class="border-info-box">
