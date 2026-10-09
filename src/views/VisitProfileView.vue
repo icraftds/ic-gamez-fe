@@ -3,6 +3,9 @@
     <div class="dash-home-grid" v-if="!isLoading && userProfile">
       <!-- MAIN COLUMN: GREETING CARD & STATS -->
       <div class="dash-main-col">
+        <button class="vp-back-btn" @click="$router.back()">
+          <i class="fa-solid fa-arrow-left"></i> Kembali
+        </button>
         <div class="dashboard-hero" style="margin-bottom: 0;">
           <div class="hero-content">
             <div class="user-info-section">
@@ -608,5 +611,28 @@ const displayBadges = computed(() => {
     padding: 10px;
     border-radius: 50%;
   }
+}
+
+.vp-back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.vp-back-btn:hover {
+  background: rgba(14, 165, 233, 0.15);
+  border-color: #0ea5e9;
+  color: #0ea5e9;
+  transform: translateX(-3px);
 }
 </style>
