@@ -61,6 +61,11 @@ export function runValidation(validationType, testCases, runnerOutputArray, user
       return validateStdout(runnerOutputArray, firstCase.expected_output);
     case 'sql_result':
       return validateSqlResult(runnerOutputArray, firstCase.expected_output);
+    case 'string_match':
+      // Membandingkan kode yang diketik user dengan string yang diharapkan (mengabaikan spasi berlebih)
+      const looseExpected = firstCase.expected_output.toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');
+      const looseActual = userCode.toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');
+      return looseActual.includes(looseExpected) || looseExpected.includes(looseActual);
     case 'dom_check':
       return validateDom(userCode, firstCase.expected_output);
     default:
