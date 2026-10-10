@@ -96,18 +96,26 @@ export function useCodeRunner() {
 
   const loadFromStorage = (lessonId, initialCode = null) => {
     currentLessonId.value = lessonId
+    let parsedInitialCode = initialCode
+    if (initialCode) {
+      try {
+        const json = JSON.parse(initialCode)
+        parsedInitialCode = json.initial_code || json.initial_query || initialCode
+      } catch (e) {}
+    }
+
     const dataStr = localStorage.getItem(`practice_state_${lessonId}`)
     if (dataStr) {
       try {
         const data = JSON.parse(dataStr)
-        code.value = data.code || initialCode || '// Ketik kode Anda di sini\n'
+        code.value = data.code || parsedInitialCode || '// Ketik kode Anda di sini\n'
         output.value = data.output || []
         status.value = data.status || 'idle'
       } catch (e) {
-        resetCode(initialCode)
+        resetCode(parsedInitialCode)
       }
     } else {
-      resetCode(initialCode)
+      resetCode(parsedInitialCode)
     }
   }
 
@@ -122,7 +130,14 @@ export function useCodeRunner() {
   }
 
   const resetCode = (initialCode = null) => {
-    code.value = initialCode || '// Ketik kode Anda di sini\n'
+    let parsedInitialCode = initialCode
+    if (initialCode) {
+      try {
+        const json = JSON.parse(initialCode)
+        parsedInitialCode = json.initial_code || json.initial_query || initialCode
+      } catch (e) {}
+    }
+    code.value = parsedInitialCode || '// Ketik kode Anda di sini\n'
     output.value = []
     status.value = 'idle'
   }

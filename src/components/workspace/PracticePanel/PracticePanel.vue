@@ -293,6 +293,21 @@ const practiceSections = computed(() => {
     }
   }
 
+  try {
+    const json = JSON.parse(text)
+    if (json.title || json.instruction || json.task_description) {
+      return {
+        title: json.title || 'Tantangan Praktik',
+        info: json.instruction || '',
+        task: json.task_description || '',
+        example: '',
+        output: (json.test_cases && json.test_cases.length > 0) ? json.test_cases[0].expected_output : ''
+      }
+    }
+  } catch (e) {
+    // Lanjutkan ke format lama jika bukan JSON
+  }
+
   const lines = text.split('\n')
   let commentLines = []
   
