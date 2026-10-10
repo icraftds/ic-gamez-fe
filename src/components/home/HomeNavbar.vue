@@ -116,12 +116,22 @@
           <button @click="toggleTheme" class="nav-btn" style="background: transparent; color: var(--text-main-hex); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 8px;" :title="isLightMode ? 'Beralih ke Dark Mode' : 'Beralih ke Light Mode'">
             <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i>
           </button>
-          <router-link
-            to="/login"
-            class="btn-login"
-            @click="mobileMenuOpen = false"
-            >Masuk / Daftar</router-link
-          >
+          <template v-if="ssoEnabled">
+            <a
+              href="https://ic-auth.unikom.my.id/"
+              class="btn-login"
+              @click="mobileMenuOpen = false"
+              >Masuk / Daftar</a
+            >
+          </template>
+          <template v-else>
+            <router-link
+              to="/login"
+              class="btn-login"
+              @click="mobileMenuOpen = false"
+              >Masuk / Daftar</router-link
+            >
+          </template>
         </div>
       </div>
     </div>

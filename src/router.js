@@ -20,7 +20,14 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('./views/LoginView.vue')
+      component: () => import('./views/LoginView.vue'),
+      beforeEnter: (to, from, next) => {
+        if (ssoEnabled) {
+          window.location.href = 'https://ic-auth.unikom.my.id/';
+        } else {
+          next();
+        }
+      }
     },
     {
       path: '/auto-login',
@@ -30,7 +37,14 @@ const router = createRouter({
     {
       path: '/register',
       name: 'register',
-      component: () => import('./views/RegisterView.vue')
+      component: () => import('./views/RegisterView.vue'),
+      beforeEnter: (to, from, next) => {
+        if (ssoEnabled) {
+          window.location.href = 'https://ic-auth.unikom.my.id/register';
+        } else {
+          next();
+        }
+      }
     },
     {
       path: '/workspace',
