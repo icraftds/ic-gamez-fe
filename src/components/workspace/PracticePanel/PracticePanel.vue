@@ -44,7 +44,7 @@
           </button>
           
           <HintButton 
-            v-if="!hintText && runStatus !== 'success'" 
+            v-if="!hintText && runStatus !== 'success' && practiceSections.has_hints" 
             :isLoading="isHintLoading"
             @click="openHint" 
           />
@@ -301,7 +301,8 @@ const practiceSections = computed(() => {
         info: json.instruction || '',
         task: json.task_description || '',
         example: '',
-        output: (json.test_cases && json.test_cases.length > 0) ? json.test_cases[0].expected_output : ''
+        output: (json.test_cases && json.test_cases.length > 0) ? json.test_cases[0].expected_output : '',
+        has_hints: !!(json.hints && json.hints.length > 0)
       }
     }
   } catch (e) {

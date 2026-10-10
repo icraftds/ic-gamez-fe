@@ -54,7 +54,7 @@
         </button>
         
         <HintButton 
-          v-if="!isCorrect && !hintText && hasQuestions" 
+          v-if="!isCorrect && !hintText && hasQuestions && hasHint" 
           :isLoading="isHintLoading"
           @click="openHint" 
         />
@@ -116,6 +116,7 @@ const props = defineProps({
 defineEmits(['back', 'submit', 'retry', 'next', 'update:selectedAnswer'])
 
 const hasQuestions = computed(() => props.quiz && props.quiz.length > 0)
+const hasHint = computed(() => props.quiz && props.quiz[0] && props.quiz[0].has_hint)
 
 const getOptionClass = (optIndex, correctIndex) => {
   // Karena backend tidak mengirimkan jawaban benar secara langsung (anti-cheat),
