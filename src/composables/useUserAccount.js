@@ -39,6 +39,7 @@ const userProfile = ref({
   streak: 0,
   longest_streak: 0,
   is_admin: false,
+  friends_count: 0,
   joinDate: ''
 })
 
@@ -81,6 +82,7 @@ export function useUserAccount() {
         longest_streak: data.longest_streak,
         is_admin: data.is_admin || false,
         showcase_medals: data.showcase_medals || null,
+        friends_count: data.friends_count || 0,
         joinDate: new Date(data.created_at).toLocaleDateString()
       }
       credits.value = data.credits
