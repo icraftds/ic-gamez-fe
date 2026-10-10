@@ -54,34 +54,37 @@ export function useCodeRunner() {
       }
 
       if (language === 'python') {
-        output.value = [{ type: 'log', text: 'Mengeksekusi Python di server...' }]
+        output.value = [{ type: 'log', text: 'Menyiapkan lingkungan Python...' }]
         
         try {
-          const res = await fetch('https://emkc.org/api/v2/piston/execute', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              language: 'python',
-              version: '*',
-              files: [{ content: code.value }]
+          if (!window.loadPyodide) {
+            output.value = [{ type: 'log', text: 'Mengunduh pustaka Python (hanya sekali)...' }]
+            const script = document.createElement('script')
+            script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js'
+            document.head.appendChild(script)
+            
+            await new Promise((resolve, reject) => {
+              script.onload = resolve
+              script.onerror = () => reject(new Error('Gagal memuat Pyodide dari CDN.'))
             })
-          })
-          
-          if (!res.ok) throw new Error('Gagal terhubung ke server eksekusi.')
-          
-          const data = await res.json()
-          
-          if (data.run && data.run.output) {
-            // Trim output and handle errors if any
-            const resultText = data.run.output.trim()
-            if (data.run.code !== 0) {
-               output.value = [{ type: 'error', text: resultText || 'Terjadi kesalahan eksekusi.' }]
-            } else {
-               output.value = [{ type: 'log', text: resultText || '(Tidak ada output)' }]
-            }
-          } else {
-            output.value = [{ type: 'error', text: data.message || 'Respons server tidak valid.' }]
           }
+          
+          if (!window.pyodideInstance) {
+            window.pyodideInstance = await window.loadPyodide({
+              indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/"
+            })
+          }
+          
+          const pyodide = window.pyodideInstance
+          
+          // Clear previous output and redirect stdout/stderr to entries array
+          entries.length = 0
+          pyodide.setStdout({ batched: (msg) => entries.push({ type: 'log', text: msg }) })
+          pyodide.setStderr({ batched: (msg) => entries.push({ type: 'error', text: msg }) })
+          
+          await pyodide.runPythonAsync(code.value)
+          
+          output.value = entries.length > 0 ? entries : [{ type: 'log', text: '(Tidak ada output)' }]
         } catch (err) {
           output.value = [{ type: 'error', text: err.message }]
         }
