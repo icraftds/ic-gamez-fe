@@ -10,6 +10,20 @@ import { runValidation } from './validators/index';
  * @returns {boolean} - True jika output sesuai harapan, False jika tidak
  */
 export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, currentCode, lesson = null) => {
+  // Parsing initial code dari JSON jika format baru
+  let initialCodeForCheck = lessonPractice;
+  if (lessonPractice) {
+    try {
+      const json = JSON.parse(lessonPractice);
+      initialCodeForCheck = json.initial_code || json.initial_query || lessonPractice;
+    } catch (e) {}
+  }
+
+  // Anti-cheat Universal: Jika kode sama persis dengan template (belum ada perubahan)
+  if (initialCodeForCheck && currentCode.trim() === initialCodeForCheck.trim()) {
+    return false;
+  }
+
   // 1. CEK DUKUNGAN VALIDATOR BARU (VERSI 2 PRD)
   if (lesson && lesson.validation_type && lesson.test_cases && lesson.test_cases.length > 0) {
     return runValidation(lesson.validation_type, lesson.test_cases, runnerOutputArray, currentCode);
@@ -31,10 +45,8 @@ export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArr
     if (codeWithoutComments.includes('___')) return false;
   }
 
-  // Anti-cheat: Jika kode sama persis dengan template (belum ada perubahan)
-  if (lessonPractice && currentCode.trim() === lessonPractice.trim()) {
-    return false;
-  }
+  // Anti-cheat (sekarang ditangani di awal fungsi)
+  // ... dihapus karena sudah di atas ...
 
   if (['html', 'css', 'sql'].includes(lessonLanguage)) return true;
   if (!lessonPractice) return true;
