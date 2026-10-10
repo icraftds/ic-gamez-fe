@@ -179,7 +179,7 @@ const startPolling = () => { pollingMessage.value = ''; poll.start() }
 const stopPolling = () => poll.stop()
 
 onMounted(async () => {
-  await bootstrapSession()
+  await bootstrapSession(true)
   if (localStorage.getItem('ic_returning_from_payment') === 'true') {
     localStorage.removeItem('ic_returning_from_payment')
     router.replace('/payment/success')

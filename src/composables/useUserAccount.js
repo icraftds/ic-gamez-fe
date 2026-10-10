@@ -141,8 +141,8 @@ export function useUserAccount() {
     return initializeRequest
   }
 
-  const bootstrapSession = async () => {
-    isBootstrapping.value = true
+  const bootstrapSession = async (silent = false) => {
+    if (!silent) isBootstrapping.value = true
     try {
       if (ssoEnabled) {
         try { if (!await loadSsoSession()) return false } catch { return false }
@@ -154,7 +154,7 @@ export function useUserAccount() {
       await fetchWallet()
       return true
     } finally {
-      isBootstrapping.value = false
+      if (!silent) isBootstrapping.value = false
     }
   }
 

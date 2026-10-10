@@ -87,7 +87,7 @@ const poll = createPaymentPoll(async (isCurrent) => {
 let disposed = false
 const startPolling = async () => {
   isLoading.value = true
-  const ready = await bootstrapSession()
+  const ready = await bootstrapSession(true)
   if (disposed) return
   if (!ready) { isLoading.value = false; return }
   poll.start()

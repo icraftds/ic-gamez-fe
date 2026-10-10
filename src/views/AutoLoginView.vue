@@ -33,7 +33,7 @@ onMounted(async () => {
     
     // 2. Fetch data user terbaru agar status login di state Vue terupdate
     try {
-      if (!await bootstrapSession()) throw new Error('Profil belum tersedia')
+      if (!await bootstrapSession(true)) throw new Error('Profil belum tersedia')
       // 3. Arahkan ke dashboard
       sessionStorage.setItem('just_logged_in', 'true')
       router.replace('/dashboard')
