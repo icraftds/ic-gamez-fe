@@ -1,12 +1,21 @@
+import { runValidation } from './validators/index';
+
 /**
  * Memeriksa apakah output dari code runner sesuai dengan harapan dari soal praktik.
  * @param {string} lessonLanguage - Bahasa pemrograman (html, css, javascript, dll)
  * @param {string} lessonPractice - Template kode praktik yang berisi komentar harapan/output
  * @param {Array} runnerOutputArray - Array output dari code runner
  * @param {string} currentCode - Kode yang ditulis oleh pengguna saat ini
+ * @param {Object} lesson - Objek lesson secara utuh (untuk mendapatkan validation_type dan test_cases)
  * @returns {boolean} - True jika output sesuai harapan, False jika tidak
  */
-export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, currentCode) => {
+export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, currentCode, lesson = null) => {
+  // 1. CEK DUKUNGAN VALIDATOR BARU (VERSI 2 PRD)
+  if (lesson && lesson.validation_type && lesson.test_cases && lesson.test_cases.length > 0) {
+    return runValidation(lesson.validation_type, lesson.test_cases, runnerOutputArray, currentCode);
+  }
+
+  // 2. LOGIKA LEGACY (VERSI LAMA JAVASCRIPT)
   // Cegah submit kosong
   if (!currentCode || currentCode.trim() === '') {
     return false;
@@ -65,3 +74,4 @@ export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArr
   
   return looseActual.includes(looseExpected) || looseExpected.includes(looseActual);
 }
+
