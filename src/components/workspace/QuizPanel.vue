@@ -33,6 +33,10 @@
             {{ isCorrect ? question.explanation : errorMessage }}
           </div>
 
+          <div v-if="hintText" class="hint-display-inline" style="margin: 15px 0 0 0;">
+            <h4><i class="fa-solid fa-lightbulb"></i> Hint:</h4>
+            <div class="hint-content" v-html="hintText"></div>
+          </div>
         </div>
       </div>
 
@@ -48,6 +52,12 @@
         <button class="nav-btn prev-btn" @click="$emit('back')">
           <i class="fa-solid fa-arrow-left"></i> Kembali
         </button>
+        
+        <HintButton 
+          v-if="!isCorrect && !hintText && hasQuestions" 
+          :isLoading="isHintLoading"
+          @click="openHint" 
+        />
       </div>
 
       <div class="footer-right">
@@ -87,6 +97,8 @@
 import { ref, computed } from 'vue'
 import { marked } from 'marked'
 import api from '../../services/api'
+import HintButton from './HintButton.vue'
+import { useUserAccount } from '../../composables/useUserAccount'
 import { useToast } from '../../composables/useToast'
 
 const { showToast } = useToast()
@@ -117,6 +129,39 @@ const getOptionClass = (optIndex, correctIndex) => {
   }
 }
 
+const hintText = ref(null)
+const isHintLoading = ref(false)
+const { credits } = useUserAccount()
+
+const openHint = async () => {
+  const quizId = props.quiz && props.quiz[0] ? props.quiz[0].id : null;
+  if (!quizId) return;
+
+  isHintLoading.value = true
+  try {
+    const res = await api.post(`/hints/quiz/${quizId}`)
+    if (res.data && res.data.hint) {
+      hintText.value = marked.parse(res.data.hint || 'Tidak ada hint tersedia.')
+      
+      // Update saldo hint premium atau energi user
+      if (res.data.remaining_credits !== undefined) {
+        credits.value = res.data.remaining_credits
+      }
+    } else {
+      hintText.value = marked.parse('Tidak ada hint tersedia.')
+    }
+  } catch (error) {
+    if (error.response?.status === 403) {
+      showToast(error.response?.data?.message || 'Energi Anda habis. Silakan top-up atau upgrade ke PRO.', 'warning')
+    } else if (error.response?.status === 400) {
+      showToast(error.response?.data?.message || 'Gagal membuka hint.', 'error')
+    } else {
+      showToast('Gagal mengambil hint.', 'error')
+    }
+  } finally {
+    isHintLoading.value = false
+  }
+}
 </script>
 
 <style scoped src="../../assets/css/components/workspace/QuizPanel.css"></style>
