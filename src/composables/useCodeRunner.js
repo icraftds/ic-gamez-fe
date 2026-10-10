@@ -108,7 +108,12 @@ export function useCodeRunner() {
     if (dataStr) {
       try {
         const data = JSON.parse(dataStr)
-        code.value = data.code || parsedInitialCode || '// Ketik kode Anda di sini\n'
+        let savedCode = data.code
+        // Deteksi bug lama: jika savedCode adalah raw JSON materi, abaikan!
+        if (savedCode && (savedCode.trim().startsWith('{"title":') || savedCode.trim().startsWith('{"instruction":') || savedCode === initialCode)) {
+          savedCode = null
+        }
+        code.value = savedCode || parsedInitialCode || '// Ketik kode Anda di sini\n'
         output.value = data.output || []
         status.value = data.status || 'idle'
       } catch (e) {
