@@ -11,7 +11,7 @@ import { validateDom } from './DomValidator';
  * @param {string} userCode - Kode mentah pengguna
  * @returns {boolean} - true jika berhasil, false jika gagal
  */
-export function runValidation(validationType, testCases, runnerOutputArray, userCode) {
+export function runValidation(validationType, testCases, runnerOutputArray, userCode, lesson = null) {
   // Cegah submit kosong
   if (!userCode || userCode.trim() === '') return false;
   
@@ -22,6 +22,34 @@ export function runValidation(validationType, testCases, runnerOutputArray, user
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/#.*$/gm, '');
   if (codeWithoutComments.includes('___')) return false;
+
+  // Anti-Cheat: Required Keywords Check
+  if (lesson && lesson.practice) {
+    let practiceData = lesson.practice;
+    if (typeof practiceData === 'string') {
+      try {
+        practiceData = JSON.parse(practiceData);
+      } catch (e) {}
+    }
+
+    if (practiceData && practiceData.required_keywords && Array.isArray(practiceData.required_keywords)) {
+      for (const keyword of practiceData.required_keywords) {
+        if (!codeWithoutComments.includes(keyword)) {
+          runnerOutputArray.push({ type: 'error', text: `Validasi Gagal: Kode Anda harus menggunakan '${keyword}'` });
+          return false;
+        }
+      }
+    }
+
+    if (practiceData && practiceData.restricted_keywords && Array.isArray(practiceData.restricted_keywords)) {
+      for (const keyword of practiceData.restricted_keywords) {
+        if (codeWithoutComments.includes(keyword)) {
+          runnerOutputArray.push({ type: 'error', text: `Validasi Gagal: Kode Anda tidak boleh menggunakan '${keyword}'` });
+          return false;
+        }
+      }
+    }
+  }
 
   // Cek apakah test cases tersedia
   if (!testCases || testCases.length === 0) return true;

@@ -26,7 +26,7 @@ export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArr
 
   // 1. CEK DUKUNGAN VALIDATOR BARU (VERSI 2 PRD)
   if (lesson && lesson.validation_type && lesson.test_cases && lesson.test_cases.length > 0) {
-    return runValidation(lesson.validation_type, lesson.test_cases, runnerOutputArray, currentCode);
+    return runValidation(lesson.validation_type, lesson.test_cases, runnerOutputArray, currentCode, lesson);
   }
 
   // 2. LOGIKA LEGACY (VERSI LAMA JAVASCRIPT)
