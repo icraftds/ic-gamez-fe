@@ -55,17 +55,37 @@ export function useCodeRunner() {
 
       if (language === 'python') {
         output.value = [{ type: 'log', text: 'Mengeksekusi Python di server...' }]
-        // Catatan: Ini adalah endpoint dummy untuk integrasi backend Piston/Judge0 nanti.
-        // const res = await axios.post('/api/run-code', { code: code.value, language });
-        // output.value = [{ type: 'log', text: res.data.stdout }];
         
-        // Mock sukses sementara agar tidak crash di JS Sandbox
-        setTimeout(() => {
-          output.value = [{ type: 'log', text: 'Simulasi eksekusi Python sukses.' }]
-        }, 1000);
+        try {
+          const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              language: 'python',
+              version: '*',
+              files: [{ content: code.value }]
+            })
+          })
+          
+          if (!res.ok) throw new Error('Gagal terhubung ke server eksekusi.')
+          
+          const data = await res.json()
+          
+          if (data.run && data.run.output) {
+            // Trim output and handle errors if any
+            const resultText = data.run.output.trim()
+            if (data.run.code !== 0) {
+               output.value = [{ type: 'error', text: resultText || 'Terjadi kesalahan eksekusi.' }]
+            } else {
+               output.value = [{ type: 'log', text: resultText || '(Tidak ada output)' }]
+            }
+          } else {
+            output.value = [{ type: 'error', text: data.message || 'Respons server tidak valid.' }]
+          }
+        } catch (err) {
+          output.value = [{ type: 'error', text: err.message }]
+        }
         
-        // Untuk simulasi ini kita kembalikan promise agar UI tidak langsung nge-check
-        await new Promise(resolve => setTimeout(resolve, 1000));
         return
       }
 
