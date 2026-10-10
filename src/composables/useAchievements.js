@@ -19,6 +19,7 @@ export function buildMedals(profile, stats) {
     const beCount = getPathCount('backend-development')
     const streakCount = profile?.longest_streak || 0
     const lvlCount = profile?.level || 1
+    const friendCount = profile?.friends_count || 0
 
     return [
       // Dasar Pemrograman Medals
@@ -83,6 +84,15 @@ export function buildMedals(profile, stats) {
       { id: 'lv-5', category: 'level', iconType: 'level', tierId: 5, name: 'Master GameZ', description: 'Level 100! Kamu diakui sebagai Master sesungguhnya.', target: 100, current: Math.min(lvlCount, 100), earned: lvlCount >= 100 },
       { id: 'lv-6', category: 'level', iconType: 'level', tierId: 6, name: 'Grandmaster', description: 'Level 125! Hanya segelintir orang yang mencapai ini.', target: 125, current: Math.min(lvlCount, 125), earned: lvlCount >= 125 },
       { id: 'lv-7', category: 'level', iconType: 'level', tierId: 7, name: 'Dewa Kode', description: 'Level 150! Kamu adalah entitas tertinggi di dunia GameZ.', target: 150, current: Math.min(lvlCount, 150), earned: lvlCount >= 150 },
+
+      // Friendship Medals
+      { id: 'fr-1', category: 'pertemanan', iconType: 'friend', tierId: 1, name: 'Koneksi Awal', description: 'Punya 15 teman. Awal yang bagus untuk membangun relasi.', target: 15, current: Math.min(friendCount, 15), earned: friendCount >= 15 },
+      { id: 'fr-2', category: 'pertemanan', iconType: 'friend', tierId: 2, name: 'Membangun Jaringan', description: 'Punya 25 teman. Lingkaran pertemananmu mulai meluas.', target: 25, current: Math.min(friendCount, 25), earned: friendCount >= 25 },
+      { id: 'fr-3', category: 'pertemanan', iconType: 'friend', tierId: 3, name: 'Makin Dikenal', description: 'Punya 35 teman. Kamu mulai banyak dikenal di komunitas.', target: 35, current: Math.min(friendCount, 35), earned: friendCount >= 35 },
+      { id: 'fr-4', category: 'pertemanan', iconType: 'friend', tierId: 4, name: 'Pusat Perhatian', description: 'Punya 50 teman. Semua orang ingin berteman denganmu.', target: 50, current: Math.min(friendCount, 50), earned: friendCount >= 50 },
+      { id: 'fr-5', category: 'pertemanan', iconType: 'friend', tierId: 5, name: 'Influencer', description: 'Punya 75 teman. Jaringan pertemanan yang luar biasa kuat.', target: 75, current: Math.min(friendCount, 75), earned: friendCount >= 75 },
+      { id: 'fr-6', category: 'pertemanan', iconType: 'friend', tierId: 6, name: 'Ikon Komunitas', description: 'Punya 90 teman. Kamu adalah sosok ikonik di sini.', target: 90, current: Math.min(friendCount, 90), earned: friendCount >= 90 },
+      { id: 'fr-7', category: 'pertemanan', iconType: 'friend', tierId: 7, name: 'Sultan Pertemanan', description: 'Punya 125 teman. Legenda sejati dalam bersosialisasi.', target: 125, current: Math.min(friendCount, 125), earned: friendCount >= 125 },
     ]
 }
 

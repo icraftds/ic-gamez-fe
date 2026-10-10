@@ -109,6 +109,14 @@
           <rect x="65" y="60" width="70" height="70" rx="8" :fill="tier.accent" opacity="0.9"/>
           <text x="117" y="122" font-family="Arial, sans-serif" font-size="44" font-weight="900" fill="#090E17" text-anchor="end">JS</text>
         </template>
+        <template v-else-if="iconType === 'friend'">
+          <circle cx="100" cy="75" r="16" fill="none" :stroke="tier.accent" stroke-width="4"/>
+          <path d="M 60,130 C 60,105 140,105 140,130" fill="none" :stroke="tier.accent" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="65" cy="85" r="12" fill="none" :stroke="tier.accent" stroke-width="3" opacity="0.6"/>
+          <path d="M 40,125 C 40,110 80,110 85,125" fill="none" :stroke="tier.accent" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+          <circle cx="135" cy="85" r="12" fill="none" :stroke="tier.accent" stroke-width="3" opacity="0.6"/>
+          <path d="M 115,125 C 120,110 160,110 160,125" fill="none" :stroke="tier.accent" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+        </template>
         <template v-else-if="iconType === 'backend'">
           <rect x="65" y="55" width="70" height="24" rx="4" fill="none" :stroke="tier.accent" stroke-width="4"/>
           <circle cx="75" cy="67" r="4" :fill="tier.accent"/>

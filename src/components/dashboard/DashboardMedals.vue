@@ -197,7 +197,8 @@ const categories = computed(() => {
     { id: 'javascript-pemula', label: 'JavaScript Pemula', earned: medals.filter(m => m.category === 'javascript-pemula' && m.earned).length, total: medals.filter(m => m.category === 'javascript-pemula').length },
     { id: 'backend-development', label: 'Backend Dev', earned: medals.filter(m => m.category === 'backend-development' && m.earned).length, total: medals.filter(m => m.category === 'backend-development').length },
     { id: 'streak', label: 'Streak', earned: medals.filter(m => m.category === 'streak' && m.earned).length, total: medals.filter(m => m.category === 'streak').length },
-    { id: 'level', label: 'Level', earned: medals.filter(m => m.category === 'level' && m.earned).length, total: medals.filter(m => m.category === 'level').length }
+    { id: 'level', label: 'Level', earned: medals.filter(m => m.category === 'level' && m.earned).length, total: medals.filter(m => m.category === 'level').length },
+    { id: 'pertemanan', label: 'Pertemanan', earned: medals.filter(m => m.category === 'pertemanan' && m.earned).length, total: medals.filter(m => m.category === 'pertemanan').length }
   ]
 })
 
