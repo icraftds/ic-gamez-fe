@@ -29,9 +29,9 @@ export function useCodeRunner() {
 
   /** 
    * Jalankan `code.value` berdasarkan bahasa yang dipilih.
-   * @param {string} language - 'javascript', 'html', atau 'sql'
+   * @param {string} language - 'javascript', 'html', 'sql', 'python', dll
    */
-  const run = (language = 'javascript') => {
+  const run = async (language = 'javascript') => {
     const entries = []
     try {
       if (language === 'html' || language === 'css') {
@@ -41,8 +41,31 @@ export function useCodeRunner() {
       }
 
       if (language === 'sql') {
-        // Mock eksekusi SQL
-        output.value = [{ type: 'log', text: 'Query SQL berhasil dieksekusi secara simulasi.' }]
+        // Mock eksekusi SQL yang mengembalikan data Tabular (Array of Objects)
+        output.value = [{ 
+          type: 'table', 
+          data: [
+            { id: 1, nama: "Andi", nilai: 95 },
+            { id: 2, nama: "Budi", nilai: 88 },
+            { id: 3, nama: "Siti", nilai: 92 }
+          ]
+        }]
+        return
+      }
+
+      if (language === 'python') {
+        output.value = [{ type: 'log', text: 'Mengeksekusi Python di server...' }]
+        // Catatan: Ini adalah endpoint dummy untuk integrasi backend Piston/Judge0 nanti.
+        // const res = await axios.post('/api/run-code', { code: code.value, language });
+        // output.value = [{ type: 'log', text: res.data.stdout }];
+        
+        // Mock sukses sementara agar tidak crash di JS Sandbox
+        setTimeout(() => {
+          output.value = [{ type: 'log', text: 'Simulasi eksekusi Python sukses.' }]
+        }, 1000);
+        
+        // Untuk simulasi ini kita kembalikan promise agar UI tidak langsung nge-check
+        await new Promise(resolve => setTimeout(resolve, 1000));
         return
       }
 

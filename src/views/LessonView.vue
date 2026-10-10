@@ -191,6 +191,11 @@ const runner = useCodeRunner()
 const scoring = useScoring()
 
 const lessonLanguage = computed(() => {
+  if (currentLesson.value?.language) {
+    return currentLesson.value.language;
+  }
+
+  // Fallback for older lessons that don't have language property
   const pSlug = (path.value?.slug || pathId.value || '').toLowerCase();
   const cSlug = (currentChapter.value?.slug || chapterId.value || '').toLowerCase();
   
@@ -372,7 +377,7 @@ const onRequestNextFromQuiz = async () => {
 /** Jalankan kode practice dan beri XP jika berhasil tanpa error. */
 const onPracticeRun = async () => {
   runner.status.value = 'idle'
-  runner.run(lessonLanguage.value)
+  await runner.run(lessonLanguage.value)
 
   const hasError = runner.output.value.some(e => e.type === 'error')
   
@@ -380,7 +385,7 @@ const onPracticeRun = async () => {
     runner.status.value = 'error'
   } else {
     // Validasi kesesuaian output
-    const isMatch = checkOutputMatch(lessonLanguage.value, currentLesson.value?.practice, runner.output.value, runner.code.value);
+    const isMatch = checkOutputMatch(lessonLanguage.value, currentLesson.value?.practice, runner.output.value, runner.code.value, currentLesson.value);
     
     if (isMatch) {
       runner.status.value = 'success'

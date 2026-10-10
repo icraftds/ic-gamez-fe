@@ -437,3 +437,37 @@
     overflow-x: hidden;
   }
 }
+
+/* ── SQL Table Output ── */
+.sql-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid rgba(147, 51, 234, 0.2);
+  border-radius: 6px;
+  background: var(--bg-editor-alt);
+}
+.sql-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-main-hex);
+}
+.sql-result-table th, .sql-result-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--white-alpha-0_06);
+  border-right: 1px solid var(--white-alpha-0_06);
+  text-align: left;
+}
+.sql-result-table th {
+  background: rgba(147, 51, 234, 0.1);
+  color: #c084fc;
+  font-weight: 700;
+}
+.sql-result-table tr:last-child td {
+  border-bottom: none;
+}
+.sql-result-table td:last-child, .sql-result-table th:last-child {
+  border-right: none;
+}

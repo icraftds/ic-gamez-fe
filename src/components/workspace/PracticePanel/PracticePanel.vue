@@ -133,10 +133,28 @@
             class="console-entry"
             :class="entry.type"
           >
-            <span class="console-prefix" aria-hidden="true">
-              {{ entry.type === 'error' ? '✖' : '›' }}
-            </span>
-            {{ entry.text }}
+            <template v-if="entry.type === 'table'">
+              <div class="sql-table-wrapper" v-if="entry.data && entry.data.length > 0">
+                <table class="sql-result-table">
+                  <thead>
+                    <tr>
+                      <th v-for="(val, key) in entry.data[0]" :key="key">{{ key }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(row, idx) in entry.data" :key="idx">
+                      <td v-for="(val, key) in row" :key="key">{{ val }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </template>
+            <template v-else>
+              <span class="console-prefix" aria-hidden="true">
+                {{ entry.type === 'error' ? '✖' : '›' }}
+              </span>
+              {{ entry.text }}
+            </template>
           </div>
         </div>
 
@@ -155,6 +173,7 @@ import { Codemirror } from 'vue-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { html } from '@codemirror/lang-html'
 import { sql } from '@codemirror/lang-sql'
+import { python } from '@codemirror/lang-python'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
@@ -257,6 +276,7 @@ const editorTabName = computed(() => {
   if (props.language === 'html') return 'index.html'
   if (props.language === 'css') return 'style.css'
   if (props.language === 'sql') return 'query.sql'
+  if (props.language === 'python') return 'script.py'
   return 'solution.js'
 })
 
@@ -366,6 +386,7 @@ const editorExtensions = computed(() => {
   if (props.language === 'html') langExtension = html()
   else if (props.language === 'css') langExtension = html()
   else if (props.language === 'sql') langExtension = sql()
+  else if (props.language === 'python') langExtension = python()
 
   return [
     basicSetup,
