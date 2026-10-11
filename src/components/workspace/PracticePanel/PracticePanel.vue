@@ -29,7 +29,7 @@
             
             <div class="p-card output-card" v-if="practiceSections.output">
               <h4><i class="fa-solid fa-terminal"></i> Harapan Output</h4>
-              <p>{{ practiceSections.output }}</p>
+              <p style="white-space: pre-wrap;">{{ practiceSections.output }}</p>
             </div>
             
           </div>
@@ -301,7 +301,9 @@ const practiceSections = computed(() => {
         info: json.instruction || '',
         task: json.task_description || '',
         example: '',
-        output: (json.test_cases && json.test_cases.length > 0) ? json.test_cases[0].expected_output : '',
+        output: (json.test_cases && json.test_cases.length > 0)
+          ? String(json.test_cases[0].expected_output || '').replace(/\\n/g, '\n')
+          : '',
         has_hints: !!(json.hints && json.hints.length > 0)
       }
     }
