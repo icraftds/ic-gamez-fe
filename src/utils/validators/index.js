@@ -11,7 +11,7 @@ import { validateDom } from './DomValidator';
  * @param {string} userCode - Kode mentah pengguna
  * @returns {boolean} - true jika berhasil, false jika gagal
  */
-export function runValidation(validationType, testCases, runnerOutputArray, userCode, lesson = null) {
+export async function runValidation(validationType, testCases, runnerOutputArray, userCode, lesson = null) {
   // Cegah submit kosong
   if (!userCode || userCode.trim() === '') return false;
   
@@ -60,7 +60,7 @@ export function runValidation(validationType, testCases, runnerOutputArray, user
     case 'stdout':
       return validateStdout(runnerOutputArray, firstCase.expected_output);
     case 'sql_result':
-      return validateSqlResult(runnerOutputArray, firstCase.expected_output);
+      return await validateSqlResult(runnerOutputArray, firstCase.expected_output, userCode);
     case 'string_match':
       // Membandingkan kode yang diketik user dengan string yang diharapkan (mengabaikan spasi berlebih)
       const looseExpected = (firstCase.expected_output || '').replace(/\\n/g, ' ').toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');

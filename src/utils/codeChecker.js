@@ -9,7 +9,7 @@ import { runValidation } from './validators/index';
  * @param {Object} lesson - Objek lesson secara utuh (untuk mendapatkan validation_type dan test_cases)
  * @returns {boolean} - True jika output sesuai harapan, False jika tidak
  */
-export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, currentCode, lesson = null) => {
+export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOutputArray, currentCode, lesson = null) => {
   // Parsing initial code dari JSON jika format baru
   let initialCodeForCheck = lessonPractice;
   if (lessonPractice) {
@@ -26,7 +26,7 @@ export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArr
 
   // 1. CEK DUKUNGAN VALIDATOR BARU (VERSI 2 PRD)
   if (lesson && lesson.validation_type && lesson.test_cases && lesson.test_cases.length > 0) {
-    return runValidation(lesson.validation_type, lesson.test_cases, runnerOutputArray, currentCode, lesson);
+    return await runValidation(lesson.validation_type, lesson.test_cases, runnerOutputArray, currentCode, lesson);
   }
 
   // 2. LOGIKA LEGACY (VERSI LAMA JAVASCRIPT)
@@ -48,7 +48,12 @@ export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArr
   // Anti-cheat (sekarang ditangani di awal fungsi)
   // ... dihapus karena sudah di atas ...
 
-  if (['html', 'css', 'sql'].includes(lessonLanguage)) return true;
+  if (['html', 'css'].includes(lessonLanguage)) return true;
+  if (lessonLanguage === 'sql') {
+    const hasError = runnerOutputArray.some(e => e.type === 'error');
+    const hasTableOrLog = runnerOutputArray.some(e => e.type === 'table' || e.type === 'log');
+    return !hasError && hasTableOrLog;
+  }
   if (!lessonPractice) return true;
   
   const lines = lessonPractice.split('\n');
