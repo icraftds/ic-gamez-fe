@@ -22,7 +22,15 @@
 .instruction-content::-webkit-scrollbar { width: 4px; }
 .instruction-content::-webkit-scrollbar-thumb { background: rgba(147, 51, 234, 0.3); border-radius: 2px; }
 
-.instruction-header { margin-bottom: 20px; }
+.instruction-header { margin-bottom: 24px; }
+
+.header-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
 
 .type-badge {
   display: inline-flex;
@@ -31,12 +39,38 @@
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.75rem;
-  font-weight: 600;
-  margin-bottom: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
 }
-.type-badge.code { background: rgba(147, 51, 234, 0.1); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.2); }
+.type-badge.code { background: rgba(147, 51, 234, 0.15); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.3); }
 
-.lesson-title { font-size: 1.3rem; font-weight: 700; line-height: 1.3; }
+.lang-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.difficulty-badge.easy { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
+.difficulty-badge.medium { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.25); }
+.difficulty-badge.hard { background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+
+.lesson-title { font-size: 1.35rem; font-weight: 700; line-height: 1.35; color: #f8fafc; }
 
 .instruction-line {
   color: var(--text-sub-hex);
@@ -239,6 +273,8 @@
   width: 100%;
   height: 100%;
   background: white; /* Preview harus punya background putih agar rendering HTML standar terlihat */
+  overflow: hidden;
+  position: relative;
 }
 .html-preview-iframe {
   width: 100%;
@@ -247,76 +283,256 @@
   background: white;
 }
 
+/* Overlay transparan di seluruh layar ketika drag resize aktif agar iframe tidak mencuri mousemove/mouseup */
+.resize-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  cursor: ns-resize;
+  background: transparent;
+}
+
+.is-resizing iframe,
+.is-resizing .html-preview-iframe {
+  pointer-events: none !important;
+}
+
 /* ── Practice Cards ── */
 .practice-cards {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .p-card {
-  padding: 16px;
-  border-radius: 12px;
-  border-left: 4px solid;
+  padding: 18px 20px;
+  border-radius: 14px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.card-header i {
+  font-size: 1.05rem;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* 1. Context Note */
+.p-card.context-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-left: 4px solid #38bdf8;
+  color: #bae6fd;
+}
+.context-icon {
+  color: #38bdf8;
+  font-size: 1.15rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.context-text {
+  flex: 1;
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
-.p-card h4 {
-  margin-top: 0;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.p-card p {
-  margin: 0;
-  color: var(--text-sub-hex);
-}
-
-.p-card pre {
-  margin: 0;
-  background: var(--black-alpha-0_2);
-  padding: 10px;
-  border-radius: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  overflow-x: auto;
-}
-
-.p-card.info-card {
-  background: rgba(56, 189, 248, 0.1);
-  border-left-color: #38bdf8;
-}
-.p-card.info-card p {
-  color: #bae6fd;
-}
-
+/* 2. Main Task Card */
 .p-card.task-card {
-  background: rgba(147, 51, 234, 0.1);
-  border-left-color: #c084fc;
+  background: rgba(147, 51, 234, 0.07);
+  border: 1px solid rgba(147, 51, 234, 0.22);
+  border-left: 4px solid #c084fc;
 }
-.p-card.task-card h4 {
+.p-card.task-card .card-header {
   color: #c084fc;
 }
 
-.p-card.example-card {
-  background: rgba(245, 158, 11, 0.1);
-  border-left-color: #fbbf24;
-}
-.p-card.example-card h4 {
-  color: #fbbf24;
+.task-markdown {
+  color: #e2e8f0;
+  font-size: 0.94rem;
+  line-height: 1.65;
 }
 
-.p-card.output-card {
-  background: rgba(16, 185, 129, 0.1);
-  border-left-color: #34d399;
+.task-markdown :deep(p) {
+  margin: 0 0 10px 0;
 }
-.p-card.output-card h4 {
+.task-markdown :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.task-markdown :deep(strong) {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.task-markdown :deep(code) {
+  background: rgba(147, 51, 234, 0.18);
+  border: 1px solid rgba(147, 51, 234, 0.35);
+  color: #d8b4fe;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88em;
+  font-weight: 600;
+}
+
+.task-markdown :deep(ol),
+.task-markdown :deep(ul) {
+  margin: 8px 0 12px 0;
+  padding-left: 22px;
+}
+
+.task-markdown :deep(li) {
+  margin-bottom: 6px;
+  line-height: 1.55;
+}
+
+/* 3. Guideline / Rule Card */
+.p-card.guideline-card {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-left: 4px solid #f59e0b;
+  padding: 14px 18px;
+}
+
+.guideline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #fbbf24;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.guideline-text {
+  margin: 0;
+  color: #fef3c7;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* 4. Example Format */
+.p-card.example-card {
+  background: rgba(100, 116, 139, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-left: 4px solid #94a3b8;
+}
+.p-card.example-card .card-header {
+  color: #cbd5e1;
+}
+
+.code-preview {
+  margin: 0;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.86rem;
+  color: #e2e8f0;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 5. Sleek Terminal Expected Output Preview */
+.terminal-preview-card {
+  background: #080512;
+  border: 1px solid rgba(147, 51, 234, 0.25);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.terminal-bar {
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.terminal-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.terminal-dots .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.terminal-dots .dot.red { background: #ef4444; }
+.terminal-dots .dot.yellow { background: #f59e0b; }
+.terminal-dots .dot.green { background: #10b981; }
+
+.terminal-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.terminal-label i {
+  color: #10b981;
+}
+
+.terminal-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.15);
   color: #34d399;
+  padding: 2px 7px;
+  border-radius: 10px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.terminal-body {
+  padding: 12px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.terminal-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.terminal-prompt {
+  color: #64748b;
+  font-weight: 700;
+  user-select: none;
+}
+
+.terminal-text {
+  color: #34d399;
+  font-weight: 600;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .feedback-banner {
