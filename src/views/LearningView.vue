@@ -17,22 +17,75 @@
         </div>
       </div>
       
-      <!-- Filter Section (New) -->
+      <!-- Filter Section -->
       <div class="filter-section">
-        <div class="search-box">
-          <i class="fa-solid fa-search"></i>
-          <input type="text" v-model="searchQuery" placeholder="Cari alur belajar..." />
+        <!-- Top Bar: Search & Access Tier -->
+        <div class="filter-top-bar">
+          <div class="search-box">
+            <i class="fa-solid fa-search"></i>
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              placeholder="Cari alur belajar (contoh: Python, CSS, Logika)..." 
+            />
+            <button 
+              v-if="searchQuery" 
+              class="clear-search-btn" 
+              @click="searchQuery = ''" 
+              title="Hapus pencarian"
+              type="button"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Tier / Access Filter -->
+          <div class="tier-pills">
+            <button 
+              v-for="tier in accessFilters" 
+              :key="tier.id"
+              class="tier-pill-btn"
+              :class="{ 
+                active: selectedTier === tier.id,
+                'tier-free': tier.id === 'free',
+                'tier-pro': tier.id === 'premium'
+              }"
+              @click="selectedTier = tier.id"
+              type="button"
+            >
+              <i v-if="tier.icon" :class="tier.icon"></i>
+              <span>{{ tier.label }}</span>
+              <span class="count-badge">{{ tierCounts[tier.id] }}</span>
+            </button>
+          </div>
         </div>
-        <div class="filter-pills">
-          <button 
-            v-for="cat in ['All', 'Web Dev', 'Mobile', 'Data Science', 'Game Dev']" 
-            :key="cat"
-            class="pill-btn"
-            :class="{ active: selectedCategory === cat }"
-            @click="selectedCategory = cat"
-          >
-            {{ cat }}
-          </button>
+
+        <!-- Bottom Bar: Curriculum Track Categories & Meta -->
+        <div class="filter-bottom-bar">
+          <div class="filter-pills">
+            <button 
+              v-for="cat in categories" 
+              :key="cat.id"
+              class="pill-btn"
+              :class="{ active: selectedCategory === cat.id }"
+              @click="selectedCategory = cat.id"
+              type="button"
+            >
+              <i v-if="cat.icon" :class="cat.icon"></i>
+              <span>{{ cat.label }}</span>
+              <span class="count-badge">{{ categoryCounts[cat.id] }}</span>
+            </button>
+          </div>
+
+          <!-- Filter Reset & Results Counter -->
+          <div v-if="hasActiveFilter" class="filter-reset-wrapper">
+            <span class="results-count">
+              Menampilkan <strong>{{ filteredPaths.length }}</strong> dari {{ paths?.length || 0 }} alur
+            </span>
+            <button class="reset-filter-btn" @click="resetFilters" type="button">
+              <i class="fa-solid fa-rotate-left"></i> Reset Filter
+            </button>
+          </div>
         </div>
       </div>
 
@@ -48,6 +101,9 @@
         <div v-if="filteredPaths.length === 0" class="no-results">
           <i class="fa-solid fa-ghost"></i>
           <p>Tidak ada alur belajar yang sesuai dengan filter Anda.</p>
+          <button v-if="hasActiveFilter" class="empty-reset-btn" @click="resetFilters" type="button">
+            <i class="fa-solid fa-rotate-left"></i> Tampilkan Semua Alur Belajar
+          </button>
         </div>
       </div>
     </div>
@@ -73,7 +129,121 @@ const router = useRouter()
 const { paths, fetchPaths, fetchPathDetails, isLoading, isPreparingLesson, hasFetchedAllPaths } = useLearningPaths()
 
 const searchQuery = ref('')
-const selectedCategory = ref('All')
+const selectedCategory = ref('all')
+const selectedTier = ref('all')
+
+const categories = [
+  { id: 'all', label: 'Semua Track', icon: 'fa-solid fa-layer-group' },
+  { id: 'fondasi', label: 'Fondasi & Logika', icon: 'fa-solid fa-brain' },
+  { id: 'web', label: 'Web Development', icon: 'fa-solid fa-code' },
+  { id: 'data', label: 'Python & Data', icon: 'fa-solid fa-database' }
+]
+
+const accessFilters = [
+  { id: 'all', label: 'Semua Akses' },
+  { id: 'free', label: 'Gratis', icon: 'fa-solid fa-gift' },
+  { id: 'premium', label: 'Pro', icon: 'fa-solid fa-crown' }
+]
+
+// Accurate mapping for curriculum tracks
+const getPathCategory = (path) => {
+  const slug = (path?.slug || '').toLowerCase()
+  const title = (path?.title || '').toLowerCase()
+  
+  if (
+    slug.includes('html') ||
+    slug.includes('css') ||
+    slug.includes('layout') ||
+    slug.includes('responsive') ||
+    slug.includes('javascript') ||
+    slug.includes('frontend') ||
+    slug.includes('backend') ||
+    slug.includes('php') ||
+    slug.includes('laravel') ||
+    slug.includes('react') ||
+    title.includes('html') ||
+    title.includes('css') ||
+    title.includes('layout') ||
+    title.includes('javascript') ||
+    title.includes('frontend') ||
+    title.includes('backend') ||
+    title.includes('php') ||
+    title.includes('laravel') ||
+    title.includes('react') ||
+    title.includes('web')
+  ) {
+    return 'web'
+  }
+  
+  if (
+    slug.includes('python') ||
+    slug.includes('database') ||
+    slug.includes('sql') ||
+    title.includes('python') ||
+    title.includes('database') ||
+    title.includes('sql') ||
+    title.includes('data')
+  ) {
+    return 'data'
+  }
+  
+  if (
+    slug.includes('dasar-pemrograman') ||
+    slug.includes('logika') ||
+    slug.includes('matematika') ||
+    slug.includes('algoritma') ||
+    title.includes('dasar pemrograman') ||
+    title.includes('logika') ||
+    title.includes('matematika') ||
+    title.includes('komputasional') ||
+    title.includes('algoritma')
+  ) {
+    return 'fondasi'
+  }
+  
+  return 'fondasi'
+}
+
+const isPathPremium = (path) => {
+  return Boolean(path.is_premium || path.isPremium)
+}
+
+const categoryCounts = computed(() => {
+  const counts = { all: paths.value?.length || 0, fondasi: 0, web: 0, data: 0 }
+  if (paths.value) {
+    paths.value.forEach(p => {
+      const cat = getPathCategory(p)
+      if (counts[cat] !== undefined) {
+        counts[cat]++
+      }
+    })
+  }
+  return counts
+})
+
+const tierCounts = computed(() => {
+  const counts = { all: paths.value?.length || 0, free: 0, premium: 0 }
+  if (paths.value) {
+    paths.value.forEach(p => {
+      if (isPathPremium(p)) {
+        counts.premium++
+      } else {
+        counts.free++
+      }
+    })
+  }
+  return counts
+})
+
+const hasActiveFilter = computed(() => {
+  return searchQuery.value.trim() !== '' || selectedCategory.value !== 'all' || selectedTier.value !== 'all'
+})
+
+const resetFilters = () => {
+  searchQuery.value = ''
+  selectedCategory.value = 'all'
+  selectedTier.value = 'all'
+}
 
 onMounted(() => {
   if (!hasFetchedAllPaths.value) {
@@ -83,43 +253,42 @@ onMounted(() => {
 })
 
 const filteredPaths = computed(() => {
-  let result = paths.value || [];
+  let result = paths.value || []
   
-  // Apply Search
+  // 1. Search Query filter
   if (searchQuery.value.trim() !== '') {
-    const q = searchQuery.value.toLowerCase()
-    result = result.filter(p => 
-      (p.title && p.title.toLowerCase().includes(q)) || 
-      (p.description && p.description.toLowerCase().includes(q))
-    )
+    const q = searchQuery.value.trim().toLowerCase()
+    result = result.filter(p => {
+      const title = (p.title || '').toLowerCase()
+      const desc = (p.description || '').toLowerCase()
+      const slug = (p.slug || '').toLowerCase()
+      return title.includes(q) || desc.includes(q) || slug.includes(q)
+    })
   }
   
-  // Apply Category
-  if (selectedCategory.value !== 'All') {
-    const cat = selectedCategory.value.toLowerCase()
-    if (cat === 'web dev') {
-      result = result.filter(p => p.title.toLowerCase().includes('web') || p.title.toLowerCase().includes('frontend') || p.title.toLowerCase().includes('backend'))
-    } else if (cat === 'data science') {
-      result = result.filter(p => p.title.toLowerCase().includes('data') || p.title.toLowerCase().includes('sql') || p.title.toLowerCase().includes('python'))
-    } else if (cat === 'mobile') {
-      result = result.filter(p => p.title.toLowerCase().includes('mobile') || p.title.toLowerCase().includes('android') || p.title.toLowerCase().includes('flutter'))
-    } else if (cat === 'game dev') {
-      result = result.filter(p => p.title.toLowerCase().includes('game') || p.title.toLowerCase().includes('unity') || p.title.toLowerCase().includes('godot'))
-    } else {
-      result = result.filter(p => p.category === selectedCategory.value)
+  // 2. Category filter
+  if (selectedCategory.value !== 'all') {
+    result = result.filter(p => getPathCategory(p) === selectedCategory.value)
+  }
+
+  // 3. Access Tier filter
+  if (selectedTier.value !== 'all') {
+    if (selectedTier.value === 'free') {
+      result = result.filter(p => !isPathPremium(p))
+    } else if (selectedTier.value === 'premium') {
+      result = result.filter(p => isPathPremium(p))
     }
   }
   
-  return result;
+  return result
 })
 
 const goToPath = async (path) => {
-  if (path.isLocked) return
+  if (path.isLocked || path.is_locked) return
 
   isPreparingLesson.value = true
 
   // Let RoadmapView handle the fetching of details, just navigate there directly
-  // Route to the new Roadmap view (which will replace PathDetailView)
   router.push(`/learning/${path.slug || path.id}`)
 }
 </script>

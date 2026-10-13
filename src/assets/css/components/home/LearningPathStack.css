@@ -12,7 +12,7 @@
   font-size: 3rem;
   font-weight: 800;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, var(--text-main-hex), var(--text-sub-hex));
+  background: linear-gradient(135deg, var(--text-main-hex, #ffffff), var(--text-sub-hex, #94a3b8));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -20,12 +20,11 @@
 
 .section-subtitle {
   font-size: 1.15rem;
-  color: var(--text-muted, var(--text-sub-hex));
+  color: var(--text-muted, var(--text-sub-hex, #94a3b8));
   line-height: 1.6;
 }
 
 .stack-container {
-
   position: relative;
   display: block;
   padding-bottom: 0vh;

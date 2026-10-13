@@ -55,10 +55,10 @@
 
           <div class="challenge-rewards">
             <div class="reward-item xp">
-              <i class="fa-solid fa-star"></i> +{{ getExpectedXp(challenge.difficulty, challenge.costCredit) }} XP
+              <i class="fa-solid fa-star"></i> +{{ getExpectedXp(challenge.difficulty) }} XP
             </div>
             <div class="reward-item coin">
-              <img src="/images/icoinz.svg" alt="iCoinZ" class="coin-icon" style="width: 16px; height: 16px;" /> +{{ challenge.coin_reward || 10 }} iCoinZ
+              <img src="/images/icoinz.svg" alt="iCoinZ" class="coin-icon" style="width: 16px; height: 16px;" /> +{{ challenge.coin_reward || getExpectedCoin(challenge.difficulty) }} iCoinZ
             </div>
           </div>
 
@@ -220,18 +220,23 @@ watch(selectedCategory, () => {
   fetchChallenges();
 });
 
-const getExpectedXp = (difficulty, costCredit = 0) => {
+const getExpectedXp = (difficulty) => {
   const diff = (difficulty || 'sedang').toLowerCase();
-  let base = 50;
-  if (diff === 'mudah' || diff === 'easy') base = 25;
-  else if (diff === 'sedang' || diff === 'medium') base = 50;
-  else if (diff === 'sulit' || diff === 'hard') base = 100;
-  else if (diff === 'boss') base = 300;
-  
-  return Math.floor(base * (1 + (costCredit / 10)));
+  if (diff === 'mudah' || diff === 'easy') return 25;
+  if (diff === 'sedang' || diff === 'medium') return 50;
+  if (diff === 'sulit' || diff === 'hard') return 100;
+  if (diff === 'boss') return 150;
+  return 50;
 };
 
-const openChallenge = (challenge) => {
+const getExpectedCoin = (difficulty) => {
+  const diff = (difficulty || 'sedang').toLowerCase();
+  if (diff === 'boss') return 25;
+  if (diff === 'sulit' || diff === 'hard') return 15;
+  return 10;
+};
+
+const openChallenge = async (challenge) => {
   if (!isLoggedIn.value) {
     emit('require-auth');
     return;
@@ -242,9 +247,13 @@ const openChallenge = (challenge) => {
     return;
   }
 
-  if (!challenge.isCompleted && !deductCredit(challenge.costCredit)) {
-    emit('require-premium');
-    return;
+  // Jika user free dan tantangan belum selesai, periksa pemotongan kredit
+  if (!isPremiumUser.value && !challenge.isCompleted) {
+    const success = await deductCredit(challenge.costCredit || 1);
+    if (!success) {
+      emit('require-premium');
+      return;
+    }
   }
 
   router.push(
