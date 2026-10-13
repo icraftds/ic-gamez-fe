@@ -1,10 +1,11 @@
 /**
- * Composable untuk menjalankan kode JavaScript pengguna
- * di dalam sandbox yang aman (tanpa akses ke DOM/window).
+ * Composable untuk mengelola state editor, persistence, dan eksekusi kode pengguna.
+ * Menerapkan Clean Code & Strategy Pattern melalui modul runners terpisah.
  */
 import { ref, watch } from 'vue'
+import { executeCode } from '../utils/runners'
 
-/** @typedef {{ type: 'log' | 'error' | 'warn', text: string }} ConsoleEntry */
+/** @typedef {{ type: 'log' | 'error' | 'warn' | 'table', text?: string, data?: any, columns?: any }} ConsoleEntry */
 
 export function useCodeRunner() {
   /** @type {import('vue').Ref<string>} */
@@ -13,99 +14,21 @@ export function useCodeRunner() {
   /** @type {import('vue').Ref<ConsoleEntry[]>} */
   const output = ref([])
 
+  const status = ref('idle')
+  const currentLessonId = ref(null)
+
   /**
-   * Membuat objek console tiruan yang menangkap semua log
-   * ke dalam array `entries`, tanpa mengekspos console asli.
-   * @param {ConsoleEntry[]} entries
+   * Jalankan `code.value` berdasarkan bahasa yang dipilih melalui runner engine terisolasi.
+   * @param {string} language - 'javascript', 'html', 'css', 'sql', 'python', 'php'
+   * @param {object|null} context - Objek materi aktif
    */
-  const createSandboxConsole = (entries) => ({
-    log: (...args) =>
-      entries.push({ type: 'log', text: args.map(String).join(' ') }),
-    error: (...args) =>
-      entries.push({ type: 'error', text: args.map(String).join(' ') }),
-    warn: (...args) =>
-      entries.push({ type: 'warn', text: '⚠ ' + args.map(String).join(' ') }),
-  })
-
-  /** 
-   * Jalankan `code.value` berdasarkan bahasa yang dipilih.
-   * @param {string} language - 'javascript', 'html', 'sql', 'python', dll
-   */
-  const run = async (language = 'javascript') => {
-    const entries = []
+  const run = async (language = 'javascript', context = null) => {
     try {
-      if (language === 'html' || language === 'css') {
-        // Untuk HTML/CSS, kembalikan sinyal sukses agar xp bisa didapat dan UI bisa mere-render preview
-        output.value = [{ type: 'log', text: 'Render HTML berhasil. Periksa tab Preview!' }]
-        return
-      }
-
-      if (language === 'sql') {
-        // Mock eksekusi SQL yang mengembalikan data Tabular (Array of Objects)
-        output.value = [{ 
-          type: 'table', 
-          data: [
-            { id: 1, nama: "Andi", nilai: 95 },
-            { id: 2, nama: "Budi", nilai: 88 },
-            { id: 3, nama: "Siti", nilai: 92 }
-          ]
-        }]
-        return
-      }
-
-      if (language === 'python') {
-        output.value = [{ type: 'log', text: 'Menyiapkan lingkungan Python...' }]
-        
-        try {
-          if (!window.loadPyodide) {
-            output.value = [{ type: 'log', text: 'Mengunduh pustaka Python (hanya sekali)...' }]
-            const script = document.createElement('script')
-            script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js'
-            document.head.appendChild(script)
-            
-            await new Promise((resolve, reject) => {
-              script.onload = resolve
-              script.onerror = () => reject(new Error('Gagal memuat Pyodide dari CDN.'))
-            })
-          }
-          
-          if (!window.pyodideInstance) {
-            window.pyodideInstance = await window.loadPyodide({
-              indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/"
-            })
-          }
-          
-          const pyodide = window.pyodideInstance
-          
-          // Clear previous output and redirect stdout/stderr to entries array
-          entries.length = 0
-          pyodide.setStdout({ batched: (msg) => entries.push({ type: 'log', text: msg }) })
-          pyodide.setStderr({ batched: (msg) => entries.push({ type: 'error', text: msg }) })
-          
-          await pyodide.runPythonAsync(code.value)
-          
-          output.value = entries.length > 0 ? entries : [{ type: 'log', text: '(Tidak ada output)' }]
-        } catch (err) {
-          output.value = [{ type: 'error', text: err.message }]
-        }
-        
-        return
-      }
-
-      // Default: JavaScript execution via sandboxed Function
-      const fn = new Function('console', code.value)
-      fn(createSandboxConsole(entries))
-
-      output.value = entries.length > 0
-        ? entries
-        : [{ type: 'log', text: '(Tidak ada output)' }]
+      output.value = await executeCode(language, code.value, context)
     } catch (error) {
       output.value = [{ type: 'error', text: error.message }]
     }
   }
-
-  const status = ref('idle')
-  const currentLessonId = ref(null)
 
   const saveToStorage = () => {
     if (!currentLessonId.value) return

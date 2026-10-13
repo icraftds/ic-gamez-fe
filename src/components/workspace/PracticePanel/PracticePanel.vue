@@ -4,34 +4,76 @@
     <section class="instruction-column">
       <div class="instruction-content">
         <header class="instruction-header">
-          <span class="type-badge code">
-            <i class="fa-solid fa-laptop-code"></i> Tantangan Koding
-          </span>
-          <h2 class="lesson-title">{{ lesson.title }}</h2>
+          <div class="header-badges">
+            <span class="type-badge code">
+              <i class="fa-solid fa-laptop-code"></i> Tantangan Koding
+            </span>
+            <span class="lang-badge" v-if="language">
+              <i :class="getLangIcon(language)"></i> {{ formatLanguage(language) }}
+            </span>
+            <span class="difficulty-badge" :class="lesson.difficulty" v-if="lesson.difficulty">
+              {{ formatDifficulty(lesson.difficulty) }}
+            </span>
+          </div>
+          <h2 class="lesson-title">{{ practiceSections?.title || lesson.title }}</h2>
         </header>
 
         <div class="instruction-body">
           <div class="practice-cards" v-if="practiceSections">
             
-            <div class="p-card info-card" v-if="practiceSections.info">
-              <p>{{ practiceSections.info }}</p>
+            <!-- Useful Context Note if not generic filler -->
+            <div class="p-card context-card" v-if="practiceSections.info && !isGenericInfo(practiceSections.info)">
+              <div class="context-icon"><i class="fa-solid fa-circle-info"></i></div>
+              <div class="context-text">{{ practiceSections.info }}</div>
             </div>
-            
+
+            <!-- Main Task Card with parsed rich Markdown -->
             <div class="p-card task-card" v-if="practiceSections.task">
-              <h4><i class="fa-solid fa-list-check"></i> Tugas</h4>
-              <p>{{ practiceSections.task }}</p>
+              <div class="card-header">
+                <i class="fa-solid fa-list-check"></i>
+                <h4>Instruksi Tugas</h4>
+              </div>
+              <div class="task-markdown markdown-body" v-html="parsedTaskData.html"></div>
             </div>
-            
+
+            <!-- Guideline / Tips Card -->
+            <div class="p-card guideline-card" v-if="parsedTaskData.guideline">
+              <div class="guideline-badge">
+                <i class="fa-solid fa-lightbulb"></i> Tips & Ketentuan
+              </div>
+              <p class="guideline-text">{{ parsedTaskData.guideline }}</p>
+            </div>
+
+            <!-- Example / Input Format -->
             <div class="p-card example-card" v-if="practiceSections.example">
-              <h4><i class="fa-solid fa-lightbulb"></i> Contoh Format / Input</h4>
-              <pre><code>{{ practiceSections.example }}</code></pre>
+              <div class="card-header">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                <h4>Contoh Format / Input</h4>
+              </div>
+              <pre class="code-preview"><code>{{ practiceSections.example }}</code></pre>
             </div>
-            
-            <div class="p-card output-card" v-if="practiceSections.output">
-              <h4><i class="fa-solid fa-terminal"></i> Harapan Output</h4>
-              <p style="white-space: pre-wrap;">{{ practiceSections.output }}</p>
+
+            <!-- Expected Output Terminal Preview -->
+            <div class="terminal-preview-card" v-if="practiceSections.output">
+              <div class="terminal-bar">
+                <div class="terminal-dots">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                </div>
+                <div class="terminal-label">
+                  <i class="fa-solid fa-terminal"></i> OUTPUT YANG DIHARAPKAN
+                </div>
+                <div class="terminal-badge">STDOUT</div>
+              </div>
+              <div class="terminal-body">
+                <div class="terminal-line">
+                  <span class="terminal-prompt">&gt;_</span>
+                  <span class="terminal-text">{{ practiceSections.output }}</span>
+                </div>
+              </div>
             </div>
-            
+
           </div>
           <div class="markdown-body" v-html="parsedInstruction" v-else></div>
         </div>
@@ -82,20 +124,11 @@
         />
       </div>
 
-      <div class="console-section" :style="{ height: consoleHeight + 'px', minHeight: consoleHeight + 'px' }">
-        
-        <div v-if="runStatus === 'success'" class="feedback-banner success">
-          <i class="fa-solid fa-circle-check"></i> Kode berhasil dijalankan! Hasil telah divalidasi.
-        </div>
-        
-        <div v-else-if="runStatus === 'warning'" class="feedback-banner warning">
-          <i class="fa-solid fa-triangle-exclamation"></i> Kode berjalan tanpa error, tapi output belum sesuai dengan yang diharapkan.
-        </div>
-        <div v-else-if="runStatus === 'error'" class="feedback-banner error">
-          <i class="fa-solid fa-circle-xmark"></i> Terdapat error saat menjalankan kode. Perbaiki dan coba lagi!
-        </div>
+      <div class="console-section" :class="{ 'is-resizing': isResizing }" :style="{ height: consoleHeight + 'px', minHeight: consoleHeight + 'px' }">
+        <!-- Overlay transparan saat drag agar mouse tidak tertangkap/stuck di dalam iframe preview -->
+        <div v-if="isResizing" class="resize-overlay"></div>
 
-        <div class="console-header" @mousedown="startResize">
+        <div class="console-header" @mousedown="startResize" @dblclick="resetConsoleHeight">
           <div class="output-tabs">
             <button
               class="output-tab-btn"
@@ -114,13 +147,24 @@
             </button>
           </div>
           
-          <div class="drag-indicator" title="Tarik untuk mengubah ukuran">
+          <div class="drag-indicator" title="Tarik ke atas/bawah untuk mengatur tinggi (Klik 2x untuk reset)">
             <i class="fa-solid fa-grip-lines"></i> <span>Geser</span>
           </div>
           
           <button class="clear-btn" @click.stop="$emit('clear-output')">
             <i class="fa-solid fa-trash"></i> Clear
           </button>
+        </div>
+
+        <div v-if="runStatus === 'success'" class="feedback-banner success">
+          <i class="fa-solid fa-circle-check"></i> Kode berhasil dijalankan! Hasil telah divalidasi.
+        </div>
+        
+        <div v-else-if="runStatus === 'warning'" class="feedback-banner warning">
+          <i class="fa-solid fa-triangle-exclamation"></i> Kode berjalan tanpa error, tapi output belum sesuai dengan yang diharapkan.
+        </div>
+        <div v-else-if="runStatus === 'error'" class="feedback-banner error">
+          <i class="fa-solid fa-circle-xmark"></i> Terdapat error saat menjalankan kode. Perbaiki dan coba lagi!
         </div>
 
         <div v-if="activeOutputTab === 'console'" class="console-output" role="log" aria-live="polite">
@@ -159,7 +203,12 @@
         </div>
 
         <div v-if="activeOutputTab === 'preview' && isHtmlMode" class="preview-output">
-          <iframe :srcdoc="code" class="html-preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+          <iframe
+            :srcdoc="code"
+            class="html-preview-iframe"
+            :style="{ pointerEvents: isResizing ? 'none' : 'auto' }"
+            sandbox="allow-scripts allow-same-origin"
+          ></iframe>
         </div>
       </div>
     </section>
@@ -174,6 +223,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { html } from '@codemirror/lang-html'
 import { sql } from '@codemirror/lang-sql'
 import { python } from '@codemirror/lang-python'
+import { php } from '@codemirror/lang-php'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { EditorView } from '@codemirror/view'
 import { basicSetup } from 'codemirror'
@@ -200,10 +250,14 @@ const isHtmlMode = computed(() => props.language === 'html' || props.language ==
 
 const consoleHeight = ref(170)
 const isResizing = ref(false)
+let startY = 0
+let startHeight = 0
 
 const startResize = (e) => {
   if (e.button !== 0) return
   isResizing.value = true
+  startY = e.clientY
+  startHeight = consoleHeight.value
   document.addEventListener('mousemove', doResize)
   document.addEventListener('mouseup', stopResize)
   document.body.style.userSelect = 'none'
@@ -211,9 +265,13 @@ const startResize = (e) => {
 
 const doResize = (e) => {
   if (!isResizing.value) return
-  consoleHeight.value -= e.movementY
-  if (consoleHeight.value < 100) consoleHeight.value = 100
-  if (consoleHeight.value > 800) consoleHeight.value = 800
+  // Tarik ke atas (clientY lebih kecil dari startY) = perbesar console
+  // Tarik ke bawah (clientY lebih besar dari startY) = perkecil console
+  const deltaY = startY - e.clientY
+  const newHeight = startHeight + deltaY
+  const minH = 120
+  const maxH = typeof window !== 'undefined' ? Math.max(minH, window.innerHeight - 150) : 750
+  consoleHeight.value = Math.max(minH, Math.min(newHeight, maxH))
 }
 
 const stopResize = () => {
@@ -221,6 +279,10 @@ const stopResize = () => {
   document.removeEventListener('mousemove', doResize)
   document.removeEventListener('mouseup', stopResize)
   document.body.style.userSelect = ''
+}
+
+const resetConsoleHeight = () => {
+  consoleHeight.value = 200
 }
 
 const handleFinishClick = () => {
@@ -277,6 +339,7 @@ const editorTabName = computed(() => {
   if (props.language === 'css') return 'style.css'
   if (props.language === 'sql') return 'query.sql'
   if (props.language === 'python') return 'script.py'
+  if (props.language === 'php') return 'index.php'
   return 'solution.js'
 })
 
@@ -375,6 +438,106 @@ const parsedInstruction = computed(() => {
   return marked.parse(text)
 })
 
+const isGenericInfo = (info) => {
+  if (!info) return true
+  const lower = info.toLowerCase().trim()
+  return (
+    lower.includes('rancang langkahnya') || 
+    lower.includes('jalankan program anda') ||
+    lower.includes('jalankan program python anda') ||
+    (lower.includes('terapkan konsep') && lower.includes('untuk menyelesaikan kasus'))
+  )
+}
+
+const formatLanguage = (lang) => {
+  if (!lang) return ''
+  const map = {
+    python: 'Python',
+    javascript: 'JavaScript',
+    js: 'JavaScript',
+    html: 'HTML',
+    css: 'CSS',
+    sql: 'SQL',
+    php: 'PHP'
+  }
+  return map[lang.toLowerCase()] || lang.toUpperCase()
+}
+
+const getLangIcon = (lang) => {
+  if (!lang) return 'fa-solid fa-code'
+  const map = {
+    python: 'fa-brands fa-python',
+    javascript: 'fa-brands fa-js',
+    js: 'fa-brands fa-js',
+    html: 'fa-brands fa-html5',
+    css: 'fa-brands fa-css3-alt',
+    sql: 'fa-solid fa-database',
+    php: 'fa-brands fa-php'
+  }
+  return map[lang.toLowerCase()] || 'fa-solid fa-code'
+}
+
+const formatDifficulty = (diff) => {
+  if (!diff) return ''
+  const map = {
+    easy: 'Mudah',
+    medium: 'Menengah',
+    hard: 'Sulit'
+  }
+  return map[diff.toLowerCase()] || diff
+}
+
+const parsedTaskData = computed(() => {
+  const rawTask = practiceSections.value?.task || ''
+  
+  if (!rawTask) {
+    return {
+      html: '',
+      guideline: ''
+    }
+  }
+
+  let text = rawTask.trim()
+  let guideline = ''
+
+  // 1. Ekstrak petunjuk / aturan jika ada
+  const rulePatterns = [
+    /(?:Tulis langkah pengolahan[^\n\r]*|Gunakan operasi sesuai topik[^:\n\r]*|Pertahankan struktur dan teks[^\n\r]*)/i
+  ]
+  for (const pattern of rulePatterns) {
+    const match = text.match(pattern)
+    if (match) {
+      guideline = match[0].trim().replace(/^[;,\s]+|[;,\s]+$/g, '')
+      text = text.replace(match[0], '').trim()
+    }
+  }
+
+  // 2. Bersihkan kalimat duplikat output seperti:
+  // "lalu tampilkan hasil tepat seperti berikut (perhatikan kapitalisasi, spasi, dan baris baru):\n```text\nTrue\n```"
+  text = text.replace(/(?:,\s*)?(?:lalu|dan)?\s*tampilkan (?:hasil|keluaran) tepat seperti berikut[^\n:`]*:?\s*```(?:text)?\s*[\s\S]*?```/gi, '.')
+  
+  // 3. Bersihkan sisa template ": \n```text ... ```"
+  text = text.replace(/:\s*```(?:text)?\s*[\s\S]*?```/gi, '.')
+
+  // 4. Perbaiki tanda baca yang dobel
+  text = text.replace(/\s*\.\s*\./g, '.')
+             .replace(/,\s*\./g, '.')
+             .trim()
+
+  // 5. Render markdown
+  let html = ''
+  try {
+    html = marked.parse(text)
+  } catch (e) {
+    html = `<p>${text}</p>`
+  }
+
+  return {
+    html,
+    guideline
+  }
+})
+
 const customTheme = EditorView.theme({
   "&": {
     backgroundColor: "#060310 !important"
@@ -405,6 +568,7 @@ const editorExtensions = computed(() => {
   else if (props.language === 'css') langExtension = html()
   else if (props.language === 'sql') langExtension = sql()
   else if (props.language === 'python') langExtension = python()
+  else if (props.language === 'php') langExtension = php()
 
   return [
     basicSetup,
