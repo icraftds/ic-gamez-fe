@@ -216,7 +216,7 @@ const isLessonCompleted = (lesson) => {
   const hasQuiz = lesson.quizzes && lesson.quizzes.length > 0;
   const quizDone = !hasQuiz || (lesson.quizPassed !== undefined ? lesson.quizPassed : (p ? p.quiz_passed : false));
   
-  const hasPractice = lesson.type === 'code' || !!lesson.practice_instructions;
+  const hasPractice = lesson.type === 'code' || lesson.type === 'theory_quiz_practice' || !!lesson.practice || !!lesson.practice_instructions;
   const practiceDone = !hasPractice || (lesson.practiceDone !== undefined ? lesson.practiceDone : (p ? !!p.saved_code : false));
   
   return theoryDone && quizDone && practiceDone;

@@ -366,7 +366,11 @@ const onRequestNextFromTheory = async () => {
     currentLesson.value.isCompleted = true
     localStorage.setItem(`theory_completed_${currentLesson.value.id}`, 'true')
     // Beritahu backend (berjalan di background, tidak memblokir UI)
-    scoring.awardXp('theory', currentLesson.value.id).catch(console.error)
+    scoring.awardXp('theory', currentLesson.value.id).then(res => {
+      if (res && res.awarded && res.xp > 0) {
+        showRewardToast(res.xp, 'Materi Selesai!', 'theory', 0)
+      }
+    }).catch(console.error)
   }
   activeStep.value = STEP.QUIZ
 }

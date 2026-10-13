@@ -5,7 +5,7 @@
       class="lesson-item lesson-header-item"
       :class="{
         'is-active': isActive && !isOpen,
-        'is-completed': lesson.isCompleted,
+        'is-completed': isLessonDone,
       }"
       @click="$emit('toggle', lesson.id)"
     >
@@ -13,7 +13,7 @@
         <i :class="lesson.type === 'text' ? 'fa-solid fa-file-alt' : 'fa-solid fa-code'"></i>
       </span>
       <span class="lesson-title">{{ lesson.title }}</span>
-      <i v-if="lesson.isCompleted" class="fa-solid fa-check status-icon completed"></i>
+      <i v-if="isLessonDone" class="fa-solid fa-check status-icon completed"></i>
       <i v-else-if="lesson.is_premium" class="fa-solid status-icon" :class="isPremiumUser ? 'fa-lock-open premium-unlocked' : 'fa-lock locked'"></i>
       <i class="fa-solid lesson-expand-icon" :class="isOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
     </button>
@@ -69,9 +69,10 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
 
-defineProps({
+const props = defineProps({
   lesson: { type: Object, required: true },
   isOpen: { type: Boolean, default: false },
   isActive: { type: Boolean, default: false },
@@ -81,6 +82,16 @@ defineProps({
 defineEmits(['toggle', 'step-click'])
 
 const { isPremiumUser } = useUserAccount()
+
+const isLessonDone = computed(() => {
+  const l = props.lesson
+  if (!l.isCompleted) return false
+  const hasQuiz = l.quizzes && l.quizzes.length > 0
+  const hasPractice = l.type === 'code' || l.type === 'theory_quiz_practice' || !!l.practice || !!l.practice_instructions
+  if (hasQuiz && !l.quizPassed) return false
+  if (hasPractice && !l.practiceDone) return false
+  return true
+})
 </script>
 
 <style scoped src="../../assets/css/components/workspace/SidebarLessonItem.css"></style>
