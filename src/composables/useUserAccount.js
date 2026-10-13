@@ -74,10 +74,10 @@ export function useUserAccount() {
         email: data.email,
         phone: data.phone || '',
         avatar: (data.avatar_url && !data.avatar_url.includes('dicebear.com')) ? data.avatar_url : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.name || 'User') + '&background=random',
-        level: data.level,
-        xp: data.xp,
-        totalXp: data.total_xp,
-        nextLevelXp: data.next_level_xp,
+        level: Number(data.level) || 1,
+        xp: Number(data.xp) || 0,
+        totalXp: Number(data.total_xp ?? data.xp) || 0,
+        nextLevelXp: Number(data.next_level_xp) || 100,
         streak: data.current_streak,
         longest_streak: data.longest_streak,
         is_admin: data.is_admin || false,
@@ -310,6 +310,43 @@ export function useUserAccount() {
     await refreshStats()
   }
 
+  /**
+   * Optimistic local XP update (untuk Optimistic UI).
+   * Tidak memanggil API - hanya update local reactive state.
+   */
+  const addXpLocal = (amount) => {
+    const numAmount = Number(amount) || 0
+    if (numAmount <= 0) return
+    const curXp = Number(userProfile.value.xp) || 0
+    const curTotalXp = Number(userProfile.value.totalXp ?? curXp) || 0
+    const curNextLevelXp = Number(userProfile.value.nextLevelXp) || 100
+    let curLevel = Number(userProfile.value.level) || 1
+
+    let newXp = curXp + numAmount
+    let newNextLevelXp = curNextLevelXp
+
+    while (newXp >= newNextLevelXp) {
+      newXp -= newNextLevelXp
+      curLevel += 1
+      newNextLevelXp = Math.round(newNextLevelXp * 1.2)
+    }
+
+    userProfile.value.xp = newXp
+    userProfile.value.totalXp = curTotalXp + numAmount
+    userProfile.value.level = curLevel
+    userProfile.value.nextLevelXp = newNextLevelXp
+  }
+
+  /**
+   * Optimistic local Coinz update (untuk Optimistic UI).
+   * Tidak memanggil API - hanya update local reactive state.
+   */
+  const addCoinzLocal = (amount) => {
+    const numAmount = Number(amount) || 0
+    if (numAmount <= 0) return
+    coinz.value = (Number(coinz.value) || 0) + numAmount
+  }
+
   const deductCredit = async (amount = 1) => {
     if (credits.value >= amount) {
       // Optimitic update
@@ -417,6 +454,8 @@ export function useUserAccount() {
     fetchUserStats,
     refreshStats,
     addXp,
+    addXpLocal,
+    addCoinzLocal,
     credits,
     coinz,
     maxCredits,
