@@ -339,6 +339,10 @@ export function useScoring() {
       const xp = response.data?.xp_earned ?? response.data?.data?.xp_earned ?? computeLocalXp(type)
       const explanation = response.data?.explanation || response.data?.data?.explanation
 
+      const results = response.data?.results || response.data?.data?.results
+      const totalQuizzes = response.data?.total_quizzes
+      const correctCount = response.data?.correct_count
+
       // Update XP lokal seketika saat award berhasil (0 delay untuk kuis/teori)
       if (awarded && xp > 0) {
         addXpLocal(xp)
@@ -348,10 +352,28 @@ export function useScoring() {
         }, 1500)
       }
 
-      return { success: true, awarded, xp, explanation }
+      return { 
+        success: true, 
+        awarded, 
+        xp, 
+        explanation, 
+        results, 
+        total_quizzes: totalQuizzes, 
+        correct_count: correctCount,
+        data: response.data 
+      }
     } catch (error) {
       if (error.response?.status === 400) {
-        return { success: false, awarded: false, xp: 0, error: error.response.data?.message || 'Gagal memproses' }
+        return { 
+          success: false, 
+          awarded: false, 
+          xp: 0, 
+          error: error.response.data?.message || 'Gagal memproses',
+          results: error.response.data?.results,
+          total_quizzes: error.response.data?.total_quizzes,
+          correct_count: error.response.data?.correct_count,
+          data: error.response.data
+        }
       }
       return { success: false, awarded: false, xp: 0, error: error.response?.data?.message || 'Terjadi kesalahan sistem.' }
     }
