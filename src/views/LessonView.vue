@@ -501,5 +501,5 @@ watch(currentLesson, (newLesson) => {
 </script>
 
 
-<style src="../assets/css/pages/LessonView.css" scoped></style>
 <style scoped src="../assets/css/views/LessonView.css"></style>
+
