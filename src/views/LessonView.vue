@@ -113,15 +113,18 @@
       :type="toast.type.value"
     />
 
-    <CoinzRewardModal
-      v-model="showCoinzReward"
-      :amount="coinzRewardAmount"
+    <!-- Dedicated iCoinZ Toast Notification -->
+    <CoinzToast
+      :amount="toast.coinz.value"
+      label="Bonus iCoinZ!"
     />
+
+    
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, defineAsyncComponent } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useLearningPaths } from '../composables/useLearningPaths'
@@ -141,7 +144,7 @@ const PracticePanel = defineAsyncComponent(() => import('../components/workspace
 const AuthRequiredModal = defineAsyncComponent(() => import('../components/common/AuthRequiredModal.vue'))
 const PremiumModal = defineAsyncComponent(() => import('../components/common/PremiumModal.vue'))
 import XpToast from '../components/common/XpToast.vue'
-import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
+import CoinzToast from '../components/common/CoinzToast.vue'
 
 // ── Enums ─────────────────────────────────────────────────────────
 const STEP = Object.freeze({ THEORY: 1, QUIZ: 2, PRACTICE: 3 })
@@ -173,7 +176,15 @@ onMounted(async () => {
     await fetchPathDetails(pathId.value)
   }
   isPreparingLesson.value = false
+
+  // Proses pending outbox dari sesi sebelumnya (jika ada)
+  scoring.processPendingFromPreviousSession()
 })
+
+onBeforeUnmount(() => {
+  scoring.flushOutboxNow().catch(() => {})
+})
+
 
 // ── Composables ───────────────────────────────────────────────────
 const { allLessons, currentIndex, isFirstLesson, isLastLesson, goToPrevLesson, goToNextLesson, goToLesson, getNextLesson } =
@@ -191,10 +202,17 @@ const runner = useCodeRunner()
 const scoring = useScoring()
 
 const lessonLanguage = computed(() => {
+  if (currentLesson.value?.language) {
+    return currentLesson.value.language;
+  }
+
+  // Fallback for older lessons that don't have language property
   const pSlug = (path.value?.slug || pathId.value || '').toLowerCase();
   const cSlug = (currentChapter.value?.slug || chapterId.value || '').toLowerCase();
   
   if (pSlug.includes('database') || pSlug.includes('sql')) return 'sql';
+  if (pSlug.includes('python')) return 'python';
+  if (pSlug.includes('php') || pSlug.includes('laravel')) return 'php';
   
   if (pSlug.includes('frontend') || pSlug.includes('web')) {
     if (cSlug.includes('javascript') || cSlug.includes('js') || ['fe4', 'fe5', 'fe6'].includes(cSlug)) return 'javascript';
@@ -208,16 +226,18 @@ const lessonLanguage = computed(() => {
 // ── Toast State ───────────────────────────────────────────────────
 const toast = {
   xp: ref(0),
+  coinz: ref(0),
   label: ref(''),
   type: ref('quiz'),
 }
 
 /** Tampilkan toast XP. Setiap panggilan me-reset amount agar watcher trigger ulang. */
-const showXpToast = (xp, label, type = 'quiz') => {
-  // Reset dulu agar watcher mendeteksi perubahan meski nilainya sama
+const showRewardToast = (xp, label, type = 'quiz', coinz = 0) => {
   toast.xp.value = 0
+  toast.coinz.value = 0
   setTimeout(() => {
     toast.xp.value = xp
+    toast.coinz.value = coinz
     toast.label.value = label
     toast.type.value = type
   }, 50)
@@ -228,8 +248,6 @@ const activeStep = ref(STEP.THEORY)
 const sidebarCollapsed = ref(false)
 const showAuthModal = ref(false)
 const showPremiumModal = ref(false)
-const showCoinzReward = ref(false)
-const coinzRewardAmount = ref(10)
 const pendingStepLabel = ref('Tes Pertanyaan')
 
 // ── Initialise step from query param (preview navigation) ─────────
@@ -309,16 +327,13 @@ const onQuizSubmit = async () => {
   }
   quiz.isChecking.value = true
   
-  // Panggil backend
+  // Quiz TETAP sinkron ke server karena perlu validasi jawaban
   const result = await scoring.awardXp('quiz', currentLesson.value.id, { 
     answer_index: quiz.selectedAnswer.value 
   })
   
   quiz.isChecking.value = false
   quiz.isSubmitted.value = true
-  
-  if (quiz.isChecking) quiz.isChecking.value = false;
-  quiz.isSubmitted.value = true;
   
   // GUNAKAN RESULT.SUCCESS SEBAGAI PENENTU KEBENARAN
   if (result.success) {
@@ -329,7 +344,7 @@ const onQuizSubmit = async () => {
       currentLesson.value.quizzes[0].explanation = result.explanation
     }
     if (result.awarded) {
-      showXpToast(result.xp, 'Quiz Benar!', 'quiz')
+      showRewardToast(result.xp, 'Quiz Benar!', 'quiz', 0)
     }
   } else {
     // Jawaban Salah (Backend mengembalikan 400 Error)
@@ -339,6 +354,7 @@ const onQuizSubmit = async () => {
     }
   }
 }
+
 
 const onRequestNextFromTheory = async () => {
   if (!isLoggedIn.value) {
@@ -350,7 +366,11 @@ const onRequestNextFromTheory = async () => {
     currentLesson.value.isCompleted = true
     localStorage.setItem(`theory_completed_${currentLesson.value.id}`, 'true')
     // Beritahu backend (berjalan di background, tidak memblokir UI)
-    scoring.awardXp('theory', currentLesson.value.id).catch(console.error)
+    scoring.awardXp('theory', currentLesson.value.id).then(res => {
+      if (res && res.awarded && res.xp > 0) {
+        showRewardToast(res.xp, 'Materi Selesai!', 'theory', 0)
+      }
+    }).catch(console.error)
   }
   activeStep.value = STEP.QUIZ
 }
@@ -372,7 +392,7 @@ const onRequestNextFromQuiz = async () => {
 /** Jalankan kode practice dan beri XP jika berhasil tanpa error. */
 const onPracticeRun = async () => {
   runner.status.value = 'idle'
-  runner.run(lessonLanguage.value)
+  await runner.run(lessonLanguage.value, currentLesson.value)
 
   const hasError = runner.output.value.some(e => e.type === 'error')
   
@@ -380,27 +400,40 @@ const onPracticeRun = async () => {
     runner.status.value = 'error'
   } else {
     // Validasi kesesuaian output
-    const isMatch = checkOutputMatch(lessonLanguage.value, currentLesson.value?.practice, runner.output.value, runner.code.value);
+    const isMatch = await checkOutputMatch(lessonLanguage.value, currentLesson.value?.practice, runner.output.value, runner.code.value, currentLesson.value);
     
     if (isMatch) {
       runner.status.value = 'success'
       if (currentLesson.value) {
+        // Cegah double-award secara lokal
+        if (scoring.hasBeenScored('practice', currentLesson.value.id)) return
+
         currentLesson.value.practiceDone = true
+
+        // Hitung nilai XP secara lokal untuk informasi chapter/difficulty
+        const chapterOrder = currentLesson.value.chapter?.sort_order
+          ?? currentLesson.value.chapterOrder
+          ?? 1
+        const difficulty = currentLesson.value.difficulty || ''
+
+        // ① OPTIMISTIC: Update UI instan tanpa menunggu API
+        const { xp, coinz } = scoring.awardXpOptimistic('practice', currentLesson.value.id, {
+          difficulty,
+          chapterOrder,
+          awardCoinz: true
+        })
+
+        // ② Tampilkan TOAST segera (XP & iCoinZ langsung muncul instan di Toast, 0 delay, no blocking popup!)
+        showRewardToast(xp, 'Praktik Berhasil!', 'practice', coinz)
+
+        // ③ BACKGROUND SYNC: Kirim ke server dengan delay 3 detik
         const extraData = {
           saved_code: runner.code.value,
           code: runner.code.value
         }
-        if (route.query.mode) {
-          extraData.mode = route.query.mode
-        }
-        const result = await scoring.awardXp('practice', currentLesson.value.id, extraData)
-        if (result.awarded) {
-          showXpToast(result.xp, 'Praktik Berhasil!', 'practice')
-          setTimeout(() => {
-            showCoinzReward.value = true
-            coinzRewardAmount.value = 10
-          }, 1500)
-        }
+        if (route.query.mode) extraData.mode = route.query.mode
+
+        scoring.enqueueSyncToServer('practice', currentLesson.value.id, extraData, xp, coinz)
       }
     } else {
       runner.status.value = 'warning'
@@ -408,11 +441,15 @@ const onPracticeRun = async () => {
   }
 }
 
+
 /** Selesai & Lanjut dari practice. */
 const onPracticeFinish = async () => {
   if (currentLesson.value) {
     currentLesson.value.practiceDone = true
   }
+
+  // Segera kirim outbox yang tertunda saat user lanjut tanpa menunggu 3 detik
+  scoring.flushOutboxNow().catch(() => {})
 
   const next = getNextLesson()
   if (next && next.is_premium && !isPremiumUser.value) {
@@ -464,8 +501,5 @@ watch(currentLesson, (newLesson) => {
 </script>
 
 
-<style src="../assets/css/pages/LessonView.css" scoped></style>
 <style scoped src="../assets/css/views/LessonView.css"></style>
-t o u c h 
- 
- 
+

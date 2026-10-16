@@ -9,7 +9,11 @@
       <!-- Quiz questions -->
       <div v-if="hasQuestions" class="quiz-container">
         <div v-for="(question, qIndex) in quiz" :key="qIndex" class="question-card">
-          <p class="question-text">{{ question.question }}</p>
+          <div class="question-header-pill">
+            <span class="q-badge"><i class="fa-solid fa-circle-question"></i> Soal Pemahaman {{ quiz.length > 1 ? `#${qIndex + 1}` : '' }}</span>
+          </div>
+
+          <div class="question-text" v-html="formatQuizText(question.question)"></div>
 
           <div class="options-list">
             <button
@@ -21,16 +25,19 @@
               @click="$emit('update:selectedAnswer', optIndex)"
             >
               <span class="option-letter">{{ String.fromCharCode(65 + optIndex) }}</span>
-              <span style="flex: 1;">{{ option }}</span>
-              <i v-if="isSubmitted && selectedAnswer === optIndex && !isCorrect" class="fa-solid fa-times-circle" style="color: #ef4444; font-size: 1.2rem;"></i>
-              <i v-if="isSubmitted && isCorrect && selectedAnswer === optIndex" class="fa-solid fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>
+              <span class="option-label" v-html="formatQuizText(option)"></span>
+              <i v-if="isSubmitted && selectedAnswer === optIndex && !isCorrect" class="fa-solid fa-circle-xmark status-icon wrong-icon"></i>
+              <i v-if="isSubmitted && isCorrect && selectedAnswer === optIndex" class="fa-solid fa-circle-check status-icon correct-icon"></i>
             </button>
           </div>
 
           <!-- Feedback after submit -->
           <div v-if="isSubmitted && (question.explanation || (!isCorrect && errorMessage))" class="feedback" :class="isCorrect ? 'correct' : 'wrong'">
-            <i :class="isCorrect ? 'fa-solid fa-check-circle' : 'fa-solid fa-times-circle'"></i>
-            {{ isCorrect ? question.explanation : errorMessage }}
+            <i :class="isCorrect ? 'fa-solid fa-circle-check' : 'fa-solid fa-triangle-exclamation'"></i>
+            <div class="feedback-body">
+              <strong class="feedback-title">{{ isCorrect ? 'Jawaban Benar!' : 'Jawaban Belum Tepat' }}</strong>
+              <p class="feedback-text">{{ isCorrect ? question.explanation : errorMessage }}</p>
+            </div>
           </div>
 
           <div v-if="hintText" class="hint-display-inline" style="margin: 15px 0 0 0;">
@@ -54,7 +61,7 @@
         </button>
         
         <HintButton 
-          v-if="!isCorrect && !hintText && hasQuestions" 
+          v-if="!isCorrect && !hintText && hasQuestions && hasHint" 
           :isLoading="isHintLoading"
           @click="openHint" 
         />
@@ -116,6 +123,16 @@ const props = defineProps({
 defineEmits(['back', 'submit', 'retry', 'next', 'update:selectedAnswer'])
 
 const hasQuestions = computed(() => props.quiz && props.quiz.length > 0)
+const hasHint = computed(() => props.quiz && props.quiz[0] && props.quiz[0].has_hint)
+
+const formatQuizText = (text) => {
+  if (!text) return ''
+  try {
+    return marked.parseInline(String(text))
+  } catch (e) {
+    return String(text)
+  }
+}
 
 const getOptionClass = (optIndex, correctIndex) => {
   // Karena backend tidak mengirimkan jawaban benar secara langsung (anti-cheat),

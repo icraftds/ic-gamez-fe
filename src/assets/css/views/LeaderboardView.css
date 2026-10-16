@@ -1,4 +1,47 @@
+/* ==========================================================================
+   Leaderboard View Styles (Standalone Page: /leaderboard)
+   ========================================================================== */
+
 .leaderboard-view {
   min-height: 100vh;
+  position: relative;
   padding-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 30px auto 0;
+  padding: 0 24px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+/* Tablet & Mobile Breakpoints */
+@media (max-width: 1024px) {
+  .leaderboard-container {
+    padding: 0 20px;
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .leaderboard-view {
+    padding-bottom: 60px;
+  }
+  
+  .leaderboard-container {
+    margin-top: 16px;
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaderboard-container {
+    margin-top: 12px;
+    padding: 0 12px;
+  }
 }

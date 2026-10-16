@@ -1,5 +1,6 @@
 <template>
   <div class="learning-path-card" :style="cardStyle">
+    <div class="card-ambient-glow" :style="ambientGlowStyle"></div>
     <div class="card-inner">
       <div class="card-content-left">
         <div class="card-header">
@@ -11,17 +12,24 @@
               border: `1px solid ${themeColor}40`,
             }"
           >
-            <i :class="path.icon"></i>
+            <i :class="path.icon || 'fa-solid fa-code'"></i>
           </div>
-          <span class="path-title" :style="{ color: themeColor }">
-            {{ path.title }}
-            <i
-              v-if="path.isPremium"
-              class="fa-solid"
-              :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'"
-              style="margin-left: 5px"
-            ></i>
-          </span>
+          <div class="header-labels">
+            <div class="path-title-row">
+              <span class="path-title" :style="{ color: themeColor }">
+                {{ path.title }}
+              </span>
+              <span v-if="isPremium" class="badge-tier tier-pro">
+                <i class="fa-solid fa-crown"></i> PRO
+              </span>
+              <span v-else class="badge-tier tier-free">
+                <i class="fa-solid fa-gift"></i> GRATIS
+              </span>
+            </div>
+            <span class="path-step-indicator" v-if="total > 0">
+              Alur {{ index + 1 }} dari {{ total }}
+            </span>
+          </div>
         </div>
 
         <h3 class="headline">
@@ -39,7 +47,7 @@
           class="btn-start"
           :style="{
             backgroundColor: themeColor,
-            boxShadow: `0 4px 20px ${themeColor}30`,
+            boxShadow: `0 4px 22px ${themeColor}35`,
           }"
         >
           <span v-if="!isPreparingLesson">Mulai Belajar</span>
@@ -64,15 +72,14 @@
                 class="feature-icon"
                 :style="{
                   color: themeColor,
-                  backgroundColor: themeColor + '10',
+                  backgroundColor: themeColor + '12',
                 }"
               >
                 <i class="fa-solid fa-book-open"></i>
               </div>
               <div class="feature-text">
                 <strong
-                  >{{ path.chapters ? path.chapters.length : 0 }} Modul
-                  Terstruktur</strong
+                  >{{ chapterCount }} Modul Terstruktur</strong
                 >
                 <span>Materi disusun step-by-step.</span>
               </div>
@@ -82,7 +89,7 @@
                 class="feature-icon"
                 :style="{
                   color: themeColor,
-                  backgroundColor: themeColor + '10',
+                  backgroundColor: themeColor + '12',
                 }"
               >
                 <i class="fa-solid fa-laptop-code"></i>
@@ -97,7 +104,7 @@
                 class="feature-icon"
                 :style="{
                   color: themeColor,
-                  backgroundColor: themeColor + '10',
+                  backgroundColor: themeColor + '12',
                 }"
               >
                 <i class="fa-solid fa-robot"></i>
@@ -129,22 +136,32 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  total: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const router = useRouter();
 const { fetchPathDetails, isPreparingLesson } = useLearningPaths();
 const { isPremiumUser } = useUserAccount();
 
-// Calculate sticky top offset
-const cardStyle = computed(() => {
-  // Base offset to clear navbar comfortably
-  const baseOffset = 130;
-  // Overlap spacing allows the header of the previous card to peek out
-  const overlapSpacing = 50;
+const isPremium = computed(() => {
+  return Boolean(props.path.is_premium || props.path.isPremium);
+});
 
+const chapterCount = computed(() => {
+  if (props.path.chapters && props.path.chapters.length > 0) {
+    return props.path.chapters.length;
+  }
+  return 4;
+});
+
+// Z-index scales smoothly so cards land on top of previous cards without offset drifting
+const cardStyle = computed(() => {
   return {
-    top: `${baseOffset + props.index * overlapSpacing}px`,
-    zIndex: props.index + 10,
+    zIndex: props.index + 5,
+    '--card-theme': themeColor.value,
   };
 });
 
@@ -156,6 +173,12 @@ const themeColor = computed(() => {
     "#10b981", // Emerald Green
   ];
   return colors[props.index % colors.length];
+});
+
+const ambientGlowStyle = computed(() => {
+  return {
+    background: `radial-gradient(circle at 85% 20%, ${themeColor.value}18 0%, transparent 60%)`,
+  };
 });
 
 const startLearning = async () => {

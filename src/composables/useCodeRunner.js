@@ -1,10 +1,11 @@
 /**
- * Composable untuk menjalankan kode JavaScript pengguna
- * di dalam sandbox yang aman (tanpa akses ke DOM/window).
+ * Composable untuk mengelola state editor, persistence, dan eksekusi kode pengguna.
+ * Menerapkan Clean Code & Strategy Pattern melalui modul runners terpisah.
  */
 import { ref, watch } from 'vue'
+import { executeCode } from '../utils/runners'
 
-/** @typedef {{ type: 'log' | 'error' | 'warn', text: string }} ConsoleEntry */
+/** @typedef {{ type: 'log' | 'error' | 'warn' | 'table', text?: string, data?: any, columns?: any }} ConsoleEntry */
 
 export function useCodeRunner() {
   /** @type {import('vue').Ref<string>} */
@@ -13,53 +14,21 @@ export function useCodeRunner() {
   /** @type {import('vue').Ref<ConsoleEntry[]>} */
   const output = ref([])
 
+  const status = ref('idle')
+  const currentLessonId = ref(null)
+
   /**
-   * Membuat objek console tiruan yang menangkap semua log
-   * ke dalam array `entries`, tanpa mengekspos console asli.
-   * @param {ConsoleEntry[]} entries
+   * Jalankan `code.value` berdasarkan bahasa yang dipilih melalui runner engine terisolasi.
+   * @param {string} language - 'javascript', 'html', 'css', 'sql', 'python', 'php'
+   * @param {object|null} context - Objek materi aktif
    */
-  const createSandboxConsole = (entries) => ({
-    log: (...args) =>
-      entries.push({ type: 'log', text: args.map(String).join(' ') }),
-    error: (...args) =>
-      entries.push({ type: 'error', text: args.map(String).join(' ') }),
-    warn: (...args) =>
-      entries.push({ type: 'warn', text: '⚠ ' + args.map(String).join(' ') }),
-  })
-
-  /** 
-   * Jalankan `code.value` berdasarkan bahasa yang dipilih.
-   * @param {string} language - 'javascript', 'html', atau 'sql'
-   */
-  const run = (language = 'javascript') => {
-    const entries = []
+  const run = async (language = 'javascript', context = null) => {
     try {
-      if (language === 'html' || language === 'css') {
-        // Untuk HTML/CSS, kembalikan sinyal sukses agar xp bisa didapat dan UI bisa mere-render preview
-        output.value = [{ type: 'log', text: 'Render HTML berhasil. Periksa tab Preview!' }]
-        return
-      }
-
-      if (language === 'sql') {
-        // Mock eksekusi SQL
-        output.value = [{ type: 'log', text: 'Query SQL berhasil dieksekusi secara simulasi.' }]
-        return
-      }
-
-      // Default: JavaScript execution via sandboxed Function
-      const fn = new Function('console', code.value)
-      fn(createSandboxConsole(entries))
-
-      output.value = entries.length > 0
-        ? entries
-        : [{ type: 'log', text: '(Tidak ada output)' }]
+      output.value = await executeCode(language, code.value, context)
     } catch (error) {
       output.value = [{ type: 'error', text: error.message }]
     }
   }
-
-  const status = ref('idle')
-  const currentLessonId = ref(null)
 
   const saveToStorage = () => {
     if (!currentLessonId.value) return
@@ -73,18 +42,31 @@ export function useCodeRunner() {
 
   const loadFromStorage = (lessonId, initialCode = null) => {
     currentLessonId.value = lessonId
+    let parsedInitialCode = initialCode
+    if (initialCode) {
+      try {
+        const json = JSON.parse(initialCode)
+        parsedInitialCode = json.initial_code || json.initial_query || initialCode
+      } catch (e) {}
+    }
+
     const dataStr = localStorage.getItem(`practice_state_${lessonId}`)
     if (dataStr) {
       try {
         const data = JSON.parse(dataStr)
-        code.value = data.code || initialCode || '// Ketik kode Anda di sini\n'
+        let savedCode = data.code
+        // Deteksi bug lama: jika savedCode adalah raw JSON materi, abaikan!
+        if (savedCode && (savedCode.trim().startsWith('{"title":') || savedCode.trim().startsWith('{"instruction":') || savedCode === initialCode)) {
+          savedCode = null
+        }
+        code.value = savedCode || parsedInitialCode || '// Ketik kode Anda di sini\n'
         output.value = data.output || []
         status.value = data.status || 'idle'
       } catch (e) {
-        resetCode(initialCode)
+        resetCode(parsedInitialCode)
       }
     } else {
-      resetCode(initialCode)
+      resetCode(parsedInitialCode)
     }
   }
 
@@ -99,7 +81,14 @@ export function useCodeRunner() {
   }
 
   const resetCode = (initialCode = null) => {
-    code.value = initialCode || '// Ketik kode Anda di sini\n'
+    let parsedInitialCode = initialCode
+    if (initialCode) {
+      try {
+        const json = JSON.parse(initialCode)
+        parsedInitialCode = json.initial_code || json.initial_query || initialCode
+      } catch (e) {}
+    }
+    code.value = parsedInitialCode || '// Ketik kode Anda di sini\n'
     output.value = []
     status.value = 'idle'
   }

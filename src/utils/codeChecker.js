@@ -1,12 +1,35 @@
+import { runValidation } from './validators/index';
+
 /**
  * Memeriksa apakah output dari code runner sesuai dengan harapan dari soal praktik.
  * @param {string} lessonLanguage - Bahasa pemrograman (html, css, javascript, dll)
  * @param {string} lessonPractice - Template kode praktik yang berisi komentar harapan/output
  * @param {Array} runnerOutputArray - Array output dari code runner
  * @param {string} currentCode - Kode yang ditulis oleh pengguna saat ini
+ * @param {Object} lesson - Objek lesson secara utuh (untuk mendapatkan validation_type dan test_cases)
  * @returns {boolean} - True jika output sesuai harapan, False jika tidak
  */
-export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArray, currentCode) => {
+export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOutputArray, currentCode, lesson = null) => {
+  // Parsing initial code dari JSON jika format baru
+  let initialCodeForCheck = lessonPractice;
+  if (lessonPractice) {
+    try {
+      const json = JSON.parse(lessonPractice);
+      initialCodeForCheck = json.initial_code || json.initial_query || lessonPractice;
+    } catch (e) {}
+  }
+
+  // Anti-cheat Universal: Jika kode sama persis dengan template (belum ada perubahan)
+  if (initialCodeForCheck && currentCode.trim() === initialCodeForCheck.trim()) {
+    return false;
+  }
+
+  // 1. CEK DUKUNGAN VALIDATOR BARU (VERSI 2 PRD)
+  if (lesson && lesson.validation_type && lesson.test_cases && lesson.test_cases.length > 0) {
+    return await runValidation(lesson.validation_type, lesson.test_cases, runnerOutputArray, currentCode, lesson);
+  }
+
+  // 2. LOGIKA LEGACY (VERSI LAMA JAVASCRIPT)
   // Cegah submit kosong
   if (!currentCode || currentCode.trim() === '') {
     return false;
@@ -22,12 +45,15 @@ export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArr
     if (codeWithoutComments.includes('___')) return false;
   }
 
-  // Anti-cheat: Jika kode sama persis dengan template (belum ada perubahan)
-  if (lessonPractice && currentCode.trim() === lessonPractice.trim()) {
-    return false;
-  }
+  // Anti-cheat (sekarang ditangani di awal fungsi)
+  // ... dihapus karena sudah di atas ...
 
-  if (['html', 'css', 'sql'].includes(lessonLanguage)) return true;
+  if (['html', 'css'].includes(lessonLanguage)) return true;
+  if (lessonLanguage === 'sql') {
+    const hasError = runnerOutputArray.some(e => e.type === 'error');
+    const hasTableOrLog = runnerOutputArray.some(e => e.type === 'table' || e.type === 'log');
+    return !hasError && hasTableOrLog;
+  }
   if (!lessonPractice) return true;
   
   const lines = lessonPractice.split('\n');
@@ -65,3 +91,4 @@ export const checkOutputMatch = (lessonLanguage, lessonPractice, runnerOutputArr
   
   return looseActual.includes(looseExpected) || looseExpected.includes(looseActual);
 }
+
