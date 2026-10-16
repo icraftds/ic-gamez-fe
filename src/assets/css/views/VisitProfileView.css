@@ -43,16 +43,39 @@
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 1.5rem;
   width: 100%;
+  align-items: stretch;
   box-sizing: border-box;
 }
 
 .dash-main-col, .dash-side-col {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
   min-width: 0;
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
+}
+
+.dash-main-col {
+  position: relative;
+}
+
+.dashboard-hero {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 0 !important;
+  box-sizing: border-box;
+}
+
+.dashboard-hero .hero-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 25px;
 }
 
 @media (max-width: 1024px) {
@@ -63,18 +86,61 @@
 
 .vp-header-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
-  flex-wrap: wrap;
   gap: 15px;
+}
+
+.vp-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.vp-add-friend-hero {
+  padding: 8px 18px !important;
+  border-radius: 20px !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.2);
+}
+
+.vp-friend-badge {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  color: #10b981 !important;
+  cursor: default !important;
+  padding: 8px 16px !important;
+  border-radius: 20px !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vp-self-badge {
+  opacity: 0.75 !important;
+  cursor: default !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #cbd5e1 !important;
+  padding: 8px 16px !important;
+  border-radius: 20px !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 @media (max-width: 768px) {
   .vp-header-row {
     flex-direction: column;
-    justify-content: center;
-    text-align: center;
+    align-items: flex-start;
+    gap: 12px;
   }
 }
 
@@ -232,5 +298,239 @@
   .vp-back-btn, .vp-add-friend-top {
     padding: 8px 16px !important;
     font-size: 0.85rem !important;
+  }
+}
+
+/* ==========================================================================
+   Leaderboard Card & Section Pencapaian (Visit Profile)
+   ========================================================================== */
+
+.vp-leaderboard-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 30px;
+  border-radius: 20px;
+  box-sizing: border-box;
+}
+
+.vp-card-header {
+  margin-bottom: 16px;
+}
+
+.vp-card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vp-trophy-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0ea5e9;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.section-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 3px 0 0;
+}
+
+/* 1 baris 2 kolom horizontal */
+.vp-rank-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: auto 0;
+}
+
+.vp-rank-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 16px 14px;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.vp-rank-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(14, 165, 233, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vp-rank-card.highlight-rank:hover {
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.vp-rank-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.vp-rank-value-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 48px;
+  justify-content: center;
+}
+
+.vp-rank-number {
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.vp-rank-empty {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.text-cyan {
+  color: #38bdf8;
+}
+
+.text-amber {
+  color: #f59e0b;
+}
+
+.vp-rank-xp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 3px 8px;
+  border-radius: 14px;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.vp-leaderboard-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #38bdf8;
+  background: rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  transition: all 0.2s ease;
+  margin-top: 16px;
+}
+
+.vp-leaderboard-link:hover {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Pencapaian Section */
+.vp-achievements-section {
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 1.5rem;
+  box-sizing: border-box;
+}
+
+.badges-grid-full {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.badge-item-full {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding: 14px 18px;
+  transition: all 0.25s ease;
+}
+
+.badge-item-full:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.badge-item-icon-box {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.badge-item-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-item-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 1024px) {
+  .badges-grid-full {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .badges-grid-full {
+    grid-template-columns: 1fr;
   }
 }

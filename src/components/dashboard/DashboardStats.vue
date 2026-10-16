@@ -155,6 +155,7 @@
             <span class="gh-rank-period">BULAN INI</span>
             <span class="gh-rank-number" v-if="activeStats.rank.this_month">#{{ activeStats.rank.this_month }}</span>
             <p class="gh-rank-empty" v-else>Belum ada XP bulan ini</p>
+            <span class="gh-rank-xp" v-if="activeStats.xp?.this_month !== undefined || activeStats.rank?.this_month_xp !== undefined">{{ activeStats.xp?.this_month ?? activeStats.rank?.this_month_xp ?? 0 }} XP</span>
           </div>
           <div class="gh-rank-card">
             <span class="gh-rank-period">SEPANJANG MASA</span>

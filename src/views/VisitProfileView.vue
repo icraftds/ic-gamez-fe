@@ -9,24 +9,6 @@
             <button class="vp-back-btn" @click="$router.back()">
               <i class="fa-solid fa-arrow-left"></i> Kembali
             </button>
-            
-            <template v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend">
-              <button v-if="hasIncomingRequest" @click="handleAcceptFriend" class="add-friend-btn vp-add-friend-top" :disabled="isAddingFriend">
-                <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
-                <i v-else class="fa-solid fa-check"></i>
-                <span class="btn-text">Terima Pertemanan</span>
-              </button>
-              <button v-else @click="handleAddFriend" class="add-friend-btn vp-add-friend-top" :disabled="isAddingFriend || isPendingFriend">
-                <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
-                <i v-else-if="isPendingFriend" class="fa-solid fa-clock"></i>
-                <i v-else class="fa-solid fa-user-plus"></i>
-                <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
-              </button>
-            </template>
-            <button v-else-if="loggedInUser && loggedInUser.id === userProfile.id" disabled class="add-friend-btn vp-add-friend-top" style="opacity: 0.6; cursor: not-allowed; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #ccc;">
-              <i class="fa-solid fa-user"></i>
-              <span class="btn-text">Profil Anda</span>
-            </button>
           </div>
           
           <div class="dashboard-hero" style="margin-bottom: 0;">
@@ -44,12 +26,37 @@
                 </div>
                 <div class="user-details" style="position: relative; width: 100%;">
                   <div class="vp-header-row">
-                    <h1 class="greeting-text" style="margin: 0; display: flex; flex-direction: column; gap: 5px;">
+                    <h1 class="greeting-text" style="margin: 0; display: flex; flex-direction: column; gap: 4px;">
                       <span class="highlight-name">{{ userProfile.username ? userProfile.username + '#' + userProfile.tag_id : userProfile.name }}</span>
-                      <span class="user-tag" style="font-size: 1rem; color: #94a3b8; font-weight: 500;">
+                      <span class="user-tag" style="font-size: 0.95rem; color: #94a3b8; font-weight: 500;">
                         {{ userProfile.username ? userProfile.name : '@' + (userProfile.slug || userProfile.id) }}
                       </span>
                     </h1>
+
+                    <!-- Tombol Add Friend sejajar dengan username di pojok kanan atas -->
+                    <div class="vp-hero-actions">
+                      <template v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend">
+                        <button v-if="hasIncomingRequest" @click="handleAcceptFriend" class="add-friend-btn vp-add-friend-hero" :disabled="isAddingFriend">
+                          <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
+                          <i v-else class="fa-solid fa-check"></i>
+                          <span class="btn-text">Terima Pertemanan</span>
+                        </button>
+                        <button v-else @click="handleAddFriend" class="add-friend-btn vp-add-friend-hero" :disabled="isAddingFriend || isPendingFriend">
+                          <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
+                          <i v-else-if="isPendingFriend" class="fa-solid fa-clock"></i>
+                          <i v-else class="fa-solid fa-user-plus"></i>
+                          <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
+                        </button>
+                      </template>
+                      <div v-else-if="loggedInUser && loggedInUser.id !== userProfile.id && isAlreadyFriend" class="add-friend-btn vp-add-friend-hero vp-friend-badge">
+                        <i class="fa-solid fa-user-check"></i>
+                        <span class="btn-text">Berteman</span>
+                      </div>
+                      <div v-else-if="loggedInUser && loggedInUser.id === userProfile.id" class="add-friend-btn vp-add-friend-hero vp-self-badge">
+                        <i class="fa-solid fa-user"></i>
+                        <span class="btn-text">Profil Anda</span>
+                      </div>
+                    </div>
                   </div>
                   <p class="motivational-text">Pemain aktif di iC GameZ</p>
                   
@@ -101,35 +108,101 @@
           </div>
         </div>
 
-        <!-- SIDE COLUMN: PENCAPAIAN -->
+        <!-- SIDE COLUMN: PERINGKAT LEADERBOARD -->
         <div class="dash-side-col">
-          <div class="badge-collection-wrapper">
-            <div class="section-card">
-              <div class="card-header-with-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                <h2 class="section-title" style="margin: 0;">Pencapaian</h2>
-                <div class="showcase-tabs" style="display: flex; gap: 4px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                  <button :class="{ active: activeTab === 'medali' }" @click="activeTab = 'medali'" class="tab-btn">Medali</button>
-                  <button :class="{ active: activeTab === 'piala' }" @click="activeTab = 'piala'" class="tab-btn">Piala</button>
-                  <button :class="{ active: activeTab === 'sertifikat' }" @click="activeTab = 'sertifikat'" class="tab-btn">Sertifikat</button>
+          <div class="section-card vp-leaderboard-card">
+            <div class="vp-card-header">
+              <div class="vp-card-title-wrap">
+                <div class="vp-trophy-badge">
+                  <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                  <h2 class="section-title">Peringkat Leaderboard</h2>
+                  <p class="section-desc">Papan peringkat global iC GameZ</p>
                 </div>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <span style="font-size: 0.85rem; color: #94a3b8;">{{ hasSavedShowcase ? 'Pencapaian pilihan' : 'Menampilkan pencapaian tertinggi' }}</span>
+            </div>
+
+            <div class="vp-rank-grid" v-if="stats?.rank">
+              <div class="vp-rank-card">
+                <div class="vp-rank-label">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  <span>BULAN INI</span>
+                </div>
+                <div class="vp-rank-value-box">
+                  <span class="vp-rank-number text-cyan" v-if="stats.rank.this_month">#{{ stats.rank.this_month }}</span>
+                  <p class="vp-rank-empty" v-else>Belum ada XP bulan ini</p>
+                  <span class="vp-rank-xp-pill" v-if="stats.xp?.this_month !== undefined || stats.rank?.this_month_xp !== undefined">
+                    <CyberXp style="width: 13px; height: 13px; display: inline-block; vertical-align: middle;" />
+                    {{ stats.xp?.this_month ?? stats.rank?.this_month_xp ?? 0 }} XP
+                  </span>
+                </div>
               </div>
 
-              <div class="badges-empty" v-if="displayBadges.length === 0">
-                <i class="fa-solid fa-medal" style="font-size: 2rem; color: #475569; margin-bottom: 10px;"></i>
-                <p><strong>Belum Ada Pencapaian</strong></p>
-              </div>
-              
-              <div class="badges-grid" v-else style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
-                <div class="badge-item" v-for="item in displayBadges" :key="item.id" style="display: flex; flex-direction: row; align-items: center; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                  <div style="width: 50px; height: 50px; margin-right: 15px; display: flex; justify-content: center; align-items: center; flex-shrink: 0;">
-                    <CyberMedal v-if="activeTab !== 'sertifikat'" :tierId="item.tierId" :isLocked="false" :iconType="item.iconType" style="width: 100%; height: 100%;" />
-                    <i v-else :class="item.iconType" style="font-size: 2.5rem; color: #f59e0b;"></i>
-                  </div>
-                  <span style="font-size: 0.9rem; color: #e2e8f0; font-weight: 500;">{{ item.name }}</span>
+              <div class="vp-rank-card highlight-rank">
+                <div class="vp-rank-label">
+                  <i class="fa-solid fa-crown text-amber"></i>
+                  <span>SEPANJANG MASA</span>
                 </div>
+                <div class="vp-rank-value-box">
+                  <span class="vp-rank-number text-amber" v-if="stats.rank.all_time">#{{ stats.rank.all_time }}</span>
+                  <p class="vp-rank-empty" v-else>-</p>
+                  <span class="vp-rank-xp-pill" v-if="stats.xp?.total || userProfile?.xp">
+                    <CyberXp style="width: 13px; height: 13px; display: inline-block; vertical-align: middle;" />
+                    {{ stats.xp?.total || userProfile?.xp }} XP
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="badges-empty" v-else>
+              <i class="fa-solid fa-ranking-star" style="font-size: 2rem; color: #475569; margin-bottom: 10px;"></i>
+              <p><strong>Belum Ada Data Peringkat</strong></p>
+            </div>
+
+            <router-link to="/leaderboard" class="vp-leaderboard-link">
+              <span>Lihat Leaderboard Lengkap</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION PENCAPAIAN (DIBAWAH CARD GREETING & LEADERBOARD) -->
+      <div class="vp-achievements-section">
+        <div class="section-card">
+          <div class="card-header-with-tabs" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="vp-trophy-badge" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.3); color: #f59e0b;">
+                <i class="fa-solid fa-medal"></i>
+              </div>
+              <div>
+                <h2 class="section-title" style="margin: 0;">Pencapaian</h2>
+                <span style="font-size: 0.85rem; color: #94a3b8;">{{ hasSavedShowcase ? 'Pencapaian pilihan' : 'Menampilkan pencapaian tertinggi' }}</span>
+              </div>
+            </div>
+
+            <div class="showcase-tabs" style="display: flex; gap: 4px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+              <button :class="{ active: activeTab === 'medali' }" @click="activeTab = 'medali'" class="tab-btn">Medali</button>
+              <button :class="{ active: activeTab === 'piala' }" @click="activeTab = 'piala'" class="tab-btn">Piala</button>
+              <button :class="{ active: activeTab === 'sertifikat' }" @click="activeTab = 'sertifikat'" class="tab-btn">Sertifikat</button>
+            </div>
+          </div>
+
+          <div class="badges-empty" v-if="displayBadges.length === 0">
+            <i class="fa-solid fa-medal" style="font-size: 2rem; color: #475569; margin-bottom: 10px;"></i>
+            <p><strong>Belum Ada Pencapaian</strong></p>
+          </div>
+          
+          <div class="badges-grid-full" v-else>
+            <div class="badge-item-full" v-for="item in displayBadges" :key="item.id">
+              <div class="badge-item-icon-box">
+                <CyberMedal v-if="activeTab !== 'sertifikat'" :tierId="item.tierId" :isLocked="false" :iconType="item.iconType" style="width: 100%; height: 100%;" />
+                <i v-else :class="item.iconType" style="font-size: 2.2rem; color: #f59e0b;"></i>
+              </div>
+              <div class="badge-item-text">
+                <span class="badge-item-name">{{ item.name }}</span>
+                <span class="badge-item-desc">{{ activeTab === 'medali' ? 'Lencana Medali' : (activeTab === 'piala' ? 'Trofi Kejuaraan' : 'Sertifikat Resmi') }}</span>
               </div>
             </div>
           </div>
@@ -144,6 +217,7 @@
           :heatmapData="heatmapData"
           :isLoading="isLoading"
           :showTopStats="false"
+          :showLeaderboard="false"
         />
       </div>
     </div>
