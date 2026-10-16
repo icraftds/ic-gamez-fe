@@ -46,11 +46,16 @@
             :lesson="currentLesson"
             :quiz="currentLesson.quizzes"
             :selected-answer="quiz.selectedAnswer.value"
+            :selected-answers="quiz.selectedAnswers.value"
+            :current-quiz-index="quiz.currentQuizIndex.value"
+            :quiz-results="quiz.quizResults.value"
             :is-submitted="quiz.isSubmitted.value"
             :is-correct="quiz.isCorrect.value"
             :is-checking="quiz.isChecking.value"
             :error-message="quiz.errorMessage.value"
             @update:selected-answer="quiz.selectedAnswer.value = $event"
+            @update:selected-answers="quiz.setAnswer($event.quizId, $event.optionIndex)"
+            @update:current-quiz-index="quiz.goToQuiz($event)"
             @submit="onQuizSubmit"
             @retry="quiz.reset()"
             @back="activeStep = STEP.THEORY"
@@ -326,28 +331,36 @@ const onQuizSubmit = async () => {
     return
   }
   quiz.isChecking.value = true
+  quiz.errorMessage.value = ''
   
+  // Siapkan payload yang mendukung single-quiz dan multi-quiz
+  const payload = quiz.getPayload(currentLesson.value?.quizzes || [])
+
   // Quiz TETAP sinkron ke server karena perlu validasi jawaban
-  const result = await scoring.awardXp('quiz', currentLesson.value.id, { 
-    answer_index: quiz.selectedAnswer.value 
-  })
+  const result = await scoring.awardXp('quiz', currentLesson.value.id, payload)
   
   quiz.isChecking.value = false
   quiz.isSubmitted.value = true
   
+  // Simpan hasil evaluasi per soal jika tersedia dari backend
+  if (result.results) {
+    quiz.setResults(result.results)
+  }
+
   // GUNAKAN RESULT.SUCCESS SEBAGAI PENENTU KEBENARAN
   if (result.success) {
-    // Jawaban Benar (Backend mengembalikan 200 OK)
+    // Semua Jawaban Benar (Backend mengembalikan 200 OK)
     quiz.isCorrect.value = true
     if (currentLesson.value) currentLesson.value.quizPassed = true
     if (result.explanation && currentLesson.value.quizzes?.[0]) {
       currentLesson.value.quizzes[0].explanation = result.explanation
     }
     if (result.awarded) {
-      showRewardToast(result.xp, 'Quiz Benar!', 'quiz', 0)
+      const rewardLabel = (currentLesson.value.quizzes?.length > 1) ? 'Semua Kuis Benar!' : 'Quiz Benar!'
+      showRewardToast(result.xp, rewardLabel, 'quiz', 0)
     }
   } else {
-    // Jawaban Salah (Backend mengembalikan 400 Error)
+    // Jawaban Salah / Belum Lengkap (Backend mengembalikan 400 Error)
     quiz.isCorrect.value = false
     if (result.error) {
       quiz.errorMessage.value = result.error

@@ -10,11 +10,11 @@
             :key="optIndex"
             class="option-btn"
             :class="{ 
-              'selected': selectedAnswer === optIndex,
+              'selected': selectedAnswers[q.id || index] === optIndex,
               'correct': hasSubmitted && optIndex === q.answer_index,
-              'wrong': hasSubmitted && selectedAnswer === optIndex && selectedAnswer !== q.answer_index
+              'wrong': hasSubmitted && selectedAnswers[q.id || index] === optIndex && selectedAnswers[q.id || index] !== q.answer_index
             }"
-            @click="!hasSubmitted && (selectedAnswer = optIndex)"
+            @click="!hasSubmitted && selectOption(q.id || index, optIndex)"
           >
             {{ opt }}
           </button>
@@ -23,7 +23,7 @@
       
       <div class="quiz-feedback" v-if="hasSubmitted">
         <p v-if="isCorrect" class="success-msg"><i class="fa-solid fa-check-circle"></i> Jawaban Benar!</p>
-        <p v-else class="error-msg"><i class="fa-solid fa-times-circle"></i> Jawaban Salah, coba lagi.</p>
+        <p v-else class="error-msg"><i class="fa-solid fa-times-circle"></i> Jawaban Belum Tepat, coba lagi.</p>
       </div>
     </div>
     
@@ -32,7 +32,7 @@
       <button 
         v-if="!hasSubmitted" 
         class="btn-primary" 
-        :disabled="selectedAnswer === null" 
+        :disabled="!isAllAnswered" 
         @click="submitQuiz"
       >
         Cek Jawaban
@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   quiz: {
@@ -67,20 +67,34 @@ const props = defineProps({
 
 defineEmits(['back', 'next'])
 
-const selectedAnswer = ref(null)
+const selectedAnswers = ref({})
 const hasSubmitted = ref(false)
 const isCorrect = ref(false)
+
+const selectOption = (qKey, optIndex) => {
+  selectedAnswers.value = {
+    ...selectedAnswers.value,
+    [qKey]: optIndex
+  }
+}
+
+const isAllAnswered = computed(() => {
+  if (!props.quiz || props.quiz.length === 0) return false
+  return props.quiz.every((q, idx) => selectedAnswers.value[q.id || idx] !== undefined)
+})
 
 const submitQuiz = () => {
   if (props.quiz && props.quiz.length > 0) {
     hasSubmitted.value = true
-    isCorrect.value = selectedAnswer.value === props.quiz[0].answer_index
+    isCorrect.value = props.quiz.every((q, idx) => {
+      return selectedAnswers.value[q.id || idx] === q.answer_index
+    })
   }
 }
 
 const resetQuiz = () => {
   hasSubmitted.value = false
-  selectedAnswer.value = null
+  selectedAnswers.value = {}
   isCorrect.value = false
 }
 </script>

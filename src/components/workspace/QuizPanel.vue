@@ -2,48 +2,109 @@
   <div class="quiz-panel">
     <section class="panel-content">
       <header class="quiz-header">
-        <h2><i class="fa-solid fa-circle-question"></i> Tes Pemahaman</h2>
+        <div class="quiz-header-top">
+          <h2><i class="fa-solid fa-circle-question"></i> Tes Pemahaman</h2>
+          <span v-if="isMultiQuiz" class="quiz-progress-badge">
+            <i class="fa-solid fa-list-check"></i> {{ answeredCount }} / {{ quiz.length }} Terjawab
+          </span>
+        </div>
         <p>Jawab pertanyaan berikut sebelum lanjut ke sesi praktik.</p>
       </header>
 
-      <!-- Quiz questions -->
+      <!-- Multi-quiz Stepper Navigation (hanya jika > 1 kuis) -->
+      <div v-if="isMultiQuiz" class="quiz-stepper">
+        <button
+          v-for="(question, qIndex) in quiz"
+          :key="qIndex"
+          type="button"
+          class="stepper-step"
+          :class="{
+            'active': localIndex === qIndex,
+            'answered': isQuizAnswered(question.id),
+            'correct': isSubmitted && isQuizCorrect(question.id),
+            'wrong': isSubmitted && isQuizWrong(question.id)
+          }"
+          @click="goToStep(qIndex)"
+        >
+          <span class="step-indicator">
+            <i v-if="isSubmitted && isQuizCorrect(question.id)" class="fa-solid fa-check"></i>
+            <i v-else-if="isSubmitted && isQuizWrong(question.id)" class="fa-solid fa-xmark"></i>
+            <span v-else>{{ qIndex + 1 }}</span>
+          </span>
+          <span class="step-title">Soal {{ qIndex + 1 }}</span>
+        </button>
+      </div>
+
+      <!-- Quiz Card Display -->
       <div v-if="hasQuestions" class="quiz-container">
-        <div v-for="(question, qIndex) in quiz" :key="qIndex" class="question-card">
+        <!-- Render Active Question Card -->
+        <div v-if="activeQuestion" class="question-card">
           <div class="question-header-pill">
-            <span class="q-badge"><i class="fa-solid fa-circle-question"></i> Soal Pemahaman {{ quiz.length > 1 ? `#${qIndex + 1}` : '' }}</span>
+            <span class="q-badge">
+              <i class="fa-solid fa-circle-question"></i> Soal Pemahaman {{ isMultiQuiz ? `#${localIndex + 1} dari ${quiz.length}` : '' }}
+            </span>
+            <span v-if="isSubmitted && isQuizCorrect(activeQuestion.id)" class="status-pill status-correct">
+              <i class="fa-solid fa-circle-check"></i> Benar
+            </span>
+            <span v-else-if="isSubmitted && isQuizWrong(activeQuestion.id)" class="status-pill status-wrong">
+              <i class="fa-solid fa-circle-xmark"></i> Salah
+            </span>
           </div>
 
-          <div class="question-text" v-html="formatQuizText(question.question)"></div>
+          <div class="question-text" v-html="formatQuizText(activeQuestion.question)"></div>
 
           <div class="options-list">
             <button
-              v-for="(option, optIndex) in question.options"
+              v-for="(option, optIndex) in activeQuestion.options"
               :key="optIndex"
+              type="button"
               class="option-btn"
-              :class="getOptionClass(optIndex, question.answer_index)"
+              :class="getOptionClass(optIndex, activeQuestion)"
               :disabled="isSubmitted || isChecking"
-              @click="$emit('update:selectedAnswer', optIndex)"
+              @click="handleSelectOption(optIndex)"
             >
               <span class="option-letter">{{ String.fromCharCode(65 + optIndex) }}</span>
               <span class="option-label" v-html="formatQuizText(option)"></span>
-              <i v-if="isSubmitted && selectedAnswer === optIndex && !isCorrect" class="fa-solid fa-circle-xmark status-icon wrong-icon"></i>
-              <i v-if="isSubmitted && isCorrect && selectedAnswer === optIndex" class="fa-solid fa-circle-check status-icon correct-icon"></i>
+              <i v-if="isSubmitted && isSelected(activeQuestion.id, optIndex) && !isQuizCorrect(activeQuestion.id)" class="fa-solid fa-circle-xmark status-icon wrong-icon"></i>
+              <i v-if="isSubmitted && isSelected(activeQuestion.id, optIndex) && isQuizCorrect(activeQuestion.id)" class="fa-solid fa-circle-check status-icon correct-icon"></i>
             </button>
           </div>
 
-          <!-- Feedback after submit -->
-          <div v-if="isSubmitted && (question.explanation || (!isCorrect && errorMessage))" class="feedback" :class="isCorrect ? 'correct' : 'wrong'">
-            <i :class="isCorrect ? 'fa-solid fa-circle-check' : 'fa-solid fa-triangle-exclamation'"></i>
-            <div class="feedback-body">
-              <strong class="feedback-title">{{ isCorrect ? 'Jawaban Benar!' : 'Jawaban Belum Tepat' }}</strong>
-              <p class="feedback-text">{{ isCorrect ? question.explanation : errorMessage }}</p>
-            </div>
+          <!-- Dynamic Hint (per soal yang sedang dibuka) -->
+          <div v-if="currentHintText" class="hint-display-inline" style="margin: 20px 0 0 0;">
+            <h4><i class="fa-solid fa-lightbulb"></i> Hint Soal #{{ localIndex + 1 }}:</h4>
+            <div class="hint-content" v-html="currentHintText"></div>
           </div>
 
-          <div v-if="hintText" class="hint-display-inline" style="margin: 15px 0 0 0;">
-            <h4><i class="fa-solid fa-lightbulb"></i> Hint:</h4>
-            <div class="hint-content" v-html="hintText"></div>
+          <!-- Feedback after submit -->
+          <div v-if="isSubmitted && (activeExplanation || (!isCorrect && errorMessage))" class="feedback" :class="isQuizCorrect(activeQuestion.id) ? 'correct' : 'wrong'">
+            <i :class="isQuizCorrect(activeQuestion.id) ? 'fa-solid fa-circle-check' : 'fa-solid fa-triangle-exclamation'"></i>
+            <div class="feedback-body">
+              <strong class="feedback-title">{{ isQuizCorrect(activeQuestion.id) ? 'Jawaban Benar!' : 'Jawaban Belum Tepat' }}</strong>
+              <p class="feedback-text">{{ isQuizCorrect(activeQuestion.id) ? activeExplanation : (errorMessage || 'Periksa kembali opsi pilihanmu untuk soal ini.') }}</p>
+            </div>
           </div>
+        </div>
+
+        <!-- In-card Navigation between quizzes (hanya jika multi-quiz) -->
+        <div v-if="isMultiQuiz" class="stepper-nav-row">
+          <button
+            type="button"
+            class="stepper-btn prev-step"
+            :disabled="localIndex === 0"
+            @click="prevStep"
+          >
+            <i class="fa-solid fa-arrow-left"></i> Soal Sebelumnya
+          </button>
+          <span class="step-counter">Soal {{ localIndex + 1 }} / {{ quiz.length }}</span>
+          <button
+            type="button"
+            class="stepper-btn next-step"
+            :disabled="localIndex === quiz.length - 1"
+            @click="nextStep"
+          >
+            Soal Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+          </button>
         </div>
       </div>
 
@@ -57,51 +118,52 @@
     <footer class="panel-footer">
       <div class="footer-left">
         <button class="nav-btn prev-btn" @click="$emit('back')">
-          <i class="fa-solid fa-arrow-left"></i> Kembali
+          <i class="fa-solid fa-arrow-left"></i> Kembali ke Materi
         </button>
         
         <HintButton 
-          v-if="!isCorrect && !hintText && hasQuestions && hasHint" 
+          v-if="!isCorrect && !currentHintText && hasQuestions && hasCurrentHint" 
           :isLoading="isHintLoading"
           @click="openHint" 
         />
       </div>
 
       <div class="footer-right">
-      <button
-        v-if="hasQuestions && !isSubmitted"
-        class="nav-btn submit-btn"
-        :disabled="selectedAnswer === null || isChecking"
-        @click="$emit('submit')"
-      >
-        <i v-if="isChecking" class="fa-solid fa-spinner fa-spin"></i>
-        {{ isChecking ? 'Mengecek...' : 'Cek Jawaban' }}
-      </button>
+        <!-- Belum Submit: tombol Cek Jawaban -->
+        <button
+          v-if="hasQuestions && !isSubmitted"
+          class="nav-btn submit-btn"
+          :disabled="!canSubmit || isChecking"
+          @click="$emit('submit')"
+        >
+          <i v-if="isChecking" class="fa-solid fa-spinner fa-spin"></i>
+          {{ isChecking ? 'Mengecek...' : (isMultiQuiz ? 'Cek Semua Jawaban' : 'Cek Jawaban') }}
+        </button>
 
-      <!-- State: sudah submit, salah -->
-      <button
-        v-else-if="isSubmitted && !isCorrect"
-        class="nav-btn retry-btn"
-        @click="$emit('retry')"
-      >
-        <i class="fa-solid fa-rotate-left"></i> Coba Lagi
-      </button>
+        <!-- Sudah Submit & Belum Lulus: tombol Coba Lagi -->
+        <button
+          v-else-if="isSubmitted && !isCorrect"
+          class="nav-btn retry-btn"
+          @click="$emit('retry')"
+        >
+          <i class="fa-solid fa-rotate-left"></i> Coba Lagi
+        </button>
 
-      <!-- State: tidak ada kuis, atau sudah benar -->
-      <button
-        v-else
-        class="nav-btn next-btn"
-        @click="$emit('next')"
-      >
-        Praktik <i class="fa-solid fa-arrow-right"></i>
-      </button>
+        <!-- Sudah Lulus atau tidak ada kuis: lanjut ke Praktik -->
+        <button
+          v-else
+          class="nav-btn next-btn"
+          @click="$emit('next')"
+        >
+          Lanjut ke Praktik <i class="fa-solid fa-arrow-right"></i>
+        </button>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { marked } from 'marked'
 import api from '../../services/api'
 import HintButton from './HintButton.vue'
@@ -109,22 +171,166 @@ import { useUserAccount } from '../../composables/useUserAccount'
 import { useToast } from '../../composables/useToast'
 
 const { showToast } = useToast()
+const { credits } = useUserAccount()
 
 const props = defineProps({
   lesson: { type: Object, default: () => ({}) },
   quiz: { type: Array, required: true },
-  selectedAnswer: { type: Number, default: null },
+  selectedAnswer: { type: Number, default: null }, // legacy fallback
+  selectedAnswers: { type: Object, default: () => ({}) },
+  currentQuizIndex: { type: Number, default: 0 },
+  quizResults: { type: Object, default: () => ({}) },
   isSubmitted: { type: Boolean, default: false },
   isCorrect: { type: Boolean, default: false },
   isChecking: { type: Boolean, default: false },
   errorMessage: { type: String, default: '' },
 })
 
-defineEmits(['back', 'submit', 'retry', 'next', 'update:selectedAnswer'])
+const emit = defineEmits([
+  'back',
+  'submit',
+  'retry',
+  'next',
+  'update:selectedAnswer',
+  'update:selectedAnswers',
+  'update:currentQuizIndex'
+])
 
-const hasQuestions = computed(() => props.quiz && props.quiz.length > 0)
-const hasHint = computed(() => props.quiz && props.quiz[0] && props.quiz[0].has_hint)
+// Stepper index lokal disinkronkan dengan prop
+const localIndex = ref(props.currentQuizIndex || 0)
+watch(() => props.currentQuizIndex, (newIdx) => {
+  if (typeof newIdx === 'number' && newIdx !== localIndex.value) {
+    localIndex.value = newIdx
+  }
+})
 
+const isMultiQuiz = computed(() => Array.isArray(props.quiz) && props.quiz.length > 1)
+const hasQuestions = computed(() => Array.isArray(props.quiz) && props.quiz.length > 0)
+
+const activeQuestion = computed(() => {
+  if (!hasQuestions.value) return null
+  return props.quiz[localIndex.value] || props.quiz[0]
+})
+
+const activeQuizId = computed(() => {
+  return activeQuestion.value ? String(activeQuestion.value.id) : ''
+})
+
+const hasCurrentHint = computed(() => {
+  return activeQuestion.value && Boolean(activeQuestion.value.has_hint)
+})
+
+const activeExplanation = computed(() => {
+  if (!activeQuestion.value) return ''
+  const qId = activeQuizId.value
+  if (props.quizResults && props.quizResults[qId]?.explanation) {
+    return props.quizResults[qId].explanation
+  }
+  return activeQuestion.value.explanation || ''
+})
+
+const getSelectedAnswerForQuiz = (qId) => {
+  const key = String(qId)
+  if (props.selectedAnswers && props.selectedAnswers[key] !== undefined) {
+    return props.selectedAnswers[key]
+  }
+  if (!isMultiQuiz.value && props.selectedAnswer !== null) {
+    return props.selectedAnswer
+  }
+  return null
+}
+
+const isSelected = (qId, optIndex) => {
+  return getSelectedAnswerForQuiz(qId) === optIndex
+}
+
+const isQuizAnswered = (qId) => {
+  return getSelectedAnswerForQuiz(qId) !== null
+}
+
+const answeredCount = computed(() => {
+  if (!Array.isArray(props.quiz)) return 0
+  return props.quiz.filter(q => isQuizAnswered(q.id)).length
+})
+
+const canSubmit = computed(() => {
+  if (!hasQuestions.value) return false
+  if (isMultiQuiz.value) {
+    return answeredCount.value === props.quiz.length
+  }
+  return props.selectedAnswer !== null || getSelectedAnswerForQuiz(props.quiz[0]?.id) !== null
+})
+
+const isQuizCorrect = (qId) => {
+  const key = String(qId)
+  if (props.quizResults && props.quizResults[key]) {
+    return Boolean(props.quizResults[key].is_correct)
+  }
+  return props.isCorrect
+}
+
+const isQuizWrong = (qId) => {
+  const key = String(qId)
+  if (props.quizResults && props.quizResults[key]) {
+    return props.quizResults[key].is_correct === false
+  }
+  return props.isSubmitted && !props.isCorrect
+}
+
+const handleSelectOption = (optIndex) => {
+  if (props.isSubmitted || props.isChecking || !activeQuestion.value) return
+  const qId = activeQuestion.value.id
+  emit('update:selectedAnswers', { quizId: qId, optionIndex: optIndex })
+  emit('update:selectedAnswer', optIndex)
+}
+
+const getOptionClass = (optIndex, question) => {
+  const qId = String(question.id)
+  const isThisSelected = isSelected(qId, optIndex)
+  const result = props.quizResults ? props.quizResults[qId] : null
+
+  if (props.isSubmitted) {
+    if (result) {
+      if (result.is_correct && isThisSelected) {
+        return { selected: true, correct: true }
+      }
+      if (!result.is_correct && isThisSelected) {
+        return { selected: true, wrong: true }
+      }
+    } else {
+      const actualCorrect = props.isCorrect ? isThisSelected : (optIndex === question.answer_index)
+      return {
+        selected: isThisSelected,
+        correct: isThisSelected && props.isCorrect,
+        wrong: isThisSelected && !props.isCorrect
+      }
+    }
+  }
+
+  return {
+    selected: isThisSelected
+  }
+}
+
+// Navigasi Stepper
+const goToStep = (idx) => {
+  localIndex.value = idx
+  emit('update:currentQuizIndex', idx)
+}
+
+const prevStep = () => {
+  if (localIndex.value > 0) {
+    goToStep(localIndex.value - 1)
+  }
+}
+
+const nextStep = () => {
+  if (localIndex.value < props.quiz.length - 1) {
+    goToStep(localIndex.value + 1)
+  }
+}
+
+// Formatting
 const formatQuizText = (text) => {
   if (!text) return ''
   try {
@@ -134,38 +340,28 @@ const formatQuizText = (text) => {
   }
 }
 
-const getOptionClass = (optIndex, correctIndex) => {
-  // Karena backend tidak mengirimkan jawaban benar secara langsung (anti-cheat),
-  // kita menentukan indeks benar dari jawaban pengguna ketika divalidasi berhasil.
-  const actualCorrectIndex = props.isCorrect ? props.selectedAnswer : correctIndex;
-
-  return {
-    selected: props.selectedAnswer === optIndex,
-    correct: props.isSubmitted && optIndex === actualCorrectIndex,
-    wrong: props.isSubmitted && props.selectedAnswer === optIndex && optIndex !== actualCorrectIndex,
-  }
-}
-
-const hintText = ref(null)
+// Hint Management (Map per Quiz ID)
+const hintsMap = ref({})
 const isHintLoading = ref(false)
-const { credits } = useUserAccount()
+
+const currentHintText = computed(() => {
+  return hintsMap.value[activeQuizId.value] || null
+})
 
 const openHint = async () => {
-  const quizId = props.quiz && props.quiz[0] ? props.quiz[0].id : null;
-  if (!quizId) return;
+  const qId = activeQuizId.value
+  if (!qId) return
 
   isHintLoading.value = true
   try {
-    const res = await api.post(`/hints/quiz/${quizId}`)
+    const res = await api.post(`/hints/quiz/${qId}`)
     if (res.data && res.data.hint) {
-      hintText.value = marked.parse(res.data.hint || 'Tidak ada hint tersedia.')
-      
-      // Update saldo hint premium atau energi user
+      hintsMap.value[qId] = marked.parse(res.data.hint || 'Tidak ada hint tersedia.')
       if (res.data.remaining_credits !== undefined) {
         credits.value = res.data.remaining_credits
       }
     } else {
-      hintText.value = marked.parse('Tidak ada hint tersedia.')
+      hintsMap.value[qId] = marked.parse('Tidak ada hint tersedia.')
     }
   } catch (error) {
     if (error.response?.status === 403) {
