@@ -137,7 +137,7 @@
           @click="$emit('submit')"
         >
           <i v-if="isChecking" class="fa-solid fa-spinner fa-spin"></i>
-          {{ isChecking ? 'Mengecek...' : (isMultiQuiz ? 'Cek Semua Jawaban' : 'Cek Jawaban') }}
+          {{ isChecking ? 'Mengecek...' : (isMultiQuiz ? `Cek Semua Jawaban (${answeredCount}/${quiz.length})` : 'Cek Jawaban') }}
         </button>
 
         <!-- Sudah Submit & Belum Lulus: tombol Coba Lagi -->

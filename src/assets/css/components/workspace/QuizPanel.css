@@ -535,3 +535,21 @@
     overflow-wrap: anywhere;
   }
 }
+
+@media (max-width: 480px) {
+  .stepper-step {
+    padding: 6px 10px;
+    gap: 4px;
+  }
+  .stepper-step .step-title {
+    display: none;
+  }
+  .stepper-nav-row {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stepper-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}

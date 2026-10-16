@@ -57,7 +57,7 @@
             @update:selected-answers="quiz.setAnswer($event.quizId, $event.optionIndex)"
             @update:current-quiz-index="quiz.goToQuiz($event)"
             @submit="onQuizSubmit"
-            @retry="quiz.reset()"
+            @retry="quiz.retry()"
             @back="activeStep = STEP.THEORY"
             @next="onRequestNextFromQuiz"
           />

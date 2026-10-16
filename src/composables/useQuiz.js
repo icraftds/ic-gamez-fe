@@ -154,6 +154,15 @@ export function useQuiz() {
     isCorrect.value = selectedAnswer.value === quiz[0].answer_index
   }
 
+  /** Reset state hasil/submit agar user bisa memperbaiki jawaban tanpa mengetik ulang semua */
+  const retry = () => {
+    isSubmitted.value = false
+    isCorrect.value = false
+    isChecking.value = false
+    errorMessage.value = ''
+    quizResults.value = {}
+  }
+
   const resetStateOnly = () => {
     selectedAnswers.value = {}
     selectedAnswer.value = null
@@ -191,6 +200,7 @@ export function useQuiz() {
     prevQuiz,
     goToQuiz,
     submit,
+    retry,
     reset,
     loadFromStorage
   }
