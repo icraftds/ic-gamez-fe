@@ -21,10 +21,7 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="isLoadingPlans" class="loading-state">
-        <div class="spinner-large"></div>
-        <p>Memuat paket langganan...</p>
-      </div>
+      <TerminalLoader v-if="isLoadingPlans" label="paket langganan" />
 
       <!-- Plan Selection -->
       <div v-else class="plans-container">
@@ -80,7 +77,7 @@
           <div class="plan-action">
             <div v-if="currentPlan === plan.slug || (isPremiumUser && (currentPlan === 'free' || !currentPlan) && plan.slug === 'pro')" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
             <button v-else class="btn-upgrade" :class="plan.slug + '-btn'" @click="handlePlanClick(plan.slug, plan)" :disabled="isNavigating">
-              <span v-if="isNavigating && navTargetSlug === plan.slug"><i class="fa-solid fa-spinner fa-spin"></i> Memproses...</span>
+              <TerminalLoader v-if="isNavigating && navTargetSlug === plan.slug" variant="inline" label="paket" />
               <span v-else>Pilih {{ plan.name }}</span>
             </button>
           </div>

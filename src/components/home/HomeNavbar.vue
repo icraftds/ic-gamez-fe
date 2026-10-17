@@ -104,7 +104,7 @@
           <!-- 3. iCoinz -->
           <div class="nav-coinz" title="Saldo iCoinZ">
             <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
-            <i v-if="isLoading" class="fa-solid fa-circle-notch fa-spin" style="margin-left: 4px; font-size: 0.9rem; opacity: 0.7;"></i>
+            <TerminalLoader v-if="isLoading" variant="inline" size="sm" />
             <span v-else class="nav-coinz-val">{{ coinz === null ? '—' : coinz.toLocaleString('id-ID') }}<small v-if="walletStatus !== 'fresh'"> · belum diperbarui</small></span>
           </div>
 

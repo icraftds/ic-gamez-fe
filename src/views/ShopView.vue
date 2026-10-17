@@ -63,10 +63,7 @@
 
       <!-- ENERGY TAB -->
       <div v-if="activeTab === 'energy'" class="tab-content energy-tab">
-        <div v-if="isLoading" class="loading-state">
-          <img src="/images/icoinz.svg" alt="Loading" class="icoinz-loading-icon" />
-          <p>Memuat etalase energi...</p>
-        </div>
+        <TerminalLoader v-if="isLoading" label="etalase energi" />
 
         <div v-else-if="packages.length === 0" class="empty-state">
           <div class="empty-icon-wrapper">
@@ -134,10 +131,7 @@
 
       <!-- ITEMS TAB -->
       <div v-if="activeTab === 'item'" class="tab-content border-tab">
-        <div v-if="isLoading" class="loading-state">
-          <img src="/images/icoinz.svg" alt="Loading" class="icoinz-loading-icon" />
-          <p>Memuat item...</p>
-        </div>
+        <TerminalLoader v-if="isLoading" label="item" />
         <div v-else-if="items.length === 0" class="empty-state">
           <div class="empty-icon-wrapper">
             <i class="fa-solid fa-box-open"></i>

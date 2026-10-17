@@ -18,20 +18,10 @@
     </template>
     
     <!-- Global Loading Overlay -->
-    <div v-if="isPreparingLesson" class="global-loading-overlay">
-      <div class="loader-content">
-        <div class="spinner-large"></div>
-        <p>Mempersiapkan materi belajar...</p>
-      </div>
-    </div>
+    <TerminalLoader v-if="isPreparingLesson" variant="overlay" size="lg" label="materi belajar" />
 
     <!-- Initial App Loader for Session Bootstrap -->
-    <div v-if="isBootstrapping" class="global-loading-overlay" style="z-index: 9999999; background: var(--bg-main, #0f172a);">
-      <div class="loader-content">
-        <div class="spinner-large"></div>
-        <p>Memuat sesi...</p>
-      </div>
-    </div>
+    <TerminalLoader v-if="isBootstrapping" variant="overlay" size="lg" label="sesi" />
     <AppToast />
     
     <!-- Global WIP Modal -->

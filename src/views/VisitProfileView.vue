@@ -37,12 +37,12 @@
                     <div class="vp-hero-actions">
                       <template v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend">
                         <button v-if="hasIncomingRequest" @click="handleAcceptFriend" class="add-friend-btn vp-add-friend-hero" :disabled="isAddingFriend">
-                          <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
+                          <TerminalLoader v-if="isAddingFriend" variant="inline" />
                           <i v-else class="fa-solid fa-check"></i>
                           <span class="btn-text">Terima Pertemanan</span>
                         </button>
                         <button v-else @click="handleAddFriend" class="add-friend-btn vp-add-friend-hero" :disabled="isAddingFriend || isPendingFriend">
-                          <i v-if="isAddingFriend" class="fa-solid fa-spinner fa-spin"></i>
+                          <TerminalLoader v-if="isAddingFriend" variant="inline" />
                           <i v-else-if="isPendingFriend" class="fa-solid fa-clock"></i>
                           <i v-else class="fa-solid fa-user-plus"></i>
                           <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
@@ -222,10 +222,7 @@
       </div>
     </div>
     
-    <div v-else-if="isLoading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Memuat profil...</p>
-    </div>
+    <TerminalLoader v-else-if="isLoading" label="profil" />
     
     <div v-else class="error-state">
       <h2><i class="fa-solid fa-triangle-exclamation"></i> Profil Tidak Ditemukan</h2>

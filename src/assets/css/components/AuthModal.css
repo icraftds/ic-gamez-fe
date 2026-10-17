@@ -200,16 +200,4 @@
   cursor: not-allowed;
 }
 
-/* Spinner Animation */
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid var(--white-alpha-0_3);
-  border-radius: 50%;
-  border-top-color: var(--text-main-hex);
-  animation: spin 1s ease-in-out infinite;
-}
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}

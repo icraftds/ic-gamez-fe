@@ -9,10 +9,7 @@
       </div>
       
       <nav class="sidebar-nav">
-        <div v-if="isLoading" class="loading-state">
-          <div class="spinner-small"></div>
-          <span>Memuat materi...</span>
-        </div>
+        <TerminalLoader v-if="isLoading" size="sm" label="materi" />
         
         <div v-else class="path-group" v-for="path in paths" :key="path.id">
           <h3 class="path-title" @click="togglePath(path.id)">

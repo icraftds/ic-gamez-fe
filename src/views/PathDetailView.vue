@@ -128,6 +128,7 @@
 
       </div>
       
+      <TerminalLoader v-else-if="isLoading" label="roadmap belajar" />
       <div v-else-if="path && !isLoading" class="container empty-state">
         <div class="empty-icon"><i class="fa-solid fa-person-digging"></i></div>
         <h3>Roadmap Sedang Dibangun</h3>

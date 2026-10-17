@@ -58,14 +58,7 @@
   padding: 2rem 0;
 }
 
-.spinner {
-  width: 60px;
-  height: 60px;
-  border: 4px solid rgba(0, 255, 234, 0.1);
-  border-top-color: #00ffea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
+
 
 .gradient-text {
   background: linear-gradient(135deg, #00ffea, #7000ff);
@@ -240,10 +233,7 @@
   filter: drop-shadow(0 0 10px rgba(0, 255, 234, 0.5));
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+
 
 @keyframes fadeIn {
   from { opacity: 0; }

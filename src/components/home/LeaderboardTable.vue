@@ -32,16 +32,7 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="lb-loading-state">
-        <div class="cube-wrapper">
-          <div class="cube">
-            <div class="side front"></div><div class="side back"></div>
-            <div class="side right"></div><div class="side left"></div>
-            <div class="side top"></div><div class="side bottom"></div>
-          </div>
-        </div>
-        <p class="loading-text">Menyinkronkan Data Peringkat...</p>
-      </div>
+      <TerminalLoader v-if="isLoading" label="peringkat" />
 
       <template v-else>
         <!-- The Cyber Podium -->

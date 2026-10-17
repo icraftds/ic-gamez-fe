@@ -109,12 +109,7 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div v-if="isPreparingLesson" class="loading-overlay">
-      <div class="loader-content">
-        <div class="spinner-large"></div>
-        <p>Mempersiapkan Roadmap Belajar...</p>
-      </div>
-    </div>
+    <TerminalLoader v-if="isPreparingLesson" variant="overlay" size="lg" label="roadmap belajar" />
   </div>
 </template>
 

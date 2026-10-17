@@ -25,7 +25,7 @@
         <i class="fa-solid fa-ticket"></i>
         <input type="text" id="coupon" v-model="couponCode" placeholder="Masukkan kode promo" autocomplete="off" @keyup.enter="validateCoupon">
         <button class="btn-apply-coupon" @click="validateCoupon" :disabled="!couponCode || isValidatingCoupon">
-          <i class="fa-solid fa-spinner fa-spin" v-if="isValidatingCoupon"></i>
+          <TerminalLoader v-if="isValidatingCoupon" variant="inline" />
           <span v-else>Terapkan</span>
         </button>
       </div>
@@ -66,9 +66,11 @@
       :disabled="!selectedMethod || isProcessingPayment"
       @click="goToInstruction"
     >
-      <i class="fa-solid fa-spinner fa-spin" v-if="isProcessingPayment"></i>
-      <i class="fa-solid fa-arrow-right" v-else></i>
-      {{ isProcessingPayment ? 'Memproses...' : 'Lanjutkan Pembayaran' }}
+      <TerminalLoader v-if="isProcessingPayment" variant="inline" label="pembayaran" />
+      <template v-else>
+        <i class="fa-solid fa-arrow-right"></i>
+        <span>Lanjutkan Pembayaran</span>
+      </template>
     </button>
   </div>
 </template>

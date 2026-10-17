@@ -159,10 +159,7 @@ const getTabIcon = (id) => {
       <div class="dash-main-wrapper">
     <!-- Content -->
     <div class="container dash-content" v-if="isLoggedIn">
-      <div v-if="isDataFetching" class="data-fetch-loader">
-        <div class="loader-ring"></div>
-        <p>Memuat Data Dashboard...</p>
-      </div>
+      <TerminalLoader v-if="isDataFetching" label="data dashboard" />
       <template v-else>
       <DashboardHome v-if="activeTab === 'beranda'" />
       <DashboardStats v-else-if="activeTab === 'statistik'" />

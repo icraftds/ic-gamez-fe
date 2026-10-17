@@ -24,7 +24,7 @@
     </div>
     <div class="dropdown-actions">
       <button @click="handleDashboardClick" class="text-primary" :disabled="isNavigating">
-        <i v-if="isNavigating" class="fa-solid fa-spinner fa-spin"></i>
+        <TerminalLoader v-if="isNavigating" variant="inline" size="sm" />
         <i v-else class="fa-solid fa-chart-pie"></i> 
         {{ dashboardToggleText }}
       </button>

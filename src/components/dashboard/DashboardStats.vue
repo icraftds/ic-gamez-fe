@@ -1,9 +1,6 @@
 <template>
   <div class="gh-stats-container">
-    <div v-if="isCurrentlyLoading" class="loading-state">
-      <i class="fa-solid fa-spinner fa-spin"></i>
-      <p>Loading activity data...</p>
-    </div>
+    <TerminalLoader v-if="isCurrentlyLoading" label="statistik aktivitas" />
 
     <template v-else-if="activeStats && activeHeatmap">
       

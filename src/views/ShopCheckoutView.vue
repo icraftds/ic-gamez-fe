@@ -63,11 +63,8 @@
 
           <!-- State 2: Processing -->
           <div v-else-if="state === 'processing'" key="processing" class="checkout-step center-content">
-            <div class="processing-spinner">
-              <img src="/images/icoinz.svg" alt="Processing" class="icoinz-loading-spin" />
-            </div>
-            <h3>Memproses Pembayaran...</h3>
-            <p>Mohon tunggu sebentar, jangan tutup halaman ini.</p>
+            <TerminalLoader size="lg" label="pembayaran" />
+            <p style="margin-top: 14px; color: var(--text-sub-hex, #94a3b8);">Mohon tunggu sebentar, jangan tutup halaman ini.</p>
           </div>
 
           <!-- State 3: Success (Coinz Only) -->
@@ -124,7 +121,7 @@
                 <div class="qr-box">
                   <QrcodeVue v-if="qrString" :value="qrString" :size="200" level="H" />
                   <div v-else class="qr-dummy-label">
-                    <i class="fa-solid fa-spinner fa-spin"></i> Memuat QR...
+                    <TerminalLoader size="sm" label="QR" />
                   </div>
                 </div>
               </div>
