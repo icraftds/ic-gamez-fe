@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFriends } from '../../composables/useFriends'
 import CyberLevel from '../ui/CyberLevel.vue'
@@ -13,6 +13,8 @@ const {
   isLoadingFriends,
   isLoadingRequests,
   toggleFriendsSidebar,
+  fetchFriendRequests,
+  hasUnreadRequests,
   searchUsers,
   addFriend,
   removeFriend,
@@ -24,6 +26,10 @@ const router = useRouter()
 const searchQuery = ref('')
 const activeTab = ref('teman')
 let searchTimeout
+
+onMounted(() => {
+  fetchFriendRequests()
+})
 
 watch(searchQuery, (newVal) => {
   clearTimeout(searchTimeout)
@@ -58,6 +64,19 @@ const handleRemoveFriend = async (userId) => {
   <div class="friends-sidebar-overlay" :class="{ 'is-open': isFriendsSidebarOpen }" @click="toggleFriendsSidebar"></div>
   
   <aside class="friends-sidebar" :class="{ 'is-open': isFriendsSidebarOpen }">
+    <!-- Edge Chevron Tab Button -->
+    <button 
+      class="fs-edge-tab" 
+      @click.stop="toggleFriendsSidebar"
+      :title="isFriendsSidebarOpen ? 'Tutup Teman' : 'Daftar Teman'"
+      :aria-label="isFriendsSidebarOpen ? 'Tutup Teman' : 'Daftar Teman'"
+      type="button"
+    >
+      <i class="fa-solid" :class="isFriendsSidebarOpen ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+      <!-- Red Dot Notification for New Friend Requests -->
+      <span v-if="hasUnreadRequests" class="fs-tab-dot" title="Permintaan pertemanan baru"></span>
+    </button>
+
     <div class="fs-header">
       <h3><i class="fa-solid fa-user-group"></i> Daftar Teman</h3>
       <button class="fs-close-btn" @click="toggleFriendsSidebar" title="Tutup">

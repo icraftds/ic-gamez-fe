@@ -19,54 +19,17 @@
           
           <!-- Hub Header (Compact Banner matching mockup) -->
           <div class="hub-header">
-            <!-- Left: 3D Isometric Cube Visual -->
-            <div class="hub-icon-wrapper">
-              <svg class="iso-cube-svg" viewBox="0 0 80 80" width="56" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="cubeTop1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#38bdf8"/>
-                    <stop offset="100%" stop-color="#0284c7"/>
-                  </linearGradient>
-                  <linearGradient id="cubeLeft1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#0369a1"/>
-                    <stop offset="100%" stop-color="#0c4a6e"/>
-                  </linearGradient>
-                  <linearGradient id="cubeRight1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#0284c7"/>
-                    <stop offset="100%" stop-color="#075985"/>
-                  </linearGradient>
-                  <linearGradient id="cubeTop2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#818cf8"/>
-                    <stop offset="100%" stop-color="#4f46e5"/>
-                  </linearGradient>
-                  <linearGradient id="cubeLeft2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#4338ca"/>
-                    <stop offset="100%" stop-color="#312e81"/>
-                  </linearGradient>
-                  <linearGradient id="cubeRight2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#4f46e5"/>
-                    <stop offset="100%" stop-color="#3730a3"/>
-                  </linearGradient>
-                  <filter id="cubeGlow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#38bdf8" flood-opacity="0.4"/>
-                  </filter>
-                </defs>
-                <g transform="translate(10, 36) scale(0.65)">
-                  <polygon points="24,4 44,14 24,24 4,14" fill="url(#cubeTop2)" />
-                  <polygon points="4,14 24,24 24,46 4,36" fill="url(#cubeLeft2)" />
-                  <polygon points="24,24 44,14 44,36 24,46" fill="url(#cubeRight2)" />
-                </g>
-                <g transform="translate(36, 36) scale(0.65)">
-                  <polygon points="24,4 44,14 24,24 4,14" fill="url(#cubeTop2)" />
-                  <polygon points="4,14 24,24 24,46 4,36" fill="url(#cubeLeft2)" />
-                  <polygon points="24,24 44,14 44,36 24,46" fill="url(#cubeRight2)" />
-                </g>
-                <g transform="translate(23, 10) scale(0.72)" filter="url(#cubeGlow)">
-                  <polygon points="24,4 44,14 24,24 4,14" fill="url(#cubeTop1)" />
-                  <polygon points="4,14 24,24 24,46 4,36" fill="url(#cubeLeft1)" />
-                  <polygon points="24,24 44,14 44,36 24,46" fill="url(#cubeRight1)" />
-                </g>
-              </svg>
+            <!-- Left: Path Logo / Icon Visual (Matches /learning) -->
+            <div 
+              class="hub-icon-wrapper" 
+              :style="{
+                borderColor: pathThemeColor + '55',
+                background: `radial-gradient(circle at 50% 50%, ${pathThemeColor}28, rgba(14, 20, 42, 0.9))`,
+                boxShadow: `0 0 28px ${pathThemeColor}30, inset 0 0 16px ${pathThemeColor}18`
+              }"
+            >
+              <div class="hub-icon-glow" :style="{ background: pathThemeColor }"></div>
+              <i :class="pathIconClass" class="hub-path-icon" :style="{ color: pathThemeColor }"></i>
             </div>
 
             <!-- Center: Title, Description, Progress -->
@@ -116,17 +79,42 @@
                     'active': selectedChapterId === chapter.id,
                     'completed': isChapterCompleted(chapter)
                   }"
+                  :style="selectedChapterId === chapter.id ? { 
+                    borderColor: getChapterTheme(chapter, cIdx).color + '66',
+                    background: `linear-gradient(90deg, ${getChapterTheme(chapter, cIdx).color}1f 0%, rgba(15, 23, 42, 0.45) 100%)`
+                  } : {}"
                   @click="selectChapter(chapter)"
                 >
                   <!-- Node Circle -->
-                  <div class="stepper-node">
+                  <div 
+                    class="stepper-node"
+                    :style="selectedChapterId === chapter.id ? { 
+                      background: getChapterTheme(chapter, cIdx).color, 
+                      borderColor: getChapterTheme(chapter, cIdx).color,
+                      boxShadow: `0 0 14px ${getChapterTheme(chapter, cIdx).color}88`,
+                      color: '#ffffff'
+                    } : {}"
+                  >
                     <i v-if="isChapterCompleted(chapter)" class="fa-solid fa-check"></i>
                     <span v-else>{{ cIdx + 1 }}</span>
                   </div>
 
                   <!-- Item Content -->
                   <div class="stepper-content">
-                    <div class="stepper-item-title">{{ chapter.title }}</div>
+                    <div class="stepper-item-title">
+                      <span 
+                        class="stepper-ch-icon" 
+                        :style="{ 
+                          color: getChapterTheme(chapter, cIdx).color, 
+                          backgroundColor: getChapterTheme(chapter, cIdx).color + '18',
+                          borderColor: getChapterTheme(chapter, cIdx).color + '35'
+                        }"
+                        :title="'Bab ' + (cIdx + 1)"
+                      >
+                        <i :class="getChapterTheme(chapter, cIdx).icon"></i>
+                      </span>
+                      <span class="stepper-title-text">{{ chapter.title }}</span>
+                    </div>
                     <div class="stepper-item-meta">
                       <span>{{ chapter.lessons?.length || 0 }} materi</span>
                       <span v-if="getChapterCompletedCount(chapter) > 0" class="stepper-item-done">
@@ -142,74 +130,51 @@
             <div class="detail-column" v-if="selectedChapter">
               
               <!-- Chapter Showcase Card -->
-              <div class="chapter-showcase-card">
-                <!-- Isometric Diagram Visual -->
-                <div class="chapter-iso-visual">
-                  <svg viewBox="0 0 200 120" width="160" height="96" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <linearGradient id="chPinkTop" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#f87171"/><stop offset="100%" stop-color="#e11d48"/>
-                      </linearGradient>
-                      <linearGradient id="chPinkLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#be123c"/><stop offset="100%" stop-color="#881337"/>
-                      </linearGradient>
-                      <linearGradient id="chPinkRight" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#e11d48"/><stop offset="100%" stop-color="#9f1239"/>
-                      </linearGradient>
-                      
-                      <linearGradient id="chCyanTop" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0284c7"/>
-                      </linearGradient>
-                      <linearGradient id="chCyanLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#0369a1"/><stop offset="100%" stop-color="#0c4a6e"/>
-                      </linearGradient>
-                      <linearGradient id="chCyanRight" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#0284c7"/><stop offset="100%" stop-color="#075985"/>
-                      </linearGradient>
-                      
-                      <linearGradient id="chPurpTop" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#7c3aed"/>
-                      </linearGradient>
-                      <linearGradient id="chPurpLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#6d28d9"/><stop offset="100%" stop-color="#4c1d95"/>
-                      </linearGradient>
-                      <linearGradient id="chPurpRight" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#5b21b6"/>
-                      </linearGradient>
-                    </defs>
-                    
-                    <!-- Dotted Connector Lines -->
-                    <path d="M100 32 L60 58 M100 32 L140 58 M60 64 L70 88 M140 64 L130 88" stroke="rgba(147, 197, 253, 0.35)" stroke-width="2" stroke-dasharray="3 3"/>
-                    
-                    <!-- Top Cube (Pink) -->
-                    <g transform="translate(85, 6) scale(0.65)">
-                      <polygon points="24,4 44,14 24,24 4,14" fill="url(#chPinkTop)" />
-                      <polygon points="4,14 24,24 24,44 4,34" fill="url(#chPinkLeft)" />
-                      <polygon points="24,24 44,14 44,34 24,44" fill="url(#chPinkRight)" />
-                    </g>
-                    <!-- Mid Left Cube (Cyan) -->
-                    <g transform="translate(45, 34) scale(0.62)">
-                      <polygon points="24,4 44,14 24,24 4,14" fill="url(#chCyanTop)" />
-                      <polygon points="4,14 24,24 24,44 4,34" fill="url(#chCyanLeft)" />
-                      <polygon points="24,24 44,14 44,34 24,44" fill="url(#chCyanRight)" />
-                    </g>
-                    <!-- Mid Right Cube (Cyan) -->
-                    <g transform="translate(125, 34) scale(0.62)">
-                      <polygon points="24,4 44,14 24,24 4,14" fill="url(#chCyanTop)" />
-                      <polygon points="4,14 24,24 24,44 4,34" fill="url(#chCyanLeft)" />
-                      <polygon points="24,24 44,14 44,34 24,44" fill="url(#chCyanRight)" />
-                    </g>
-                    <!-- Center Core Cube (Purple) -->
-                    <g transform="translate(85, 48) scale(0.68)">
-                      <polygon points="24,4 44,14 24,24 4,14" fill="url(#chPurpTop)" />
-                      <polygon points="4,14 24,24 24,44 4,34" fill="url(#chPurpLeft)" />
-                      <polygon points="24,24 44,14 44,34 24,44" fill="url(#chPurpRight)" />
-                    </g>
-                  </svg>
+              <div 
+                class="chapter-showcase-card" 
+                :style="{
+                  borderColor: activeChapterTheme.color + '40',
+                  background: `linear-gradient(135deg, ${activeChapterTheme.color}14 0%, rgba(13, 20, 38, 0.75) 100%)`
+                }"
+              >
+                <!-- Dynamic Chapter Icon Showcase Visual -->
+                <div class="chapter-visual-wrapper" :style="{ '--ch-color': activeChapterTheme.color }">
+                  <div class="chapter-visual-glow" :style="{ background: activeChapterTheme.color }"></div>
+                  <div 
+                    class="chapter-visual-core" 
+                    :style="{
+                      borderColor: activeChapterTheme.color + '66',
+                      background: `radial-gradient(circle at 50% 50%, ${activeChapterTheme.color}25, rgba(15, 23, 42, 0.92))`,
+                      boxShadow: `0 0 25px ${activeChapterTheme.color}35, inset 0 0 15px ${activeChapterTheme.color}20`
+                    }"
+                  >
+                    <div class="chapter-visual-orbit" :style="{ borderColor: activeChapterTheme.color + '33' }"></div>
+                    <i :class="activeChapterTheme.icon" class="chapter-visual-icon" :style="{ color: activeChapterTheme.color }"></i>
+                  </div>
+                  <div 
+                    class="chapter-visual-pill" 
+                    :style="{
+                      color: activeChapterTheme.color,
+                      borderColor: activeChapterTheme.color + '45',
+                      backgroundColor: activeChapterTheme.color + '18'
+                    }"
+                  >
+                    BAB {{ selectedChapterIndex + 1 }}
+                  </div>
                 </div>
 
                 <div class="chapter-showcase-info">
-                  <div class="chapter-badge">BAB {{ selectedChapterIndex + 1 }}</div>
+                  <div 
+                    class="chapter-badge" 
+                    :style="{
+                      color: activeChapterTheme.color,
+                      borderColor: activeChapterTheme.color + '45',
+                      backgroundColor: activeChapterTheme.color + '16'
+                    }"
+                  >
+                    <i :class="activeChapterTheme.icon"></i>
+                    <span>MODUL BAB {{ selectedChapterIndex + 1 }}</span>
+                  </div>
                   <h2 class="chapter-title">{{ selectedChapter.title }}</h2>
                   <p class="chapter-desc">{{ selectedChapter.description || 'Pelajari materi dan selesaikan tantangan untuk menguasai bab ini secara komprehensif.' }}</p>
                   
@@ -219,7 +184,14 @@
                     <span class="meta-tag"><i class="fa-solid fa-trophy"></i> +{{ (selectedChapter.lessons?.length || 0) * 50 }} XP</span>
                   </div>
 
-                  <button class="btn-start-module" @click="startOrResumeChapter(selectedChapter)">
+                  <button 
+                    class="btn-start-module" 
+                    :style="{
+                      background: `linear-gradient(135deg, ${activeChapterTheme.color} 0%, ${activeChapterTheme.color}dd 100%)`,
+                      boxShadow: `0 4px 18px ${activeChapterTheme.color}45`
+                    }"
+                    @click="startOrResumeChapter(selectedChapter)"
+                  >
                     <i class="fa-solid fa-play"></i>
                     <span>{{ isChapterCompleted(selectedChapter) ? 'Ulangi Bab' : (getChapterCompletedCount(selectedChapter) > 0 ? 'Lanjutkan Modul' : 'Mulai Modul') }}</span>
                   </button>
@@ -329,6 +301,161 @@ const { isPremiumUser } = useUserAccount()
 const pathId = computed(() => route.params.pathId)
 const path = computed(() => getPathById(pathId.value))
 const showPremiumModal = ref(false)
+
+// Path theme color matching /learning
+const pathThemeColor = computed(() => {
+  if (!path.value) return '#38bdf8'
+  const slug = path.value.slug || ''
+  const brandColors = {
+    'dasar-pemrograman': '#00f0ff',
+    'logika-dan-berpikir-komputasional': '#ec4899',
+    'dasar-python': '#38bdf8',
+    'matematika-informatika': '#a855f7',
+    'html-css-dasar': '#f97316',
+    'layout-dan-responsive-design': '#8b5cf6',
+    'javascript-pemula': '#facc15',
+    'frontend-web': '#06b6d4',
+    'backend-development': '#22c55e',
+    'frontend-framework': '#00d8ff',
+    'php-laravel': '#f43f5e',
+    'database-sql': '#0284c7',
+    'global-challenges': '#eab308'
+  }
+  if (brandColors[slug]) return brandColors[slug]
+  if (path.value.is_premium || path.value.isPremium) return '#f59e0b'
+  return '#38bdf8'
+})
+
+// Path icon class matching /learning
+const pathIconClass = computed(() => {
+  if (path.value?.icon) return path.value.icon
+  const fallbackIcons = {
+    'dasar-pemrograman': 'fa-solid fa-code',
+    'logika-dan-berpikir-komputasional': 'fa-solid fa-brain',
+    'dasar-python': 'fa-brands fa-python',
+    'matematika-informatika': 'fa-solid fa-calculator',
+    'html-css-dasar': 'fa-brands fa-html5',
+    'layout-dan-responsive-design': 'fa-solid fa-table-cells-large',
+    'javascript-pemula': 'fa-brands fa-js',
+    'frontend-web': 'fa-solid fa-globe',
+    'backend-development': 'fa-solid fa-server',
+    'frontend-framework': 'fa-brands fa-react',
+    'php-laravel': 'fa-brands fa-laravel',
+    'database-sql': 'fa-solid fa-database',
+    'global-challenges': 'fa-solid fa-trophy'
+  }
+  return fallbackIcons[path.value?.slug] || 'fa-solid fa-code'
+})
+
+// Diverse Chapter Themes & Icons per Bab
+const CHAPTER_PALETTE = [
+  { color: '#38bdf8', defaultIcon: 'fa-solid fa-seedling' },
+  { color: '#ec4899', defaultIcon: 'fa-solid fa-code-branch' },
+  { color: '#a855f7', defaultIcon: 'fa-solid fa-arrows-rotate' },
+  { color: '#10b981', defaultIcon: 'fa-solid fa-layer-group' },
+  { color: '#f59e0b', defaultIcon: 'fa-solid fa-gears' },
+  { color: '#6366f1', defaultIcon: 'fa-solid fa-shield-halved' },
+  { color: '#06b6d4', defaultIcon: 'fa-solid fa-rocket' },
+  { color: '#f43f5e', defaultIcon: 'fa-solid fa-trophy' }
+]
+
+const getChapterTheme = (chapter, index = 0) => {
+  if (!chapter) return { color: '#38bdf8', icon: 'fa-solid fa-book-open' }
+  
+  if (chapter.icon) {
+    const fallback = CHAPTER_PALETTE[index % CHAPTER_PALETTE.length]
+    return { color: fallback.color, icon: chapter.icon }
+  }
+
+  const text = `${chapter.slug || ''} ${chapter.title || ''}`.toLowerCase()
+
+  let icon = null
+  let color = null
+
+  if (text.includes('variabel') || text.includes('sintaks') || text.includes('pengenalan') || text.includes('fundamental') || text.includes('dekomposisi')) {
+    icon = text.includes('dekomposisi') ? 'fa-solid fa-puzzle-piece' : (text.includes('sintaks') ? 'fa-solid fa-terminal' : 'fa-solid fa-cube')
+    color = '#38bdf8'
+  } else if (text.includes('operator') || text.includes('percabangan') || text.includes('kondisi') || text.includes('kontrol alur') || text.includes('flowchart') || text.includes('himpunan')) {
+    icon = text.includes('flowchart') ? 'fa-solid fa-diagram-project' : 'fa-solid fa-code-branch'
+    color = '#ec4899'
+  } else if (text.includes('perulangan') || text.includes('loop') || text.includes('iterasi') || text.includes('fungsi') || text.includes('modul')) {
+    icon = text.includes('fungsi') ? 'fa-solid fa-puzzle-piece' : 'fa-solid fa-arrows-rotate'
+    color = '#a855f7'
+  } else if (text.includes('array') || text.includes('objek') || text.includes('struktur data') || text.includes('list') || text.includes('dictionary') || text.includes('file')) {
+    icon = text.includes('file') ? 'fa-solid fa-file-code' : 'fa-solid fa-layer-group'
+    color = '#10b981'
+  } else if (text.includes('pencarian') || text.includes('pengurutan') || text.includes('search') || text.includes('sort')) {
+    icon = 'fa-solid fa-arrow-down-short-wide'
+    color = '#f59e0b'
+  } else if (text.includes('soal logika') || text.includes('logika matematika') || text.includes('algoritma')) {
+    icon = 'fa-solid fa-brain'
+    color = '#8b5cf6'
+  } else if (text.includes('bilangan') || text.includes('representasi data') || text.includes('matematika')) {
+    icon = 'fa-solid fa-calculator'
+    color = '#06b6d4'
+  } else if (text.includes('kombinatorika') || text.includes('peluang') || text.includes('graf')) {
+    icon = text.includes('graf') ? 'fa-solid fa-network-wired' : 'fa-solid fa-dice'
+    color = '#6366f1'
+  } else if (text.includes('html') || text.includes('semantik') || text.includes('struktur')) {
+    icon = 'fa-brands fa-html5'
+    color = '#f97316'
+  } else if (text.includes('form') || text.includes('input') || text.includes('validasi') || text.includes('teks')) {
+    icon = 'fa-solid fa-file-pen'
+    color = '#eab308'
+  } else if (text.includes('flexbox') || text.includes('box model') || text.includes('css')) {
+    icon = text.includes('flexbox') ? 'fa-solid fa-table-columns' : 'fa-brands fa-css3-alt'
+    color = '#3b82f6'
+  } else if (text.includes('grid')) {
+    icon = 'fa-solid fa-table-cells-large'
+    color = '#8b5cf6'
+  } else if (text.includes('responsive') || text.includes('media query') || text.includes('mobile')) {
+    icon = 'fa-solid fa-mobile-screen-button'
+    color = '#14b8a6'
+  } else if (text.includes('landing page') || text.includes('proyek') || text.includes('mini project')) {
+    icon = 'fa-solid fa-rocket'
+    color = '#ec4899'
+  } else if (text.includes('komponen') || text.includes('jsx')) {
+    icon = 'fa-solid fa-cubes'
+    color = '#00d8ff'
+  } else if (text.includes('state') || text.includes('props')) {
+    icon = 'fa-solid fa-sliders'
+    color = '#a855f7'
+  } else if (text.includes('hooks') || text.includes('lifecycle')) {
+    icon = 'fa-solid fa-wand-magic-sparkles'
+    color = '#f59e0b'
+  } else if (text.includes('routing') || text.includes('route')) {
+    icon = 'fa-solid fa-route'
+    color = '#10b981'
+  } else if (text.includes('server') || text.includes('node')) {
+    icon = 'fa-brands fa-node-js'
+    color = '#22c55e'
+  } else if (text.includes('express') || text.includes('api') || text.includes('rest')) {
+    icon = 'fa-solid fa-bolt'
+    color = '#06b6d4'
+  } else if (text.includes('database') || text.includes('sql') || text.includes('crud') || text.includes('ddl') || text.includes('dml') || text.includes('eloquent')) {
+    icon = 'fa-solid fa-database'
+    color = '#0284c7'
+  } else if (text.includes('autentikasi') || text.includes('auth') || text.includes('keamanan') || text.includes('security')) {
+    icon = 'fa-solid fa-shield-halved'
+    color = '#f43f5e'
+  } else if (text.includes('laravel') || text.includes('blade')) {
+    icon = 'fa-brands fa-laravel'
+    color = '#f43f5e'
+  } else if (text.includes('challenge') || text.includes('tantangan') || text.includes('boss')) {
+    icon = 'fa-solid fa-trophy'
+    color = '#eab308'
+  }
+
+  const fallback = CHAPTER_PALETTE[index % CHAPTER_PALETTE.length]
+  return {
+    color: color || fallback.color,
+    icon: icon || fallback.defaultIcon
+  }
+}
+
+const activeChapterTheme = computed(() => {
+  return getChapterTheme(selectedChapter.value, selectedChapterIndex.value)
+})
 
 const selectedChapterId = ref(null)
 

@@ -14,6 +14,9 @@
           <button class="materials-btn" @click="$router.push('/materials')">
             <i class="fa-solid fa-book-open-reader"></i> Baca Pusat Materi
           </button>
+          <button class="encyclopedia-btn" @click="$router.push('/encyclopedia')">
+            <i class="fa-solid fa-book-bookmark"></i> Ensiklopedia
+          </button>
         </div>
       </div>
       
