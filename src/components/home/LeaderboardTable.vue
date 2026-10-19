@@ -40,7 +40,9 @@
           <div class="cyber-podium">
             <!-- 2nd Place -->
             <div class="podium-card-cyber p-second">
-              <div class="cyber-rank-badge silver">2</div>
+              <div class="podium-crown-cyber">
+                <CyberCrown :rank="2" :size="95" />
+              </div>
               <div class="podium-avatar-wrapper plan-badge-wrapper">
                 <CyberBorder 
                   class="cyber-border-leaderboard"
@@ -62,8 +64,9 @@
 
             <!-- 1st Place -->
             <div class="podium-card-cyber p-first">
-              <div class="cyber-crown"><i class="fa-solid fa-crown"></i></div>
-              <div class="cyber-rank-badge gold">1</div>
+              <div class="podium-crown-cyber rank-1">
+                <CyberCrown :rank="1" :size="125" />
+              </div>
               <div class="podium-avatar-wrapper big-avatar plan-badge-wrapper">
                 <CyberBorder 
                   class="cyber-border-leaderboard"
@@ -85,7 +88,9 @@
 
             <!-- 3rd Place -->
             <div class="podium-card-cyber p-third">
-              <div class="cyber-rank-badge bronze">3</div>
+              <div class="podium-crown-cyber">
+                <CyberCrown :rank="3" :size="95" />
+              </div>
               <div class="podium-avatar-wrapper plan-badge-wrapper">
                 <CyberBorder 
                   class="cyber-border-leaderboard"
@@ -172,6 +177,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useUserAccount } from "../../composables/useUserAccount";
 import CyberBorder from '../ui/CyberBorder.vue';
+import CyberCrown from '../ui/CyberCrown.vue';
 import api from '../../services/api';
 
 const getUserBadgeStatus = (user) => {
