@@ -196,12 +196,13 @@
           
           <div class="badges-grid-full" v-else>
             <div class="badge-item-full" v-for="item in displayBadges" :key="item.id">
-              <div class="badge-item-icon-box">
-                <CyberMedal v-if="activeTab !== 'sertifikat'" :tierId="item.tierId" :isLocked="false" :iconType="item.iconType" style="width: 100%; height: 100%;" />
+              <div class="badge-item-icon-box" style="display: flex; justify-content: center; align-items: center;">
+                <CyberMedal v-if="activeTab === 'medali'" :tierId="item.tierId" :isLocked="false" :iconType="item.iconType" style="width: 100%; height: 100%;" />
+                <CyberTrophy v-else-if="activeTab === 'piala'" :tier="item.tier" :icon="item.icon || 'none'" :size="65" />
                 <i v-else :class="item.iconType" style="font-size: 2.2rem; color: #f59e0b;"></i>
               </div>
               <div class="badge-item-text">
-                <span class="badge-item-name">{{ item.name }}</span>
+                <span class="badge-item-name">{{ item.title || item.name }}</span>
                 <span class="badge-item-desc">{{ activeTab === 'medali' ? 'Lencana Medali' : (activeTab === 'piala' ? 'Trofi Kejuaraan' : 'Sertifikat Resmi') }}</span>
               </div>
             </div>
@@ -239,10 +240,11 @@ import api from '../services/api'
 import CyberBorder from '../components/ui/CyberBorder.vue'
 import CyberXp from '../components/ui/CyberXp.vue'
 import CyberMedal from '../components/ui/CyberMedal.vue'
+import CyberTrophy from '../components/ui/CyberTrophy.vue'
 import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useFriends } from '../composables/useFriends'
-import { buildMedals } from '../composables/useAchievements'
+import { buildMedals, buildTrophies } from '../composables/useAchievements'
 
 const route = useRoute()
 const router = useRouter()
@@ -371,11 +373,12 @@ const borderId = computed(() => {
   return 'D_FREE';
 });
 
-// Katalog medali sama persis dengan dashboard pemilik akun (useAchievements)
+// Katalog medali & piala sama persis dengan dashboard pemilik akun (useAchievements)
 const earnedByTab = computed(() => {
   if (!stats.value || !userProfile.value) return { medali: [], piala: [], sertifikat: [] }
-  const earned = buildMedals(userProfile.value, stats.value).filter(m => m.earned)
-  return { medali: earned, piala: earned, sertifikat: [] }
+  const earnedMedalList = buildMedals(userProfile.value, stats.value).filter(m => m.earned)
+  const earnedPialaList = buildTrophies(stats.value?.trophies || userProfile.value?.trophies || []).filter(p => p.earned)
+  return { medali: earnedMedalList, piala: earnedPialaList, sertifikat: [] }
 })
 
 const MAX_SHOWCASE = 4
@@ -392,7 +395,7 @@ const displayBadges = computed(() => {
       .filter(Boolean)
       .slice(0, MAX_SHOWCASE)
   }
-  return [...earned].sort((a, b) => b.tierId - a.tierId).slice(0, MAX_SHOWCASE)
+  return [...earned].sort((a, b) => (b.tierId || b.tier || 0) - (a.tierId || a.tier || 0)).slice(0, MAX_SHOWCASE)
 });
 </script>
 
