@@ -25,11 +25,12 @@
       
       <div class="badges-grid" v-else style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
         <div class="badge-item" v-for="item in displayItems" :key="item.id" style="display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.03); padding: 15px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-          <div style="width: 60px; height: 60px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center;">
-            <CyberMedal v-if="activeTab !== 'sertifikat'" :tierId="item.tierId" :isLocked="false" :iconType="item.iconType" style="width: 100%; height: 100%;" />
+          <div style="width: 65px; height: 65px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center;">
+            <CyberMedal v-if="activeTab === 'medali'" :tierId="item.tierId" :isLocked="false" :iconType="item.iconType" style="width: 100%; height: 100%;" />
+            <CyberTrophy v-else-if="activeTab === 'piala'" :tier="item.tier" :icon="item.icon || 'none'" :size="65" />
             <i v-else :class="item.iconType" style="font-size: 2.5rem; color: #f59e0b;"></i>
           </div>
-          <span style="font-size: 0.8rem; text-align: center; color: #e2e8f0; font-weight: 500;">{{ item.name }}</span>
+          <span style="font-size: 0.8rem; text-align: center; color: #e2e8f0; font-weight: 500;">{{ item.title || item.name }}</span>
         </div>
       </div>
 
@@ -62,11 +63,12 @@
                 :class="{ selected: isSelected(item) }"
                 @click="toggleSelection(item)"
               >
-                <div class="select-icon">
-                  <CyberMedal v-if="modalTab !== 'sertifikat'" :tierId="item.tierId" :isLocked="false" :iconType="item.iconType" style="width: 50px; height: 50px;" />
+                <div class="select-icon" style="display: flex; justify-content: center; align-items: center; width: 50px; height: 50px;">
+                  <CyberMedal v-if="modalTab === 'medali'" :tierId="item.tierId" :isLocked="false" :iconType="item.iconType" style="width: 50px; height: 50px;" />
+                  <CyberTrophy v-else-if="modalTab === 'piala'" :tier="item.tier" :icon="item.icon || 'none'" :size="50" />
                   <i v-else :class="item.iconType" style="font-size: 2rem; color: #f59e0b;"></i>
                 </div>
-                <span class="select-name">{{ item.name }}</span>
+                <span class="select-name">{{ item.title || item.name }}</span>
                 <div class="check-mark" v-if="isSelected(item)"><i class="fa-solid fa-check"></i></div>
               </div>
             </div>
@@ -90,6 +92,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useAchievements } from '../../../composables/useAchievements'
 import { useToast } from '../../../composables/useToast'
 import CyberMedal from '../../ui/CyberMedal.vue'
+import CyberTrophy from '../../ui/CyberTrophy.vue'
 import api from '../../../services/api'
 
 const {
@@ -136,7 +139,7 @@ const resolveShowcase = (tab) => {
       .slice(0, MAX_SHOWCASE)
   }
   return [...earned]
-    .sort((a, b) => (b.tierId || 0) - (a.tierId || 0))
+    .sort((a, b) => (b.tierId || b.tier || 0) - (a.tierId || a.tier || 0))
     .slice(0, MAX_SHOWCASE)
 }
 
