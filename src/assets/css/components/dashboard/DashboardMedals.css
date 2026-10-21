@@ -190,6 +190,11 @@
   gap: 20px;
 }
 
+.badges-grid.trophy-grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+}
+
 /* Badge Card Modern Design */
 .badge-card {
   background: var(--black-alpha-0_3);
@@ -202,6 +207,36 @@
   text-align: center;
   position: relative;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.trophy-card {
+  padding: 28px 22px 24px 22px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.trophy-card.is-earned {
+  border-color: rgba(255, 215, 0, 0.25);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}
+
+.trophy-card .badge-info h4 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  line-height: 1.35;
+  color: #FFFFFF;
+}
+
+.trophy-tier-tag {
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .badge-card:hover {
