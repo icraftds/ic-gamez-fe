@@ -137,6 +137,7 @@ import { useQuiz } from '../composables/useQuiz'
 import { useCodeRunner } from '../composables/useCodeRunner'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useScoring } from '../composables/useScoring'
+import api from '../services/api'
 import { checkOutputMatch } from '../utils/codeChecker'
 
 import SimpleBackground from '../components/common/SimpleBackground.vue'
@@ -377,12 +378,8 @@ const onRequestNextFromTheory = async () => {
   if (currentLesson.value) {
     currentLesson.value.isCompleted = true
     localStorage.setItem(`theory_completed_${currentLesson.value.id}`, 'true')
-    // Beritahu backend (berjalan di background, tidak memblokir UI)
-    scoring.awardXp('theory', currentLesson.value.id).then(res => {
-      if (res && res.awarded && res.xp > 0) {
-        showRewardToast(res.xp, 'Materi Selesai!', 'theory', 0)
-      }
-    }).catch(console.error)
+    // Simpan progres materi selesai ke backend (tanpa penambahan reward XP)
+    api.post('/progress/complete', { lesson_id: currentLesson.value.id }).catch(console.error)
   }
   activeStep.value = STEP.QUIZ
 }

@@ -2,7 +2,7 @@
   <div class="practice-panel">
     <!-- Left: Instruction -->
     <section class="instruction-column">
-      <div class="instruction-content">
+      <div class="instruction-content" :class="{ 'has-schema-view': activeInstructionTab === 'schema' && isSqlMode }">
         <header class="instruction-header">
           <div class="header-badges">
             <span class="type-badge code">
@@ -16,9 +16,38 @@
             </span>
           </div>
           <h2 class="lesson-title">{{ practiceSections?.title || lesson.title }}</h2>
+
+          <!-- Tab Switcher Khusus Latihan SQL: Soal vs Atribut Database -->
+          <div v-if="isSqlMode" class="sql-segmented-tabs">
+            <button 
+              type="button"
+              class="sql-tab-btn" 
+              :class="{ active: activeInstructionTab === 'task' }"
+              @click="activeInstructionTab = 'task'"
+            >
+              <i class="fa-solid fa-list-check"></i>
+              <span>Instruksi Soal</span>
+            </button>
+            <button 
+              type="button"
+              class="sql-tab-btn" 
+              :class="{ active: activeInstructionTab === 'schema' }"
+              @click="activeInstructionTab = 'schema'"
+            >
+              <i class="fa-solid fa-database"></i>
+              <span>Atribut Database</span>
+              <span class="sql-tab-counter">8 Tabel</span>
+            </button>
+          </div>
         </header>
 
-        <div class="instruction-body">
+        <!-- View 1: Atribut Database (Schema & Data Preview) -->
+        <div v-if="activeInstructionTab === 'schema' && isSqlMode" class="schema-view-wrapper">
+          <DatabaseSchemaViewer :customSetupSql="lesson.setup_code || null" />
+        </div>
+
+        <!-- View 2: Instruksi Soal (Default) -->
+        <div v-else class="instruction-body">
           <div class="practice-cards" v-if="practiceSections">
             
             <!-- Useful Context Note if not generic filler -->
@@ -111,9 +140,24 @@
         <div class="editor-tabs">
           <span class="editor-tab">{{ editorTabName }}</span>
         </div>
-        <button class="run-btn" @click="$emit('run')">
-          <i class="fa-solid fa-play"></i> Jalankan
-        </button>
+
+        <div class="editor-topbar-actions">
+          <button 
+            v-if="isSqlMode"
+            type="button"
+            class="sql-schema-toggle-btn"
+            :class="{ active: activeInstructionTab === 'schema' }"
+            @click="activeInstructionTab = activeInstructionTab === 'schema' ? 'task' : 'schema'"
+            :title="activeInstructionTab === 'schema' ? 'Kembali ke instruksi soal' : 'Buka kamus atribut database'"
+          >
+            <i class="fa-solid fa-table-list"></i>
+            <span>{{ activeInstructionTab === 'schema' ? 'Lihat Soal' : 'Atribut Database' }}</span>
+          </button>
+
+          <button class="run-btn" @click="$emit('run')">
+            <i class="fa-solid fa-play"></i> Jalankan
+          </button>
+        </div>
       </div>
 
       <div class="editor-body">
@@ -231,6 +275,7 @@ import { useUserAccount } from '../../../composables/useUserAccount'
 import { useToast } from '../../../composables/useToast'
 import api from '../../../services/api'
 import HintButton from '../HintButton.vue'
+import DatabaseSchemaViewer from '../DatabaseSchemaViewer.vue'
 
 const { showToast } = useToast()
 
@@ -246,7 +291,16 @@ const props = defineProps({
 const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'])
 
 const activeOutputTab = ref('console')
+const activeInstructionTab = ref('task') // 'task' | 'schema'
 const isHtmlMode = computed(() => props.language === 'html' || props.language === 'css')
+const isSqlMode = computed(() => {
+  const lang = (props.language || props.lesson?.language || '').toLowerCase()
+  return lang === 'sql' || lang.includes('sql') || lang.includes('database')
+})
+
+watch(() => props.lesson?.id, () => {
+  activeInstructionTab.value = 'task'
+})
 
 const consoleHeight = ref(170)
 const isResizing = ref(false)

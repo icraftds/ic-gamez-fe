@@ -3,11 +3,24 @@
     <div class="sidebar-inner">
       <!-- Sidebar Header -->
       <div class="sidebar-header">
-        <div class="header-title-wrap">
-          <div class="header-icon"><i class="fa-solid fa-book-bookmark"></i></div>
-          <div>
-            <h2>Pusat Materi</h2>
-            <p class="header-subtitle">Dokumentasi & Modul Teori</p>
+        <div class="header-branding">
+          <div class="header-icon-box">
+            <i class="fa-solid fa-book-bookmark"></i>
+          </div>
+          <div class="header-text-block">
+            <div class="header-title-row">
+              <h2 class="sidebar-title">Pusat Materi</h2>
+              <span v-if="isProUser" class="tier-badge-pill pro" title="Akses PRO Aktif">
+                <i class="fa-solid fa-crown"></i> PRO
+              </span>
+              <router-link v-else-if="isLoggedIn" to="/pricing" class="tier-badge-pill upgrade">
+                Upgrade <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </router-link>
+              <router-link v-else to="/login?redirect=/materials" class="tier-badge-pill login">
+                Masuk <i class="fa-solid fa-arrow-right"></i>
+              </router-link>
+            </div>
+            <p class="sidebar-subtitle">Dokumentasi & Modul Teori</p>
           </div>
         </div>
         <button class="close-sidebar-btn" @click="$emit('close')" aria-label="Tutup Sidebar">
@@ -15,63 +28,38 @@
         </button>
       </div>
 
-      <!-- User Plan Status Pill -->
-      <div class="user-tier-banner">
-        <div v-if="isProUser" class="tier-pill pill-pro">
-          <i class="fa-solid fa-crown"></i>
-          <span>Paket PRO Aktif</span>
+      <!-- Segmented Tier Filter (Semua, Gratis, PRO) -->
+      <div class="tier-filter-wrapper">
+        <div class="tier-segmented-control" role="tablist">
+          <button 
+            type="button"
+            class="segment-tab"
+            :class="{ active: selectedTier === 'all' }"
+            @click="onSelectTier('all')"
+          >
+            <span>Semua</span>
+            <span class="count-pill">{{ counts.all || totalLessonsCount }}</span>
+          </button>
+          <button 
+            type="button"
+            class="segment-tab tab-free"
+            :class="{ active: selectedTier === 'free' }"
+            @click="onSelectTier('free')"
+          >
+            <span>Gratis</span>
+            <span class="count-pill">{{ counts.free || freeLessonsCount }}</span>
+          </button>
+          <button 
+            type="button"
+            class="segment-tab tab-pro"
+            :class="{ active: selectedTier === 'pro' }"
+            @click="onSelectTier('pro')"
+          >
+            <i class="fa-solid fa-crown pro-crown-icon"></i>
+            <span>PRO</span>
+            <span class="count-pill">{{ counts.pro || proLessonsCount }}</span>
+          </button>
         </div>
-        <div v-else-if="isLoggedIn" class="tier-pill pill-free">
-          <div class="pill-left">
-            <i class="fa-solid fa-circle-user"></i>
-            <span>Paket FREE</span>
-          </div>
-          <router-link to="/pricing" class="pill-upgrade-btn">
-            Upgrade <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          </router-link>
-        </div>
-        <div v-else class="tier-pill pill-guest">
-          <div class="pill-left">
-            <i class="fa-solid fa-user-lock"></i>
-            <span>Mode Tamu</span>
-          </div>
-          <router-link to="/login?redirect=/materials" class="pill-upgrade-btn">
-            Masuk <i class="fa-solid fa-arrow-right"></i>
-          </router-link>
-        </div>
-      </div>
-
-      <!-- Tier Filter Tabs (Semua, Gratis, Pro) -->
-      <div class="tier-filter-tabs">
-        <button 
-          type="button"
-          class="tier-tab-btn"
-          :class="{ active: selectedTier === 'all' }"
-          @click="onSelectTier('all')"
-        >
-          <span>Semua</span>
-          <span class="tab-count">{{ counts.all || totalLessonsCount }}</span>
-        </button>
-        <button 
-          type="button"
-          class="tier-tab-btn tab-free"
-          :class="{ active: selectedTier === 'free' }"
-          @click="onSelectTier('free')"
-        >
-          <i class="fa-solid fa-gift"></i>
-          <span>Materi Free</span>
-          <span class="tab-count">{{ counts.free || freeLessonsCount }}</span>
-        </button>
-        <button 
-          type="button"
-          class="tier-tab-btn tab-pro"
-          :class="{ active: selectedTier === 'pro' }"
-          @click="onSelectTier('pro')"
-        >
-          <i class="fa-solid fa-crown"></i>
-          <span>Materi PRO</span>
-          <span class="tab-count">{{ counts.pro || proLessonsCount }}</span>
-        </button>
       </div>
 
       <!-- Search Input -->
@@ -81,13 +69,14 @@
           type="text" 
           :value="searchQuery" 
           @input="$emit('update:searchQuery', $event.target.value)"
-          placeholder="Cari materi, bab, alur..." 
+          placeholder="Cari materi atau topik..." 
         />
         <button 
           v-if="searchQuery" 
           class="clear-search-btn" 
           @click="$emit('update:searchQuery', '')"
           type="button"
+          aria-label="Hapus pencarian"
         >
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -101,43 +90,35 @@
         <!-- Empty State -->
         <div v-else-if="isEmpty" class="empty-filter-state">
           <i class="fa-solid fa-filter-circle-xmark empty-icon"></i>
-          <p>Tidak ada materi yang sesuai dengan filter.</p>
+          <p>Tidak ada materi yang cocok.</p>
           <button class="reset-filter-btn" @click="resetFilters" type="button">
             <i class="fa-solid fa-rotate-left"></i> Reset Filter
           </button>
         </div>
         
         <div v-else class="materials-sections-wrapper">
-          <!-- 1. SECTION: PUSAT MATERI GRATIS (FREE) -->
+          <!-- 1. SECTION: MATERI GRATIS (FREE) -->
           <div 
             v-if="(selectedTier === 'all' || selectedTier === 'free') && freePaths.length > 0" 
-            class="tier-section-block section-free"
+            class="section-tier-group"
           >
-            <div class="tier-section-header">
-              <div class="section-header-left">
-                <span class="section-icon free"><i class="fa-solid fa-gift"></i></span>
-                <div>
-                  <h3 class="section-title">Pusat Materi Gratis</h3>
-                  <span class="section-subtitle">Terbuka untuk semua pengguna</span>
-                </div>
+            <div class="category-divider">
+              <div class="category-divider-left">
+                <span class="category-dot dot-free"></span>
+                <span class="category-heading">Materi Gratis</span>
               </div>
-              <span class="section-count-badge free">{{ freeLessonsCount }} Materi</span>
+              <span class="category-meta">{{ freeLessonsCount }} materi</span>
             </div>
 
             <!-- Free Paths List -->
             <div class="paths-sub-list">
               <div class="path-group" v-for="path in freePaths" :key="'free-' + path.id">
-                <div class="path-header-row" @click="togglePath('free-' + path.id)">
-                  <h4 class="path-title">
-                    <span class="path-title-content">
-                      <i :class="path.icon || 'fa-solid fa-book'"></i>
-                      <span class="title-text">{{ path.title }}</span>
-                    </span>
-                  </h4>
-                  <div class="path-meta-right">
-                    <span class="tier-tag tag-free">FREE</span>
-                    <i class="fa-solid fa-chevron-down toggle-icon" :class="{ 'rotated': openPaths.includes('free-' + path.id) }"></i>
+                <div class="path-header-row" @click="togglePath('free-' + path.id)" :title="path.title">
+                  <div class="path-title-content">
+                    <i :class="path.icon || 'fa-solid fa-code'" class="path-icon free-accent"></i>
+                    <span class="title-text">{{ path.title }}</span>
                   </div>
+                  <i class="fa-solid fa-chevron-down toggle-icon" :class="{ 'rotated': openPaths.includes('free-' + path.id) }"></i>
                 </div>
                 
                 <transition name="slide-fade">
@@ -157,13 +138,11 @@
                               :class="{ 
                                 'active': activeLessonId === lesson.id && activeChapterId === chapter.id && activePathId === path.id
                               }"
+                              :title="lesson.title"
                             >
                               <div class="lesson-item-left">
                                 <i class="fa-regular fa-file-lines status-icon free-icon"></i>
                                 <span class="lesson-link-title">{{ lesson.title }}</span>
-                              </div>
-                              <div class="lesson-item-right">
-                                <span class="badge-mini-free">FREE</span>
                               </div>
                             </a>
                           </li>
@@ -176,36 +155,29 @@
             </div>
           </div>
 
-          <!-- 2. SECTION: PUSAT MATERI PRO (KHUSUS PAKET PRO) -->
+          <!-- 2. SECTION: MATERI PRO -->
           <div 
             v-if="(selectedTier === 'all' || selectedTier === 'pro') && proPaths.length > 0" 
-            class="tier-section-block section-pro"
+            class="section-tier-group"
           >
-            <div class="tier-section-header">
-              <div class="section-header-left">
-                <span class="section-icon pro"><i class="fa-solid fa-crown"></i></span>
-                <div>
-                  <h3 class="section-title">Pusat Materi PRO</h3>
-                  <span class="section-subtitle">Khusus pengguna paket PRO</span>
-                </div>
+            <div class="category-divider">
+              <div class="category-divider-left">
+                <i class="fa-solid fa-crown category-crown-icon"></i>
+                <span class="category-heading pro-heading">Materi PRO</span>
               </div>
-              <span class="section-count-badge pro">{{ proLessonsCount }} Materi</span>
+              <span class="category-meta pro-meta">{{ proLessonsCount }} materi</span>
             </div>
 
             <!-- Pro Paths List -->
             <div class="paths-sub-list">
               <div class="path-group" v-for="path in proPaths" :key="'pro-' + path.id">
-                <div class="path-header-row" @click="togglePath('pro-' + path.id)">
-                  <h4 class="path-title">
-                    <span class="path-title-content">
-                      <i :class="path.icon || 'fa-solid fa-book'"></i>
-                      <span class="title-text">{{ path.title }}</span>
-                    </span>
-                  </h4>
+                <div class="path-header-row" @click="togglePath('pro-' + path.id)" :title="path.title">
+                  <div class="path-title-content">
+                    <i :class="path.icon || 'fa-solid fa-layer-group'" class="path-icon pro-accent"></i>
+                    <span class="title-text">{{ path.title }}</span>
+                  </div>
                   <div class="path-meta-right">
-                    <span class="tier-tag tag-pro">
-                      <i class="fa-solid fa-crown"></i> PRO
-                    </span>
+                    <i v-if="!isProUser" class="fa-solid fa-lock pro-lock-icon" title="Perlu Akses PRO"></i>
                     <i class="fa-solid fa-chevron-down toggle-icon" :class="{ 'rotated': openPaths.includes('pro-' + path.id) }"></i>
                   </div>
                 </div>
@@ -226,17 +198,14 @@
                               class="lesson-link"
                               :class="{ 
                                 'active': activeLessonId === lesson.id && activeChapterId === chapter.id && activePathId === path.id,
-                                'is-pro-lesson': true,
                                 'is-locked': !isProUser
                               }"
+                              :title="lesson.title"
                             >
                               <div class="lesson-item-left">
                                 <i v-if="!isProUser" class="fa-solid fa-lock status-icon lock-icon"></i>
-                                <i v-else class="fa-solid fa-crown status-icon pro-active-icon"></i>
+                                <i v-else class="fa-regular fa-file-lines status-icon pro-icon"></i>
                                 <span class="lesson-link-title">{{ lesson.title }}</span>
-                              </div>
-                              <div class="lesson-item-right">
-                                <span class="badge-mini-pro">PRO</span>
                               </div>
                             </a>
                           </li>

@@ -28,7 +28,7 @@
     <CoffeeModal v-model="showWipModal" />
 
     <!-- Friends Sidebar -->
-    <FriendsSidebar v-if="isLoggedIn" />
+    <FriendsSidebar v-if="showFriendsSidebar" />
 
   </div>
 </template>
@@ -59,6 +59,9 @@ const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login
 const showHomeNavbar = computed(() => {
   const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials', 'profile-edit']
   return !hiddenRoutes.includes(route.name)
+})
+const showFriendsSidebar = computed(() => {
+  return isLoggedIn.value && !['lesson', 'materials'].includes(route.name)
 })
 
 const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping } = useUserAccount()
