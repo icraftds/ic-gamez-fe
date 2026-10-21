@@ -5,11 +5,8 @@
     <div class="success-container">
       <div class="success-card">
         <div v-if="isLoading" class="status-content">
-          <div class="spinner-large">
-            <i class="fa-solid fa-spinner fa-spin"></i>
-          </div>
-          <h2>Sedang memverifikasi pembayaran Anda...</h2>
-          <p>Mohon jangan tutup halaman ini. Kami sedang melakukan sinkronisasi dengan sistem bank dan payment gateway.</p>
+          <TerminalLoader size="lg" label="verifikasi pembayaran" />
+          <p style="margin-top: 18px;">Mohon jangan tutup halaman ini. Kami sedang melakukan sinkronisasi dengan sistem bank dan payment gateway.</p>
         </div>
         <div v-else-if="isSuccess" class="status-content success">
           <div class="icon-circle">

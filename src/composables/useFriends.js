@@ -10,6 +10,8 @@ const isSearching = ref(false)
 const isLoadingFriends = ref(false)
 const isLoadingRequests = ref(false)
 
+const hasUnreadRequests = ref(false)
+
 export function useFriends() {
   const { isLoggedIn } = useUserAccount()
 
@@ -17,8 +19,12 @@ export function useFriends() {
     if (!isLoggedIn.value) return
     isFriendsSidebarOpen.value = !isFriendsSidebarOpen.value
     if (isFriendsSidebarOpen.value) {
+      // Hilangkan titik merah ketika sidebar dibuka
+      hasUnreadRequests.value = false
+      localStorage.setItem('seen_friend_requests_count', String(friendRequests.value.length || 0))
+
       if (friends.value.length === 0) fetchFriends()
-      if (friendRequests.value.length === 0) fetchFriendRequests()
+      fetchFriendRequests()
     }
   }
 
@@ -38,7 +44,19 @@ export function useFriends() {
     try {
       isLoadingRequests.value = true
       const res = await api.get('/user/friend-requests')
-      friendRequests.value = res.data.data
+      const data = res.data.data || []
+      friendRequests.value = data
+
+      // Cek apakah ada permintaan teman baru yang belum dilihat
+      const seenCount = parseInt(localStorage.getItem('seen_friend_requests_count') || '0', 10)
+      if (data.length > 0 && data.length > seenCount && !isFriendsSidebarOpen.value) {
+        hasUnreadRequests.value = true
+      } else if (data.length === 0 || isFriendsSidebarOpen.value) {
+        hasUnreadRequests.value = false
+        if (data.length === 0) {
+          localStorage.setItem('seen_friend_requests_count', '0')
+        }
+      }
     } catch (err) {
       console.error('Failed to fetch friend requests', err)
     } finally {
@@ -118,6 +136,7 @@ export function useFriends() {
     addFriend,
     removeFriend,
     acceptFriendRequest,
-    rejectFriendRequest
+    rejectFriendRequest,
+    hasUnreadRequests
   }
 }

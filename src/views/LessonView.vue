@@ -81,8 +81,7 @@
 
           <!-- Loading State -->
           <div key="loading" v-else-if="isLoading || !path?.chapters" class="loading-state">
-            <div class="spinner-large"></div>
-            <p>Mempersiapkan materi belajar...</p>
+            <TerminalLoader size="lg" label="materi belajar" />
           </div>
 
           <!-- Fallback: lesson tidak ditemukan -->

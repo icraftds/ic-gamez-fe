@@ -11,10 +11,7 @@
     </div>
 
     <div v-if="activeTab === 'items'" class="tab-content">
-      <div v-if="loading" class="loading-state">
-        <div class="loader-ring"></div>
-        <p>Memuat inventory...</p>
-      </div>
+      <TerminalLoader v-if="loading" label="inventory" />
     <div v-else-if="activeInventory.length === 0" class="empty-state">
       <i class="fa-solid fa-box-open"></i>
       <p>Inventory Anda kosong. Beli barang di Shop!</p>

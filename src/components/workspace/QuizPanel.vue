@@ -136,8 +136,10 @@
           :disabled="!canSubmit || isChecking"
           @click="$emit('submit')"
         >
-          <i v-if="isChecking" class="fa-solid fa-spinner fa-spin"></i>
-          {{ isChecking ? 'Mengecek...' : (isMultiQuiz ? `Cek Semua Jawaban (${answeredCount}/${quiz.length})` : 'Cek Jawaban') }}
+          <TerminalLoader v-if="isChecking" variant="inline" text="Mengecek" />
+          <template v-else>
+            {{ isMultiQuiz ? `Cek Semua Jawaban (${answeredCount}/${quiz.length})` : 'Cek Jawaban' }}
+          </template>
         </button>
 
         <!-- Sudah Submit & Belum Lulus: tombol Coba Lagi -->

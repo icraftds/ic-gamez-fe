@@ -19,10 +19,7 @@
     </div>
 
     <div class="daily-content">
-      <div v-if="isLoadingEvent" class="challenge-info card-glass" style="text-align: center; padding: 40px;">
-        <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: #38bdf8;"></i>
-        <p style="margin-top: 15px; color: #cbd5e1;">Memuat tantangan hari ini...</p>
-      </div>
+      <TerminalLoader v-if="isLoadingEvent" label="tantangan hari ini" />
 
       <div v-else class="challenge-info card-glass">
         <h3><i class="fa-solid fa-code"></i> {{ currentEvent?.title }}</h3>

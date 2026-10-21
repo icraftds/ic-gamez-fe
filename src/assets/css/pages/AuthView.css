@@ -341,19 +341,7 @@
   text-decoration: underline;
 }
 
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid var(--white-alpha-0_3);
-  border-top-color: var(--text-main-hex);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto;
-}
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
 
 /* Responsive adjustments */
 @media (max-width: 992px) {

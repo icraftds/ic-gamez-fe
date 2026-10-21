@@ -96,19 +96,112 @@ export function buildMedals(profile, stats) {
     ]
 }
 
+export const TROPHY_CATALOG = [
+  { id: 'trophy-1', tier: 1, slug: 'copper-circuit', name: 'Copper Circuit' },
+  { id: 'trophy-2', tier: 2, slug: 'neon-carbon', name: 'Neon Carbon' },
+  { id: 'trophy-3', tier: 3, slug: 'cobalt-aegis', name: 'Cobalt Aegis' },
+  { id: 'trophy-4', tier: 4, slug: 'violet-glitch', name: 'Violet Glitch' },
+  { id: 'trophy-5', tier: 5, slug: 'hyper-gold', name: 'Hyper Gold' },
+  { id: 'trophy-6', tier: 6, slug: 'crimson-mecha', name: 'Crimson Mecha' },
+  { id: 'trophy-7', tier: 7, slug: 'platinum-orbital', name: 'Platinum Orbital' },
+  { id: 'trophy-8', tier: 8, slug: 'obsidian-void', name: 'Obsidian Void' },
+  { id: 'trophy-9', tier: 9, slug: 'quantum-apex', name: 'Quantum Apex' },
+  { id: 'trophy-10', tier: 10, slug: 'singularity-god', name: 'Singularity God' }
+]
+
+export function buildTrophies(userTrophies = []) {
+  const catalogMap = new Map(TROPHY_CATALOG.map(t => [t.tier, t]))
+  
+  // 1. Group earned trophies by (tier + icon)
+  const earnedGroups = new Map()
+  const earnedTierSet = new Set()
+
+  const validTrophies = (userTrophies || []).filter(ut => {
+    const tier = ut.tier || ut.trophy_tier || ut.tierId
+    return tier >= 1 && tier <= 10
+  })
+
+  validTrophies.forEach(ut => {
+    const tier = ut.tier || ut.trophy_tier || ut.tierId
+    const icon = ut.icon || 'none'
+    const groupKey = `${tier}_${icon}`
+    earnedTierSet.add(tier)
+
+    const cat = catalogMap.get(tier) || { name: `Tier ${tier}`, slug: `tier-${tier}` }
+    const awardedAtTime = ut.awarded_at ? new Date(ut.awarded_at).getTime() : 0
+
+    if (!earnedGroups.has(groupKey)) {
+      earnedGroups.set(groupKey, {
+        id: `earned-${ut.id || groupKey}`,
+        dbId: ut.id,
+        uniqueKey: groupKey,
+        tier: tier,
+        slug: cat.slug,
+        name: cat.name,
+        title: ut.title || ut.name || cat.name, // Judul / Nama Penghargaan
+        icon: icon,
+        earned: true,
+        count: 1,
+        awarded_at: ut.awarded_at,
+        awardedAtTime: awardedAtTime,
+        awardedList: [ut]
+      })
+    } else {
+      const g = earnedGroups.get(groupKey)
+      g.count += 1
+      g.awardedList.push(ut)
+      if (awardedAtTime > g.awardedAtTime) {
+        g.awardedAtTime = awardedAtTime
+        g.awarded_at = ut.awarded_at
+        if (ut.title) g.title = ut.title
+        g.dbId = ut.id
+      }
+    }
+  })
+
+  // 2. Sort earned trophies by awardedAtTime DESC (most recent at the top)
+  const earnedList = Array.from(earnedGroups.values()).sort((a, b) => {
+    if (b.awardedAtTime !== a.awardedAtTime) {
+      return b.awardedAtTime - a.awardedAtTime
+    }
+    return b.tier - a.tier
+  })
+
+  // 3. Unearned tiers shown below as locked (10 down to 1)
+  const unearnedList = TROPHY_CATALOG
+    .filter(t => !earnedTierSet.has(t.tier))
+    .sort((a, b) => b.tier - a.tier)
+    .map(t => ({
+      id: `locked-${t.tier}`,
+      uniqueKey: `locked-${t.tier}`,
+      tier: t.tier,
+      slug: t.slug,
+      name: t.name,
+      title: t.name,
+      icon: 'none',
+      earned: false,
+      count: 0,
+      awarded_at: null,
+      awardedAtTime: 0,
+      awardedList: []
+    }))
+
+  return [...earnedList, ...unearnedList]
+}
+
 export function useAchievements() {
   const { userProfile, userStats, fetchUserStats } = useUserAccount()
 
   const allMedals = computed(() => buildMedals(userProfile.value, userStats.value))
 
-  // Piala: mengikuti tab Piala di halaman Pencapaian (saat ini memakai daftar yang sama dengan medali)
-  const allPiala = computed(() => allMedals.value)
+  // Piala: Koleksi 10 Piala Megah Cyberpunk (Default no icon)
+  const allPiala = computed(() => buildTrophies(userStats.value?.trophies || userProfile.value?.trophies || []))
 
   // Sertifikat: belum ada sumber data (halaman Pencapaian masih menampilkan empty state)
   const allSertifikat = computed(() => [])
 
   const earnedMedals = computed(() => allMedals.value.filter(m => m.earned))
-  const earnedPiala = computed(() => allPiala.value.filter(m => m.earned))
+  const earnedPiala = computed(() => allPiala.value.filter(p => p.earned))
   const earnedSertifikat = computed(() => allSertifikat.value.filter(c => c.earned))
 
   return {
@@ -123,3 +216,4 @@ export function useAchievements() {
     earnedSertifikat
   }
 }
+

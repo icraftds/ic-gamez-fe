@@ -5,7 +5,7 @@
     :disabled="isLoading"
     style="display: flex; align-items: center; justify-content: center; gap: 4px; padding-right: 8px;"
   >
-    <i v-if="isLoading" class="fa-solid fa-spinner fa-spin" style="margin-right: 4px;"></i>
+    <TerminalLoader v-if="isLoading" variant="inline" size="sm" />
     <i v-else class="fa-solid fa-lightbulb" style="margin-right: 4px;"></i> 
     <span style="font-weight: 600; font-size: 0.95rem;">Buka Hint : 1</span>
     <div style="width: 20px; height: 30px; display: flex; align-items: center; justify-content: flex-start; overflow: visible;">

@@ -11,10 +11,7 @@
             <input type="text" placeholder="Cari algoritma, teori..." @focus="openWipModal" />
           </div>
           
-          <div v-if="isLoading" class="sidebar-loading">
-            <div class="spinner-small"></div>
-            <span>Memuat data...</span>
-          </div>
+          <TerminalLoader v-if="isLoading" size="sm" label="topik" />
           <nav v-else class="topic-nav">
             <div class="nav-section" v-for="section in encyclopediaData" :key="section.section">
               <h4>{{ section.section }}</h4>
@@ -33,10 +30,7 @@
 
         <!-- Main Content -->
         <main class="encyclopedia-content">
-          <div v-if="isTopicLoading || isLoading" class="article-loading">
-            <div class="spinner"></div>
-            <p>Memuat artikel...</p>
-          </div>
+          <TerminalLoader v-if="isTopicLoading || isLoading" label="artikel" />
           <ArticleReader v-else-if="selectedTopic" :article="selectedTopic" />
         </main>
       </div>

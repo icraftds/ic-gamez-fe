@@ -52,28 +52,12 @@
           >Tantangan</router-link
         >
         <router-link
-          to="/encyclopedia"
-          class="nav-link"
-          :class="{ active: $route.path === '/encyclopedia' }"
-          @click="mobileMenuOpen = false"
-          >Ensiklopedia</router-link
-        >
-        <router-link
           to="/leaderboard"
           class="nav-link"
           :class="{ active: $route.path === '/leaderboard' }"
           @click="mobileMenuOpen = false"
           >Leaderboard</router-link
         >
-        <!-- Mobile only Friends button -->
-        <a 
-          href="#"
-          v-if="isLoggedIn"
-          class="nav-link mobile-only-friends"
-          @click.prevent="openFriendsSidebarMobile"
-        >
-          <i class="fa-solid fa-user-group"></i> Teman
-        </a>
         <router-link
           v-if="!isLoggedIn"
           to="/pricing"
@@ -91,11 +75,6 @@
             <i class="fa-solid fa-crown text-warning"></i> Upgrade
           </button>
           
-          <!-- Friends Button (Desktop only) -->
-          <button class="nav-btn friends-btn" @click="toggleFriendsSidebar" title="Teman">
-            <i class="fa-solid fa-user-group"></i>
-          </button>
-          
           <!-- 2. GameZ Shop -->
           <button class="nav-btn shop-btn nav-shop-btn" @click="$router.push('/shop')" title="GameZ Shop (Top Up)" style="cursor: pointer;">
             <i class="fa-solid fa-cart-plus"></i>
@@ -104,7 +83,7 @@
           <!-- 3. iCoinz -->
           <div class="nav-coinz" title="Saldo iCoinZ">
             <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
-            <i v-if="isLoading" class="fa-solid fa-circle-notch fa-spin" style="margin-left: 4px; font-size: 0.9rem; opacity: 0.7;"></i>
+            <TerminalLoader v-if="isLoading" variant="inline" size="sm" />
             <span v-else class="nav-coinz-val">{{ coinz === null ? '—' : coinz.toLocaleString('id-ID') }}<small v-if="walletStatus !== 'fresh'"> · belum diperbarui</small></span>
           </div>
 
@@ -137,15 +116,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import { useTheme } from "../../composables/useTheme";
 import UserProfileDropdown from "../common/UserProfileDropdown.vue";
-import { useFriends } from "../../composables/useFriends";
-
 const { isLightMode, toggleTheme } = useTheme();
-const { toggleFriendsSidebar } = useFriends();
-
-const openFriendsSidebarMobile = () => {
-  mobileMenuOpen.value = false;
-  toggleFriendsSidebar();
-};
 
 const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz, walletStatus } =
   useUserAccount();

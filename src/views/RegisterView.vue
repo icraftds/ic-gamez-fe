@@ -81,8 +81,8 @@
             </div>
 
             <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading || authCooldown > 0">
-              <span v-if="!isLoading">Daftar Akun</span>
-              <div v-else class="spinner"></div>
+              <TerminalLoader v-if="isLoading" variant="inline" label="pendaftaran" />
+              <span v-else>Daftar Akun</span>
             </button>
           </form>
 
@@ -112,8 +112,8 @@
             </div>
 
             <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading || authCooldown > 0">
-              <span v-if="!isLoading">Verifikasi OTP</span>
-              <div v-else class="spinner"></div>
+              <TerminalLoader v-if="isLoading" variant="inline" label="verifikasi" />
+              <span v-else>Verifikasi OTP</span>
             </button>
             
             <button type="button" @click="handleResendOtp" :disabled="isLoading || authCooldown > 0" style="background: transparent; color: var(--text-sub-hex); border: none; margin-top: 15px; cursor: pointer; text-decoration: underline; width: 100%; text-align: center;">

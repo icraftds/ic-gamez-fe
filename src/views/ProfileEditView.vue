@@ -177,10 +177,13 @@ const handleUsernameUpdate = (updatedUser) => {
           <!-- Submit Button -->
           <div class="pe-actions">
             <button type="submit" class="pe-save-btn" :class="{ 'btn-success': isSuccess }" :disabled="isSavingProfile">
-              <i v-if="isSavingProfile" class="fa-solid fa-circle-notch fa-spin"></i>
-              <i v-else-if="isSuccess" class="fa-solid fa-check"></i>
-              <i v-else class="fa-solid fa-floppy-disk"></i>
-              {{ isSavingProfile ? 'Menyimpan...' : isSuccess ? 'Tersimpan!' : 'Simpan Perubahan' }}
+              <TerminalLoader v-if="isSavingProfile" variant="inline" text="Menyimpan" />
+              <template v-else-if="isSuccess">
+                <i class="fa-solid fa-check"></i> Tersimpan!
+              </template>
+              <template v-else>
+                <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+              </template>
             </button>
           </div>
           

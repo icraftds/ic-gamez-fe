@@ -14,6 +14,9 @@
           <button class="materials-btn" @click="$router.push('/materials')">
             <i class="fa-solid fa-book-open-reader"></i> Baca Pusat Materi
           </button>
+          <button class="encyclopedia-btn" @click="$router.push('/encyclopedia')">
+            <i class="fa-solid fa-book-bookmark"></i> Ensiklopedia
+          </button>
         </div>
       </div>
       
@@ -109,12 +112,7 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div v-if="isPreparingLesson" class="loading-overlay">
-      <div class="loader-content">
-        <div class="spinner-large"></div>
-        <p>Mempersiapkan Roadmap Belajar...</p>
-      </div>
-    </div>
+    <TerminalLoader v-if="isPreparingLesson" variant="overlay" size="lg" label="roadmap belajar" />
   </div>
 </template>
 

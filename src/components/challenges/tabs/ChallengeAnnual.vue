@@ -1,10 +1,6 @@
 <template>
   <div class="challenge-annual">
-    <div v-if="isLoading" class="loading-state card-glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
-      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 3rem; color: #38bdf8; margin-bottom: 20px;"></i>
-      <h3 style="color: #f8fafc; font-size: 1.5rem;">Memuat Data...</h3>
-      <p style="color: #94a3b8;">Tunggu sebentar, kami sedang menyiapkan event tahunan untuk Anda.</p>
-    </div>
+    <TerminalLoader v-if="isLoading" label="event tahunan" />
 
     <div v-else-if="currentEvent && !isEventUpcoming" class="annual-active-container">
       <div class="annual-banner">

@@ -77,9 +77,7 @@
           </div>
         </div>
       </div>
-      <div v-if="isLoading" class="empty-state">
-        Memuat tantangan...
-      </div>
+      <TerminalLoader v-if="isLoading" label="tantangan modul" />
       <div v-else-if="challenges.length === 0" class="empty-state">
         Tidak ada tantangan dalam kategori ini.
       </div>

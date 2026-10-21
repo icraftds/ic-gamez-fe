@@ -53,8 +53,8 @@
             </div>
 
             <button type="submit" class="btn-submit" :disabled="isLoading">
-              <span v-if="!isLoading">Masuk ke Akun</span>
-              <div v-else class="spinner"></div>
+              <TerminalLoader v-if="isLoading" variant="inline" label="masuk" />
+              <span v-else>Masuk ke Akun</span>
             </button>
           </form>
 
@@ -88,8 +88,8 @@
             </div>
 
             <button type="submit" class="btn-submit" :disabled="isLoading">
-              <span v-if="!isLoading">Buat Akun Baru</span>
-              <div v-else class="spinner"></div>
+              <TerminalLoader v-if="isLoading" variant="inline" label="pendaftaran" />
+              <span v-else>Buat Akun Baru</span>
             </button>
           </form>
         </div>

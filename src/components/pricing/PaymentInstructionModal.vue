@@ -7,8 +7,7 @@
       </button>
       
       <div v-if="isLoading" class="loading-state">
-        <div class="spinner"></div>
-        <p>Memuat instruksi pembayaran...</p>
+        <TerminalLoader label="instruksi pembayaran" />
       </div>
 
       <div v-else-if="!isSuccess" class="payment-details">

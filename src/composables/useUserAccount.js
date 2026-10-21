@@ -151,8 +151,14 @@ export function useUserAccount() {
       }
       const user = await fetchUser(true)
       if (!user) return false
-      if (!ssoEnabled) await initializeWallet()
-      else walletInitializationPending.value = ssoState.walletPending.value
+      if (!ssoEnabled) {
+        await initializeWallet()
+      } else {
+        walletInitializationPending.value = ssoState.walletPending.value
+        if (walletInitializationPending.value) {
+          await initializeWallet()
+        }
+      }
       await fetchWallet()
       return true
     } finally {

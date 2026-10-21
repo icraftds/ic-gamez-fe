@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFriends } from '../../composables/useFriends'
 import CyberLevel from '../ui/CyberLevel.vue'
@@ -13,6 +13,8 @@ const {
   isLoadingFriends,
   isLoadingRequests,
   toggleFriendsSidebar,
+  fetchFriendRequests,
+  hasUnreadRequests,
   searchUsers,
   addFriend,
   removeFriend,
@@ -24,6 +26,10 @@ const router = useRouter()
 const searchQuery = ref('')
 const activeTab = ref('teman')
 let searchTimeout
+
+onMounted(() => {
+  fetchFriendRequests()
+})
 
 watch(searchQuery, (newVal) => {
   clearTimeout(searchTimeout)
@@ -58,6 +64,19 @@ const handleRemoveFriend = async (userId) => {
   <div class="friends-sidebar-overlay" :class="{ 'is-open': isFriendsSidebarOpen }" @click="toggleFriendsSidebar"></div>
   
   <aside class="friends-sidebar" :class="{ 'is-open': isFriendsSidebarOpen }">
+    <!-- Edge Chevron Tab Button -->
+    <button 
+      class="fs-edge-tab" 
+      @click.stop="toggleFriendsSidebar"
+      :title="isFriendsSidebarOpen ? 'Tutup Teman' : 'Daftar Teman'"
+      :aria-label="isFriendsSidebarOpen ? 'Tutup Teman' : 'Daftar Teman'"
+      type="button"
+    >
+      <i class="fa-solid" :class="isFriendsSidebarOpen ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+      <!-- Red Dot Notification for New Friend Requests -->
+      <span v-if="hasUnreadRequests" class="fs-tab-dot" title="Permintaan pertemanan baru"></span>
+    </button>
+
     <div class="fs-header">
       <h3><i class="fa-solid fa-user-group"></i> Daftar Teman</h3>
       <button class="fs-close-btn" @click="toggleFriendsSidebar" title="Tutup">
@@ -79,7 +98,7 @@ const handleRemoveFriend = async (userId) => {
           placeholder="Cari teman (nama, slug, id)..." 
           class="fs-search-input"
         >
-        <i v-if="isSearching" class="fa-solid fa-circle-notch fa-spin fs-search-spinner"></i>
+        <TerminalLoader v-if="isSearching" variant="inline" size="sm" class="fs-search-spinner" />
       </div>
 
       <!-- Autocomplete Dropdown -->
@@ -130,9 +149,7 @@ const handleRemoveFriend = async (userId) => {
 
     <div class="fs-content">
       <div v-if="activeTab === 'teman'">
-        <div v-if="isLoadingFriends" class="fs-loading">
-          <i class="fa-solid fa-circle-notch fa-spin"></i> Memuat teman...
-        </div>
+        <TerminalLoader v-if="isLoadingFriends" size="sm" label="teman" />
         <div v-else-if="friends.length === 0" class="fs-empty">
           <i class="fa-solid fa-ghost"></i>
           <p>Belum ada teman. Cari dan tambah teman sekarang!</p>
@@ -164,9 +181,7 @@ const handleRemoveFriend = async (userId) => {
       </div>
 
       <div v-if="activeTab === 'permintaan'">
-        <div v-if="isLoadingRequests" class="fs-loading">
-          <i class="fa-solid fa-circle-notch fa-spin"></i> Memuat permintaan...
-        </div>
+        <TerminalLoader v-if="isLoadingRequests" size="sm" label="permintaan" />
         <div v-else-if="friendRequests.length === 0" class="fs-empty-msg">
           <i class="fa-solid fa-envelope-open-text" style="font-size: 2rem; opacity: 0.5; margin-bottom: 10px; display: block;"></i>
           Belum ada permintaan pertemanan.

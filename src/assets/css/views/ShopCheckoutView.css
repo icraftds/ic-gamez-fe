@@ -258,11 +258,7 @@
   padding: 40px 0;
 }
 
-.processing-spinner {
-  font-size: 3rem;
-  color: var(--primary);
-  margin-bottom: 20px;
-}
+
 
 .center-content h3 {
   font-size: 1.3rem;

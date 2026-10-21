@@ -50,13 +50,11 @@
             boxShadow: `0 4px 22px ${themeColor}35`,
           }"
         >
-          <span v-if="!isPreparingLesson">Mulai Belajar</span>
-          <span v-else>Menyiapkan Materi...</span>
-          <i
-            v-if="!isPreparingLesson"
-            class="fa-solid fa-arrow-right btn-icon"
-          ></i>
-          <div v-else class="btn-spinner"></div>
+          <template v-if="!isPreparingLesson">
+            <span>Mulai Belajar</span>
+            <i class="fa-solid fa-arrow-right btn-icon"></i>
+          </template>
+          <TerminalLoader v-else variant="inline" label="materi" />
         </router-link>
       </div>
 

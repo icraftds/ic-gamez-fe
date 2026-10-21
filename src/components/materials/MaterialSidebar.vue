@@ -96,10 +96,7 @@
       <!-- Nav Navigation -->
       <nav class="sidebar-nav">
         <!-- Loading State -->
-        <div v-if="isLoading" class="loading-state">
-          <div class="spinner-small"></div>
-          <span>Memuat daftar materi...</span>
-        </div>
+        <TerminalLoader v-if="isLoading" size="sm" label="materi" />
 
         <!-- Empty State -->
         <div v-else-if="isEmpty" class="empty-filter-state">

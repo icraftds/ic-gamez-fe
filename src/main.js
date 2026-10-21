@@ -15,12 +15,14 @@ app.config.errorHandler = (err, instance, info) => {
 import CyberEnergy from './components/ui/CyberEnergy.vue'
 import CyberXp from './components/ui/CyberXp.vue'
 import CyberLevel from './components/ui/CyberLevel.vue'
+import TerminalLoader from './components/common/TerminalLoader.vue'
 
 app.use(createPinia())
 app.use(router)
 app.component('CyberEnergy', CyberEnergy)
 app.component('CyberXp', CyberXp)
 app.component('CyberLevel', CyberLevel)
+app.component('TerminalLoader', TerminalLoader)
 
 initCsrf().then(() => {
   app.mount('#app')

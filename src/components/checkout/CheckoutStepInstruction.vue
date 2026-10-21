@@ -31,7 +31,7 @@
         <div class="qr-box">
           <qrcode-vue v-if="paymentDetails.qr_string" :value="paymentDetails.qr_string" :size="200" level="H" />
           <div v-else class="qr-dummy-label">
-            <i class="fa-solid fa-spinner fa-spin"></i> Memuat QR...
+            <TerminalLoader size="sm" label="QR" />
           </div>
         </div>
       </div>

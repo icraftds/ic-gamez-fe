@@ -1,10 +1,7 @@
 <template>
   <div class="auto-login-container">
-    <div class="loader-content">
-      <div class="spinner-large"></div>
-      <h2>Autentikasi iC-Market...</h2>
-      <p>Mohon tunggu sebentar, kami sedang menghubungkan akun Anda.</p>
-    </div>
+    <TerminalLoader size="lg" label="autentikasi akun" />
+    <p>Mohon tunggu sebentar, kami sedang menghubungkan akun Anda.</p>
   </div>
 </template>
 
@@ -58,27 +55,12 @@ onMounted(async () => {
   background-color: var(--bg);
   color: var(--text-light);
   text-align: center;
+  padding: 0 20px;
 }
 
-.loader-content {
-  background: var(--bg-alt);
-  padding: 40px;
-  border-radius: 20px;
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-}
 p {
   color: var(--text-muted);
   margin: 0;
+  font-size: 0.9rem;
 }
 </style>
