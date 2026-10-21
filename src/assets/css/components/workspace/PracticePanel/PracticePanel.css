@@ -636,8 +636,9 @@
   font-size: 0.85rem;
   font-weight: 600;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 .feedback-banner.success {
   background: rgba(16, 185, 129, 0.15);
@@ -650,12 +651,116 @@
   border-bottom: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-
 .feedback-banner.warning {
   background: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
   border-bottom: 1px solid rgba(245, 158, 11, 0.3);
 }
+
+.feedback-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feedback-sql-hint {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #fef08a;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #fbbf24;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.45;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.feedback-sql-hint i {
+  color: #fbbf24;
+  margin-top: 2px;
+}
+
+/* ── Visual SQL Expected Output Table ── */
+.text-cyan {
+  color: #38bdf8 !important;
+}
+
+.terminal-badge.sql-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.expected-sql-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.expected-sql-scroll {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.expected-sql-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.expected-sql-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: #38bdf8;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  text-transform: lowercase;
+}
+
+.expected-sql-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: #34d399;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+}
+
+.th-num, .td-num {
+  width: 32px;
+  text-align: center;
+  color: #64748b !important;
+  font-size: 0.72rem;
+}
+
+.expected-sql-meta {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.expected-sql-meta i {
+  color: #38bdf8;
+}
+
+.expected-sql-meta code {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
 
 .footer-left {
   display: flex;
