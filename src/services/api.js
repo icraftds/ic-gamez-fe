@@ -92,8 +92,12 @@ api.interceptors.response.use(
         error.config.url.includes('submit-speedrun') ||
         error.config.url.includes('/coupons/validate') ||
         error.config.url.includes('/hints') ||
-        error.config.url.includes('/events/') ||
-        error.config.url.includes('/events/daily/active')
+        error.config.url.includes('/events') ||
+        error.config.url.includes('/paths') ||
+        error.config.url.includes('/challenges') ||
+        error.config.url.includes('/materials') ||
+        error.config.url.includes('/user/statistics') ||
+        error.config.url.includes('/progress')
       )) {
         return Promise.reject(error);
       }

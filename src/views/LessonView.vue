@@ -9,7 +9,7 @@
       :previous-lesson-title="previousLessonTitle"
       :active-step="activeStep"
       :lesson="currentLesson"
-      @back="router.push({ path: `/learning/${path?.slug || pathId}`, query: { chapter: currentChapter?.slug || currentChapter?.id } })"
+      @back="route.query.mode === 'challenge' ? router.push('/challenges') : router.push({ path: `/learning/${path?.slug || pathId}`, query: { chapter: currentChapter?.slug || currentChapter?.id } })"
       @prev-lesson="goToPrevLesson"
     />
 
@@ -72,10 +72,11 @@
             :code="runner.code.value"
             :output="runner.output.value"
             :is-last-lesson="isLastLesson"
+            :is-challenge="route.query.mode === 'challenge'"
             @update:code="runner.code.value = $event; runner.status.value = 'idle'"
             @run="onPracticeRun"
             @clear-output="runner.clearOutput()"
-            @back="activeStep = STEP.QUIZ"
+            @back="route.query.mode === 'challenge' ? router.push('/challenges') : (activeStep = STEP.QUIZ)"
             @finish="onPracticeFinish"
           />
 
@@ -137,6 +138,7 @@ import { useQuiz } from '../composables/useQuiz'
 import { useCodeRunner } from '../composables/useCodeRunner'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useScoring } from '../composables/useScoring'
+import api from '../services/api'
 import { checkOutputMatch } from '../utils/codeChecker'
 
 import SimpleBackground from '../components/common/SimpleBackground.vue'
@@ -377,12 +379,8 @@ const onRequestNextFromTheory = async () => {
   if (currentLesson.value) {
     currentLesson.value.isCompleted = true
     localStorage.setItem(`theory_completed_${currentLesson.value.id}`, 'true')
-    // Beritahu backend (berjalan di background, tidak memblokir UI)
-    scoring.awardXp('theory', currentLesson.value.id).then(res => {
-      if (res && res.awarded && res.xp > 0) {
-        showRewardToast(res.xp, 'Materi Selesai!', 'theory', 0)
-      }
-    }).catch(console.error)
+    // Simpan progres materi selesai ke backend (tanpa penambahan reward XP)
+    api.post('/progress/complete', { lesson_id: currentLesson.value.id }).catch(console.error)
   }
   activeStep.value = STEP.QUIZ
 }
@@ -420,7 +418,10 @@ const onPracticeRun = async () => {
         // Cegah double-award secara lokal
         if (scoring.hasBeenScored('practice', currentLesson.value.id)) return
 
-        currentLesson.value.practiceDone = true
+        // Hanya tandai practiceDone jika BUKAN mode challenge agar alur belajar tidak terpengaruh
+        if (route.query.mode !== 'challenge') {
+          currentLesson.value.practiceDone = true
+        }
 
         // Hitung nilai XP secara lokal untuk informasi chapter/difficulty
         const chapterOrder = currentLesson.value.chapter?.sort_order
@@ -436,7 +437,7 @@ const onPracticeRun = async () => {
         })
 
         // ② Tampilkan TOAST segera (XP & iCoinZ langsung muncul instan di Toast, 0 delay, no blocking popup!)
-        showRewardToast(xp, 'Praktik Berhasil!', 'practice', coinz)
+        showRewardToast(xp, route.query.mode === 'challenge' ? 'Tantangan Selesai!' : 'Praktik Berhasil!', 'practice', coinz)
 
         // ③ BACKGROUND SYNC: Kirim ke server dengan delay 3 detik
         const extraData = {
@@ -456,6 +457,24 @@ const onPracticeRun = async () => {
 
 /** Selesai & Lanjut dari practice. */
 const onPracticeFinish = async () => {
+  if (route.query.mode === 'challenge') {
+    // 1. Catat tantangan selesai ke localStorage agar langsung terupdate di sisi client
+    try {
+      const completed = JSON.parse(localStorage.getItem('completed_challenges') || '[]')
+      if (currentLesson.value?.id && !completed.includes(currentLesson.value.id)) {
+        completed.push(currentLesson.value.id)
+        localStorage.setItem('completed_challenges', JSON.stringify(completed))
+      }
+    } catch (e) {}
+
+    // 2. Segera flush outbox ke backend
+    await scoring.flushOutboxNow().catch(() => {})
+
+    // 3. Kembali ke halaman tantangan
+    router.push('/challenges')
+    return
+  }
+
   if (currentLesson.value) {
     currentLesson.value.practiceDone = true
   }
@@ -500,7 +519,7 @@ watch(currentLesson, (newLesson) => {
     if (quiz.isCorrect.value) {
       newLesson.quizPassed = true
     }
-    if (runner.status.value === 'success') {
+    if (runner.status.value === 'success' && route.query.mode !== 'challenge') {
       newLesson.practiceDone = true
     }
   } else {

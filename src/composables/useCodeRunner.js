@@ -30,6 +30,14 @@ export function useCodeRunner() {
     }
   }
 
+  const isChallengeMode = () => {
+    return typeof window !== 'undefined' && window.location.search.includes('mode=challenge')
+  }
+
+  const getStorageKey = (lessonId) => {
+    return isChallengeMode() ? `challenge_practice_state_${lessonId}` : `practice_state_${lessonId}`
+  }
+
   const saveToStorage = () => {
     if (!currentLessonId.value) return
     const data = {
@@ -37,7 +45,7 @@ export function useCodeRunner() {
       output: output.value,
       status: status.value
     }
-    localStorage.setItem(`practice_state_${currentLessonId.value}`, JSON.stringify(data))
+    localStorage.setItem(getStorageKey(currentLessonId.value), JSON.stringify(data))
   }
 
   const loadFromStorage = (lessonId, initialCode = null) => {
@@ -50,7 +58,7 @@ export function useCodeRunner() {
       } catch (e) {}
     }
 
-    const dataStr = localStorage.getItem(`practice_state_${lessonId}`)
+    const dataStr = localStorage.getItem(getStorageKey(lessonId))
     if (dataStr) {
       try {
         const data = JSON.parse(dataStr)

@@ -1,4 +1,4 @@
-import { runValidation } from './validators/index';
+import { runValidation } from './validators/index.js';
 
 /**
  * Memeriksa apakah output dari code runner sesuai dengan harapan dari soal praktik.
@@ -25,8 +25,18 @@ export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOut
   }
 
   // 1. CEK DUKUNGAN VALIDATOR BARU (VERSI 2 PRD)
-  if (lesson && lesson.validation_type && lesson.test_cases && lesson.test_cases.length > 0) {
-    return await runValidation(lesson.validation_type, lesson.test_cases, runnerOutputArray, currentCode, lesson);
+  let testCases = lesson?.test_cases;
+  if ((!testCases || testCases.length === 0) && lessonPractice) {
+    try {
+      const parsedP = typeof lessonPractice === 'string' ? JSON.parse(lessonPractice) : lessonPractice;
+      testCases = parsedP?.test_cases;
+    } catch (e) {}
+  }
+
+  const validationType = lesson?.validation_type || (lessonLanguage === 'sql' ? 'sql_result' : null);
+
+  if (validationType && testCases && testCases.length > 0) {
+    return await runValidation(validationType, testCases, runnerOutputArray, currentCode, lesson);
   }
 
   // 2. LOGIKA LEGACY (VERSI LAMA JAVASCRIPT)
@@ -41,12 +51,10 @@ export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOut
       .replace(/\/\/.*$/gm, '')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/--.*$/gm, '')
       .replace(/#.*$/gm, '');
     if (codeWithoutComments.includes('___')) return false;
   }
-
-  // Anti-cheat (sekarang ditangani di awal fungsi)
-  // ... dihapus karena sudah di atas ...
 
   if (['html', 'css'].includes(lessonLanguage)) return true;
   if (lessonLanguage === 'sql') {

@@ -72,6 +72,68 @@
 
 .lesson-title { font-size: 1.35rem; font-weight: 700; line-height: 1.35; color: #f8fafc; }
 
+/* ── SQL Tab Switcher ── */
+.sql-segmented-tabs {
+  display: flex;
+  background: rgba(15, 10, 28, 0.85);
+  border: 1px solid rgba(147, 51, 234, 0.25);
+  border-radius: 10px;
+  padding: 4px;
+  margin-top: 14px;
+  gap: 5px;
+}
+
+.sql-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sql-tab-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sql-tab-btn.active {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.35), rgba(79, 70, 229, 0.3));
+  border-color: rgba(168, 85, 247, 0.45);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(147, 51, 234, 0.25);
+}
+
+.sql-tab-counter {
+  font-size: 0.7rem;
+  background: rgba(168, 85, 247, 0.25);
+  color: #d8b4fe;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.sql-tab-btn.active .sql-tab-counter {
+  background: rgba(168, 85, 247, 0.5);
+  color: #ffffff;
+}
+
+.instruction-content.has-schema-view {
+  padding: 20px 18px;
+}
+
+.schema-view-wrapper {
+  margin-top: 4px;
+}
+
 .instruction-line {
   color: var(--text-sub-hex);
   font-size: 0.95rem;
@@ -123,6 +185,40 @@
   border-radius: 6px 6px 0 0;
   font-size: 0.78rem;
   font-family: 'JetBrains Mono', monospace;
+}
+
+.editor-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sql-schema-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(147, 51, 234, 0.15);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  color: #d8b4fe;
+  padding: 5px 12px;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sql-schema-toggle-btn:hover {
+  background: rgba(147, 51, 234, 0.28);
+  border-color: #c084fc;
+  color: #ffffff;
+}
+
+.sql-schema-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.35), rgba(79, 70, 229, 0.3));
+  border-color: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
 }
 
 .run-btn {
@@ -540,8 +636,9 @@
   font-size: 0.85rem;
   font-weight: 600;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 .feedback-banner.success {
   background: rgba(16, 185, 129, 0.15);
@@ -554,12 +651,116 @@
   border-bottom: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-
 .feedback-banner.warning {
   background: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
   border-bottom: 1px solid rgba(245, 158, 11, 0.3);
 }
+
+.feedback-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feedback-sql-hint {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #fef08a;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #fbbf24;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.45;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.feedback-sql-hint i {
+  color: #fbbf24;
+  margin-top: 2px;
+}
+
+/* ── Visual SQL Expected Output Table ── */
+.text-cyan {
+  color: #38bdf8 !important;
+}
+
+.terminal-badge.sql-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.expected-sql-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.expected-sql-scroll {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.expected-sql-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.expected-sql-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: #38bdf8;
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  text-transform: lowercase;
+}
+
+.expected-sql-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: #34d399;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+}
+
+.th-num, .td-num {
+  width: 32px;
+  text-align: center;
+  color: #64748b !important;
+  font-size: 0.72rem;
+}
+
+.expected-sql-meta {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.expected-sql-meta i {
+  color: #38bdf8;
+}
+
+.expected-sql-meta code {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
 
 .footer-left {
   display: flex;

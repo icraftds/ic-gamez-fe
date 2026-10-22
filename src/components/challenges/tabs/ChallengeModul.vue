@@ -141,8 +141,24 @@ const handleClickOutside = (event) => {
   }
 };
 
+const challengeCategoryList = [
+  'Tantangan Database & SQL',
+  'Tantangan JavaScript & Logika',
+  'Algoritma & Problem Solving',
+  'Tantangan Python Fundamentals',
+  'Tantangan PHP & Backend',
+  'Tantangan Frontend & Web',
+];
+
 const uniqueCategories = computed(() => {
-  return paths.value.map(p => p.title);
+  const catSet = new Set(challengeCategoryList);
+  paths.value.forEach(p => {
+    if (p.title && p.slug !== 'global-challenges') catSet.add(p.title);
+  });
+  challenges.value.forEach(c => {
+    if (c.category) catSet.add(c.category);
+  });
+  return Array.from(catSet);
 });
 
 const fetchChallenges = async () => {
@@ -164,10 +180,15 @@ const fetchChallenges = async () => {
     
     totalPages.value = response.data.meta ? response.data.meta.last_page : 1;
     
-    challenges.value = response.data.data.map(challenge => {
-      let category = 'Lainnya';
-      let pathId = null;
-      let chapterId = challenge.chapter_id;
+    let completedLocal = []
+    try {
+      completedLocal = JSON.parse(localStorage.getItem('completed_challenges') || '[]')
+    } catch(e) {}
+
+    const list = response.data.data.map(challenge => {
+      let category = challenge.path_title || 'Lainnya';
+      let pathId = challenge.path_slug || challenge.path_id;
+      let chapterId = challenge.chapter_slug || challenge.chapter_id;
       
       const path = paths.value.find(p => p.chapters && p.chapters.some(c => c.id == challenge.chapter_id));
       if (path) {
@@ -176,22 +197,28 @@ const fetchChallenges = async () => {
         const chapter = path.chapters.find(c => c.id == challenge.chapter_id);
         if (chapter) chapterId = chapter.slug || chapter.id;
       }
+
+      if (!pathId) pathId = challenge.path_slug || 'global-challenges';
+      if (!chapterId) chapterId = challenge.chapter_slug || challenge.chapter_id || 'algorithms';
       
+      let p = challenge.progress;
+      if (Array.isArray(p)) p = p.length > 0 ? p[0] : null;
+      const isChallengeCompleted = Boolean((p && p.challenge_completed) || completedLocal.includes(challenge.id));
+
       return {
         ...challenge,
         category,
         pathId,
         chapterId,
         difficulty: challenge.difficulty || (challenge.is_premium ? 'Sulit' : 'Sedang'),
-        isCompleted: (() => {
-          let p = challenge.progress;
-          if (Array.isArray(p)) p = p.length > 0 ? p[0] : null;
-          return p ? (p.is_completed || !!p.saved_code) : false;
-        })(),
+        isCompleted: isChallengeCompleted,
         isPremium: challenge.is_premium,
         costCredit: challenge.cost_credit,
       };
     });
+
+    // Hilangkan kartu soal yang sudah selesai dari layar
+    challenges.value = list.filter(item => !item.isCompleted);
     
   } catch (error) {
     console.error('Failed to fetch challenges:', error);
@@ -254,8 +281,11 @@ const openChallenge = async (challenge) => {
     }
   }
 
+  const pId = challenge.pathId || challenge.path_slug || 'global-challenges';
+  const cId = challenge.chapterId || challenge.chapter_slug || challenge.chapter_id || 'algorithms';
+
   router.push(
-    `/learning/${challenge.pathId}/lesson/${challenge.chapterId}/${challenge.id}?step=practice&mode=challenge`
+    `/learning/${pId}/lesson/${cId}/${challenge.id}?step=practice&mode=challenge`
   );
 };
 </script>

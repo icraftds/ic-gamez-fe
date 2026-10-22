@@ -2,7 +2,7 @@
   <div class="practice-panel">
     <!-- Left: Instruction -->
     <section class="instruction-column">
-      <div class="instruction-content">
+      <div class="instruction-content" :class="{ 'has-schema-view': activeInstructionTab === 'schema' && isSqlMode }">
         <header class="instruction-header">
           <div class="header-badges">
             <span class="type-badge code">
@@ -16,9 +16,38 @@
             </span>
           </div>
           <h2 class="lesson-title">{{ practiceSections?.title || lesson.title }}</h2>
+
+          <!-- Tab Switcher Khusus Latihan SQL: Soal vs Atribut Database -->
+          <div v-if="isSqlMode" class="sql-segmented-tabs">
+            <button 
+              type="button"
+              class="sql-tab-btn" 
+              :class="{ active: activeInstructionTab === 'task' }"
+              @click="activeInstructionTab = 'task'"
+            >
+              <i class="fa-solid fa-list-check"></i>
+              <span>Instruksi Soal</span>
+            </button>
+            <button 
+              type="button"
+              class="sql-tab-btn" 
+              :class="{ active: activeInstructionTab === 'schema' }"
+              @click="activeInstructionTab = 'schema'"
+            >
+              <i class="fa-solid fa-database"></i>
+              <span>Atribut Database</span>
+              <span class="sql-tab-counter">8 Tabel</span>
+            </button>
+          </div>
         </header>
 
-        <div class="instruction-body">
+        <!-- View 1: Atribut Database (Schema & Data Preview) -->
+        <div v-if="activeInstructionTab === 'schema' && isSqlMode" class="schema-view-wrapper">
+          <DatabaseSchemaViewer :customSetupSql="lesson.setup_code || null" />
+        </div>
+
+        <!-- View 2: Instruksi Soal (Default) -->
+        <div v-else class="instruction-body">
           <div class="practice-cards" v-if="practiceSections">
             
             <!-- Useful Context Note if not generic filler -->
@@ -53,8 +82,8 @@
               <pre class="code-preview"><code>{{ practiceSections.example }}</code></pre>
             </div>
 
-            <!-- Expected Output Terminal Preview -->
-            <div class="terminal-preview-card" v-if="practiceSections.output">
+            <!-- Expected Output: Visual Table Preview for SQL vs STDOUT for others -->
+            <div class="terminal-preview-card" :class="{ 'is-sql-table': isSqlMode && parsedExpectedSqlTable }" v-if="practiceSections.output">
               <div class="terminal-bar">
                 <div class="terminal-dots">
                   <span class="dot red"></span>
@@ -62,12 +91,40 @@
                   <span class="dot green"></span>
                 </div>
                 <div class="terminal-label">
-                  <i class="fa-solid fa-terminal"></i> OUTPUT YANG DIHARAPKAN
+                  <i :class="isSqlMode && parsedExpectedSqlTable ? 'fa-solid fa-table-list text-cyan' : 'fa-solid fa-terminal'"></i>
+                  {{ isSqlMode && parsedExpectedSqlTable ? 'HASIL TABEL YANG DIHARAPKAN' : 'OUTPUT YANG DIHARAPKAN' }}
                 </div>
-                <div class="terminal-badge">STDOUT</div>
+                <div class="terminal-badge" :class="{ 'sql-badge': isSqlMode && parsedExpectedSqlTable }">
+                  {{ isSqlMode && parsedExpectedSqlTable ? 'SQL RESULT' : 'STDOUT' }}
+                </div>
               </div>
               <div class="terminal-body">
-                <div class="terminal-line">
+                <!-- If SQL Table: Visual Preview -->
+                <div v-if="isSqlMode && parsedExpectedSqlTable" class="expected-sql-table-container">
+                  <div class="expected-sql-scroll">
+                    <table class="expected-sql-table">
+                      <thead>
+                        <tr>
+                          <th class="th-num">#</th>
+                          <th v-for="col in parsedExpectedSqlTable.columns" :key="col">{{ col }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(row, idx) in parsedExpectedSqlTable.rows" :key="idx">
+                          <td class="td-num">{{ idx + 1 }}</td>
+                          <td v-for="col in parsedExpectedSqlTable.columns" :key="col">{{ row[col] }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="expected-sql-meta">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Harapan: <strong>{{ parsedExpectedSqlTable.columns.length }} kolom</strong> (<code>{{ parsedExpectedSqlTable.columns.join(', ') }}</code>) &bull; <strong>{{ parsedExpectedSqlTable.rows.length }} baris</strong></span>
+                  </div>
+                </div>
+
+                <!-- Fallback: Standard line text preview -->
+                <div v-else class="terminal-line">
                   <span class="terminal-prompt">&gt;_</span>
                   <span class="terminal-text">{{ practiceSections.output }}</span>
                 </div>
@@ -94,7 +151,7 @@
 
         <button class="nav-btn finish-btn" @click="handleFinishClick">
           <i class="fa-solid fa-check"></i>
-          {{ isLastLesson ? 'Selesai' : 'Lanjut Materi' }}
+          {{ isChallenge ? 'Selesaikan Tantangan' : (isLastLesson ? 'Selesai' : 'Lanjut Materi') }}
         </button>
       </footer>
       
@@ -111,9 +168,24 @@
         <div class="editor-tabs">
           <span class="editor-tab">{{ editorTabName }}</span>
         </div>
-        <button class="run-btn" @click="$emit('run')">
-          <i class="fa-solid fa-play"></i> Jalankan
-        </button>
+
+        <div class="editor-topbar-actions">
+          <button 
+            v-if="isSqlMode"
+            type="button"
+            class="sql-schema-toggle-btn"
+            :class="{ active: activeInstructionTab === 'schema' }"
+            @click="activeInstructionTab = activeInstructionTab === 'schema' ? 'task' : 'schema'"
+            :title="activeInstructionTab === 'schema' ? 'Kembali ke instruksi soal' : 'Buka kamus atribut database'"
+          >
+            <i class="fa-solid fa-table-list"></i>
+            <span>{{ activeInstructionTab === 'schema' ? 'Lihat Soal' : 'Atribut Database' }}</span>
+          </button>
+
+          <button class="run-btn" @click="$emit('run')">
+            <i class="fa-solid fa-play"></i> Jalankan
+          </button>
+        </div>
       </div>
 
       <div class="editor-body">
@@ -161,7 +233,14 @@
         </div>
         
         <div v-else-if="runStatus === 'warning'" class="feedback-banner warning">
-          <i class="fa-solid fa-triangle-exclamation"></i> Kode berjalan tanpa error, tapi output belum sesuai dengan yang diharapkan.
+          <div class="feedback-banner-header">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Kode berjalan tanpa error, tapi output belum sesuai dengan yang diharapkan.</span>
+          </div>
+          <div v-if="sqlValidationHint" class="feedback-sql-hint">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>{{ sqlValidationHint }}</span>
+          </div>
         </div>
         <div v-else-if="runStatus === 'error'" class="feedback-banner error">
           <i class="fa-solid fa-circle-xmark"></i> Terdapat error saat menjalankan kode. Perbaiki dan coba lagi!
@@ -231,6 +310,7 @@ import { useUserAccount } from '../../../composables/useUserAccount'
 import { useToast } from '../../../composables/useToast'
 import api from '../../../services/api'
 import HintButton from '../HintButton.vue'
+import DatabaseSchemaViewer from '../DatabaseSchemaViewer.vue'
 
 const { showToast } = useToast()
 
@@ -241,12 +321,22 @@ const props = defineProps({
   output: { type: Array, default: () => [] },
   isLastLesson: { type: Boolean, default: false },
   runStatus: { type: String, default: 'idle' },
+  isChallenge: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'])
 
 const activeOutputTab = ref('console')
+const activeInstructionTab = ref('task') // 'task' | 'schema'
 const isHtmlMode = computed(() => props.language === 'html' || props.language === 'css')
+const isSqlMode = computed(() => {
+  const lang = (props.language || props.lesson?.language || '').toLowerCase()
+  return lang === 'sql' || lang.includes('sql') || lang.includes('database')
+})
+
+watch(() => props.lesson?.id, () => {
+  activeInstructionTab.value = 'task'
+})
 
 const consoleHeight = ref(170)
 const isResizing = ref(false)
@@ -431,6 +521,62 @@ const practiceSections = computed(() => {
   }
 
   return result
+})
+
+const parsedExpectedSqlTable = computed(() => {
+  if (!isSqlMode.value) return null
+  const rawOutput = practiceSections.value?.output || ''
+  if (!rawOutput) return null
+  
+  try {
+    const parsed = JSON.parse(rawOutput.trim())
+    if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null) {
+      const columns = Object.keys(parsed[0])
+      return {
+        columns,
+        rows: parsed
+      }
+    }
+  } catch (e) {
+    // bukan format JSON array of objects
+  }
+  return null
+})
+
+const sqlValidationHint = computed(() => {
+  if (!isSqlMode.value || props.runStatus !== 'warning') return null
+  
+  const tableEntry = props.output.find(e => e.type === 'table')
+  if (!tableEntry || !tableEntry.data || tableEntry.data.length === 0) return null
+  
+  const actualCols = Object.keys(tableEntry.data[0] || {})
+  
+  if (parsedExpectedSqlTable.value) {
+    const expCols = parsedExpectedSqlTable.value.columns
+    const actualColStr = actualCols.join(', ')
+    const expColStr = expCols.join(', ')
+    
+    if (actualCols.length > expCols.length) {
+      return `Hasil query Anda memiliki ${actualCols.length} kolom (${actualColStr}), sedangkan yang diharapkan hanya ${expCols.length} kolom (${expColStr}). Coba ganti 'SELECT *' menjadi 'SELECT ${expColStr}'.`
+    }
+    
+    if (actualCols.length < expCols.length) {
+      return `Hasil query Anda memiliki ${actualCols.length} kolom (${actualColStr}), sedangkan yang diharapkan ${expCols.length} kolom (${expColStr}).`
+    }
+
+    const missingCols = expCols.filter(ec => !actualCols.some(ac => ac.toLowerCase() === ec.toLowerCase()))
+    if (missingCols.length > 0) {
+      return `Kolom '${missingCols.join(', ')}' belum terpilih. Kolom yang diharapkan: [${expColStr}].`
+    }
+
+    const expRowCount = parsedExpectedSqlTable.value.rows.length
+    const actRowCount = tableEntry.data.length
+    if (actRowCount !== expRowCount) {
+      return `Jumlah baris yang dihasilkan (${actRowCount}) berbeda dengan yang diharapkan (${expRowCount} baris). Periksa filter WHERE atau klausa LIMIT Anda.`
+    }
+  }
+
+  return null
 })
 
 const parsedInstruction = computed(() => {

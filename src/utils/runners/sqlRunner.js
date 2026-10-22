@@ -1,10 +1,11 @@
 /**
  * Runner untuk SQL menggunakan in-memory SQLite WebAssembly (Client-side)
  */
-export async function runSql(code) {
+export async function runSql(code, context = null) {
   try {
-    const { executeSqlQuery } = await import('../sql/sqlEngine')
-    const result = await executeSqlQuery(code)
+    const { executeSqlQuery } = await import('../sql/sqlEngine.js')
+    const customInitSql = context?.setup_code || null
+    const result = await executeSqlQuery(code, { customInitSql })
 
     if (!result.success) {
       return [{ type: 'error', text: result.error }]

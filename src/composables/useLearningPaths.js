@@ -27,6 +27,7 @@ export function useLearningPaths() {
 
   // To get detailed info including chapters and lessons for a specific path
   const fetchPathDetails = async (slug, skipLoadingState = false) => {
+    if (!slug || slug === 'null' || slug === 'undefined') return null
     try {
       if (!skipLoadingState) isLoading.value = true
       const response = await api.get(`/paths/${slug}`)
@@ -113,21 +114,46 @@ export function useLearningPaths() {
 
   const getLessonById = (pathId, chapterId, lessonId) => {
     const chapter = getChapterById(pathId, chapterId)
-    if (!chapter || !chapter.lessons) return null
-    return chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+    if (chapter && chapter.lessons) {
+      const found = chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+      if (found) return found
+    }
+
+    // Fallback: cari di seluruh paths dan chapters jika format ID/slug berbeda
+    for (const p of paths.value) {
+      if (p.chapters) {
+        for (const c of p.chapters) {
+          if (c.lessons) {
+            const found = c.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+            if (found) return found
+          }
+        }
+      }
+    }
+    return null
   }
 
   // Jika diperlukan untuk backward compatibility
   const allChallenges = computed(() => {
     const challenges = []
+    let completedLocal = []
+    try {
+      completedLocal = JSON.parse(localStorage.getItem('completed_challenges') || '[]')
+    } catch (e) {}
+
     paths.value.forEach(path => {
       if (path.chapters) {
         path.chapters.forEach(chapter => {
           if (chapter.lessons) {
             chapter.lessons.forEach(lesson => {
               if (lesson.type === 'code') {
+                let prog = lesson.progress
+                if (Array.isArray(prog)) prog = prog.length > 0 ? prog[0] : null
+                const isChallengeDone = Boolean((prog && prog.challenge_completed) || completedLocal.includes(lesson.id))
+
                 challenges.push({
                   ...lesson,
+                  isChallengeDone,
                   pathId: path.slug || path.id,
                   chapterId: chapter.slug || chapter.id,
                   category: path.title,

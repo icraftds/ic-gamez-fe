@@ -4,7 +4,7 @@ import api from '../services/api'
 
 // ── XP Constants (dipakai untuk Optimistic UI, tanpa menunggu API) ─────────
 const XP_REWARDS = Object.freeze({
-  theory: 10,
+  theory: 0,
   quiz: { default: 25, hard: 50 },
   practice: { easy: 25, medium: 50, hard: 100, boss: 150 }
 })
@@ -42,7 +42,7 @@ let isProcessingOutbox = false // Concurrency lock
  */
 function computeLocalXp(type, difficulty = '', chapterOrder = 1) {
   const diff = (difficulty || '').toLowerCase()
-  if (type === 'theory') return XP_REWARDS.theory
+  if (type === 'theory') return 0
   if (type === 'quiz') {
     if (chapterOrder >= 4 || ['hard', 'sulit', 'boss'].includes(diff)) {
       return XP_REWARDS.quiz.hard

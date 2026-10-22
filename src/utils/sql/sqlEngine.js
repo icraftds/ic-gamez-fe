@@ -1,5 +1,5 @@
 import initSqlJs from 'sql.js'
-import { ICGAMEZ_STORE_SCHEMA_SQL } from './icgamezStoreSchema'
+import { ICGAMEZ_STORE_SCHEMA_SQL } from './icgamezStoreSchema.js'
 
 let SQL = null
 let sqlInitPromise = null
@@ -15,20 +15,28 @@ export async function getSqlInstance() {
     try {
       // 1. Coba load dari asset lokal public/sql/
       const instance = await initSqlJs({
-        locateFile: file => `/sql/${file}`
+        locateFile: (file) => {
+          if (file.endsWith('.wasm')) {
+            return `/sql/sql-wasm-browser.wasm`
+          }
+          return `/sql/${file}`
+        }
       })
       SQL = instance
       return SQL
     } catch (localErr) {
       console.warn('[sqlEngine] Gagal memuat wasm lokal, mencoba CDN...', localErr)
-      // 2. Fallback ke CDN resmi
-      const instance = await initSqlJs({
-        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/${file}`
-      })
-      SQL = instance
-      return SQL
-    } finally {
-      sqlInitPromise = null
+      // 2. Fallback ke CDN resmi (versi 1.14.2 sesuai package.json)
+      try {
+        const instance = await initSqlJs({
+          locateFile: (file) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.14.2/${file}`
+        })
+        SQL = instance
+        return SQL
+      } catch (cdnErr) {
+        console.error('[sqlEngine] Gagal memuat SQLite WASM dari semua sumber:', cdnErr)
+        throw new Error('Gagal memuat mesin SQLite WebAssembly. Periksa koneksi internet atau asset lokal.')
+      }
     }
   })()
 
@@ -60,7 +68,7 @@ export async function executeSqlQuery(sqlQuery, options = {}) {
       success: false,
       tables: [],
       rowsModified: 0,
-      error: 'Query SQL tidak boleh kosong.'
+      error: 'Query SQL tidak boleh kosong. Tuliskan query Anda terlebih dahulu.'
     }
   }
 
@@ -96,11 +104,18 @@ export async function executeSqlQuery(sqlQuery, options = {}) {
       db,
     }
   } catch (error) {
+    let errorMsg = error.message || 'Terjadi kesalahan sintaks SQL.'
+
+    // Berikan petunjuk ramah jika user mencoba query nama database bukan nama tabel
+    if (errorMsg.includes('no such table: icgamez_store')) {
+      errorMsg = "Tabel 'icgamez_store' tidak ditemukan. 'icgamez_store' adalah nama database, bukan nama tabel. Silakan gunakan tabel yang tersedia seperti: categories, products, orders, dll. (Cek tab Atribut Database)."
+    }
+
     return {
       success: false,
       tables: [],
       rowsModified: 0,
-      error: error.message || 'Terjadi kesalahan sintaks SQL.',
+      error: errorMsg,
       db,
     }
   }
