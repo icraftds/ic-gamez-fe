@@ -20,11 +20,11 @@
         ></div>
 
         <router-link
-          :to="$route.path === '/' ? '/' : '/dashboard'"
+          :to="$route.path === '/' ? '/' : (isLoggedIn ? '/dashboard' : '/')"
           class="nav-link"
           :class="{ active: $route.path === '/' || $route.path.startsWith('/dashboard') }"
           @click="handleNavClick"
-          >{{ $route.path === '/' ? 'Beranda' : 'Dashboard' }}</router-link
+          >Beranda</router-link
         >
         <router-link
           to="/learning"
@@ -152,11 +152,11 @@
       <div class="nav-drawer" :class="{ open: mobileMenuOpen }">
         <div class="nav-capsule nav-center-capsule mobile-center-capsule">
           <router-link
-            :to="$route.path === '/' ? '/' : '/dashboard'"
+            :to="$route.path === '/' ? '/' : (isLoggedIn ? '/dashboard' : '/')"
             class="nav-link"
             :class="{ active: $route.path === '/' || $route.path.startsWith('/dashboard') }"
             @click="mobileMenuOpen = false"
-            >{{ $route.path === '/' ? 'Beranda' : 'Dashboard' }}</router-link
+            >Beranda</router-link
           >
           <router-link
             to="/learning"
