@@ -1,5 +1,5 @@
 import initSqlJs from 'sql.js'
-import { ICGAMEZ_STORE_SCHEMA_SQL } from './icgamezStoreSchema'
+import { ICGAMEZ_STORE_SCHEMA_SQL } from './icgamezStoreSchema.js'
 
 let SQL = null
 let sqlInitPromise = null

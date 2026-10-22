@@ -4,8 +4,20 @@ import { useLearningPaths } from "./useLearningPaths.js";
 export function useChallengesStats() {
   const { allChallenges } = useLearningPaths();
 
+  const normalizeDiff = (diff) => {
+    const d = (diff || '').toLowerCase();
+    if (d === 'easy' || d === 'mudah') return 'Mudah';
+    if (d === 'medium' || d === 'sedang') return 'Sedang';
+    if (d === 'hard' || d === 'sulit' || d === 'boss') return 'Sulit';
+    return 'Sedang';
+  };
+
+  const isItemCompleted = (c) => {
+    return Boolean(c.isChallengeDone || c.isCompleted || c.practiceDone);
+  };
+
   const completedCount = computed(
-    () => allChallenges.value.filter((c) => c.isCompleted || c.practiceDone).length
+    () => allChallenges.value.filter(isItemCompleted).length
   );
   
   const completionPercentage = computed(() => {
@@ -14,10 +26,10 @@ export function useChallengesStats() {
   });
 
   const getDiffStats = (diff) => {
-    const challenges = allChallenges.value.filter((c) => c.difficulty === diff);
+    const challenges = allChallenges.value.filter((c) => normalizeDiff(c.difficulty) === diff);
     return {
       total: challenges.length,
-      completed: challenges.filter((c) => c.isCompleted || c.practiceDone).length,
+      completed: challenges.filter(isItemCompleted).length,
     };
   };
 

@@ -1,201 +1,1243 @@
 /**
  * dbSchemaInspector.js
  * Visual Data Dictionary & Schema Inspector untuk Database IC Game-Z Store (SQLite).
- * Menyediakan definisi atribut, tipe data, foreign key, keterangan, serta sampel data nyata.
+ * Sesuai 100% dengan skema kanonikal 111 materi Alur 13 (SQL & Basis Data).
  */
 
 import { ICGAMEZ_STORE_SCHEMA_SQL } from './icgamezStoreSchema'
 
 export const ICGAMEZ_STORE_METADATA = [
   {
-    name: 'categories',
-    label: 'Kategori Produk',
-    icon: 'fa-solid fa-tags',
-    description: 'Menyimpan pengelompokan jenis produk dan periferal gaming.',
-    columns: [
-      { name: 'id', type: 'INTEGER', isPk: true, notNull: true, description: 'ID unik kategori (Primary Key)' },
-      { name: 'name', type: 'TEXT', isPk: false, notNull: true, description: 'Nama kategori produk (Keyboard, Mouse, Monitor, dll.)' },
-      { name: 'description', type: 'TEXT', isPk: false, notNull: false, description: 'Keterangan lengkap cakupan produk dalam kategori' }
+    "name": "customers",
+    "label": "Pelanggan (Customers)",
+    "icon": "fa-solid fa-users",
+    "description": "Data akun pelanggan/pembeli terdaftar di IC Game-Z Store.",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kunci utama pelanggan"
+      },
+      {
+        "name": "name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Nama pelanggan"
+      },
+      {
+        "name": "email",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Email unik pelanggan"
+      },
+      {
+        "name": "city",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kota pelanggan"
+      },
+      {
+        "name": "joined_at",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Tanggal bergabung"
+      }
     ],
-    foreignKeys: [],
-    totalRows: 5,
-    sampleRows: [
-      { id: 1, name: 'Keyboard', description: 'Keyboard mekanikal, gaming, dan produktivitas harian' },
-      { id: 2, name: 'Mouse', description: 'Mouse gaming presisi tinggi, nirkabel, dan ergonomis' },
-      { id: 3, name: 'Monitor', description: 'Monitor resolusi tinggi untuk gaming dan desain grafis' },
-      { id: 4, name: 'Audio', description: 'Headset, headphone studio, mikrofon, dan soundbar gaming' },
-      { id: 5, name: 'Aksesoris', description: 'Mousepad, deskmat, kabel braided, dan headphone stand' }
+    "foreignKeys": [],
+    "totalRows": 15,
+    "sampleRows": [
+      {
+        "id": 1,
+        "name": "Andi Pratama",
+        "email": "andi@mail.test",
+        "city": "Bandung",
+        "joined_at": "2026-01-05"
+      },
+      {
+        "id": 2,
+        "name": "Budi Santoso",
+        "email": "budi@mail.test",
+        "city": "Jakarta",
+        "joined_at": "2026-01-12"
+      },
+      {
+        "id": 3,
+        "name": "Citra Lestari",
+        "email": "citra@mail.test",
+        "city": "Surabaya",
+        "joined_at": "2026-01-18"
+      },
+      {
+        "id": 4,
+        "name": "Dina Maharani",
+        "email": "dina@mail.test",
+        "city": "Semarang",
+        "joined_at": "2026-02-02"
+      },
+      {
+        "id": 5,
+        "name": "Eko Saputra",
+        "email": "eko@mail.test",
+        "city": "Bandung",
+        "joined_at": "2026-02-08"
+      }
     ]
   },
   {
-    name: 'products',
-    label: 'Produk & Hardware',
-    icon: 'fa-solid fa-box-open',
-    description: 'Katalog barang/produk yang dijual, beserta harga dan stok fisik.',
-    columns: [
-      { name: 'id', type: 'INTEGER', isPk: true, notNull: true, description: 'ID unik produk (Primary Key)' },
-      { name: 'category_id', type: 'INTEGER', isPk: false, isFk: true, fkTarget: 'categories.id', notNull: false, description: 'ID kategori rujukan (Foreign Key ke categories)' },
-      { name: 'supplier_id', type: 'INTEGER', isPk: false, isFk: true, fkTarget: 'suppliers.id', notNull: false, description: 'ID pemasok penyedia barang (Foreign Key ke suppliers)' },
-      { name: 'name', type: 'TEXT', isPk: false, notNull: true, description: 'Nama resmi produk dan spesifikasinya' },
-      { name: 'price', type: 'INTEGER', isPk: false, notNull: true, description: 'Harga satuan produk dalam satuan Rupiah (IDR)' },
-      { name: 'stock', type: 'INTEGER', isPk: false, notNull: true, description: 'Jumlah sisa unit produk yang tersedia di gudang' }
+    "name": "categories",
+    "label": "Kategori Produk",
+    "icon": "fa-solid fa-tags",
+    "description": "Kategori dan kelompok produk periferal gaming.",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kunci utama kategori"
+      },
+      {
+        "name": "name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Nama kategori unik"
+      }
     ],
-    foreignKeys: [
-      { from: 'category_id', toTable: 'categories', toColumn: 'id' },
-      { from: 'supplier_id', toTable: 'suppliers', toColumn: 'id' }
-    ],
-    totalRows: 22,
-    sampleRows: [
-      { id: 1, category_id: 1, supplier_id: 1, name: 'MechaKey K1 Blue Switch', price: 450000, stock: 25 },
-      { id: 2, category_id: 1, supplier_id: 1, name: 'MechaKey K2 Red Switch Wireless', price: 650000, stock: 18 },
-      { id: 3, category_id: 1, supplier_id: 2, name: 'ProTypist Ergonomic Keyboard', price: 850000, stock: 12 },
-      { id: 5, category_id: 2, supplier_id: 1, name: 'SwiftMouse M1 Optical', price: 125000, stock: 45 },
-      { id: 9, category_id: 3, supplier_id: 2, name: 'VisionPro 24 FHD 75Hz', price: 1450000, stock: 14 }
+    "foreignKeys": [],
+    "totalRows": 5,
+    "sampleRows": [
+      {
+        "id": 1,
+        "name": "Keyboard"
+      },
+      {
+        "id": 2,
+        "name": "Mouse"
+      },
+      {
+        "id": 3,
+        "name": "Monitor"
+      },
+      {
+        "id": 4,
+        "name": "Audio"
+      },
+      {
+        "id": 5,
+        "name": "Aksesori"
+      }
     ]
   },
   {
-    name: 'customers',
-    label: 'Pelanggan (Customers)',
-    icon: 'fa-solid fa-users',
-    description: 'Data pengguna/pembeli terdaftar yang melakukan transaksi di toko.',
-    columns: [
-      { name: 'id', type: 'INTEGER', isPk: true, notNull: true, description: 'ID unik pelanggan (Primary Key)' },
-      { name: 'name', type: 'TEXT', isPk: false, notNull: true, description: 'Nama lengkap pelanggan' },
-      { name: 'email', type: 'TEXT', isPk: false, notNull: false, isUnique: true, description: 'Alamat surel unik pelanggan' },
-      { name: 'phone', type: 'TEXT', isPk: false, notNull: false, description: 'Nomor telepon/kontak aktif' },
-      { name: 'city', type: 'TEXT', isPk: false, notNull: false, description: 'Kota domisili tempat tinggal' },
-      { name: 'created_at', type: 'TEXT', isPk: false, notNull: false, description: 'Tanggal akun didaftarkan (YYYY-MM-DD)' }
+    "name": "suppliers",
+    "label": "Pemasok (Suppliers)",
+    "icon": "fa-solid fa-truck-field",
+    "description": "Distributor dan mitra pemasok perangkat gaming.",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kunci utama supplier"
+      },
+      {
+        "name": "name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Nama supplier"
+      },
+      {
+        "name": "city",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kota supplier"
+      }
     ],
-    foreignKeys: [],
-    totalRows: 15,
-    sampleRows: [
-      { id: 1, name: 'Andi Pratama', email: 'andi.pratama@gmail.com', phone: '081211112222', city: 'Bandung', created_at: '2024-01-05' },
-      { id: 2, name: 'Budi Santoso', email: 'budi.santoso@gmail.com', phone: '081233334444', city: 'Jakarta', created_at: '2024-01-08' },
-      { id: 3, name: 'Citra Lestari', email: 'citra.lestari@yahoo.com', phone: '081355556666', city: 'Surabaya', created_at: '2024-01-12' },
-      { id: 4, name: 'Dina Maharani', email: 'dina.m@gmail.com', phone: '081377778888', city: 'Semarang', created_at: '2024-01-15' },
-      { id: 5, name: 'Eko Prasetyo', email: 'eko.prasetyo@gmail.com', phone: '082199990000', city: 'Yogyakarta', created_at: '2024-01-20' }
+    "foreignKeys": [],
+    "totalRows": 6,
+    "sampleRows": [
+      {
+        "id": 1,
+        "name": "Nusantara Tech",
+        "city": "Jakarta"
+      },
+      {
+        "id": 2,
+        "name": "Prima Digital",
+        "city": "Bandung"
+      },
+      {
+        "id": 3,
+        "name": "Surya Komputer",
+        "city": "Surabaya"
+      },
+      {
+        "id": 4,
+        "name": "Jogja Periferal",
+        "city": "Yogyakarta"
+      },
+      {
+        "id": 5,
+        "name": "Semarang Elektronik",
+        "city": "Semarang"
+      }
     ]
   },
   {
-    name: 'orders',
-    label: 'Pesanan (Orders)',
-    icon: 'fa-solid fa-receipt',
-    description: 'Header transaksi pesanan, mencatat pembeli, kasir/sales, tanggal, status, dan total bayar.',
-    columns: [
-      { name: 'id', type: 'INTEGER', isPk: true, notNull: true, description: 'Nomor nota / ID pesanan (Primary Key)' },
-      { name: 'customer_id', type: 'INTEGER', isPk: false, isFk: true, fkTarget: 'customers.id', notNull: false, description: 'ID pelanggan yang membeli (Foreign Key ke customers)' },
-      { name: 'employee_id', type: 'INTEGER', isPk: false, isFk: true, fkTarget: 'employees.id', notNull: false, description: 'ID staf/kasir yang melayani (Foreign Key ke employees)' },
-      { name: 'order_date', type: 'TEXT', isPk: false, notNull: true, description: 'Tanggal pesanan dibuat (YYYY-MM-DD)' },
-      { name: 'status', type: 'TEXT', isPk: false, notNull: true, description: 'Status order: completed, pending, atau cancelled' },
-      { name: 'total_amount', type: 'INTEGER', isPk: false, notNull: true, description: 'Total nilai transaksi belanja (IDR)' }
+    "name": "products",
+    "label": "Produk & Hardware",
+    "icon": "fa-solid fa-box-open",
+    "description": "Katalog barang dan periferal gaming lengkap dengan harga dan stok.",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kunci utama produk"
+      },
+      {
+        "name": "category_id",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": true,
+        "fkTarget": "categories.id",
+        "description": "Referensi kategori"
+      },
+      {
+        "name": "supplier_id",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": true,
+        "fkTarget": "suppliers.id",
+        "description": "Referensi supplier"
+      },
+      {
+        "name": "name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Nama produk"
+      },
+      {
+        "name": "price",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Harga produk rupiah"
+      },
+      {
+        "name": "stock",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Stok saat ini"
+      },
+      {
+        "name": "discontinued",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Penanda produk dihentikan"
+      }
     ],
-    foreignKeys: [
-      { from: 'customer_id', toTable: 'customers', toColumn: 'id' },
-      { from: 'employee_id', toTable: 'employees', toColumn: 'id' }
+    "foreignKeys": [
+      {
+        "from": "supplier_id",
+        "toTable": "suppliers",
+        "toColumn": "id"
+      },
+      {
+        "from": "category_id",
+        "toTable": "categories",
+        "toColumn": "id"
+      }
     ],
-    totalRows: 28,
-    sampleRows: [
-      { id: 1, customer_id: 1, employee_id: 2, order_date: '2024-01-10', status: 'completed', total_amount: 575000 },
-      { id: 2, customer_id: 2, employee_id: 2, order_date: '2024-01-12', status: 'completed', total_amount: 3475000 },
-      { id: 3, customer_id: 3, employee_id: 4, order_date: '2024-01-15', status: 'completed', total_amount: 650000 },
-      { id: 4, customer_id: 4, employee_id: 2, order_date: '2024-01-18', status: 'completed', total_amount: 220000 },
-      { id: 5, customer_id: 5, employee_id: 4, order_date: '2024-01-22', status: 'completed', total_amount: 1450000 }
+    "totalRows": 24,
+    "sampleRows": [
+      {
+        "id": 1,
+        "category_id": 1,
+        "supplier_id": 1,
+        "name": "MechaKey K1",
+        "price": 450000,
+        "stock": 18,
+        "discontinued": 0
+      },
+      {
+        "id": 2,
+        "category_id": 1,
+        "supplier_id": 2,
+        "name": "TypePro TKL",
+        "price": 625000,
+        "stock": 12,
+        "discontinued": 0
+      },
+      {
+        "id": 3,
+        "category_id": 1,
+        "supplier_id": 4,
+        "name": "SilentBoard S2",
+        "price": 325000,
+        "stock": 25,
+        "discontinued": 0
+      },
+      {
+        "id": 4,
+        "category_id": 1,
+        "supplier_id": 5,
+        "name": "RetroKeys R1",
+        "price": 780000,
+        "stock": 7,
+        "discontinued": 0
+      },
+      {
+        "id": 5,
+        "category_id": 2,
+        "supplier_id": 1,
+        "name": "SwiftMouse M2",
+        "price": 225000,
+        "stock": 35,
+        "discontinued": 0
+      }
     ]
   },
   {
-    name: 'order_items',
-    label: 'Rincian Item (Order Items)',
-    icon: 'fa-solid fa-list-ol',
-    description: 'Daftar barang detail yang dibeli dalam setiap order transaksi.',
-    columns: [
-      { name: 'id', type: 'INTEGER', isPk: true, notNull: true, description: 'ID baris detail (Primary Key)' },
-      { name: 'order_id', type: 'INTEGER', isPk: false, isFk: true, fkTarget: 'orders.id', notNull: false, description: 'Nomor pesanan rujukan (Foreign Key ke orders)' },
-      { name: 'product_id', type: 'INTEGER', isPk: false, isFk: true, fkTarget: 'products.id', notNull: false, description: 'Produk yang dibeli (Foreign Key ke products)' },
-      { name: 'quantity', type: 'INTEGER', isPk: false, notNull: true, description: 'Jumlah kuantitas unit yang dibeli' },
-      { name: 'unit_price', type: 'INTEGER', isPk: false, notNull: true, description: 'Harga per unit saat transaksi berlangsung (IDR)' },
-      { name: 'subtotal', type: 'INTEGER', isPk: false, notNull: true, description: 'Total harga item (quantity * unit_price)' }
+    "name": "employees",
+    "label": "Pegawai (Employees)",
+    "icon": "fa-solid fa-user-tie",
+    "description": "Staf internal toko (Manager, Sales, Support, Warehouse).",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kunci utama pegawai"
+      },
+      {
+        "name": "name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Nama pegawai"
+      },
+      {
+        "name": "role",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Peran pegawai"
+      },
+      {
+        "name": "manager_id",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": false,
+        "isFk": true,
+        "fkTarget": "employees.id",
+        "description": "Atasan pegawai"
+      }
     ],
-    foreignKeys: [
-      { from: 'order_id', toTable: 'orders', toColumn: 'id' },
-      { from: 'product_id', toTable: 'products', toColumn: 'id' }
+    "foreignKeys": [
+      {
+        "from": "manager_id",
+        "toTable": "employees",
+        "toColumn": "id"
+      }
     ],
-    totalRows: 42,
-    sampleRows: [
-      { id: 1, order_id: 1, product_id: 1, quantity: 1, unit_price: 450000, subtotal: 450000 },
-      { id: 2, order_id: 1, product_id: 5, quantity: 1, unit_price: 125000, subtotal: 125000 },
-      { id: 3, order_id: 2, product_id: 6, quantity: 1, unit_price: 275000, subtotal: 275000 },
-      { id: 4, order_id: 2, product_id: 10, quantity: 1, unit_price: 3200000, subtotal: 3200000 },
-      { id: 5, order_id: 3, product_id: 2, quantity: 1, unit_price: 650000, subtotal: 650000 }
+    "totalRows": 6,
+    "sampleRows": [
+      {
+        "id": 1,
+        "name": "Rina",
+        "role": "Manager",
+        "manager_id": null
+      },
+      {
+        "id": 2,
+        "name": "Seno",
+        "role": "Sales",
+        "manager_id": 1
+      },
+      {
+        "id": 3,
+        "name": "Tari",
+        "role": "Sales",
+        "manager_id": 1
+      },
+      {
+        "id": 4,
+        "name": "Umar",
+        "role": "Support",
+        "manager_id": 1
+      },
+      {
+        "id": 5,
+        "name": "Vina",
+        "role": "Sales",
+        "manager_id": 1
+      }
     ]
   },
   {
-    name: 'employees',
-    label: 'Pegawai (Employees)',
-    icon: 'fa-solid fa-id-badge',
-    description: 'Data karyawan toko yang bertugas melayani transaksi dan operasional.',
-    columns: [
-      { name: 'id', type: 'INTEGER', isPk: true, notNull: true, description: 'ID unik pegawai (Primary Key)' },
-      { name: 'name', type: 'TEXT', isPk: false, notNull: true, description: 'Nama lengkap karyawan' },
-      { name: 'role', type: 'TEXT', isPk: false, notNull: true, description: 'Posisi/Jabatan (Admin, Kasir, Warehouse, Sales, Manager, CS)' },
-      { name: 'salary', type: 'INTEGER', isPk: false, notNull: true, description: 'Gaji pokok bulanan karyawan (IDR)' },
-      { name: 'hire_date', type: 'TEXT', isPk: false, notNull: false, description: 'Tanggal mulai bekerja (YYYY-MM-DD)' }
+    "name": "orders",
+    "label": "Pesanan (Orders)",
+    "icon": "fa-solid fa-receipt",
+    "description": "Header transaksi belanja pelanggan dengan status pesanan.",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kunci utama pesanan"
+      },
+      {
+        "name": "customer_id",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": true,
+        "fkTarget": "customers.id",
+        "description": "Pelanggan pemilik pesanan"
+      },
+      {
+        "name": "employee_id",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": true,
+        "fkTarget": "employees.id",
+        "description": "Pegawai yang menangani pesanan"
+      },
+      {
+        "name": "order_date",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Tanggal pesanan"
+      },
+      {
+        "name": "status",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Status pesanan"
+      },
+      {
+        "name": "shipping_city",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kota pengiriman"
+      }
     ],
-    foreignKeys: [],
-    totalRows: 6,
-    sampleRows: [
-      { id: 1, name: 'Rian Ardianto', role: 'Admin', salary: 5500000, hire_date: '2023-01-15' },
-      { id: 2, name: 'Siti Nurhaliza', role: 'Kasir', salary: 4200000, hire_date: '2023-03-10' },
-      { id: 3, name: 'Doni Setiawan', role: 'Warehouse', salary: 4500000, hire_date: '2023-05-01' },
-      { id: 4, name: 'Maya Agustina', role: 'Sales', salary: 4800000, hire_date: '2023-06-20' },
-      { id: 5, name: 'Eko Wahyudi', role: 'Manager', salary: 8500000, hire_date: '2022-10-01' },
-      { id: 6, name: 'Tari Melati', role: 'CS', salary: 4000000, hire_date: '2023-08-15' }
+    "foreignKeys": [
+      {
+        "from": "employee_id",
+        "toTable": "employees",
+        "toColumn": "id"
+      },
+      {
+        "from": "customer_id",
+        "toTable": "customers",
+        "toColumn": "id"
+      }
+    ],
+    "totalRows": 30,
+    "sampleRows": [
+      {
+        "id": 1,
+        "customer_id": 1,
+        "employee_id": 2,
+        "order_date": "2026-04-01",
+        "status": "paid",
+        "shipping_city": "Bandung"
+      },
+      {
+        "id": 2,
+        "customer_id": 2,
+        "employee_id": 3,
+        "order_date": "2026-04-02",
+        "status": "paid",
+        "shipping_city": "Jakarta"
+      },
+      {
+        "id": 3,
+        "customer_id": 3,
+        "employee_id": 2,
+        "order_date": "2026-04-03",
+        "status": "paid",
+        "shipping_city": "Surabaya"
+      },
+      {
+        "id": 4,
+        "customer_id": 4,
+        "employee_id": 5,
+        "order_date": "2026-04-04",
+        "status": "pending",
+        "shipping_city": "Semarang"
+      },
+      {
+        "id": 5,
+        "customer_id": 5,
+        "employee_id": 3,
+        "order_date": "2026-04-05",
+        "status": "paid",
+        "shipping_city": "Bandung"
+      }
     ]
   },
   {
-    name: 'suppliers',
-    label: 'Pemasok (Suppliers)',
-    icon: 'fa-solid fa-truck',
-    description: 'Data distributor dan vendor resmi penyedia stok produk periferal.',
-    columns: [
-      { name: 'id', type: 'INTEGER', isPk: true, notNull: true, description: 'ID unik pemasok (Primary Key)' },
-      { name: 'name', type: 'TEXT', isPk: false, notNull: true, description: 'Nama perusahaan/badan usaha supplier' },
-      { name: 'contact_name', type: 'TEXT', isPk: false, notNull: false, description: 'Nama kontak penanggung jawab (PIC)' },
-      { name: 'phone', type: 'TEXT', isPk: false, notNull: false, description: 'Nomor telepon kantor/supplier' },
-      { name: 'city', type: 'TEXT', isPk: false, notNull: false, description: 'Kota domisili kantor pusat supplier' }
+    "name": "order_items",
+    "label": "Detail Pesanan (Order Items)",
+    "icon": "fa-solid fa-list-check",
+    "description": "Rincian unit produk dan harga per item dalam setiap pesanan.",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kunci utama item pesanan"
+      },
+      {
+        "name": "order_id",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": true,
+        "fkTarget": "orders.id",
+        "description": "Referensi pesanan"
+      },
+      {
+        "name": "product_id",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": true,
+        "fkTarget": "products.id",
+        "description": "Referensi produk"
+      },
+      {
+        "name": "quantity",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Jumlah unit"
+      },
+      {
+        "name": "unit_price",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Harga saat transaksi"
+      }
     ],
-    foreignKeys: [],
-    totalRows: 6,
-    sampleRows: [
-      { id: 1, name: 'PT Tech Mandiri', contact_name: 'Hendra Wijaya', phone: '081234567890', city: 'Bandung' },
-      { id: 2, name: 'CV Elektronika Jaya', contact_name: 'Ratna Sari', phone: '081398765432', city: 'Jakarta' },
-      { id: 3, name: 'PT Global Sukses', contact_name: 'Bambang Irawan', phone: '082155443322', city: 'Surabaya' },
-      { id: 4, name: 'Digital Nusantara', contact_name: 'Dewi Anggraini', phone: '085277889900', city: 'Semarang' },
-      { id: 5, name: 'PT Sinar Komputer', contact_name: 'Agus Prasetyo', phone: '087811223344', city: 'Yogyakarta' }
+    "foreignKeys": [
+      {
+        "from": "product_id",
+        "toTable": "products",
+        "toColumn": "id"
+      },
+      {
+        "from": "order_id",
+        "toTable": "orders",
+        "toColumn": "id"
+      }
+    ],
+    "totalRows": 60,
+    "sampleRows": [
+      {
+        "id": 1,
+        "order_id": 1,
+        "product_id": 1,
+        "quantity": 1,
+        "unit_price": 450000
+      },
+      {
+        "id": 2,
+        "order_id": 1,
+        "product_id": 5,
+        "quantity": 2,
+        "unit_price": 225000
+      },
+      {
+        "id": 3,
+        "order_id": 2,
+        "product_id": 9,
+        "quantity": 1,
+        "unit_price": 1850000
+      },
+      {
+        "id": 4,
+        "order_id": 2,
+        "product_id": 17,
+        "quantity": 1,
+        "unit_price": 275000
+      },
+      {
+        "id": 5,
+        "order_id": 3,
+        "product_id": 14,
+        "quantity": 1,
+        "unit_price": 890000
+      }
     ]
   },
   {
-    name: 'payments',
-    label: 'Pembayaran (Payments)',
-    icon: 'fa-solid fa-credit-card',
-    description: 'Catatan bukti dan status pembayaran dari setiap pesanan pelanggan.',
-    columns: [
-      { name: 'id', type: 'INTEGER', isPk: true, notNull: true, description: 'ID unik pembayaran (Primary Key)' },
-      { name: 'order_id', type: 'INTEGER', isPk: false, isFk: true, fkTarget: 'orders.id', notNull: false, description: 'ID pesanan yang dibayar (Foreign Key ke orders)' },
-      { name: 'payment_method', type: 'TEXT', isPk: false, notNull: true, description: 'Metode bayar: QRIS, Transfer Bank, Kartu Kredit, atau E-Wallet' },
-      { name: 'amount', type: 'INTEGER', isPk: false, notNull: true, description: 'Nominal dana yang dibayarkan (IDR)' },
-      { name: 'payment_date', type: 'TEXT', isPk: false, notNull: false, description: 'Waktu tanggal pembayaran tercatat (YYYY-MM-DD)' },
-      { name: 'status', type: 'TEXT', isPk: false, notNull: true, description: 'Status bayar: success, pending, atau failed' }
+    "name": "payments",
+    "label": "Pembayaran (Payments)",
+    "icon": "fa-solid fa-credit-card",
+    "description": "Bukti dan status pelunasan transaksi pesanan pelanggan.",
+    "columns": [
+      {
+        "name": "id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kunci utama pembayaran"
+      },
+      {
+        "name": "order_id",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": true,
+        "fkTarget": "orders.id",
+        "description": "Referensi unik pesanan"
+      },
+      {
+        "name": "payment_method",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Metode pembayaran"
+      },
+      {
+        "name": "paid_amount",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Nominal pembayaran"
+      },
+      {
+        "name": "paid_at",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Tanggal bayar, null jika belum lunas"
+      }
     ],
-    foreignKeys: [
-      { from: 'order_id', toTable: 'orders', toColumn: 'id' }
+    "foreignKeys": [
+      {
+        "from": "order_id",
+        "toTable": "orders",
+        "toColumn": "id"
+      }
     ],
-    totalRows: 28,
-    sampleRows: [
-      { id: 1, order_id: 1, payment_method: 'QRIS', amount: 575000, payment_date: '2024-01-10', status: 'success' },
-      { id: 2, order_id: 2, payment_method: 'Transfer Bank', amount: 3475000, payment_date: '2024-01-12', status: 'success' },
-      { id: 3, order_id: 3, payment_method: 'E-Wallet', amount: 650000, payment_date: '2024-01-15', status: 'success' },
-      { id: 4, order_id: 4, payment_method: 'QRIS', amount: 220000, payment_date: '2024-01-18', status: 'success' },
-      { id: 5, order_id: 5, payment_method: 'Transfer Bank', amount: 1450000, payment_date: '2024-01-22', status: 'success' }
+    "totalRows": 30,
+    "sampleRows": [
+      {
+        "id": 1,
+        "order_id": 1,
+        "payment_method": "transfer",
+        "paid_amount": 900000,
+        "paid_at": "2026-04-01"
+      },
+      {
+        "id": 2,
+        "order_id": 2,
+        "payment_method": "card",
+        "paid_amount": 2125000,
+        "paid_at": "2026-04-02"
+      },
+      {
+        "id": 3,
+        "order_id": 3,
+        "payment_method": "ewallet",
+        "paid_amount": 1080000,
+        "paid_at": "2026-04-03"
+      },
+      {
+        "id": 4,
+        "order_id": 4,
+        "payment_method": "transfer",
+        "paid_amount": 695000,
+        "paid_at": null
+      },
+      {
+        "id": 5,
+        "order_id": 5,
+        "payment_method": "card",
+        "paid_amount": 2595000,
+        "paid_at": "2026-04-05"
+      }
+    ]
+  },
+  {
+    "name": "sales_raw",
+    "label": "Data Mentah Penjualan (Sales Raw)",
+    "icon": "fa-solid fa-file-invoice-dollar",
+    "description": "Tabel denormalisasi transaksi mentah untuk analisis normalisasi.",
+    "columns": [
+      {
+        "name": "row_id",
+        "type": "INTEGER",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom row_id pada tabel sales_raw"
+      },
+      {
+        "name": "order_code",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom order_code pada tabel sales_raw"
+      },
+      {
+        "name": "order_date",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom order_date pada tabel sales_raw"
+      },
+      {
+        "name": "customer_name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom customer_name pada tabel sales_raw"
+      },
+      {
+        "name": "customer_email",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom customer_email pada tabel sales_raw"
+      },
+      {
+        "name": "customer_city",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom customer_city pada tabel sales_raw"
+      },
+      {
+        "name": "product_name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom product_name pada tabel sales_raw"
+      },
+      {
+        "name": "category_name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom category_name pada tabel sales_raw"
+      },
+      {
+        "name": "supplier_name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom supplier_name pada tabel sales_raw"
+      },
+      {
+        "name": "quantity",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom quantity pada tabel sales_raw"
+      },
+      {
+        "name": "unit_price",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom unit_price pada tabel sales_raw"
+      }
+    ],
+    "foreignKeys": [],
+    "totalRows": 20,
+    "sampleRows": [
+      {
+        "row_id": 1,
+        "order_code": "ORD-001",
+        "order_date": "2026-04-01",
+        "customer_name": "Andi Pratama",
+        "customer_email": "andi@mail.test",
+        "customer_city": "Bandung",
+        "product_name": "MechaKey K1",
+        "category_name": "Keyboard",
+        "supplier_name": "Nusantara Tech",
+        "quantity": 1,
+        "unit_price": 450000
+      },
+      {
+        "row_id": 2,
+        "order_code": "ORD-001",
+        "order_date": "2026-04-01",
+        "customer_name": "Andi Pratama",
+        "customer_email": "andi@mail.test",
+        "customer_city": "Bandung",
+        "product_name": "SwiftMouse M2",
+        "category_name": "Mouse",
+        "supplier_name": "Nusantara Tech",
+        "quantity": 2,
+        "unit_price": 225000
+      },
+      {
+        "row_id": 3,
+        "order_code": "ORD-002",
+        "order_date": "2026-04-02",
+        "customer_name": "Budi Santoso",
+        "customer_email": "budi@mail.test",
+        "customer_city": "Jakarta",
+        "product_name": "VisionPro 24",
+        "category_name": "Monitor",
+        "supplier_name": "Surya Komputer",
+        "quantity": 1,
+        "unit_price": 1850000
+      },
+      {
+        "row_id": 4,
+        "order_code": "ORD-002",
+        "order_date": "2026-04-02",
+        "customer_name": "Budi Santoso",
+        "customer_email": "budi@mail.test",
+        "customer_city": "Jakarta",
+        "product_name": "USB Hub 7P",
+        "category_name": "Aksesori",
+        "supplier_name": "Prima Digital",
+        "quantity": 1,
+        "unit_price": 275000
+      },
+      {
+        "row_id": 5,
+        "order_code": "ORD-003",
+        "order_date": "2026-04-03",
+        "customer_name": "Citra Lestari",
+        "customer_email": "citra@mail.test",
+        "customer_city": "Surabaya",
+        "product_name": "StudioHead H7",
+        "category_name": "Audio",
+        "supplier_name": "Surya Komputer",
+        "quantity": 1,
+        "unit_price": 890000
+      }
+    ]
+  },
+  {
+    "name": "schema_dictionary",
+    "label": "Kamus Skema (Schema Dictionary)",
+    "icon": "fa-solid fa-book-bookmark",
+    "description": "Kamus metadata kolom, tipe data, dan integritas skema.",
+    "columns": [
+      {
+        "name": "table_name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom table_name pada tabel schema_dictionary"
+      },
+      {
+        "name": "column_name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom column_name pada tabel schema_dictionary"
+      },
+      {
+        "name": "data_type",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom data_type pada tabel schema_dictionary"
+      },
+      {
+        "name": "is_primary_key",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom is_primary_key pada tabel schema_dictionary"
+      },
+      {
+        "name": "is_foreign_key",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom is_foreign_key pada tabel schema_dictionary"
+      },
+      {
+        "name": "allows_null",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom allows_null pada tabel schema_dictionary"
+      },
+      {
+        "name": "description",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom description pada tabel schema_dictionary"
+      }
+    ],
+    "foreignKeys": [],
+    "totalRows": 37,
+    "sampleRows": [
+      {
+        "table_name": "customers",
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "is_primary_key": 1,
+        "is_foreign_key": 0,
+        "allows_null": 0,
+        "description": "Kunci utama pelanggan"
+      },
+      {
+        "table_name": "customers",
+        "column_name": "name",
+        "data_type": "TEXT",
+        "is_primary_key": 0,
+        "is_foreign_key": 0,
+        "allows_null": 0,
+        "description": "Nama pelanggan"
+      },
+      {
+        "table_name": "customers",
+        "column_name": "email",
+        "data_type": "TEXT",
+        "is_primary_key": 0,
+        "is_foreign_key": 0,
+        "allows_null": 0,
+        "description": "Email unik pelanggan"
+      },
+      {
+        "table_name": "customers",
+        "column_name": "city",
+        "data_type": "TEXT",
+        "is_primary_key": 0,
+        "is_foreign_key": 0,
+        "allows_null": 0,
+        "description": "Kota pelanggan"
+      },
+      {
+        "table_name": "customers",
+        "column_name": "joined_at",
+        "data_type": "TEXT",
+        "is_primary_key": 0,
+        "is_foreign_key": 0,
+        "allows_null": 0,
+        "description": "Tanggal bergabung"
+      }
+    ]
+  },
+  {
+    "name": "relationships",
+    "label": "Relasi Antar Tabel (Relationships)",
+    "icon": "fa-solid fa-diagram-project",
+    "description": "Katalog relasi foreign key dan kardinalitas antar entitas.",
+    "columns": [
+      {
+        "name": "relation_name",
+        "type": "TEXT",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom relation_name pada tabel relationships"
+      },
+      {
+        "name": "parent_table",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom parent_table pada tabel relationships"
+      },
+      {
+        "name": "child_table",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom child_table pada tabel relationships"
+      },
+      {
+        "name": "parent_key",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom parent_key pada tabel relationships"
+      },
+      {
+        "name": "child_key",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom child_key pada tabel relationships"
+      },
+      {
+        "name": "cardinality",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom cardinality pada tabel relationships"
+      }
+    ],
+    "foreignKeys": [],
+    "totalRows": 7,
+    "sampleRows": [
+      {
+        "relation_name": "customers_orders",
+        "parent_table": "customers",
+        "child_table": "orders",
+        "parent_key": "id",
+        "child_key": "customer_id",
+        "cardinality": "1:N"
+      },
+      {
+        "relation_name": "employees_orders",
+        "parent_table": "employees",
+        "child_table": "orders",
+        "parent_key": "id",
+        "child_key": "employee_id",
+        "cardinality": "1:N"
+      },
+      {
+        "relation_name": "orders_order_items",
+        "parent_table": "orders",
+        "child_table": "order_items",
+        "parent_key": "id",
+        "child_key": "order_id",
+        "cardinality": "1:N"
+      },
+      {
+        "relation_name": "products_order_items",
+        "parent_table": "products",
+        "child_table": "order_items",
+        "parent_key": "id",
+        "child_key": "product_id",
+        "cardinality": "1:N"
+      },
+      {
+        "relation_name": "categories_products",
+        "parent_table": "categories",
+        "child_table": "products",
+        "parent_key": "id",
+        "child_key": "category_id",
+        "cardinality": "1:N"
+      }
+    ]
+  },
+  {
+    "name": "index_catalog",
+    "label": "Katalog Indeks (Index Catalog)",
+    "icon": "fa-solid fa-bolt",
+    "description": "Daftar indeks performa pencarian dan constraint keunikan.",
+    "columns": [
+      {
+        "name": "index_name",
+        "type": "TEXT",
+        "isPk": true,
+        "notNull": false,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom index_name pada tabel index_catalog"
+      },
+      {
+        "name": "table_name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom table_name pada tabel index_catalog"
+      },
+      {
+        "name": "columns_name",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom columns_name pada tabel index_catalog"
+      },
+      {
+        "name": "purpose",
+        "type": "TEXT",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom purpose pada tabel index_catalog"
+      },
+      {
+        "name": "is_unique",
+        "type": "INTEGER",
+        "isPk": false,
+        "notNull": true,
+        "isFk": false,
+        "fkTarget": null,
+        "description": "Kolom is_unique pada tabel index_catalog"
+      }
+    ],
+    "foreignKeys": [],
+    "totalRows": 6,
+    "sampleRows": [
+      {
+        "index_name": "idx_customers_email",
+        "table_name": "customers",
+        "columns_name": "email",
+        "purpose": "Mempercepat pencarian pelanggan berdasarkan email",
+        "is_unique": 1
+      },
+      {
+        "index_name": "idx_products_category",
+        "table_name": "products",
+        "columns_name": "category_id",
+        "purpose": "Mempercepat filter dan join berdasarkan kategori",
+        "is_unique": 0
+      },
+      {
+        "index_name": "idx_orders_customer",
+        "table_name": "orders",
+        "columns_name": "customer_id",
+        "purpose": "Mempercepat riwayat pesanan pelanggan",
+        "is_unique": 0
+      },
+      {
+        "index_name": "idx_orders_date",
+        "table_name": "orders",
+        "columns_name": "order_date",
+        "purpose": "Mempercepat filter dan pengurutan berdasarkan tanggal",
+        "is_unique": 0
+      },
+      {
+        "index_name": "idx_order_items_order",
+        "table_name": "order_items",
+        "columns_name": "order_id",
+        "purpose": "Mempercepat pengambilan detail item satu pesanan",
+        "is_unique": 0
+      }
     ]
   }
 ]
@@ -221,22 +1263,29 @@ export async function getDatabaseSchemaMetadata(customSetupSql = null) {
     const tableNames = tablesRes[0].values.map(r => r[0])
     const dynamicTables = []
 
+    // Ambil data schema_dictionary jika tersedia di database aktif
+    const dictMap = {}
+    try {
+      const dictRes = db.exec("SELECT table_name, column_name, data_type, is_primary_key, is_foreign_key, allows_null, description FROM schema_dictionary")
+      if (dictRes.length > 0) {
+        dictRes[0].values.forEach(r => {
+          dictMap[`${r[0]}.${r[1]}`] = {
+            type: r[2],
+            isPk: Boolean(r[3]),
+            isFk: Boolean(r[4]),
+            allowsNull: Boolean(r[5]),
+            description: r[6]
+          }
+        })
+      }
+    } catch (e) {
+      // Abaikan jika tabel schema_dictionary tidak ada pada custom setup
+    }
+
     for (const tableName of tableNames) {
       // 1. Cek info tabel
       const infoRes = db.exec(`PRAGMA table_info("${tableName}")`)
       const columns = []
-      if (infoRes && infoRes.length > 0) {
-        infoRes[0].values.forEach(row => {
-          columns.push({
-            name: row[1],
-            type: row[2] || 'TEXT',
-            notNull: Boolean(row[3]),
-            defaultValue: row[4],
-            isPk: Boolean(row[5]),
-            description: `Kolom ${row[1]} pada tabel ${tableName}`
-          })
-        })
-      }
 
       // 2. Cek foreign keys
       const fkRes = db.exec(`PRAGMA foreign_key_list("${tableName}")`)
@@ -246,22 +1295,40 @@ export async function getDatabaseSchemaMetadata(customSetupSql = null) {
           foreignKeys.push({
             from: row[3],
             toTable: row[2],
-            toColumn: row[4]
+            toColumn: row[4] || 'id'
           })
         })
       }
 
-      columns.forEach(col => {
-        const fk = foreignKeys.find(f => f.from === col.name)
-        if (fk) {
-          col.isFk = true
-          col.fkTarget = `${fk.toTable}.${fk.toColumn || 'id'}`
-        }
-      })
+      if (infoRes && infoRes.length > 0) {
+        infoRes[0].values.forEach(row => {
+          const colName = row[1]
+          const fk = foreignKeys.find(f => f.from === colName)
+          const metaDict = dictMap[`${tableName}.${colName}`]
+          const existingMeta = ICGAMEZ_STORE_METADATA.find(m => m.name === tableName)
+          const existingCol = existingMeta?.columns.find(c => c.name === colName)
 
-      // 3. Ambil sample rows
+          columns.push({
+            name: colName,
+            type: row[2] || 'TEXT',
+            notNull: Boolean(row[3]),
+            defaultValue: row[4],
+            isPk: Boolean(row[5]),
+            isFk: Boolean(fk),
+            fkTarget: fk ? `${fk.toTable}.${fk.toColumn}` : null,
+            description: metaDict?.description || existingCol?.description || `Kolom ${colName} pada tabel ${tableName}`
+          })
+        })
+      }
+
+      // 3. Ambil sample rows & total rows
       let sampleRows = []
+      let totalRows = 0
       try {
+        const countRes = db.exec(`SELECT COUNT(*) FROM "${tableName}"`)
+        if (countRes && countRes[0] && countRes[0].values) {
+          totalRows = countRes[0].values[0][0]
+        }
         const sampleRes = db.exec(`SELECT * FROM "${tableName}" LIMIT 5`)
         if (sampleRes && sampleRes.length > 0) {
           const cols = sampleRes[0].columns
@@ -275,7 +1342,6 @@ export async function getDatabaseSchemaMetadata(customSetupSql = null) {
         console.warn('Gagal load sample rows:', e)
       }
 
-      // Cari metadata statis jika ada untuk memperkaya deskripsi
       const existingMeta = ICGAMEZ_STORE_METADATA.find(m => m.name === tableName)
 
       dynamicTables.push({
@@ -283,12 +1349,9 @@ export async function getDatabaseSchemaMetadata(customSetupSql = null) {
         label: existingMeta?.label || `Tabel ${tableName}`,
         icon: existingMeta?.icon || 'fa-solid fa-table',
         description: existingMeta?.description || `Struktur data tabel ${tableName} pada database latihan.`,
-        columns: columns.map(c => {
-          const existCol = existingMeta?.columns.find(ec => ec.name === c.name)
-          if (existCol?.description) c.description = existCol.description
-          return c
-        }),
+        columns,
         foreignKeys,
+        totalRows: totalRows || sampleRows.length,
         sampleRows
       })
     }
@@ -348,4 +1411,3 @@ export async function fetchTableData(tableName, limit = 50, customInitSql = null
     }
   }
 }
-

@@ -151,7 +151,7 @@
 
         <button class="nav-btn finish-btn" @click="handleFinishClick">
           <i class="fa-solid fa-check"></i>
-          {{ isLastLesson ? 'Selesai' : 'Lanjut Materi' }}
+          {{ isChallenge ? 'Selesaikan Tantangan' : (isLastLesson ? 'Selesai' : 'Lanjut Materi') }}
         </button>
       </footer>
       
@@ -321,6 +321,7 @@ const props = defineProps({
   output: { type: Array, default: () => [] },
   isLastLesson: { type: Boolean, default: false },
   runStatus: { type: String, default: 'idle' },
+  isChallenge: { type: Boolean, default: false },
 })
 
 const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'])

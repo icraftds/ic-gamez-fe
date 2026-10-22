@@ -22,7 +22,7 @@ export async function executeCode(language = 'javascript', code = '', context = 
       return await runHtml()
 
     case 'sql':
-      return await runSql(code)
+      return await runSql(code, context)
 
     case 'python':
       return await runPython(code)

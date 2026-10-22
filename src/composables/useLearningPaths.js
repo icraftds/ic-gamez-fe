@@ -120,14 +120,24 @@ export function useLearningPaths() {
   // Jika diperlukan untuk backward compatibility
   const allChallenges = computed(() => {
     const challenges = []
+    let completedLocal = []
+    try {
+      completedLocal = JSON.parse(localStorage.getItem('completed_challenges') || '[]')
+    } catch (e) {}
+
     paths.value.forEach(path => {
       if (path.chapters) {
         path.chapters.forEach(chapter => {
           if (chapter.lessons) {
             chapter.lessons.forEach(lesson => {
               if (lesson.type === 'code') {
+                let prog = lesson.progress
+                if (Array.isArray(prog)) prog = prog.length > 0 ? prog[0] : null
+                const isChallengeDone = Boolean((prog && prog.challenge_completed) || completedLocal.includes(lesson.id))
+
                 challenges.push({
                   ...lesson,
+                  isChallengeDone,
                   pathId: path.slug || path.id,
                   chapterId: chapter.slug || chapter.id,
                   category: path.title,

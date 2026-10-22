@@ -164,7 +164,12 @@ const fetchChallenges = async () => {
     
     totalPages.value = response.data.meta ? response.data.meta.last_page : 1;
     
-    challenges.value = response.data.data.map(challenge => {
+    let completedLocal = []
+    try {
+      completedLocal = JSON.parse(localStorage.getItem('completed_challenges') || '[]')
+    } catch(e) {}
+
+    const list = response.data.data.map(challenge => {
       let category = 'Lainnya';
       let pathId = null;
       let chapterId = challenge.chapter_id;
@@ -177,21 +182,24 @@ const fetchChallenges = async () => {
         if (chapter) chapterId = chapter.slug || chapter.id;
       }
       
+      let p = challenge.progress;
+      if (Array.isArray(p)) p = p.length > 0 ? p[0] : null;
+      const isChallengeCompleted = Boolean((p && p.challenge_completed) || completedLocal.includes(challenge.id));
+
       return {
         ...challenge,
         category,
         pathId,
         chapterId,
         difficulty: challenge.difficulty || (challenge.is_premium ? 'Sulit' : 'Sedang'),
-        isCompleted: (() => {
-          let p = challenge.progress;
-          if (Array.isArray(p)) p = p.length > 0 ? p[0] : null;
-          return p ? (p.is_completed || !!p.saved_code) : false;
-        })(),
+        isCompleted: isChallengeCompleted,
         isPremium: challenge.is_premium,
         costCredit: challenge.cost_credit,
       };
     });
+
+    // Hilangkan kartu soal yang sudah selesai dari layar
+    challenges.value = list.filter(item => !item.isCompleted);
     
   } catch (error) {
     console.error('Failed to fetch challenges:', error);
