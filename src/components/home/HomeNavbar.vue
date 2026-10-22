@@ -62,12 +62,6 @@
         <template v-if="isLoggedIn">
           <!-- Floating Actions Capsule -->
           <div class="nav-capsule nav-actions-capsule">
-            <!-- Search Icon Button -->
-            <button class="nav-icon-btn" @click="handleSearchClick" aria-label="Cari Tantangan & Modul">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <span class="nav-tooltip">Cari Tantangan</span>
-            </button>
-
             <!-- Notifications / Friend Requests Bell with Red Dot -->
             <button class="nav-icon-btn notif-btn" @click="toggleFriendsSidebar" aria-label="Notifikasi & Teman">
               <i class="fa-regular fa-bell"></i>
@@ -192,9 +186,6 @@
         <div class="nav-right-cluster mobile-drawer-actions">
           <template v-if="isLoggedIn">
             <div class="nav-capsule nav-actions-capsule">
-              <button class="nav-icon-btn" @click="handleSearchClick" title="Cari Tantangan">
-                <i class="fa-solid fa-magnifying-glass"></i>
-              </button>
               <button class="nav-icon-btn notif-btn" @click="toggleFriendsSidebar(); mobileMenuOpen = false" title="Notifikasi & Teman">
                 <i class="fa-regular fa-bell"></i>
                 <span v-if="hasUnreadRequests" class="notif-red-dot"></span>
@@ -303,11 +294,6 @@ watch(isLoggedIn, () => {
     updatePill();
   });
 });
-
-const handleSearchClick = () => {
-  mobileMenuOpen.value = false;
-  router.push('/challenges');
-};
 
 const handleClickOutside = (e) => {
   if (mobileMenuOpen.value && !e.target.closest('.nav-drawer') && !e.target.closest('.hamburger-btn')) {

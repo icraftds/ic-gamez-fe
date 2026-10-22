@@ -424,6 +424,34 @@ body:not(.light-mode) .nav-login-link {
   color: #ffffff;
 }
 
+@media (min-width: 993px) and (max-width: 1200px) {
+  .navbar-wrapper {
+    padding: 12px 16px;
+  }
+  .desktop-center-capsule {
+    position: relative;
+    left: auto;
+    transform: none;
+    margin: 0 auto;
+  }
+  .nav-link {
+    padding: 2px 12px 0;
+    font-size: 0.86rem;
+  }
+  .nav-actions-capsule {
+    padding: 0 6px;
+    gap: 4px;
+  }
+  .nav-upgrade-pill {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+  }
+  .nav-coinz-pill {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+}
+
 /* ═══════════════════════════════════════════
    MOBILE RESPONSIVENESS (≤992px)
    ═══════════════════════════════════════════ */
