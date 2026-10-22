@@ -141,8 +141,24 @@ const handleClickOutside = (event) => {
   }
 };
 
+const challengeCategoryList = [
+  'Tantangan Database & SQL',
+  'Tantangan JavaScript & Logika',
+  'Algoritma & Problem Solving',
+  'Tantangan Python Fundamentals',
+  'Tantangan PHP & Backend',
+  'Tantangan Frontend & Web',
+];
+
 const uniqueCategories = computed(() => {
-  return paths.value.map(p => p.title);
+  const catSet = new Set(challengeCategoryList);
+  paths.value.forEach(p => {
+    if (p.title && p.slug !== 'global-challenges') catSet.add(p.title);
+  });
+  challenges.value.forEach(c => {
+    if (c.category) catSet.add(c.category);
+  });
+  return Array.from(catSet);
 });
 
 const fetchChallenges = async () => {
