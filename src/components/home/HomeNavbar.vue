@@ -88,11 +88,11 @@
             </button>
 
             <!-- iCoinz Display -->
-            <div class="nav-coinz-pill" @click="$router.push('/shop')" aria-label="Saldo iCoinZ (Klik untuk Top Up)">
+            <div class="nav-coinz-pill" @click="$router.push('/shop')" :aria-label="`Saldo: ${fullCoinzFormatted} iCoinZ`">
               <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
               <TerminalLoader v-if="isLoading" variant="inline" size="sm" />
-              <span v-else class="nav-coinz-val">{{ coinz === null ? '—' : coinz.toLocaleString('id-ID') }}</span>
-              <span class="nav-tooltip">Saldo iCoinZ (Top Up)</span>
+              <span v-else class="nav-coinz-val">{{ shortCoinz }}</span>
+              <span class="nav-tooltip">{{ fullCoinzFormatted }} iCoinZ</span>
             </div>
           </div>
 
@@ -121,9 +121,9 @@
 
       <!-- Mobile Actions (Profile + Hamburger) -->
       <div class="mobile-nav-actions">
-        <div v-if="isLoggedIn" class="mobile-coinz-pill" @click="$router.push('/shop')" title="Saldo iCoinZ">
+        <div v-if="isLoggedIn" class="mobile-coinz-pill" @click="$router.push('/shop')" :title="`Saldo: ${fullCoinzFormatted} iCoinZ`">
           <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
-          <span class="nav-coinz-val">{{ coinz === null ? '—' : coinz.toLocaleString('id-ID') }}</span>
+          <span class="nav-coinz-val">{{ shortCoinz }}</span>
         </div>
         <UserProfileDropdown v-if="isLoggedIn" class="mobile-only-profile" />
         <button
@@ -231,6 +231,29 @@ const { isLightMode, toggleTheme } = useTheme();
 const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz, walletStatus } =
   useUserAccount();
 const { toggleFriendsSidebar, hasUnreadRequests } = useFriends();
+
+const formatShortCoinz = (val) => {
+  if (val === null || val === undefined) return '—';
+  const num = Number(val);
+  if (isNaN(num)) return '—';
+  if (num >= 1_000_000_000) {
+    return `${Math.floor(num / 1_000_000_000)}B`;
+  }
+  if (num >= 1_000_000) {
+    return `${Math.floor(num / 1_000_000)}M`;
+  }
+  if (num >= 1_000) {
+    return `${Math.floor(num / 1_000)}k`;
+  }
+  return num.toLocaleString('id-ID');
+};
+
+const shortCoinz = computed(() => formatShortCoinz(coinz.value));
+const fullCoinzFormatted = computed(() => {
+  if (coinz.value === null || coinz.value === undefined) return '0';
+  const num = Number(coinz.value);
+  return isNaN(num) ? '0' : num.toLocaleString('id-ID');
+});
 
 const router = useRouter();
 const route = useRoute();
