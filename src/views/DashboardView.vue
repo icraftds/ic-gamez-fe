@@ -12,6 +12,7 @@ import UserProfileDropdown from '../components/common/UserProfileDropdown.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useTheme } from '../composables/useTheme'
+import { useWipModal } from '../composables/useWipModal'
 import LeaderboardTable from '../components/home/LeaderboardTable.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
@@ -20,6 +21,10 @@ import api from '../services/api'
 
 const { isLoggedIn, userProfile, credits, coinz, walletStatus, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout, isLoading: isUserLoading } = useUserAccount()
 const { isLightMode, toggleTheme } = useTheme()
+const { showWipModal } = useWipModal()
+const setThemeMode = (light) => {
+  if (isLightMode.value !== light) toggleTheme()
+}
 
 import { onUnmounted } from 'vue'
 const { hasFetchedAllPaths, fetchAllPathsDetails, isLoading: isPathsLoading } = useLearningPaths()
@@ -130,28 +135,67 @@ const getTabIcon = (id) => {
 <template>
   <div class="dashboard-view">
     <SimpleBackground />
-    <div class="dash-layout" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
-      <!-- Dashboard Sidebar -->
-      <aside class="dash-sidebar" :class="{ 'is-collapsed': isSidebarCollapsed }">
-        <div class="sidebar-header">
-          <button class="toggle-btn" @click="isSidebarCollapsed = !isSidebarCollapsed" :title="isSidebarCollapsed ? 'Buka Menu' : 'Tutup Menu'">
-            <i :class="isSidebarCollapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left'"></i>
+    <div class="dash-layout">
+      <!-- Floating Modular Sidebar (Matching Image 2) -->
+      <aside class="dash-floating-sidebar">
+        <!-- 1. Top Capsule: Theme Switcher -->
+        <div class="sidebar-capsule capsule-theme">
+          <button
+            class="sidebar-pill-btn"
+            :class="{ active: isLightMode }"
+            @click="setThemeMode(true)"
+            aria-label="Mode Terang"
+          >
+            <i class="fa-regular fa-sun"></i>
+            <span class="sidebar-tooltip">Mode Terang</span>
+          </button>
+          <button
+            class="sidebar-pill-btn"
+            :class="{ active: !isLightMode }"
+            @click="setThemeMode(false)"
+            aria-label="Mode Gelap"
+          >
+            <i class="fa-regular fa-moon"></i>
+            <span class="sidebar-tooltip">Mode Gelap</span>
           </button>
         </div>
-        <div class="sidebar-menu">
+
+        <!-- 2. Middle Capsule: Navigation Icons (5 tabs sesuai sebelumnya) -->
+        <div class="sidebar-capsule capsule-nav">
           <button
             v-for="tab in tabs"
             :key="tab.id"
             :id="`dash-tab-${tab.id}`"
-            class="dash-tab-btn"
-            :class="{ active: activeTab === tab.id, 'is-center': tab.id === centerTabId }"
-            :style="{ '--m-order': getMobileOrder(tab.id) }"
+            class="sidebar-pill-btn"
+            :class="{ active: activeTab === tab.id }"
             @click="activeTab = tab.id"
-            :title="isSidebarCollapsed ? tab.label : ''"
             :aria-label="tab.label"
           >
             <i :class="getTabIcon(tab.id)"></i>
-            <span v-if="!isSidebarCollapsed" class="tab-label">{{ tab.label }}</span>
+            <span class="sidebar-tooltip">{{ tab.label }}</span>
+          </button>
+        </div>
+
+        <!-- 3. Bottom Capsule: Help & Logout (matches Image 2 bottom capsule) -->
+        <div class="sidebar-capsule capsule-bottom">
+          <!-- Help / Question mark circle -->
+          <button
+            class="sidebar-pill-btn"
+            @click="showWipModal = true"
+            aria-label="Bantuan & Dukungan"
+          >
+            <i class="fa-regular fa-circle-question"></i>
+            <span class="sidebar-tooltip">Bantuan & Dukungan</span>
+          </button>
+
+          <!-- Logout door icon -->
+          <button
+            class="sidebar-pill-btn logout-pill-btn"
+            @click="handleLogoutClick"
+            aria-label="Keluar dari Akun"
+          >
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span class="sidebar-tooltip">Keluar</span>
           </button>
         </div>
       </aside>
@@ -219,238 +263,234 @@ const getTabIcon = (id) => {
 <style scoped src="../assets/css/views/DashboardView.css"></style>
 
 <style scoped>
+/* ═══════════════════════════════════════════
+   FLOATING MODULAR SIDEBAR (Inspired by Image 2)
+   ═══════════════════════════════════════════ */
 .dash-layout {
   display: flex;
-  min-height: calc(100vh - 75px); 
+  min-height: calc(100vh - 86px);
   position: relative;
 }
-.dash-sidebar {
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding-top: 20px;
+
+.dash-floating-sidebar {
   position: fixed;
-  top: 75px;
-  left: 0;
-  bottom: 0;
-  z-index: 50;
-}
-.dash-sidebar::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-right: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 2%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0.2) 98%, rgba(0,0,0,0) 100%);
-  mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 2%, rgba(0,0,0,1) 10%, rgba(0,0,0,1) 90%, rgba(0,0,0,0.2) 98%, rgba(0,0,0,0) 100%);
-}
-.dash-sidebar.is-collapsed {
-  width: 80px;
-}
-.sidebar-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 16px 20px;
-}
-.dash-sidebar.is-collapsed .sidebar-header {
-  justify-content: center;
-  padding: 0 0 20px;
-}
-.toggle-btn {
-  background: var(--glass-bg-card-0_6, rgba(30, 41, 59, 0.5));
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-  color: var(--text-light, #f1f5f9);
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.toggle-btn:hover {
-  background: var(--glass-border, rgba(255, 255, 255, 0.2));
-}
-.sidebar-menu {
+  top: 90px;
+  left: 28px;
+  bottom: 28px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 0;
-}
-.dash-tab-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-muted, #94a3b8);
-  padding: 14px 40px;
-  border-radius: 0;
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  font-size: 1.05rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.dash-sidebar.is-collapsed .dash-tab-btn {
-  justify-content: center;
-  padding: 14px 0;
-}
-.dash-tab-btn:hover {
-  background: var(--glass-bg-card-0_6, rgba(255, 255, 255, 0.05));
-  color: var(--text-light, white);
-}
-.dash-tab-btn.active {
-  background: linear-gradient(to left, rgba(129, 140, 248, 0.2), transparent);
-  color: var(--primary, #818cf8);
-  border-left: none;
-  border-right: 3px solid var(--primary, #818cf8);
+  z-index: 50;
+  width: 52px;
+  pointer-events: none;
 }
 
-.dash-tab-btn i {
-  font-size: 1.3rem;
-  width: 24px;
-  text-align: center;
+.sidebar-capsule {
+  pointer-events: auto;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  border-radius: 9999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+body:not(.light-mode) .sidebar-capsule {
+  background: rgba(18, 22, 34, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* 1. Theme Capsule */
+.capsule-theme {
+  padding: 6px;
+  gap: 4px;
+}
+
+/* 2. Nav Icons Capsule */
+.capsule-nav {
+  padding: 12px 6px;
+  gap: 14px;
+}
+
+/* 3. Bottom Capsule */
+.capsule-bottom {
+  padding: 8px 6px;
+  gap: 8px;
+}
+
+/* Sidebar Pill Buttons */
+.sidebar-pill-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.sidebar-pill-btn:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+body:not(.light-mode) .sidebar-pill-btn {
+  color: #94a3b8;
+}
+
+body:not(.light-mode) .sidebar-pill-btn:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* Active Icon in Nav Capsule: Solid circle (matches Image 2) */
+.capsule-nav .sidebar-pill-btn.active {
+  background: #111827;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+body:not(.light-mode) .capsule-nav .sidebar-pill-btn.active {
+  background: #ffffff;
+  color: #0b0f19;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.3);
+}
+
+/* Active Theme Toggle Icon */
+.capsule-theme .sidebar-pill-btn.active {
+  background: #f1f5f9;
+  color: #f59e0b;
+}
+
+body:not(.light-mode) .capsule-theme .sidebar-pill-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #38bdf8;
+}
+
+/* Logout button hover */
+.logout-pill-btn:hover {
+  color: #ef4444 !important;
+}
+
+/* ═══════════════════════════════════════════
+   FLOATING GLASS SIDEBAR TOOLTIP
+   ═══════════════════════════════════════════ */
+.sidebar-tooltip {
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+  background: #0f172a;
+  color: #f8fafc;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: 0.05s;
+  z-index: 999;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: normal;
+}
+
+body:not(.light-mode) .sidebar-tooltip {
+  background: rgba(18, 24, 38, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6), 0 0 12px rgba(56, 189, 248, 0.15);
+}
+
+/* Triangle arrow caret pointing left to the button */
+.sidebar-tooltip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 5px 6px 5px 0;
+  border-style: solid;
+  border-color: transparent #0f172a transparent transparent;
+}
+
+body:not(.light-mode) .sidebar-tooltip::before {
+  border-color: transparent rgba(18, 24, 38, 0.95) transparent transparent;
+}
+
+.sidebar-pill-btn:hover .sidebar-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Main Content Area */
 .dash-main-wrapper {
   flex: 1;
-  padding: 30px;
-  margin-left: 250px;
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  max-width: 100%;
+  padding: 24px 32px;
+  margin-left: 96px;
+  max-width: calc(100% - 96px);
+  box-sizing: border-box;
+  transition: margin-left 0.3s ease;
 }
-.dash-layout.sidebar-collapsed .dash-main-wrapper {
-  margin-left: 80px;
-}
-/* ===== Tablet / Mobile: Bottom Navigation (icons only) ===== */
-@media (max-width: 768px) {
-  .dash-layout {
-    flex-direction: column;
-  }
 
-  .dash-sidebar,
-  .dash-sidebar.is-collapsed {
+/* Mobile Responsiveness (≤768px) */
+@media (max-width: 768px) {
+  .dash-floating-sidebar {
     position: fixed;
     top: auto;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100% !important;
-    height: calc(64px + env(safe-area-inset-bottom, 0px));
-    padding: 0;
-    z-index: 90;
-    border: none;
-  }
-
-  /* Bar background with a curved notch for the center button */
-  .dash-sidebar::before {
-    background: var(--bg-deep, #050511);
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.08));
-    border-bottom: none;
-    border-radius: 24px 24px 0 0;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.4);
-    -webkit-mask-image: radial-gradient(circle 40px at 50% 0, rgba(0,0,0,0) 39px, rgba(0,0,0,1) 40px);
-    mask-image: radial-gradient(circle 40px at 50% 0, rgba(0,0,0,0) 39px, rgba(0,0,0,1) 40px);
-  }
-
-  .sidebar-header {
-    display: none;
-  }
-
-  .sidebar-menu {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: auto;
+    height: auto;
     flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-    height: 64px;
-    padding: 0 8px;
-    margin-bottom: env(safe-area-inset-bottom, 0px);
-    gap: 0;
-    overflow: visible;
-  }
-
-  .dash-tab-btn,
-  .dash-sidebar.is-collapsed .dash-tab-btn {
-    flex: 1;
     justify-content: center;
-    height: 100%;
-    padding: 0;
-    gap: 0;
-    border: none !important;
-    border-radius: 0;
-    background: transparent !important;
-    color: var(--text-muted, #94a3b8);
-    opacity: 0.7;
-    overflow: visible;
-    order: var(--m-order, 0);
+    z-index: 99;
   }
 
-  /* Icons only */
-  .dash-tab-btn .tab-label {
-    display: none;
+  .capsule-theme,
+  .capsule-bottom,
+  .sidebar-tooltip {
+    display: none !important;
   }
 
-  .dash-tab-btn i {
-    font-size: 1.35rem;
-    transition: transform 0.25s ease, color 0.25s ease;
+  .capsule-nav {
+    flex-direction: row;
+    padding: 6px 14px;
+    gap: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
 
-  .dash-tab-btn:hover {
-    opacity: 1;
-    color: var(--text-light, #f1f5f9);
-  }
-
-  .dash-tab-btn.active {
-    opacity: 1;
-    color: var(--primary, #818cf8);
-  }
-  .dash-tab-btn.active i {
-    transform: translateY(-2px) scale(1.1);
-  }
-
-  /* Raised center button sitting in the notch */
-  .dash-tab-btn.is-center,
-  .dash-sidebar.is-collapsed .dash-tab-btn.is-center {
-    flex: 0 0 58px;
-    width: 58px;
-    height: 58px;
-    margin: 0 10px;
-    border-radius: 50%;
-    transform: translateY(-32px);
-    background: linear-gradient(135deg, var(--primary, #818cf8), #a855f7) !important;
-    color: #fff;
-    opacity: 1;
-    box-shadow: 0 8px 20px rgba(129, 140, 248, 0.45);
-  }
-  .dash-tab-btn.is-center i {
-    font-size: 1.4rem;
-  }
-  .dash-tab-btn.is-center:hover {
-    color: #fff;
-    transform: translateY(-34px);
-  }
-  .dash-tab-btn.is-center.active {
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(129, 140, 248, 0.6), 0 0 0 4px rgba(129, 140, 248, 0.2);
-  }
-  .dash-tab-btn.is-center.active i {
-    transform: none;
-  }
-
-  .dash-main-wrapper,
-  .dash-layout.sidebar-collapsed .dash-main-wrapper {
+  .dash-main-wrapper {
     margin-left: 0;
-    padding: 15px;
-    /* keep content clear of the bottom nav */
-    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+    max-width: 100%;
+    padding: 16px;
+    padding-bottom: 90px;
   }
 }
 </style>
