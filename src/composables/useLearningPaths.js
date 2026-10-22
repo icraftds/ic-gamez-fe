@@ -27,6 +27,7 @@ export function useLearningPaths() {
 
   // To get detailed info including chapters and lessons for a specific path
   const fetchPathDetails = async (slug, skipLoadingState = false) => {
+    if (!slug || slug === 'null' || slug === 'undefined') return null
     try {
       if (!skipLoadingState) isLoading.value = true
       const response = await api.get(`/paths/${slug}`)
@@ -113,8 +114,23 @@ export function useLearningPaths() {
 
   const getLessonById = (pathId, chapterId, lessonId) => {
     const chapter = getChapterById(pathId, chapterId)
-    if (!chapter || !chapter.lessons) return null
-    return chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+    if (chapter && chapter.lessons) {
+      const found = chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+      if (found) return found
+    }
+
+    // Fallback: cari di seluruh paths dan chapters jika format ID/slug berbeda
+    for (const p of paths.value) {
+      if (p.chapters) {
+        for (const c of p.chapters) {
+          if (c.lessons) {
+            const found = c.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+            if (found) return found
+          }
+        }
+      }
+    }
+    return null
   }
 
   // Jika diperlukan untuk backward compatibility

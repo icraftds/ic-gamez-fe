@@ -170,9 +170,9 @@ const fetchChallenges = async () => {
     } catch(e) {}
 
     const list = response.data.data.map(challenge => {
-      let category = 'Lainnya';
-      let pathId = null;
-      let chapterId = challenge.chapter_id;
+      let category = challenge.path_title || 'Lainnya';
+      let pathId = challenge.path_slug || challenge.path_id;
+      let chapterId = challenge.chapter_slug || challenge.chapter_id;
       
       const path = paths.value.find(p => p.chapters && p.chapters.some(c => c.id == challenge.chapter_id));
       if (path) {
@@ -181,6 +181,9 @@ const fetchChallenges = async () => {
         const chapter = path.chapters.find(c => c.id == challenge.chapter_id);
         if (chapter) chapterId = chapter.slug || chapter.id;
       }
+
+      if (!pathId) pathId = challenge.path_slug || 'global-challenges';
+      if (!chapterId) chapterId = challenge.chapter_slug || challenge.chapter_id || 'algorithms';
       
       let p = challenge.progress;
       if (Array.isArray(p)) p = p.length > 0 ? p[0] : null;
@@ -262,8 +265,11 @@ const openChallenge = async (challenge) => {
     }
   }
 
+  const pId = challenge.pathId || challenge.path_slug || 'global-challenges';
+  const cId = challenge.chapterId || challenge.chapter_slug || challenge.chapter_id || 'algorithms';
+
   router.push(
-    `/learning/${challenge.pathId}/lesson/${challenge.chapterId}/${challenge.id}?step=practice&mode=challenge`
+    `/learning/${pId}/lesson/${cId}/${challenge.id}?step=practice&mode=challenge`
   );
 };
 </script>
