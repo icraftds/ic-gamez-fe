@@ -8,7 +8,7 @@
     <div class="path-card-inner">
       <div class="path-icon-container">
         <div class="path-icon" :style="{ color: themeColor, backgroundColor: themeColor + '20', border: `1px solid ${themeColor}50` }">
-          <i :class="path.icon"></i>
+          <i :class="pathIcon"></i>
         </div>
         <div v-if="path.isLocked || path.is_locked" class="locked-badge-float">
           <i class="fa-solid fa-lock"></i> TAHAP MVP
@@ -42,6 +42,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
+import { getPathThemeColor, getPathIconClass } from '../../utils/pathTheme'
 
 const props = defineProps({
   path: {
@@ -65,10 +66,11 @@ const handleClick = () => {
 }
 
 const themeColor = computed(() => {
-  if (props.path.isLocked || props.path.is_locked) return '#475569' // Slate gray for locked
-  if (props.path.isPremium || props.path.is_premium) return '#f59e0b' // Amber/Gold for premium
-  const colors = ['#00f0ff', '#ec4899', '#9333ea', '#10b981']
-  return colors[props.index % colors.length] || '#00f0ff'
+  return getPathThemeColor(props.path, props.index)
+})
+
+const pathIcon = computed(() => {
+  return getPathIconClass(props.path)
 })
 </script>
 
