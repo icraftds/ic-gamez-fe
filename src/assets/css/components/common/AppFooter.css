@@ -139,3 +139,44 @@ body.light-mode .logo-light { display: block; }
     text-align: center;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .gamez-footer {
+  background: #eaecf1;
+  border-top: 1px solid rgba(124, 58, 237, 0.12);
+  color: #475569;
+}
+
+body.light-mode .footer-heading {
+  color: #0f172a;
+}
+
+body.light-mode .footer-desc {
+  color: #475569;
+}
+
+body.light-mode .footer-links a {
+  color: #475569;
+}
+
+body.light-mode .footer-links a:hover {
+  color: #7c3aed;
+}
+
+body.light-mode .social-links a {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  color: #64748b;
+}
+
+body.light-mode .social-links a:hover {
+  background: #7c3aed;
+  color: #ffffff;
+  border-color: #7c3aed;
+}
+
+body.light-mode .footer-bottom {
+  border-top: 1px solid rgba(124, 58, 237, 0.1);
+  color: #64748b;
+}
+

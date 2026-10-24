@@ -97,3 +97,22 @@ button {
   opacity: 0.9;
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
 }
+
+/* Light Mode Overhauls */
+:global(body.light-mode) .modal-content {
+  background: #ffffff;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+:global(body.light-mode) .btn-cancel {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #475569;
+}
+
+:global(body.light-mode) .btn-cancel:hover {
+  background: rgba(124, 58, 237, 0.08);
+  color: #7c3aed;
+}
+

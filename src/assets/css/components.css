@@ -459,3 +459,90 @@
         .data-table th, .data-table td { padding: 10px; font-size: 0.8rem; }
         .empty-state { padding: 25px; font-size: 0.95rem; }
       }
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR GLOBAL COMPONENTS
+   ══════════════════════════════════════════════════ */
+body.light-mode .persp-card::before {
+  background: #ffffff;
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .persp-card {
+  border-color: rgba(124, 58, 237, 0.14);
+}
+
+body.light-mode .persp-card:hover::before {
+  background: #ffffff;
+}
+
+body.light-mode .persp-card:hover {
+  border-color: #7c3aed;
+  box-shadow:
+    0 25px 50px -10px rgba(15, 23, 42, 0.12),
+    0 0 30px rgba(124, 58, 237, 0.18) !important;
+}
+
+body.light-mode .card-code-preview {
+  background: #ffffff;
+  color: #0284c7;
+  border-color: rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode .modal-content {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15), 0 0 30px rgba(124, 58, 237, 0.08);
+}
+
+body.light-mode .table-container {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .data-table th {
+  background: #f8fafc;
+  color: #475569;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .data-table td {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+  color: #0f172a;
+}
+
+body.light-mode .data-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+body.light-mode .pagination {
+  background: #f8fafc;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .page-btn {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  color: #0f172a;
+}
+
+body.light-mode .page-btn:hover:not(:disabled) {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+body.light-mode .filter-select {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+body.light-mode .filter-select select {
+  color: #0f172a;
+}
+
+body.light-mode .filter-select select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
