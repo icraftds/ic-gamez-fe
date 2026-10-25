@@ -74,3 +74,33 @@
   border: 1px solid #10b981 !important;
   box-shadow: none !important;
 }
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR CHALLENGE GRID
+   ══════════════════════════════════════════════════ */
+body.light-mode .filter-tabs {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+}
+
+body.light-mode .filter-btn {
+  color: #64748b;
+}
+
+body.light-mode .filter-btn:hover {
+  color: #0f172a;
+}
+
+body.light-mode .filter-btn.active {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(2, 132, 199, 0.12));
+  color: #7c3aed;
+  box-shadow: none;
+}
+
+body.light-mode .tag {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: rgba(15, 23, 42, 0.06);
+}
+

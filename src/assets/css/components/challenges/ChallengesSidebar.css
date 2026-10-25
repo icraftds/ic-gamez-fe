@@ -202,3 +202,46 @@
   .card { padding: 20px; }
   .progress-circle { width: 100px; }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .sidebar .card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.05);
+}
+
+body.light-mode .sidebar .card h3 {
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+body.light-mode .badge.free {
+  background: rgba(124, 58, 237, 0.08);
+  color: #475569;
+}
+
+body.light-mode .upgrade-box {
+  background: rgba(245, 158, 11, 0.07);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+body.light-mode .percentage {
+  fill: #0f172a;
+}
+
+body.light-mode .circle-bg {
+  stroke: rgba(124, 58, 237, 0.1);
+}
+
+body.light-mode .tag {
+  background: rgba(124, 58, 237, 0.06);
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  color: #475569;
+}
+
+body.light-mode .tag:hover,
+body.light-mode .tag.active {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+

@@ -77,15 +77,15 @@
       <div class="history-stats">
         <div class="stat-row">
           <span><CyberEnergy :pkgId="1" :isAnimated="false" /> Harian</span>
-          <span class="count" style="color: white; font-weight: 600;">{{ userStats?.events?.daily || 0 }}x</span>
+          <span class="count" style="color: var(--text-main-hex); font-weight: 600;">{{ userStats?.events?.daily || 0 }}x</span>
         </div>
         <div class="stat-row">
           <span><i class="fa-solid fa-calendar-week" style="color: #3b82f6; width: 20px;"></i> Mingguan</span>
-          <span class="count" style="color: white; font-weight: 600;">{{ userStats?.events?.weekly || 0 }}x</span>
+          <span class="count" style="color: var(--text-main-hex); font-weight: 600;">{{ userStats?.events?.weekly || 0 }}x</span>
         </div>
         <div class="stat-row">
           <span><i class="fa-solid fa-trophy" style="color: #10b981; width: 20px;"></i> Tahunan</span>
-          <span class="count" style="color: white; font-weight: 600;">{{ userStats?.events?.annual || 0 }}x</span>
+          <span class="count" style="color: var(--text-main-hex); font-weight: 600;">{{ userStats?.events?.annual || 0 }}x</span>
         </div>
       </div>
     </div>
