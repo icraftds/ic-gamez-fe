@@ -57,6 +57,11 @@ export function useUserAccount() {
    */
   const loadUser = async (silent = false) => {
     const token = authIdentity()
+    if (!token) {
+      isLoggedIn.value = false
+      if (!silent) isLoading.value = false
+      return null
+    }
     try {
       if (!silent) isLoading.value = true
       const response = await api.get('/auth/me')
