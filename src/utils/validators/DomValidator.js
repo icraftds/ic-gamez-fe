@@ -222,7 +222,9 @@ function evaluateSingleRule(userCode, virtualDoc, rule, cssRules) {
     // 4c. Cek atribut khusus (alt, content, title)
     if (decls['content'] || decls['alt'] || decls['title']) {
       const targetVal = decls['content'] || decls['alt'] || decls['title'];
-      return userCode.toLowerCase().includes(targetVal.toLowerCase());
+      const cleanUserCode = userCode.toLowerCase().replace(/\s*,\s*/g, ',');
+      const cleanTarget = targetVal.toLowerCase().replace(/\s*,\s*/g, ',');
+      return cleanUserCode.includes(cleanTarget);
     }
 
     // 4d. Cek Properti CSS
@@ -269,33 +271,36 @@ function evaluateSingleRule(userCode, virtualDoc, rule, cssRules) {
   return subTokens.every(token => {
     token = token.trim();
     // Atribut [attr=val]
-    const attrMatch = /^([a-z0-9_-]+)?\[([^\]=~]+)([=~]+)([^\]]+)\]/i.exec(token);
+    const attrMatch = /\[([^\]=~]+)([=~]+)([^\]]+)\]/i.exec(token);
     if (attrMatch) {
-      const tag = attrMatch[1] || '';
-      const attrName = attrMatch[2];
-      const attrVal = attrMatch[4].replace(/["']/g, '');
-      const regex = tag
-        ? new RegExp(`<${tag}[^>]*${attrName}=["']?${attrVal}`, 'i')
-        : new RegExp(`${attrName}=["']?${attrVal}`, 'i');
-      return regex.test(userCode);
+      const attrName = attrMatch[1].trim();
+      const attrVal = attrMatch[3].replace(/["']/g, '').trim();
+      const hasAttr = new RegExp(`${attrName}=["']?${attrVal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i').test(userCode);
+      if (!hasAttr) return false;
     }
 
+    // Hapus bagian [attr=val] dari token sebelum memeriksa class dan id elemen
+    const tokenWithoutAttrs = token.replace(/\[[^\]]+\]/g, '');
+
     // ID atau Class
-    const idMatch = /#([a-z0-9_-]+)/i.exec(token);
+    const idMatch = /#([a-z0-9_-]+)/i.exec(tokenWithoutAttrs);
     if (idMatch && !userCode.toLowerCase().includes(`id="${idMatch[1].toLowerCase()}"`) && !userCode.toLowerCase().includes(`id='${idMatch[1].toLowerCase()}'`)) {
       return false;
     }
-    const classMatch = /\.([a-z0-9_-]+)/i.exec(token);
+    const classMatch = /\.([a-z0-9_-]+)/i.exec(tokenWithoutAttrs);
     if (classMatch && !new RegExp(`class=["'][^"']*\\b${classMatch[1]}\\b[^"']*["']`, 'i').test(userCode)) {
       return false;
     }
 
-    const cleanTag = token.replace(/[^a-z0-9_-]/g, '');
-    if (cleanTag && cleanTag !== 'nth' && !['header','nav','main','article','footer','section','div','p','h1','h2','h3','h4','h5','h6','ul','ol','li','table','tr','td','th','form','input','button','textarea','select','option','label','img','a','span','blockquote','cite','details','summary','small'].includes(cleanTag)) {
-      return true;
-    }
-    if (cleanTag && cleanTag !== 'nth') {
-      return new RegExp(`<${cleanTag}[\\s>]`, 'i').test(userCode);
+    // Tag HTML dasar
+    const lastWord = token.trim().split(/\s+/).pop();
+    const tagMatch = /^([a-z0-9_-]+)(?:[.#\[]|$)/i.exec(lastWord);
+    if (tagMatch) {
+      const cleanTag = tagMatch[1].toLowerCase();
+      const validHtmlTags = ['header','nav','main','article','footer','section','div','p','h1','h2','h3','h4','h5','h6','ul','ol','li','table','tr','td','th','form','input','button','textarea','select','option','label','img','a','span','blockquote','cite','details','summary','small','meta','title','head','body','html'];
+      if (validHtmlTags.includes(cleanTag)) {
+        return new RegExp(`<${cleanTag}[\\s>]`, 'i').test(userCode);
+      }
     }
     return true;
   });
