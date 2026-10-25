@@ -171,6 +171,16 @@
 
         <div class="editor-topbar-actions">
           <button 
+            type="button"
+            class="reset-code-btn"
+            @click="$emit('reset')"
+            title="Kembalikan editor ke kode template awal"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Reset Kode</span>
+          </button>
+
+          <button 
             v-if="isSqlMode"
             type="button"
             class="sql-schema-toggle-btn"
@@ -324,7 +334,7 @@ const props = defineProps({
   isChallenge: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'])
+const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code', 'reset'])
 
 const activeOutputTab = ref('console')
 const activeInstructionTab = ref('task') // 'task' | 'schema'
