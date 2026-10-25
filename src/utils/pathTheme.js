@@ -56,7 +56,19 @@ export const BRAND_COLORS = {
   'frontend-web': '#14b8a6',
   
   // Global Challenges: Trophy Gold
-  'global-challenges': '#eab308'
+  'global-challenges': '#eab308',
+
+  // REST API: Emerald / Cyan Green
+  'rest-api': '#10b981',
+  'api': '#10b981',
+
+  // Data Science Python: Indigo / Deep Violet
+  'data-science-python': '#6366f1',
+  'data-science': '#6366f1',
+
+  // Struktur Data & Algoritma: Electric Purple / Amethyst
+  'struktur-data-algoritma': '#8b5cf6',
+  'dsa': '#8b5cf6'
 }
 
 export const FALLBACK_PALETTE = [
@@ -127,6 +139,9 @@ export function getPathIconClass(path) {
   if (slug.includes('matematika')) return 'fa-solid fa-calculator'
   if (slug.includes('dasar-pemrograman')) return 'fa-solid fa-code'
   if (slug.includes('frontend-web')) return 'fa-brands fa-html5'
+  if (slug.includes('rest-api') || slug.includes('api')) return 'fa-solid fa-network-wired'
+  if (slug.includes('data-science')) return 'fa-solid fa-chart-line'
+  if (slug.includes('struktur-data') || slug.includes('algoritma')) return 'fa-solid fa-sitemap'
   if (slug.includes('challenge')) return 'fa-solid fa-trophy'
 
   return 'fa-solid fa-code'

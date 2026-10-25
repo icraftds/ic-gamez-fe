@@ -92,7 +92,12 @@
         </div>
       </div>
 
-      <div class="paths-grid">
+      <!-- Loading state if full paths list is being fetched -->
+      <div v-if="isLoading && paths.length <= 1" class="paths-loading-state" style="display: flex; justify-content: center; align-items: center; min-height: 320px; width: 100%;">
+        <TerminalLoader size="lg" label="seluruh alur belajar" />
+      </div>
+
+      <div v-else class="paths-grid">
         <PathCard 
           v-for="(path, index) in filteredPaths" 
           :key="path.id" 
@@ -243,9 +248,9 @@ const resetFilters = () => {
   selectedTier.value = 'all'
 }
 
-onMounted(() => {
-  if (!hasFetchedAllPaths.value) {
-    fetchPaths()
+onMounted(async () => {
+  if (!hasFetchedAllPaths.value || paths.value.length <= 1) {
+    await fetchPaths()
   }
   isPreparingLesson.value = false
 })

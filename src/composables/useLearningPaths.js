@@ -1,10 +1,26 @@
 import { ref, computed } from 'vue'
 import api from '../services/api'
 
-const globalPaths = ref([])
+const CACHE_KEY = 'ic_learning_paths_cache'
+
+function loadCachedPaths() {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed) && parsed.length > 1) {
+        return parsed
+      }
+    }
+  } catch (e) {}
+  return []
+}
+
+const initialCached = loadCachedPaths()
+const globalPaths = ref(initialCached)
 const globalIsLoading = ref(false)
 const globalIsPreparingLesson = ref(false)
-const globalHasFetchedAllPaths = ref(false)
+const globalHasFetchedAllPaths = ref(initialCached.length > 1)
 
 export function useLearningPaths() {
   const paths = globalPaths
@@ -12,12 +28,39 @@ export function useLearningPaths() {
   const isPreparingLesson = globalIsPreparingLesson
   const hasFetchedAllPaths = globalHasFetchedAllPaths
 
-  const fetchPaths = async () => {
+  const fetchPaths = async (force = false) => {
+    if (isLoading.value && !force) return
     try {
       isLoading.value = true
       const response = await api.get('/paths')
-      paths.value = response.data.data
-      hasFetchedAllPaths.value = true
+      if (response.data && Array.isArray(response.data.data)) {
+        const freshPaths = response.data.data
+
+        // Map existing detailed chapters to retain loaded lessons/quizzes
+        const detailedMap = new Map()
+        paths.value.forEach(p => {
+          if (p.chapters && p.chapters.length > 0) {
+            detailedMap.set(p.slug || String(p.id), p.chapters)
+          }
+        })
+
+        paths.value = freshPaths.map(newPath => {
+          const key = newPath.slug || String(newPath.id)
+          const existingChapters = detailedMap.get(key)
+          if (existingChapters) {
+            return {
+              ...newPath,
+              chapters: existingChapters
+            }
+          }
+          return newPath
+        })
+
+        hasFetchedAllPaths.value = true
+        try {
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(freshPaths))
+        } catch (e) {}
+      }
     } catch (error) {
       console.error('Failed to fetch learning paths', error)
     } finally {
@@ -74,11 +117,15 @@ export function useLearningPaths() {
         });
       }
 
-      const index = paths.value.findIndex(p => p.slug === slug)
+      const index = paths.value.findIndex(p => p.slug === slug || String(p.id) === String(slug))
       if (index !== -1) {
         paths.value[index] = detailedPath
       } else {
         paths.value.push(detailedPath)
+        // If paths list is incomplete, fetch full list in background
+        if (!hasFetchedAllPaths.value || paths.value.length <= 1) {
+          fetchPaths()
+        }
       }
       return detailedPath
     } catch (error) {
