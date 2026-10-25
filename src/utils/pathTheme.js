@@ -68,7 +68,24 @@ export const BRAND_COLORS = {
 
   // Struktur Data & Algoritma: Electric Purple / Amethyst
   'struktur-data-algoritma': '#8b5cf6',
-  'dsa': '#8b5cf6'
+  'dsa': '#8b5cf6',
+
+  // Fondasi Informatika: Cyan / Turquoise
+  'fondasi-informatika': '#06b6d4',
+  'fondasi': '#06b6d4',
+
+  // Object-Oriented Programming: Amber / Orange
+  'object-oriented-programming': '#f59e0b',
+  'oop': '#f59e0b',
+
+  // Software Engineering Fundamentals: Emerald Green
+  'software-engineering-fundamentals': '#10b981',
+  'software-engineering': '#10b981',
+
+  // Dasar AI & Machine Learning: AI Violet / Magenta
+  'ai-machine-learning-dasar': '#a855f7',
+  'ai': '#a855f7',
+  'machine-learning': '#a855f7'
 }
 
 export const FALLBACK_PALETTE = [
@@ -142,6 +159,10 @@ export function getPathIconClass(path) {
   if (slug.includes('rest-api') || slug.includes('api')) return 'fa-solid fa-network-wired'
   if (slug.includes('data-science')) return 'fa-solid fa-chart-line'
   if (slug.includes('struktur-data') || slug.includes('algoritma')) return 'fa-solid fa-sitemap'
+  if (slug.includes('fondasi')) return 'fa-solid fa-microchip'
+  if (slug.includes('object-oriented') || slug.includes('oop')) return 'fa-solid fa-cubes'
+  if (slug.includes('software-engineering')) return 'fa-solid fa-gears'
+  if (slug.includes('ai') || slug.includes('machine-learning')) return 'fa-solid fa-robot'
   if (slug.includes('challenge')) return 'fa-solid fa-trophy'
 
   return 'fa-solid fa-code'
