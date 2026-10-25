@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import api from '../services/api'
 
-const CACHE_KEY = 'ic_learning_paths_cache'
+const CACHE_KEY = 'ic_learning_paths_cache_v3'
 
 function loadCachedPaths() {
   try {
@@ -160,19 +160,32 @@ export function useLearningPaths() {
   }
 
   const getLessonById = (pathId, chapterId, lessonId) => {
-    const chapter = getChapterById(pathId, chapterId)
-    if (chapter && chapter.lessons) {
-      const found = chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
-      if (found) return found
+    // 1. Cari secara tepat di path dan chapter yang diminta
+    const path = getPathById(pathId)
+    if (path && path.chapters) {
+      const chapter = path.chapters.find(c => String(c.id) === String(chapterId) || c.slug === chapterId)
+      if (chapter && chapter.lessons) {
+        const found = chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+        if (found) return found
+      }
+      // Jika tidak di chapter tersebut, cari di chapter lain dalam PATH YANG SAMA (jangan bocor ke alur belajar lain)
+      for (const c of path.chapters) {
+        if (c.lessons) {
+          const found = c.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+          if (found) return found
+        }
+      }
     }
 
-    // Fallback: cari di seluruh paths dan chapters jika format ID/slug berbeda
-    for (const p of paths.value) {
-      if (p.chapters) {
-        for (const c of p.chapters) {
-          if (c.lessons) {
-            const found = c.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
-            if (found) return found
+    // 2. Fallback global HANYA JIKA pathId tidak ditentukan sama sekali (misal dari challenge atau search global)
+    if (!pathId) {
+      for (const p of paths.value) {
+        if (p.chapters) {
+          for (const c of p.chapters) {
+            if (c.lessons) {
+              const found = c.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+              if (found) return found
+            }
           }
         }
       }

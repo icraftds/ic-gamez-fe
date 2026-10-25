@@ -21,27 +21,76 @@ export function useQuiz() {
   const isChecking = ref(false)
   const errorMessage = ref('')
   const currentLessonId = ref(null)
+  const currentLessonSlug = ref(null)
 
   const saveToStorage = () => {
-    if (!currentLessonId.value) return
+    const key = currentLessonSlug.value ? `quiz_state_${currentLessonSlug.value}` : (currentLessonId.value ? `quiz_state_${currentLessonId.value}` : null)
+    if (!key) return
     const data = {
+      lessonId: currentLessonId.value,
+      slug: currentLessonSlug.value,
       selectedAnswers: selectedAnswers.value,
       selectedAnswer: selectedAnswer.value,
       currentQuizIndex: currentQuizIndex.value,
       quizResults: quizResults.value,
       isSubmitted: isSubmitted.value,
       isCorrect: isCorrect.value,
-      errorMessage: errorMessage.value
+      errorMessage: errorMessage.value,
+      v: 2
     }
-    localStorage.setItem(`quiz_state_${currentLessonId.value}`, JSON.stringify(data))
+    localStorage.setItem(key, JSON.stringify(data))
   }
 
-  const loadFromStorage = (lessonId) => {
+  const loadFromStorage = (lessonOrId, quizzes = []) => {
+    let lessonId = null
+    let lessonSlug = null
+
+    if (lessonOrId && typeof lessonOrId === 'object') {
+      lessonId = lessonOrId.id
+      lessonSlug = lessonOrId.slug
+    } else {
+      lessonId = lessonOrId
+      lessonSlug = typeof lessonOrId === 'string' && isNaN(Number(lessonOrId)) ? lessonOrId : null
+    }
+
     currentLessonId.value = lessonId
-    const dataStr = localStorage.getItem(`quiz_state_${lessonId}`)
+    currentLessonSlug.value = lessonSlug
+
+    const primaryKey = lessonSlug ? `quiz_state_${lessonSlug}` : (lessonId ? `quiz_state_${lessonId}` : null)
+    let dataStr = primaryKey ? localStorage.getItem(primaryKey) : null
+
+    // Fallback ke integer ID key jika slug belum ada
+    if (!dataStr && lessonId) {
+      dataStr = localStorage.getItem(`quiz_state_${lessonId}`)
+    }
+
     if (dataStr) {
       try {
         const data = JSON.parse(dataStr)
+
+        // Cegah kontaminasi: jika data slug tidak cocok, abaikan
+        if (data.slug && lessonSlug && data.slug !== lessonSlug) {
+          resetStateOnly()
+          return
+        }
+
+        // Validasi: jika daftar quiz diberikan dan ada jawaban tersimpan,
+        // pastikan setidaknya satu quiz_id cocok dengan materi aktif.
+        if (Array.isArray(quizzes) && quizzes.length > 0) {
+          const validQuizIds = new Set(quizzes.map(q => String(q.id)))
+          const savedQuizIds = Object.keys(data.selectedAnswers || {})
+          if (savedQuizIds.length > 0) {
+            const hasMatch = savedQuizIds.some(id => validQuizIds.has(id))
+            if (!hasMatch) {
+              // Quiz lama dari materi lain yang menabrak ID! Buang!
+              if (primaryKey) localStorage.removeItem(primaryKey)
+              if (lessonId) localStorage.removeItem(`quiz_state_${lessonId}`)
+              resetStateOnly()
+              return
+            }
+          }
+        }
+
         selectedAnswers.value = data.selectedAnswers || {}
         selectedAnswer.value = data.selectedAnswer ?? null
         currentQuizIndex.value = data.currentQuizIndex ?? 0
@@ -49,12 +98,14 @@ export function useQuiz() {
         isSubmitted.value = !!data.isSubmitted
         isCorrect.value = !!data.isCorrect
         errorMessage.value = data.errorMessage || ''
+        return
       } catch (e) {
         resetStateOnly()
+        return
       }
-    } else {
-      resetStateOnly()
     }
+
+    resetStateOnly()
   }
 
   watch(

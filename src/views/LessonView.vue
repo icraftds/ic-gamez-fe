@@ -310,7 +310,7 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
         return
       }
       if (!lesson.quizPassed) return // Ignore click if locked
-      runner.loadFromStorage(lesson, lesson.practice, lesson.slug)
+      runner.loadFromStorage(lesson, lesson.practice, lesson.slug, lessonLanguage.value)
       activeStep.value = STEP.PRACTICE
     } else {
       activeStep.value = STEP.THEORY
@@ -396,7 +396,7 @@ const onRequestNextFromQuiz = async () => {
     currentLesson.value.quizPassed = true
   }
 
-  runner.loadFromStorage(currentLesson.value, currentLesson.value?.practice, currentLesson.value?.slug)
+  runner.loadFromStorage(currentLesson.value, currentLesson.value?.practice, currentLesson.value?.slug, lessonLanguage.value)
   activeStep.value = STEP.PRACTICE
 }
 
@@ -515,12 +515,12 @@ watch(currentLesson, (newLesson) => {
   }
   initStepFromQuery()
   if (newLesson && newLesson.id) {
-    quiz.loadFromStorage(newLesson.id)
+    quiz.loadFromStorage(newLesson, newLesson.quizzes || [])
   } else {
     quiz.reset()
   }
   if (newLesson && newLesson.id) {
-    runner.loadFromStorage(newLesson, newLesson?.practice, newLesson?.slug)
+    runner.loadFromStorage(newLesson, newLesson?.practice, newLesson?.slug, lessonLanguage.value)
     if (quiz.isCorrect.value) {
       newLesson.quizPassed = true
     }
