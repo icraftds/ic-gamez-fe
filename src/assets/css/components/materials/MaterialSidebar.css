@@ -612,3 +612,24 @@
     display: block;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .docs-sidebar {
+  background: #ffffff;
+  border-right: 1px solid rgba(124, 58, 237, 0.12);
+}
+
+body.light-mode .path-content {
+  background: rgba(124, 58, 237, 0.03);
+}
+
+body.light-mode .chapter-title {
+  color: #7c3aed;
+}
+
+body.light-mode .lesson-link.active {
+  background: rgba(124, 58, 237, 0.08);
+  color: #7c3aed;
+  border-left-color: #7c3aed;
+}
+

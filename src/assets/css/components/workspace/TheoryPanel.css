@@ -157,3 +157,29 @@
     box-sizing: border-box;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .lesson-body :deep(h3) {
+  color: #7c3aed;
+}
+
+body.light-mode .lesson-body :deep(pre) {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.16);
+}
+
+body.light-mode .lesson-body :deep(code) {
+  color: #0284c7;
+}
+
+body.light-mode .lesson-body :deep(p code),
+body.light-mode .lesson-body :deep(li code) {
+  background: rgba(2, 132, 199, 0.08);
+  color: #0369a1;
+}
+
+body.light-mode .theory-panel .panel-footer {
+  background: #ffffff;
+  border-top: 1px solid rgba(124, 58, 237, 0.12);
+}
+
