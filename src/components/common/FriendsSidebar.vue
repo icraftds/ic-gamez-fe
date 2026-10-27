@@ -2,6 +2,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFriends } from '../../composables/useFriends'
+import { useNotifications } from '../../composables/useNotifications'
 import CyberLevel from '../ui/CyberLevel.vue'
 
 const {
@@ -13,22 +14,71 @@ const {
   isLoadingFriends,
   isLoadingRequests,
   toggleFriendsSidebar,
+  fetchFriends,
   fetchFriendRequests,
   hasUnreadRequests,
   searchUsers,
   addFriend,
   removeFriend,
   acceptFriendRequest,
-  rejectFriendRequest
+  rejectFriendRequest,
+  initialSidebarTab
 } = useFriends()
+
+const {
+  notifications,
+  unreadCount,
+  unclaimedRewardsCount,
+  isLoadingNotifications,
+  isClaiming,
+  hasUnread,
+  fetchNotifications,
+  markAsRead,
+  markAllAsRead,
+  claimReward
+} = useNotifications()
 
 const router = useRouter()
 const searchQuery = ref('')
-const activeTab = ref('teman')
+const activeTab = ref(initialSidebarTab.value || 'notifikasi')
+const claimToast = ref(null)
 let searchTimeout
+let toastTimeout
 
 onMounted(() => {
   fetchFriendRequests()
+  if (isFriendsSidebarOpen.value && activeTab.value === 'notifikasi') {
+    fetchNotifications()
+  }
+})
+
+watch(initialSidebarTab, (newTab) => {
+  if (newTab) {
+    activeTab.value = newTab
+  }
+})
+
+watch(isFriendsSidebarOpen, (isOpen) => {
+  if (isOpen) {
+    if (activeTab.value === 'notifikasi') {
+      fetchNotifications({ force: true })
+    } else if (activeTab.value === 'teman') {
+      if (friends.value.length === 0) fetchFriends()
+    } else if (activeTab.value === 'permintaan') {
+      fetchFriendRequests()
+    }
+  }
+})
+
+watch(activeTab, (tab) => {
+  if (!isFriendsSidebarOpen.value) return
+  if (tab === 'notifikasi') {
+    fetchNotifications()
+  } else if (tab === 'teman') {
+    if (friends.value.length === 0) fetchFriends()
+  } else if (tab === 'permintaan') {
+    fetchFriendRequests()
+  }
 })
 
 watch(searchQuery, (newVal) => {
@@ -44,7 +94,7 @@ watch(searchQuery, (newVal) => {
 
 const visitProfile = (slugOrId) => {
   if (slugOrId) {
-    toggleFriendsSidebar() // close sidebar
+    toggleFriendsSidebar()
     router.push(`/coderz/${slugOrId}`)
   }
 }
@@ -58,6 +108,81 @@ const handleRemoveFriend = async (userId) => {
     await removeFriend(userId)
   }
 }
+
+const handleNotifClick = (notif) => {
+  if (!notif.is_read) {
+    markAsRead(notif.id)
+  }
+}
+
+const handleClaimReward = async (notif) => {
+  const result = await claimReward(notif)
+  if (result.success) {
+    claimToast.value = result.message || `Berhasil mengklaim +${notif.reward_coinz} iCoinz!`
+    clearTimeout(toastTimeout)
+    toastTimeout = setTimeout(() => {
+      claimToast.value = null
+    }, 4500)
+  } else {
+    alert(result.message)
+  }
+}
+
+const navigateCta = (url) => {
+  toggleFriendsSidebar()
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    window.open(url, '_blank')
+  } else {
+    router.push(url)
+  }
+}
+
+const formatTimeAgo = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diffSec = Math.floor((now - date) / 1000)
+  if (diffSec < 60) return 'Baru saja'
+  const diffMin = Math.floor(diffSec / 60)
+  if (diffMin < 60) return `${diffMin}m lalu`
+  const diffHour = Math.floor(diffMin / 60)
+  if (diffHour < 24) return `${diffHour}j lalu`
+  const diffDay = Math.floor(diffHour / 24)
+  if (diffDay < 7) return `${diffDay}h lalu`
+  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+}
+
+const formatExpiryRemaining = (dateStr) => {
+  if (!dateStr) return ''
+  const expDate = new Date(dateStr)
+  const diffSec = Math.floor((expDate - new Date()) / 1000)
+  if (diffSec <= 0) return 'Kedaluwarsa'
+  const diffMin = Math.floor(diffSec / 60)
+  if (diffMin < 60) return `Berakhir dlm ${diffMin}m`
+  const diffHour = Math.floor(diffMin / 60)
+  if (diffHour < 24) return `Berakhir dlm ${diffHour}j`
+  const diffDay = Math.floor(diffHour / 24)
+  if (diffDay <= 7) return `Berakhir dlm ${diffDay} hari`
+  return `Hingga ${expDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}`
+}
+
+const getCategoryIcon = (category) => {
+  switch (category) {
+    case 'maintenance': return 'fa-screwdriver-wrench'
+    case 'new_feature': return 'fa-rocket'
+    case 'gift': return 'fa-gift'
+    default: return 'fa-bullhorn'
+  }
+}
+
+const getCategoryLabel = (category) => {
+  switch (category) {
+    case 'maintenance': return 'Maintenance'
+    case 'new_feature': return 'Fitur Baru'
+    case 'gift': return 'Hadiah iCoinz'
+    default: return 'Pengumuman'
+  }
+}
 </script>
 
 <template>
@@ -65,46 +190,61 @@ const handleRemoveFriend = async (userId) => {
   <div 
     class="friends-sidebar-overlay" 
     :class="{ 'is-open': isFriendsSidebarOpen }" 
-    @click="toggleFriendsSidebar"
+    @click="toggleFriendsSidebar()"
   ></div>
   
   <aside class="friends-sidebar" :class="{ 'is-open': isFriendsSidebarOpen }">
-    <!-- Sleek Floating Capsule Edge Tab (Matches Topbar & Leftbar Capsule Concept) -->
+    <!-- Sleek Floating Capsule Edge Tab -->
     <button 
       class="fs-edge-tab" 
-      @click.stop="toggleFriendsSidebar"
+      @click.stop="toggleFriendsSidebar('teman')"
       :class="{ 'is-open': isFriendsSidebarOpen }"
-      :title="isFriendsSidebarOpen ? 'Tutup Teman' : 'Daftar Teman'"
-      :aria-label="isFriendsSidebarOpen ? 'Tutup Teman' : 'Daftar Teman'"
+      :title="isFriendsSidebarOpen ? 'Tutup Sidebar' : 'Buka Notifikasi & Teman'"
+      :aria-label="isFriendsSidebarOpen ? 'Tutup Sidebar' : 'Buka Notifikasi & Teman'"
       type="button"
     >
       <div class="fs-edge-tab-inner">
-        <i class="fa-solid" :class="isFriendsSidebarOpen ? 'fa-xmark' : 'fa-user-group'"></i>
+        <i class="fa-solid" :class="isFriendsSidebarOpen ? 'fa-xmark' : (activeTab === 'notifikasi' ? 'fa-bell' : 'fa-user-group')"></i>
         <i v-if="!isFriendsSidebarOpen" class="fa-solid fa-chevron-left fs-edge-chevron"></i>
       </div>
-      <!-- Red Dot Notification for New Friend Requests -->
-      <span v-if="hasUnreadRequests" class="fs-tab-dot" title="Permintaan pertemanan baru"></span>
+      <!-- Notification Dot on edge tab -->
+      <span v-if="unclaimedRewardsCount > 0" class="fs-tab-dot" style="background: #f59e0b; box-shadow: 0 0 8px #f59e0b;" title="Hadiah iCoinz tersedia!"></span>
+      <span v-else-if="hasUnread || hasUnreadRequests" class="fs-tab-dot" title="Pesan atau permintaan baru"></span>
     </button>
 
     <!-- Header Section -->
     <div class="fs-header">
       <div class="fs-header-branding">
-        <div class="fs-header-icon-box">
-          <i class="fa-solid fa-user-group"></i>
+        <div class="fs-header-icon-box" :class="{ 'icon-notif': activeTab === 'notifikasi' }">
+          <i class="fa-solid" :class="activeTab === 'notifikasi' ? 'fa-bell' : 'fa-user-group'"></i>
         </div>
         <div class="fs-header-texts">
-          <h3 class="fs-title">Daftar Teman</h3>
-          <span class="fs-subtitle">Komunitas & Koneksi Game-Z</span>
+          <h3 class="fs-title">{{ activeTab === 'notifikasi' ? 'Pusat Notifikasi' : 'Daftar Teman' }}</h3>
+          <span class="fs-subtitle">{{ activeTab === 'notifikasi' ? 'Pengumuman Sistem & Kotak Hadiah' : 'Komunitas & Koneksi Game-Z' }}</span>
         </div>
       </div>
-      <button class="fs-close-btn" @click="toggleFriendsSidebar" title="Tutup">
+      <button class="fs-close-btn" @click="toggleFriendsSidebar()" title="Tutup">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-    <!-- Floating Capsule Tabs (Identical to Topbar & Leftbar Capsule Concept) -->
+    <!-- Floating Capsule Tabs (3 Tabs: Pesan, Teman, Permintaan) -->
     <div class="fs-tabs-wrapper">
       <div class="fs-tabs-capsule">
+        <button 
+          class="fs-tab-pill" 
+          :class="{ active: activeTab === 'notifikasi' }" 
+          @click="activeTab = 'notifikasi'"
+        >
+          <i class="fa-solid fa-bell"></i>
+          <span>Pesan</span>
+          <!-- Gold badge if unclaimed gifts exist -->
+          <span v-if="unclaimedRewardsCount > 0" class="fs-tab-count fs-gift-badge" title="Hadiah belum diklaim">
+            <i class="fa-solid fa-gift"></i> {{ unclaimedRewardsCount }}
+          </span>
+          <span v-else-if="unreadCount > 0" class="fs-tab-count has-badge">{{ unreadCount }}</span>
+        </button>
+
         <button 
           class="fs-tab-pill" 
           :class="{ active: activeTab === 'teman' }" 
@@ -112,8 +252,9 @@ const handleRemoveFriend = async (userId) => {
         >
           <i class="fa-solid fa-users"></i>
           <span>Teman</span>
-          <span class="fs-tab-count">{{ friends.length }}</span>
+          <span v-if="friends.length > 0" class="fs-tab-count">{{ friends.length }}</span>
         </button>
+
         <button 
           class="fs-tab-pill" 
           :class="{ active: activeTab === 'permintaan' }" 
@@ -121,13 +262,32 @@ const handleRemoveFriend = async (userId) => {
         >
           <i class="fa-solid fa-user-plus"></i>
           <span>Permintaan</span>
-          <span class="fs-tab-count" :class="{ 'has-badge': hasUnreadRequests }">{{ friendRequests.length }}</span>
+          <span v-if="friendRequests.length > 0" class="fs-tab-count" :class="{ 'has-badge': hasUnreadRequests }">{{ friendRequests.length }}</span>
         </button>
       </div>
     </div>
 
-    <!-- Search Section -->
-    <div class="fs-search-container">
+    <!-- Quick Action Toolbar for Notifications -->
+    <div v-if="activeTab === 'notifikasi' && notifications.length > 0" class="fs-notif-toolbar">
+      <span class="fs-notif-count-label">
+        {{ notifications.length }} Pesan Masuk
+      </span>
+      <button v-if="unreadCount > 0" class="fs-btn-read-all" @click="markAllAsRead">
+        <i class="fa-solid fa-check-double"></i>
+        <span>Tandai Semua Dibaca</span>
+      </button>
+    </div>
+
+    <!-- Claim Toast Notification Alert -->
+    <transition name="dropdown-fade">
+      <div v-if="claimToast" class="fs-claim-toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ claimToast }}</span>
+      </div>
+    </transition>
+
+    <!-- Search Section (Only for Friends & Requests Tabs) -->
+    <div v-if="activeTab !== 'notifikasi'" class="fs-search-container">
       <div class="fs-search-capsule">
         <i class="fa-solid fa-magnifying-glass fs-search-icon"></i>
         <input 
@@ -205,6 +365,100 @@ const handleRemoveFriend = async (userId) => {
 
     <!-- Content Area -->
     <div class="fs-content">
+      <!-- 0. Tab Notifikasi & Pesan Hadiah -->
+      <div v-if="activeTab === 'notifikasi'" class="fs-tab-content">
+        <div v-if="isLoadingNotifications" class="fs-loading-wrap">
+          <TerminalLoader size="sm" label="pesan" />
+        </div>
+        <div v-else-if="notifications.length === 0" class="fs-empty-state">
+          <div class="fs-empty-icon-wrap icon-notif">
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </div>
+          <h4>Belum Ada Pesan</h4>
+          <p>Pengumuman sistem, info maintenance, dan pesan hadiah dari admin akan tampil di sini.</p>
+        </div>
+        <div v-else class="fs-notifications-list">
+          <div 
+            v-for="notif in notifications" 
+            :key="notif.id" 
+            class="fs-notif-card"
+            :class="[
+              'category-' + notif.category,
+              { 'is-unread': !notif.is_read, 'has-reward': notif.reward_coinz > 0 }
+            ]"
+            @click="handleNotifClick(notif)"
+          >
+            <!-- Header Row -->
+            <div class="fs-notif-header">
+              <div class="fs-notif-badge-group">
+                <span class="fs-category-badge" :class="'cat-' + notif.category">
+                  <i class="fa-solid" :class="getCategoryIcon(notif.category)"></i>
+                  {{ getCategoryLabel(notif.category) }}
+                </span>
+                <span v-if="!notif.is_read" class="fs-unread-dot" title="Belum dibaca"></span>
+              </div>
+              <span class="fs-notif-time">{{ formatTimeAgo(notif.created_at) }}</span>
+            </div>
+
+            <!-- Title & Body -->
+            <h4 class="fs-notif-title">{{ notif.title }}</h4>
+            <p class="fs-notif-msg">{{ notif.message }}</p>
+
+            <!-- Expiration / Deadline Info -->
+            <div v-if="notif.expires_at" class="fs-notif-expiry">
+              <i class="fa-regular fa-clock"></i>
+              <span>{{ formatExpiryRemaining(notif.expires_at) }}</span>
+            </div>
+
+            <!-- Reward Gift Box (if has coinz) -->
+            <div v-if="notif.reward_coinz > 0" class="fs-reward-box">
+              <div class="fs-reward-info">
+                <div class="fs-reward-coin-icon">
+                  <i class="fa-solid fa-coins"></i>
+                </div>
+                <div class="fs-reward-texts">
+                  <span class="fs-reward-label">Hadiah Bonus</span>
+                  <span class="fs-reward-val">+{{ notif.reward_coinz.toLocaleString('id-ID') }} iCoinz</span>
+                </div>
+              </div>
+
+              <div class="fs-reward-action">
+                <button 
+                  v-if="notif.can_claim" 
+                  class="fs-btn-claim" 
+                  :disabled="isClaiming[notif.id]"
+                  @click.stop="handleClaimReward(notif)"
+                >
+                  <i v-if="isClaiming[notif.id]" class="fa-solid fa-circle-notch fa-spin"></i>
+                  <template v-else>
+                    <i class="fa-solid fa-gift"></i>
+                    <span>Klaim</span>
+                  </template>
+                </button>
+                <span v-else-if="notif.is_claimed" class="fs-badge-claimed">
+                  <i class="fa-solid fa-check"></i> Sudah Diklaim
+                </span>
+                <span v-else-if="notif.is_expired" class="fs-badge-expired">
+                  <i class="fa-solid fa-clock"></i> Kedaluwarsa
+                </span>
+              </div>
+            </div>
+
+            <!-- Optional CTA Link -->
+            <div v-if="notif.action_url" class="fs-notif-action-row">
+              <a 
+                :href="notif.action_url" 
+                class="fs-notif-cta-btn" 
+                @click.prevent.stop="navigateCta(notif.action_url)"
+              >
+                <span>{{ notif.action_label || 'Lihat Selengkapnya' }}</span>
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- 1. Teman Tab -->
       <div v-if="activeTab === 'teman'" class="fs-tab-content">
         <div v-if="isLoadingFriends" class="fs-loading-wrap">
