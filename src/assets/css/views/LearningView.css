@@ -516,3 +516,123 @@
   color: var(--text-light);
 }
 
+/* Light Mode Overhauls */
+body.light-mode .hero-badge {
+  background: rgba(2, 132, 199, 0.08);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode .tier-pill-btn {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  color: #64748b;
+}
+
+body.light-mode .tier-pill-btn:hover {
+  background: rgba(124, 58, 237, 0.05);
+  color: #0f172a;
+}
+
+body.light-mode .tier-pill-btn.active {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+  border-color: #0284c7;
+  box-shadow: 0 0 15px -3px rgba(2, 132, 199, 0.2);
+}
+
+body.light-mode .materials-btn {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #0f172a;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .materials-btn i {
+  color: #0284c7;
+}
+
+body.light-mode .materials-btn:hover {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: #7c3aed;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.1);
+}
+
+body.light-mode .encyclopedia-btn {
+  background: #ffffff;
+  border: 1px solid rgba(219, 39, 119, 0.25);
+  color: #0f172a;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .encyclopedia-btn i {
+  color: #db2777;
+}
+
+body.light-mode .encyclopedia-btn:hover {
+  background: rgba(219, 39, 119, 0.06);
+  border-color: #db2777;
+  box-shadow: 0 8px 20px rgba(219, 39, 119, 0.1);
+}
+
+body.light-mode .empty-reset-btn {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode .loader-content {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+body.light-mode .filter-section {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.05);
+}
+
+body.light-mode .search-box input {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  color: #0f172a;
+}
+
+body.light-mode .search-box input:focus {
+  background: #ffffff;
+  border-color: #0284c7;
+}
+
+body.light-mode .pill-btn {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  color: #475569;
+}
+
+body.light-mode .pill-btn:hover {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+body.light-mode .pill-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode .pill-btn.active .count-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+body.light-mode .pill-btn .count-badge {
+  background: rgba(124, 58, 237, 0.1);
+  color: #475569;
+}
+
+
+

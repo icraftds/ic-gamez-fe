@@ -870,3 +870,87 @@
     align-items: flex-start;
   }
 }
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR LEARNING PATH DETAIL
+   ══════════════════════════════════════════════════ */
+body.light-mode .roadmap-hub-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .hub-title {
+  color: #0f172a;
+}
+
+body.light-mode .hub-desc {
+  color: #475569;
+}
+
+body.light-mode .stat-val {
+  color: #0f172a;
+}
+
+body.light-mode .stat-lbl {
+  color: #64748b;
+}
+
+body.light-mode .hub-stat-item {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .chapter-showcase-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .node-title {
+  color: #0f172a;
+}
+
+body.light-mode .node-desc {
+  color: #475569;
+}
+
+body.light-mode .chapter-lesson-item {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .chapter-lesson-item:hover {
+  background: #f1f5f9;
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+body.light-mode .lesson-name {
+  color: #0f172a;
+}
+
+body.light-mode .lesson-sub {
+  color: #64748b;
+}
+
+body.light-mode .project-title {
+  color: #0f172a;
+}
+
+body.light-mode .project-name {
+  color: #0f172a;
+}
+
+body.light-mode .stepper-item {
+  color: #64748b;
+}
+
+body.light-mode .stepper-item:hover {
+  color: #0f172a;
+}
+
+body.light-mode .stepper-item.active {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.08);
+}
+

@@ -151,3 +151,38 @@
   color: var(--text-sub-hex);
 }
 
+/* Light Mode Overhauls */
+body.light-mode .encyclopedia-sidebar {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.05);
+}
+
+body.light-mode .search-box input {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #0f172a;
+}
+
+body.light-mode .search-box input:focus {
+  background: #ffffff;
+  border-color: #0284c7;
+}
+
+body.light-mode .topic-nav a:hover {
+  background: rgba(124, 58, 237, 0.06);
+  color: #0f172a;
+}
+
+body.light-mode .topic-nav a.active {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
+body.light-mode .article-loading {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.05);
+}
+
+

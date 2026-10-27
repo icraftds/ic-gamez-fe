@@ -521,3 +521,44 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .vp-content-wrapper .section-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.05);
+}
+
+body.light-mode .vp-content-wrapper .section-title {
+  color: #0f172a;
+}
+
+body.light-mode .vp-back-btn {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  color: #475569;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .vp-back-btn:hover {
+  background: rgba(124, 58, 237, 0.08);
+  color: #7c3aed;
+}
+
+body.light-mode .badge-item-name {
+  color: #0f172a;
+}
+
+body.light-mode .tab-btn {
+  color: #64748b;
+}
+
+body.light-mode .tab-btn:hover {
+  color: #0f172a;
+}
+
+body.light-mode .tab-btn.active {
+  background: #7c3aed;
+  color: #ffffff !important;
+}
+

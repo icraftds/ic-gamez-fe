@@ -182,3 +182,30 @@
     padding: 24px 16px;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .checkout-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 15px 40px rgba(124, 58, 237, 0.06);
+  color: #0f172a;
+}
+
+body.light-mode .checkout-breadcrumb .current {
+  color: #0f172a;
+}
+
+body.light-mode .step-dot {
+  background: #ffffff;
+  border: 2px solid rgba(124, 58, 237, 0.2);
+  color: #64748b;
+}
+
+body.light-mode .step-line {
+  background: rgba(124, 58, 237, 0.15);
+}
+
+body.light-mode :deep(.section-title) {
+  color: #0f172a;
+}
+

@@ -318,3 +318,64 @@
     font-size: 1.5rem;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .pe-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 20px 50px rgba(124, 58, 237, 0.08);
+}
+
+body.light-mode .pe-header h2 {
+  color: #0f172a;
+}
+
+body.light-mode .pe-back-btn {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #475569;
+}
+
+body.light-mode .pe-back-btn:hover {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
+body.light-mode .pe-avatar-wrapper {
+  background: #f8fafc;
+  border: 3px solid rgba(124, 58, 237, 0.2);
+}
+
+body.light-mode .pe-avatar-info h4 {
+  color: #0f172a;
+}
+
+body.light-mode .pe-divider {
+  border-top: 1px solid rgba(124, 58, 237, 0.12);
+}
+
+body.light-mode .pe-form-group label {
+  color: #334155;
+}
+
+body.light-mode .pe-input {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #0f172a;
+}
+
+body.light-mode .pe-input::placeholder {
+  color: #94a3b8;
+}
+
+body.light-mode .pe-input:focus {
+  background: #ffffff;
+  border-color: #0284c7;
+}
+
+body.light-mode .pe-input-wrapper.is-disabled .pe-input {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: rgba(124, 58, 237, 0.1);
+}
+
