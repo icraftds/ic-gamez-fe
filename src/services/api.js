@@ -42,7 +42,7 @@ api.interceptors.request.use(async config => {
     if (!path.startsWith('/') || path.startsWith('//') || path.includes('://')) return Promise.reject(new Error('Invalid product path'));
     config.headers.delete('Authorization');
     const method = (config.method || 'get').toUpperCase();
-    const privatePath = /^\/(?:auth\/me|user|payments|subscription|coupons)(?:\/|$)/.test(path);
+    const privatePath = /^\/(?:auth\/me|user|payments|subscription|coupons|notifications)(?:\/|$)/.test(path);
     if (ssoState.user.value || privatePath || !['GET', 'HEAD'].includes(method)) {
       config.baseURL = '/api/bff';
       config.withCredentials = true;
