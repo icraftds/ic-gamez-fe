@@ -2,11 +2,9 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotifications } from '../composables/useNotifications'
-import { useUserAccount } from '../composables/useUserAccount'
 import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 
 const router = useRouter()
-const { coinz } = useUserAccount()
 
 const {
   notifications,
@@ -165,287 +163,277 @@ const getCategoryLabel = (category) => {
 </script>
 
 <template>
-  <div class="notifications-page-wrapper">
-    <!-- Top Header Banner -->
-    <div class="notif-page-header container">
-      <div class="notif-header-left">
-        <div class="notif-header-icon">
-          <i class="fa-solid fa-envelope-open-text"></i>
-        </div>
-        <div class="notif-header-titles">
-          <h1>Kotak Pesan & Hadiah</h1>
-          <p>Pusat pengumuman sistem, info pembaruan server, dan klaim hadiah iCoinZ.</p>
-        </div>
-      </div>
-
-      <div class="notif-header-right">
-        <button
-          v-if="unreadCount > 0"
-          class="notif-action-btn btn-mark-all"
-          @click="markAllAsRead"
-          title="Tandai semua pesan telah dibaca"
-        >
-          <i class="fa-solid fa-check-double"></i>
-          <span>Tandai Semua Dibaca</span>
-        </button>
-
-        <button
-          class="notif-action-btn btn-refresh"
-          :disabled="isLoadingNotifications"
-          @click="fetchNotifications({ force: true })"
-          title="Muat ulang pesan"
-        >
-          <i class="fa-solid fa-rotate" :class="{ 'fa-spin': isLoadingNotifications }"></i>
-        </button>
-
-        <div class="notif-wallet-pill" @click="router.push('/shop')" title="Saldo iCoinZ Anda">
-          <img src="/images/icoinz.svg" alt="iCoinZ" class="notif-coin-svg" />
-          <span>{{ formatCoinz(coinz) }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Floating Claim Feedback Toast -->
-    <div class="container notif-toast-container" v-if="claimToast || claimErrorToast">
-      <transition name="mail-fade">
-        <div v-if="claimToast" class="notif-feedback-banner is-success">
-          <i class="fa-solid fa-circle-check"></i>
-          <span>{{ claimToast }}</span>
-        </div>
-        <div v-else-if="claimErrorToast" class="notif-feedback-banner is-error">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <span>{{ claimErrorToast }}</span>
-        </div>
-      </transition>
-    </div>
-
-    <!-- Main Game Mailbox Split Layout -->
-    <div class="container notif-mailbox-section">
-      <div class="mailbox-shell" :class="{ 'has-mobile-selection': !!selectedNotif }">
-        <!-- LEFT PANE: Message List -->
-        <aside class="mailbox-list-pane">
-          <!-- Filter Tabs -->
-          <div class="mailbox-filter-bar">
-            <button
-              class="mail-filter-tab"
-              :class="{ active: activeFilter === 'all' }"
-              @click="activeFilter = 'all'"
-            >
-              <span>Semua</span>
-              <span v-if="notifications.length > 0" class="filter-count">{{ notifications.length }}</span>
-            </button>
-
-            <button
-              class="mail-filter-tab"
-              :class="{ active: activeFilter === 'unread' }"
-              @click="activeFilter = 'unread'"
-            >
-              <span>Belum Dibaca</span>
-              <span v-if="unreadCount > 0" class="filter-count badge-unread">{{ unreadCount }}</span>
-            </button>
-
-            <button
-              class="mail-filter-tab"
-              :class="{ active: activeFilter === 'gift' }"
-              @click="activeFilter = 'gift'"
-            >
-              <i class="fa-solid fa-gift"></i>
-              <span>Hadiah</span>
-              <span v-if="unclaimedRewardsCount > 0" class="filter-count badge-gift">{{ unclaimedRewardsCount }}</span>
-            </button>
-          </div>
-
-          <!-- Loading State -->
-          <div v-if="isLoadingNotifications" class="mailbox-list-loading">
-            <TerminalLoader size="sm" label="kotak pesan" />
-          </div>
-
-          <!-- Empty List State -->
-          <div v-else-if="filteredNotifications.length === 0" class="mailbox-list-empty">
-            <div class="empty-mail-icon">
-              <i class="fa-solid fa-inbox"></i>
-            </div>
-            <h4>Tidak Ada Pesan</h4>
-            <p v-if="activeFilter === 'unread'">Semua pesan sudah Anda baca.</p>
-            <p v-else-if="activeFilter === 'gift'">Belum ada pesan berhadiah saat ini.</p>
-            <p v-else>Belum ada pengumuman atau hadiah baru di kotak pesan Anda.</p>
-          </div>
-
-          <!-- Scrollable Mail Items -->
-          <div v-else class="mailbox-items-scroll">
-            <button
-              v-for="notif in filteredNotifications"
-              :key="notif.id"
-              type="button"
-              class="mail-list-item"
-              :class="{
-                'is-selected': selectedId === notif.id,
-                'is-unread': !notif.is_read,
-                'has-unclaimed-gift': notif.can_claim
-              }"
-              @click="selectMail(notif)"
-            >
-              <!-- Left Icon Envelope / Gift Chest -->
-              <div
-                class="mail-item-icon"
-                :class="[
-                  'cat-' + notif.category,
-                  { 'gift-unclaimed': notif.can_claim, 'is-read': notif.is_read && !notif.can_claim }
-                ]"
-              >
-                <i
-                  v-if="notif.reward_coinz > 0"
-                  class="fa-solid"
-                  :class="notif.can_claim ? 'fa-gift' : 'fa-box-open'"
-                ></i>
-                <i v-else class="fa-solid" :class="getCategoryIcon(notif.category)"></i>
-                <span v-if="!notif.is_read" class="mail-unread-dot"></span>
-              </div>
-
-              <!-- Center Texts -->
-              <div class="mail-item-body">
-                <div class="mail-item-top">
-                  <span class="mail-item-cat" :class="'text-' + notif.category">
-                    {{ getCategoryLabel(notif.category) }}
-                  </span>
-                  <span class="mail-item-time">{{ formatTimeAgo(notif.created_at) }}</span>
-                </div>
-
-                <h4 class="mail-item-title">{{ notif.title }}</h4>
-
-                <div class="mail-item-bottom">
-                  <span v-if="notif.reward_coinz > 0" class="mail-gift-tag" :class="{ claimed: notif.is_claimed }">
-                    <img src="/images/icoinz.svg" alt="" class="mini-coin-icon" />
-                    {{ notif.is_claimed ? 'Sudah Diklaim' : `+${formatCoinz(notif.reward_coinz)} iCoinZ` }}
-                  </span>
-                  <span v-else class="mail-snippet">{{ notif.message }}</span>
-                </div>
-              </div>
-            </button>
-          </div>
-        </aside>
-
-        <!-- RIGHT PANE: Message Reader & Claim Screen -->
-        <main class="mailbox-reader-pane">
-          <!-- No Message Clicked Yet (Standby Screen) -->
-          <div v-if="!selectedNotif" class="reader-standby-state">
-            <div class="standby-hologram">
-              <div class="hologram-ring"></div>
+  <div class="notifications-fullpage">
+    <!-- Full-Viewport Split Game Inbox Layout -->
+    <div class="mailbox-full-layout" :class="{ 'has-mobile-selection': !!selectedNotif }">
+      <!-- LEFT PANE: Full-Height Game Inbox Sidebar -->
+      <aside class="mailbox-list-pane">
+        <!-- Integrated Inbox Header -->
+        <div class="mailbox-sidebar-header">
+          <div class="mailbox-title-group">
+            <div class="mailbox-title-icon">
               <i class="fa-solid fa-envelope-open-text"></i>
             </div>
-            <h3>Layar Baca Pesan</h3>
-            <p>Klik salah satu pesan pada daftar di sebelah kiri untuk membuka isi pengumuman atau mengklaim hadiah iCoinZ.</p>
-            <div class="standby-badges" v-if="unreadCount > 0 || unclaimedRewardsCount > 0">
-              <span v-if="unreadCount > 0" class="standby-pill pill-unread">
-                <i class="fa-solid fa-envelope"></i> {{ unreadCount }} Pesan Belum Dibaca
-              </span>
-              <span v-if="unclaimedRewardsCount > 0" class="standby-pill pill-gift">
-                <i class="fa-solid fa-gift"></i> {{ unclaimedRewardsCount }} Hadiah Siap Diklaim
-              </span>
+            <div class="mailbox-title-texts">
+              <h1>Kotak Pesan</h1>
+              <span>{{ notifications.length }} Transmisi Sistem</span>
             </div>
           </div>
 
-          <!-- Active Message Detail Screen -->
-          <div v-else class="reader-detail-view" :key="selectedNotif.id">
-            <!-- Mobile Back Navigation -->
-            <button type="button" class="reader-mobile-back" @click="closeReaderMobile">
-              <i class="fa-solid fa-arrow-left"></i>
-              <span>Kembali ke Daftar Pesan</span>
+          <div class="mailbox-header-actions">
+            <button
+              v-if="unreadCount > 0"
+              type="button"
+              class="notif-icon-action"
+              @click="markAllAsRead"
+              title="Tandai semua telah dibaca"
+            >
+              <i class="fa-solid fa-check-double"></i>
             </button>
+            <button
+              type="button"
+              class="notif-icon-action"
+              :disabled="isLoadingNotifications"
+              @click="fetchNotifications({ force: true })"
+              title="Muat ulang pesan"
+            >
+              <i class="fa-solid fa-rotate" :class="{ 'fa-spin': isLoadingNotifications }"></i>
+            </button>
+          </div>
+        </div>
 
-            <!-- Reader Top Header -->
-            <div class="reader-header">
-              <div class="reader-meta-row">
-                <span class="reader-cat-badge" :class="'badge-' + selectedNotif.category">
-                  <i class="fa-solid" :class="getCategoryIcon(selectedNotif.category)"></i>
-                  {{ getCategoryLabel(selectedNotif.category) }}
-                </span>
+        <!-- Filter Tabs -->
+        <div class="mailbox-filter-bar">
+          <button
+            class="mail-filter-tab"
+            :class="{ active: activeFilter === 'all' }"
+            @click="activeFilter = 'all'"
+          >
+            <span>Semua</span>
+            <span v-if="notifications.length > 0" class="filter-count">{{ notifications.length }}</span>
+          </button>
 
-                <span v-if="selectedNotif.expires_at" class="reader-expiry-pill">
-                  <i class="fa-regular fa-clock"></i>
-                  {{ formatExpiryRemaining(selectedNotif.expires_at) }}
-                </span>
-              </div>
+          <button
+            class="mail-filter-tab"
+            :class="{ active: activeFilter === 'unread' }"
+            @click="activeFilter = 'unread'"
+          >
+            <span>Belum Dibaca</span>
+            <span v-if="unreadCount > 0" class="filter-count badge-unread">{{ unreadCount }}</span>
+          </button>
 
-              <h2 class="reader-title">{{ selectedNotif.title }}</h2>
+          <button
+            class="mail-filter-tab"
+            :class="{ active: activeFilter === 'gift' }"
+            @click="activeFilter = 'gift'"
+          >
+            <i class="fa-solid fa-gift"></i>
+            <span>Hadiah</span>
+            <span v-if="unclaimedRewardsCount > 0" class="filter-count badge-gift">{{ unclaimedRewardsCount }}</span>
+          </button>
+        </div>
 
-              <div class="reader-sender-row">
-                <div class="sender-avatar">
-                  <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <div class="sender-info">
-                  <span class="sender-name">Admin System IC Game-Z</span>
-                  <span class="sender-date">{{ formatFullDate(selectedNotif.created_at) }}</span>
-                </div>
-              </div>
+        <!-- Loading State -->
+        <div v-if="isLoadingNotifications" class="mailbox-list-loading">
+          <TerminalLoader size="sm" label="kotak pesan" />
+        </div>
+
+        <!-- Empty List State -->
+        <div v-else-if="filteredNotifications.length === 0" class="mailbox-list-empty">
+          <div class="empty-mail-icon">
+            <i class="fa-solid fa-inbox"></i>
+          </div>
+          <h4>Tidak Ada Pesan</h4>
+          <p v-if="activeFilter === 'unread'">Semua pesan sudah Anda baca.</p>
+          <p v-else-if="activeFilter === 'gift'">Belum ada pesan berhadiah saat ini.</p>
+          <p v-else>Belum ada pengumuman atau hadiah baru di kotak pesan Anda.</p>
+        </div>
+
+        <!-- Scrollable Mail Items -->
+        <div v-else class="mailbox-items-scroll">
+          <button
+            v-for="notif in filteredNotifications"
+            :key="notif.id"
+            type="button"
+            class="mail-list-item"
+            :class="{
+              'is-selected': selectedId === notif.id,
+              'is-unread': !notif.is_read,
+              'has-unclaimed-gift': notif.can_claim
+            }"
+            @click="selectMail(notif)"
+          >
+            <!-- Left Icon Envelope / Gift Chest -->
+            <div
+              class="mail-item-icon"
+              :class="[
+                'cat-' + notif.category,
+                { 'gift-unclaimed': notif.can_claim, 'is-read': notif.is_read && !notif.can_claim }
+              ]"
+            >
+              <i
+                v-if="notif.reward_coinz > 0"
+                class="fa-solid"
+                :class="notif.can_claim ? 'fa-gift' : 'fa-box-open'"
+              ></i>
+              <i v-else class="fa-solid" :class="getCategoryIcon(notif.category)"></i>
+              <span v-if="!notif.is_read" class="mail-unread-dot"></span>
             </div>
 
-            <!-- Reader Scrollable Content -->
-            <div class="reader-body-scroll">
-              <div v-if="selectedNotif.banner_url" class="reader-banner-wrap">
-                <img :src="selectedNotif.banner_url" :alt="selectedNotif.title" class="reader-banner-img" />
+            <!-- Center Texts -->
+            <div class="mail-item-body">
+              <div class="mail-item-top">
+                <span class="mail-item-cat" :class="'text-' + notif.category">
+                  {{ getCategoryLabel(notif.category) }}
+                </span>
+                <span class="mail-item-time">{{ formatTimeAgo(notif.created_at) }}</span>
               </div>
 
-              <div class="reader-message-content">{{ selectedNotif.message }}</div>
+              <h4 class="mail-item-title">{{ notif.title }}</h4>
 
-              <!-- Optional CTA Link Button -->
-              <div v-if="selectedNotif.action_url" class="reader-cta-box">
-                <button type="button" class="reader-cta-btn" @click="navigateCta(selectedNotif.action_url)">
-                  <span>{{ selectedNotif.action_label || 'Buka Tautan Terkait' }}</span>
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </button>
+              <div class="mail-item-bottom">
+                <span v-if="notif.reward_coinz > 0" class="mail-gift-tag" :class="{ claimed: notif.is_claimed }">
+                  <img src="/images/icoinz.svg" alt="" class="mini-coin-icon" />
+                  {{ notif.is_claimed ? 'Sudah Diklaim' : `+${formatCoinz(notif.reward_coinz)} iCoinZ` }}
+                </span>
+                <span v-else class="mail-snippet">{{ notif.message }}</span>
               </div>
             </div>
+          </button>
+        </div>
+      </aside>
 
-            <!-- Bottom In-Game Attachment & Reward Claim Dock -->
-            <div v-if="selectedNotif.reward_coinz > 0" class="reader-reward-dock" :class="{ 'is-claimed': selectedNotif.is_claimed }">
-              <div class="reward-dock-left">
-                <div class="reward-slot-box" :class="{ 'claimed': selectedNotif.is_claimed }">
-                  <img src="/images/icoinz.svg" alt="iCoinZ" class="reward-slot-img" />
-                  <span class="reward-slot-qty">x{{ formatCoinz(selectedNotif.reward_coinz) }}</span>
-                  <div v-if="selectedNotif.is_claimed" class="reward-slot-check">
-                    <i class="fa-solid fa-check"></i>
-                  </div>
-                </div>
+      <!-- RIGHT PANE: Full-Screen Message Reader & Reward Claim Canvas -->
+      <main class="mailbox-reader-pane">
+        <!-- Floating Claim Feedback Banner inside Reader -->
+        <transition name="mail-fade">
+          <div v-if="claimToast" class="notif-feedback-banner is-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>{{ claimToast }}</span>
+          </div>
+          <div v-else-if="claimErrorToast" class="notif-feedback-banner is-error">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>{{ claimErrorToast }}</span>
+          </div>
+        </transition>
 
-                <div class="reward-dock-texts">
-                  <span class="reward-dock-label">Lampiran Hadiah</span>
-                  <h4 class="reward-dock-amount">+{{ formatCoinz(selectedNotif.reward_coinz) }} iCoinZ</h4>
-                  <span class="reward-dock-sub">
-                    {{ selectedNotif.is_claimed ? 'Hadiah telah ditambahkan ke saldo Wallet Anda' : 'Klik tombol Klaim untuk memasukkan iCoinZ ke Wallet Anda' }}
-                  </span>
-                </div>
+        <!-- No Message Clicked Yet (Standby Screen) -->
+        <div v-if="!selectedNotif" class="reader-standby-state">
+          <div class="standby-hologram">
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </div>
+          <h3>Pilih Transmisi Pesan</h3>
+          <p>Klik salah satu pesan pada daftar di sebelah kiri untuk membuka isi pengumuman atau mengklaim hadiah iCoinZ.</p>
+          <div class="standby-badges" v-if="unreadCount > 0 || unclaimedRewardsCount > 0">
+            <span v-if="unreadCount > 0" class="standby-pill pill-unread">
+              <i class="fa-solid fa-envelope"></i> {{ unreadCount }} Pesan Belum Dibaca
+            </span>
+            <span v-if="unclaimedRewardsCount > 0" class="standby-pill pill-gift">
+              <i class="fa-solid fa-gift"></i> {{ unclaimedRewardsCount }} Hadiah Siap Diklaim
+            </span>
+          </div>
+        </div>
+
+        <!-- Active Message Detail Screen -->
+        <div v-else class="reader-detail-view" :key="selectedNotif.id">
+          <!-- Mobile Back Navigation -->
+          <button type="button" class="reader-mobile-back" @click="closeReaderMobile">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Kembali ke Daftar Pesan</span>
+          </button>
+
+          <!-- Reader Top Header -->
+          <div class="reader-header">
+            <div class="reader-meta-row">
+              <span class="reader-cat-badge" :class="'badge-' + selectedNotif.category">
+                <i class="fa-solid" :class="getCategoryIcon(selectedNotif.category)"></i>
+                {{ getCategoryLabel(selectedNotif.category) }}
+              </span>
+
+              <span v-if="selectedNotif.expires_at" class="reader-expiry-pill">
+                <i class="fa-regular fa-clock"></i>
+                {{ formatExpiryRemaining(selectedNotif.expires_at) }}
+              </span>
+            </div>
+
+            <h2 class="reader-title">{{ selectedNotif.title }}</h2>
+
+            <div class="reader-sender-row">
+              <div class="sender-avatar">
+                <i class="fa-solid fa-shield-halved"></i>
               </div>
-
-              <div class="reward-dock-right">
-                <button
-                  v-if="selectedNotif.can_claim"
-                  type="button"
-                  class="btn-game-claim"
-                  :disabled="isClaiming[selectedNotif.id]"
-                  @click="handleClaimReward(selectedNotif)"
-                >
-                  <i v-if="isClaiming[selectedNotif.id]" class="fa-solid fa-circle-notch fa-spin"></i>
-                  <template v-else>
-                    <i class="fa-solid fa-gift"></i>
-                    <span>Klaim Hadiah</span>
-                  </template>
-                </button>
-
-                <div v-else-if="selectedNotif.is_claimed" class="badge-game-claimed">
-                  <i class="fa-solid fa-circle-check"></i>
-                  <span>Sudah Diklaim</span>
-                </div>
-
-                <div v-else-if="selectedNotif.is_expired" class="badge-game-expired">
-                  <i class="fa-solid fa-clock"></i>
-                  <span>Kedaluwarsa</span>
-                </div>
+              <div class="sender-info">
+                <span class="sender-name">Admin System IC Game-Z</span>
+                <span class="sender-date">{{ formatFullDate(selectedNotif.created_at) }}</span>
               </div>
             </div>
           </div>
-        </main>
-      </div>
+
+          <!-- Reader Scrollable Content -->
+          <div class="reader-body-scroll">
+            <div v-if="selectedNotif.banner_url" class="reader-banner-wrap">
+              <img :src="selectedNotif.banner_url" :alt="selectedNotif.title" class="reader-banner-img" />
+            </div>
+
+            <div class="reader-message-content">{{ selectedNotif.message }}</div>
+
+            <!-- Optional CTA Link Button -->
+            <div v-if="selectedNotif.action_url" class="reader-cta-box">
+              <button type="button" class="reader-cta-btn" @click="navigateCta(selectedNotif.action_url)">
+                <span>{{ selectedNotif.action_label || 'Buka Tautan Terkait' }}</span>
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bottom Full-Width In-Game Attachment & Reward Claim Dock -->
+          <div v-if="selectedNotif.reward_coinz > 0" class="reader-reward-dock" :class="{ 'is-claimed': selectedNotif.is_claimed }">
+            <div class="reward-dock-left">
+              <div class="reward-slot-box" :class="{ 'claimed': selectedNotif.is_claimed }">
+                <img src="/images/icoinz.svg" alt="iCoinZ" class="reward-slot-img" />
+                <span class="reward-slot-qty">x{{ formatCoinz(selectedNotif.reward_coinz) }}</span>
+                <div v-if="selectedNotif.is_claimed" class="reward-slot-check">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              </div>
+
+              <div class="reward-dock-texts">
+                <span class="reward-dock-label">Lampiran Hadiah</span>
+                <h4 class="reward-dock-amount">+{{ formatCoinz(selectedNotif.reward_coinz) }} iCoinZ</h4>
+                <span class="reward-dock-sub">
+                  {{ selectedNotif.is_claimed ? 'Hadiah telah ditambahkan ke saldo Wallet Anda' : 'Klik tombol Klaim untuk memasukkan iCoinZ ke Wallet Anda' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="reward-dock-right">
+              <button
+                v-if="selectedNotif.can_claim"
+                type="button"
+                class="btn-game-claim"
+                :disabled="isClaiming[selectedNotif.id]"
+                @click="handleClaimReward(selectedNotif)"
+              >
+                <i v-if="isClaiming[selectedNotif.id]" class="fa-solid fa-circle-notch fa-spin"></i>
+                <template v-else>
+                  <i class="fa-solid fa-gift"></i>
+                  <span>Klaim Hadiah</span>
+                </template>
+              </button>
+
+              <div v-else-if="selectedNotif.is_claimed" class="badge-game-claimed">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Sudah Diklaim</span>
+              </div>
+
+              <div v-else-if="selectedNotif.is_expired" class="badge-game-expired">
+                <i class="fa-solid fa-clock"></i>
+                <span>Kedaluwarsa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
 
     <!-- Animated iCoinZ Reward Celebration Modal -->
@@ -458,4 +446,3 @@ const getCategoryLabel = (category) => {
 </template>
 
 <style scoped src="../assets/css/views/NotificationsView.css"></style>
-

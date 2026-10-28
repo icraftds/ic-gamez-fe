@@ -1,231 +1,162 @@
 /* ═══════════════════════════════════════════════════════════════
-   IN-GAME SYSTEM MAILBOX & NOTIFICATIONS PAGE
-   Master-Detail Game Inbox Layout (Dark & Light Mode Ready)
+   IN-GAME FULL-PAGE SYSTEM MAILBOX & NOTIFICATIONS HUD
+   Edge-to-Edge Split View (No Floating Box, Full Viewport)
    ═══════════════════════════════════════════════════════════════ */
 
-.notifications-page-wrapper {
-  min-height: calc(100vh - 80px);
-  padding: 108px 0 60px;
+.notifications-fullpage {
+  width: 100%;
+  height: 100vh;
+  padding-top: 78px; /* Space for fixed top HomeNavbar */
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at 70% 25%, rgba(14, 165, 233, 0.06) 0%, transparent 55%),
+              #070a12;
 }
 
-/* 1. Top Header */
-.notif-page-header {
+body.light-mode .notifications-fullpage {
+  background: #f8fafc;
+}
+
+/* 1. Full-Viewport Split Layout */
+.mailbox-full-layout {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+body.light-mode .mailbox-full-layout {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2. LEFT PANE: FULL-HEIGHT MAILBOX LIST SIDEBAR
+   ═══════════════════════════════════════════════════════════════ */
+.mailbox-list-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: rgba(11, 15, 25, 0.85);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.light-mode .mailbox-list-pane {
+  background: #ffffff;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Integrated Sidebar Header */
+.mailbox-sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
 }
 
-.notif-header-left {
+body.light-mode .mailbox-sidebar-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.mailbox-title-group {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
-.notif-header-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+.mailbox-title-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.08));
   border: 1px solid rgba(56, 189, 248, 0.35);
   color: #38bdf8;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.18);
+  font-size: 1.1rem;
   flex-shrink: 0;
 }
 
-body.light-mode .notif-header-icon {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(2, 132, 199, 0.06));
-  border-color: rgba(14, 165, 233, 0.3);
+body.light-mode .mailbox-title-icon {
+  background: #e0f2fe;
+  border-color: #bae6fd;
   color: #0284c7;
-  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.12);
 }
 
-.notif-header-titles h1 {
+.mailbox-title-texts h1 {
   margin: 0;
-  font-size: 1.45rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #f8fafc;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
-body.light-mode .notif-header-titles h1 {
+body.light-mode .mailbox-title-texts h1 {
   color: #0f172a;
 }
 
-.notif-header-titles p {
-  margin: 2px 0 0;
-  font-size: 0.85rem;
-  color: #94a3b8;
-}
-
-body.light-mode .notif-header-titles p {
+.mailbox-title-texts span {
+  font-size: 0.75rem;
   color: #64748b;
 }
 
-.notif-header-right {
+.mailbox-header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.notif-action-btn {
-  height: 40px;
-  padding: 0 15px;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
-  font-size: 0.82rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
+}
+
+.notif-icon-action {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  font-size: 0.85rem;
   transition: all 0.2s ease;
-  font-family: inherit;
 }
 
-body.light-mode .notif-action-btn {
-  background: #ffffff;
+body.light-mode .notif-icon-action {
+  background: #f8fafc;
   border-color: rgba(0, 0, 0, 0.1);
-  color: #334155;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  color: #475569;
 }
 
-.notif-action-btn:hover:not(:disabled) {
-  background: rgba(56, 189, 248, 0.14);
+.notif-icon-action:hover:not(:disabled) {
+  background: rgba(56, 189, 248, 0.15);
   border-color: rgba(56, 189, 248, 0.4);
   color: #38bdf8;
-  transform: translateY(-1px);
 }
 
-body.light-mode .notif-action-btn:hover:not(:disabled) {
-  background: #f0f9ff;
-  border-color: #0ea5e9;
+body.light-mode .notif-icon-action:hover:not(:disabled) {
+  background: #e0f2fe;
+  border-color: #0284c7;
   color: #0284c7;
 }
 
-.notif-action-btn.btn-refresh {
-  width: 40px;
-  padding: 0;
-  justify-content: center;
-}
-
-.notif-wallet-pill {
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 9999px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(217, 119, 6, 0.08));
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #fbbf24;
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-body.light-mode .notif-wallet-pill {
-  background: #fffbeb;
-  border-color: #fcd34d;
-  color: #b45309;
-}
-
-.notif-wallet-pill:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
-}
-
-.notif-coin-svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* 2. Toast Banner */
-.notif-toast-container {
-  margin-bottom: 16px;
-}
-
-.notif-feedback-banner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 18px;
-  border-radius: 14px;
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-
-.notif-feedback-banner.is-success {
-  background: rgba(16, 185, 129, 0.16);
-  border: 1px solid rgba(52, 211, 153, 0.4);
-  color: #34d399;
-}
-
-body.light-mode .notif-feedback-banner.is-success {
-  background: #ecfdf5;
-  border-color: #6ee7b7;
-  color: #047857;
-}
-
-.notif-feedback-banner.is-error {
-  background: rgba(239, 68, 68, 0.16);
-  border: 1px solid rgba(248, 113, 113, 0.4);
-  color: #f87171;
-}
-
-/* 3. Main Mailbox Split Shell */
-.mailbox-shell {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  height: calc(100vh - 235px);
-  min-height: 540px;
-  max-height: 760px;
-  background: rgba(15, 20, 32, 0.78);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-}
-
-body.light-mode .mailbox-shell {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.07);
-}
-
-/* 4. Left Pane: Message List */
-.mailbox-list-pane {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 14, 24, 0.45);
-  min-width: 0;
-  height: 100%;
-  overflow: hidden;
-}
-
-body.light-mode .mailbox-list-pane {
-  background: #f8fafc;
-  border-right: 1px solid rgba(0, 0, 0, 0.07);
-}
-
+/* Filter Bar */
 .mailbox-filter-bar {
   display: flex;
   gap: 6px;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
 
@@ -253,7 +184,7 @@ body.light-mode .mailbox-filter-bar {
 }
 
 body.light-mode .mail-filter-tab {
-  background: rgba(0, 0, 0, 0.04);
+  background: #f1f5f9;
   color: #64748b;
 }
 
@@ -264,12 +195,12 @@ body.light-mode .mail-filter-tab {
 
 body.light-mode .mail-filter-tab:hover:not(.active) {
   color: #0f172a;
-  background: rgba(0, 0, 0, 0.07);
+  background: #e2e8f0;
 }
 
 .mail-filter-tab.active {
   background: rgba(56, 189, 248, 0.16);
-  border-color: rgba(56, 189, 248, 0.35);
+  border-color: rgba(56, 189, 248, 0.38);
   color: #38bdf8;
 }
 
@@ -296,11 +227,11 @@ body.light-mode .mail-filter-tab.active {
   color: #ffffff;
 }
 
-/* Scrollable List */
+/* Scrollable Mail Items */
 .mailbox-items-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 14px 16px 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -311,8 +242,8 @@ body.light-mode .mail-filter-tab.active {
   text-align: left;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 13px 14px;
+  gap: 13px;
+  padding: 14px 16px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   background: rgba(255, 255, 255, 0.025);
@@ -323,14 +254,13 @@ body.light-mode .mail-filter-tab.active {
 }
 
 body.light-mode .mail-list-item {
-  background: #ffffff;
+  background: #f8fafc;
   border-color: rgba(0, 0, 0, 0.06);
 }
 
 .mail-list-item:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.12);
-  transform: translateX(2px);
 }
 
 body.light-mode .mail-list-item:hover {
@@ -349,25 +279,26 @@ body.light-mode .mail-list-item.is-unread {
 }
 
 .mail-list-item.is-selected {
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(14, 165, 233, 0.06)) !important;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.05)) !important;
   border-color: #38bdf8 !important;
-  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15);
+  border-left: 4px solid #38bdf8 !important;
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.12);
 }
 
 body.light-mode .mail-list-item.is-selected {
-  background: linear-gradient(135deg, #e0f2fe, #f0f9ff) !important;
+  background: linear-gradient(90deg, #e0f2fe, #f0f9ff) !important;
   border-color: #0284c7 !important;
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12);
+  border-left: 4px solid #0284c7 !important;
 }
 
 .mail-item-icon {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   flex-shrink: 0;
   position: relative;
   background: rgba(139, 92, 246, 0.15);
@@ -407,7 +338,7 @@ body.light-mode .mail-list-item.is-selected {
   height: 10px;
   border-radius: 50%;
   background: #38bdf8;
-  border: 2px solid #0f1420;
+  border: 2px solid #0b0f19;
   box-shadow: 0 0 8px #38bdf8;
 }
 
@@ -452,8 +383,8 @@ body.light-mode .mail-item-cat.text-maintenance { color: #ea580c; }
 }
 
 .mail-item-title {
-  margin: 0 0 4px;
-  font-size: 0.88rem;
+  margin: 0 0 5px;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #cbd5e1;
   white-space: nowrap;
@@ -491,7 +422,7 @@ body.light-mode .mail-list-item.is-unread .mail-item-title {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: 9999px;
   font-size: 0.72rem;
   font-weight: 700;
@@ -558,7 +489,9 @@ body.light-mode .mailbox-list-empty h4 {
   color: #64748b;
 }
 
-/* 5. Right Pane: Message Reader & Claim Screen */
+/* ═══════════════════════════════════════════════════════════════
+   3. RIGHT PANE: FULL-SCREEN MESSAGE READER & REWARD DOCK
+   ═══════════════════════════════════════════════════════════════ */
 .mailbox-reader-pane {
   display: flex;
   flex-direction: column;
@@ -568,7 +501,37 @@ body.light-mode .mailbox-list-empty h4 {
   position: relative;
 }
 
-/* Standby State (Before Clicking a Message) */
+.notif-feedback-banner {
+  margin: 18px 64px 0 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.notif-feedback-banner.is-success {
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #34d399;
+}
+
+body.light-mode .notif-feedback-banner.is-success {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
+}
+
+.notif-feedback-banner.is-error {
+  background: rgba(239, 68, 68, 0.16);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: #f87171;
+}
+
+/* Standby State */
 .reader-standby-state {
   flex: 1;
   display: flex;
@@ -580,31 +543,30 @@ body.light-mode .mailbox-list-empty h4 {
 }
 
 .standby-hologram {
-  position: relative;
-  width: 88px;
-  height: 88px;
-  border-radius: 24px;
+  width: 96px;
+  height: 96px;
+  border-radius: 28px;
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.14), rgba(14, 165, 233, 0.04));
   border: 1px solid rgba(56, 189, 248, 0.25);
   color: #38bdf8;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
-  margin-bottom: 20px;
-  box-shadow: 0 12px 32px rgba(56, 189, 248, 0.12);
+  font-size: 2.4rem;
+  margin-bottom: 22px;
+  box-shadow: 0 12px 36px rgba(56, 189, 248, 0.14);
 }
 
 body.light-mode .standby-hologram {
-  background: #f0f9ff;
+  background: #e0f2fe;
   border-color: #bae6fd;
   color: #0284c7;
 }
 
 .reader-standby-state h3 {
   margin: 0 0 8px;
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: #f1f5f9;
 }
 
@@ -614,9 +576,9 @@ body.light-mode .reader-standby-state h3 {
 
 .reader-standby-state p {
   margin: 0;
-  max-width: 420px;
-  font-size: 0.88rem;
-  line-height: 1.6;
+  max-width: 440px;
+  font-size: 0.92rem;
+  line-height: 1.65;
   color: #94a3b8;
 }
 
@@ -627,7 +589,7 @@ body.light-mode .reader-standby-state p {
 .standby-badges {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 22px;
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -636,9 +598,9 @@ body.light-mode .reader-standby-state p {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 14px;
+  padding: 7px 16px;
   border-radius: 9999px;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
@@ -654,7 +616,7 @@ body.light-mode .reader-standby-state p {
   color: #fbbf24;
 }
 
-/* Active Reader Detail View */
+/* Active Reader Full-Page Detail View */
 .reader-detail-view {
   display: flex;
   flex-direction: column;
@@ -666,7 +628,7 @@ body.light-mode .reader-standby-state p {
   display: none;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
+  padding: 14px 20px;
   background: transparent;
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -683,13 +645,14 @@ body.light-mode .reader-mobile-back {
 }
 
 .reader-header {
-  padding: 24px 28px 18px;
+  padding: 32px 72px 24px 48px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
 }
 
 body.light-mode .reader-header {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
 }
 
 .reader-meta-row {
@@ -697,7 +660,7 @@ body.light-mode .reader-header {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
 }
 
@@ -705,12 +668,12 @@ body.light-mode .reader-header {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 9999px;
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   background: rgba(139, 92, 246, 0.16);
   color: #c4b5fd;
   border: 1px solid rgba(139, 92, 246, 0.35);
@@ -762,12 +725,12 @@ body.light-mode .reader-cat-badge.badge-maintenance {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #94a3b8;
   background: rgba(148, 163, 184, 0.1);
   border: 1px solid rgba(148, 163, 184, 0.2);
-  padding: 4px 11px;
+  padding: 5px 13px;
   border-radius: 9999px;
 }
 
@@ -778,11 +741,12 @@ body.light-mode .reader-expiry-pill {
 }
 
 .reader-title {
-  margin: 0 0 14px;
-  font-size: 1.35rem;
+  margin: 0 0 16px;
+  font-size: 1.65rem;
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.35;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 body.light-mode .reader-title {
@@ -792,12 +756,12 @@ body.light-mode .reader-title {
 .reader-sender-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .sender-avatar {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 10px;
   background: rgba(56, 189, 248, 0.14);
   border: 1px solid rgba(56, 189, 248, 0.3);
@@ -805,7 +769,7 @@ body.light-mode .reader-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 body.light-mode .sender-avatar {
@@ -820,7 +784,7 @@ body.light-mode .sender-avatar {
 }
 
 .sender-name {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #e2e8f0;
 }
@@ -830,7 +794,7 @@ body.light-mode .sender-name {
 }
 
 .sender-date {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: #64748b;
 }
 
@@ -838,26 +802,28 @@ body.light-mode .sender-name {
 .reader-body-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 28px;
+  padding: 32px 72px 32px 48px;
 }
 
 .reader-banner-wrap {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  max-width: 820px;
 }
 
 .reader-banner-img {
   width: 100%;
-  max-height: 260px;
+  max-height: 320px;
   object-fit: cover;
   display: block;
 }
 
 .reader-message-content {
-  font-size: 0.94rem;
-  line-height: 1.75;
+  max-width: 860px;
+  font-size: 1rem;
+  line-height: 1.8;
   color: #cbd5e1;
   white-space: pre-line;
   word-break: break-word;
@@ -868,19 +834,19 @@ body.light-mode .reader-message-content {
 }
 
 .reader-cta-box {
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 .reader-cta-btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 20px;
+  padding: 12px 22px;
   border-radius: 12px;
   background: rgba(56, 189, 248, 0.14);
   border: 1px solid rgba(56, 189, 248, 0.35);
   color: #38bdf8;
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -904,47 +870,42 @@ body.light-mode .reader-cta-btn:hover {
   color: #ffffff;
 }
 
-/* 6. Bottom In-Game Reward Claim Dock */
+/* 4. Full-Width Bottom Docked Reward Bar */
 .reader-reward-dock {
-  margin: 0 24px 24px;
-  padding: 16px 20px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(217, 119, 6, 0.06));
-  border: 1px solid rgba(251, 191, 36, 0.38);
+  padding: 20px 72px 24px 48px;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.16), rgba(15, 23, 42, 0.92));
+  border-top: 1px solid rgba(251, 191, 36, 0.35);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
   flex-shrink: 0;
-  box-shadow: 0 8px 28px rgba(245, 158, 11, 0.12);
 }
 
 body.light-mode .reader-reward-dock {
-  background: linear-gradient(135deg, #fffbeb, #fef3c7);
-  border-color: #fcd34d;
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.1);
+  background: linear-gradient(90deg, #fffbeb, #fef3c7);
+  border-top: 1px solid #fcd34d;
 }
 
 .reader-reward-dock.is-claimed {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: none;
+  background: rgba(15, 23, 42, 0.65);
+  border-top-color: rgba(255, 255, 255, 0.08);
 }
 
 body.light-mode .reader-reward-dock.is-claimed {
-  background: #f8fafc;
-  border-color: #e2e8f0;
+  background: #ffffff;
+  border-top-color: rgba(0, 0, 0, 0.08);
 }
 
 .reward-dock-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
 }
 
 .reward-slot-box {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   border-radius: 16px;
   background: radial-gradient(circle at center, rgba(251, 191, 36, 0.3), rgba(217, 119, 6, 0.12));
   border: 2px solid #fbbf24;
@@ -953,7 +914,7 @@ body.light-mode .reader-reward-dock.is-claimed {
   align-items: center;
   justify-content: center;
   position: relative;
-  box-shadow: 0 0 18px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
   flex-shrink: 0;
 }
 
@@ -964,12 +925,12 @@ body.light-mode .reader-reward-dock.is-claimed {
 }
 
 .reward-slot-img {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
 }
 
 .reward-slot-qty {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 800;
   color: #fde68a;
   margin-top: 2px;
@@ -988,7 +949,7 @@ body.light-mode .reward-slot-qty {
   align-items: center;
   justify-content: center;
   color: #34d399;
-  font-size: 1.3rem;
+  font-size: 1.35rem;
 }
 
 .reward-dock-texts {
@@ -997,7 +958,7 @@ body.light-mode .reward-slot-qty {
 }
 
 .reward-dock-label {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1010,7 +971,7 @@ body.light-mode .reward-dock-label {
 
 .reward-dock-amount {
   margin: 2px 0;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #fbbf24;
 }
@@ -1020,7 +981,7 @@ body.light-mode .reward-dock-amount {
 }
 
 .reward-dock-sub {
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   color: #94a3b8;
 }
 
@@ -1029,13 +990,13 @@ body.light-mode .reward-dock-sub {
 }
 
 .btn-game-claim {
-  height: 46px;
-  padding: 0 24px;
+  height: 48px;
+  padding: 0 28px;
   border-radius: 9999px;
   border: none;
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
   color: #0b0f19;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
@@ -1061,13 +1022,13 @@ body.light-mode .reward-dock-sub {
 .badge-game-claimed {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
+  gap: 8px;
+  padding: 10px 20px;
   border-radius: 9999px;
   background: rgba(16, 185, 129, 0.16);
   border: 1px solid rgba(52, 211, 153, 0.35);
   color: #34d399;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1081,13 +1042,13 @@ body.light-mode .badge-game-claimed {
 .badge-game-expired {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
+  gap: 8px;
+  padding: 10px 20px;
   border-radius: 9999px;
   background: rgba(100, 116, 139, 0.15);
   border: 1px solid rgba(100, 116, 139, 0.3);
   color: #94a3b8;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 
@@ -1105,21 +1066,27 @@ body.light-mode .badge-game-claimed {
 
 /* Responsive Mobile Master-Detail View */
 @media (max-width: 900px) {
-  .mailbox-shell {
+  .mailbox-full-layout {
     grid-template-columns: 1fr;
-    height: calc(100vh - 210px);
   }
 
-  .mailbox-shell.has-mobile-selection .mailbox-list-pane {
+  .mailbox-full-layout.has-mobile-selection .mailbox-list-pane {
     display: none;
   }
 
-  .mailbox-shell:not(.has-mobile-selection) .mailbox-reader-pane {
+  .mailbox-full-layout:not(.has-mobile-selection) .mailbox-reader-pane {
     display: none;
   }
 
   .reader-mobile-back {
     display: inline-flex;
+  }
+
+  .reader-header,
+  .reader-body-scroll,
+  .reader-reward-dock {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .reader-reward-dock {
@@ -1137,4 +1104,3 @@ body.light-mode .badge-game-claimed {
     justify-content: center;
   }
 }
-

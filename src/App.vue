@@ -14,7 +14,7 @@
           </transition>
         </router-view>
       </div>
-      <AppFooter v-if="!isWorkspacePage && !isAuthPage && route.name !== 'materials'" />
+      <AppFooter v-if="!isWorkspacePage && !isAuthPage && route.name !== 'materials' && route.name !== 'notifications'" />
     </template>
     
     <!-- Global Loading Overlay -->
