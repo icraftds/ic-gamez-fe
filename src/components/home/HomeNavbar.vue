@@ -62,12 +62,17 @@
         <template v-if="isLoggedIn">
           <!-- Floating Actions Capsule -->
           <div class="nav-capsule nav-actions-capsule">
-            <!-- Notifications / Friend Requests Bell with Red Dot / Gold Gift Pulse -->
-            <button class="nav-icon-btn notif-btn" @click="toggleFriendsSidebar('notifikasi')" aria-label="Notifikasi & Hadiah">
+            <!-- Dedicated Notifications & Gift Box Page Button -->
+            <button
+              class="nav-icon-btn notif-btn"
+              :class="{ active: $route.path.startsWith('/notifications') }"
+              @click="$router.push('/notifications')"
+              aria-label="Kotak Pesan & Notifikasi"
+            >
               <i class="fa-regular fa-bell"></i>
               <span v-if="hasUnclaimedGifts" class="notif-gift-dot" title="Hadiah iCoinz tersedia!"></span>
-              <span v-else-if="hasUnread || hasUnreadRequests" class="notif-red-dot" title="Notifikasi baru"></span>
-              <span class="nav-tooltip">Notifikasi & Hadiah</span>
+              <span v-else-if="hasUnread" class="notif-red-dot" title="Pesan baru belum dibaca"></span>
+              <span class="nav-tooltip">Kotak Pesan & Hadiah</span>
             </button>
 
             <!-- GameZ Shop Button -->
@@ -187,10 +192,15 @@
         <div class="nav-right-cluster mobile-drawer-actions">
           <template v-if="isLoggedIn">
             <div class="nav-capsule nav-actions-capsule">
-              <button class="nav-icon-btn notif-btn" @click="toggleFriendsSidebar('notifikasi'); mobileMenuOpen = false" title="Notifikasi & Hadiah">
+              <button
+                class="nav-icon-btn notif-btn"
+                :class="{ active: $route.path.startsWith('/notifications') }"
+                @click="$router.push('/notifications'); mobileMenuOpen = false"
+                title="Kotak Pesan & Hadiah"
+              >
                 <i class="fa-regular fa-bell"></i>
                 <span v-if="hasUnclaimedGifts" class="notif-gift-dot"></span>
-                <span v-else-if="hasUnread || hasUnreadRequests" class="notif-red-dot"></span>
+                <span v-else-if="hasUnread" class="notif-red-dot"></span>
               </button>
               <button
                 class="nav-icon-btn shop-btn"
@@ -220,20 +230,16 @@
 </template>
 
 <script setup>
-import { ssoEnabled, globalLogoutEnabled } from '../../services/sso';
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useUserAccount } from "../../composables/useUserAccount";
 import { useTheme } from "../../composables/useTheme";
 import UserProfileDropdown from "../common/UserProfileDropdown.vue";
-import { useFriends } from "../../composables/useFriends";
 import { useNotifications } from "../../composables/useNotifications";
 
 const { isLightMode, toggleTheme } = useTheme();
 
-const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz, walletStatus } =
-  useUserAccount();
-const { toggleFriendsSidebar, hasUnreadRequests } = useFriends();
+const { isPremiumUser, isLoggedIn, isLoading, fetchUser, coinz } = useUserAccount();
 const { hasUnread, hasUnclaimedGifts, startPolling, stopPolling } = useNotifications();
 
 const formatShortCoinz = (val) => {
@@ -327,8 +333,6 @@ const handleClickOutside = (e) => {
     mobileMenuOpen.value = false;
   }
 };
-
-let notifInterval;
 
 watch(isLoggedIn, (logged) => {
   if (logged) {
