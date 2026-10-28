@@ -54,7 +54,7 @@
             </div>
 
             <div class="checkout-actions">
-              <button class="btn-cancel" @click="$router.push('/shop')">Batal</button>
+              <button class="btn-cancel" @click="cancelCheckout">Batal</button>
               <button class="btn-primary" :disabled="method !== 'coinz' || state === 'processing'" @click="processPayment">
                 <i class="fa-solid fa-check"></i> Konfirmasi & Bayar
               </button>
@@ -85,9 +85,7 @@
               <button class="btn-primary" @click="$router.push('/dashboard')">
                 Kembali ke Dashboard
               </button>
-              <button class="btn-outline" @click="$router.push('/shop')">
-                Beli Lagi
-              </button>
+              <button class="btn-outline" @click="cancelCheckout">Beli Lagi</button>
             </div>
           </div>
 
@@ -155,13 +153,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import api from '../services/api'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 
 const route = useRoute()
+const router = useRouter()
 const { fetchUser, fetchWallet, userProfile } = useUserAccount()
 const pkgId = route.query.pkgId
 const pkgName = route.query.name || 'Paket'
@@ -176,6 +175,12 @@ const countdown = ref(0)
 const formattedCountdown = computed(() => '00:00')
 const formattedPrice = computed(() => Number(price).toLocaleString('id-ID'))
 const intentKey = computed(() => `ic_energy_purchase:${userProfile.value.id}`)
+
+
+const cancelCheckout = () => {
+  localStorage.removeItem(intentKey.value)
+  router.push('/shop')
+}
 
 const processPayment = async () => {
   if (state.value === 'processing' || method !== 'coinz') return
@@ -212,10 +217,11 @@ const processPayment = async () => {
     }
     state.value = 'success'
   } catch (error) {
-    // Only a definitive rejection permits a new purchase intent.
-    if (error.response?.status === 400 && error.response?.data?.success === false) localStorage.removeItem(intentKey.value)
+    if (error.response?.status === 400 || error.response?.status === 404 || error.response?.status === 409 || error.response?.status === 422) {
+      localStorage.removeItem(intentKey.value)
+    }
     state.value = 'confirm'
-    errorMsg.value = error.response?.data?.message || error.message || 'Pembelian belum pasti. Coba kembali dengan referensi yang sama.'
+    errorMsg.value = error.response?.data?.message || error.message || 'Pembelian gagal. Silakan coba lagi.'
   }
 }
 </script>
