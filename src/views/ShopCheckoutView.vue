@@ -152,7 +152,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import api from '../services/api'
@@ -174,56 +174,58 @@ const qrString = ref('')
 const countdown = ref(0)
 const formattedCountdown = computed(() => '00:00')
 const formattedPrice = computed(() => Number(price).toLocaleString('id-ID'))
-const intentKey = computed(() => `ic_energy_purchase:${userProfile.value.id}`)
+const idempotencyKey = ref(crypto.randomUUID())
 
+// Bersihkan kunci intent lama dari localStorage yang berpotensi mengunci pembelian user
+onMounted(() => {
+  try {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('ic_energy_purchase')) {
+        localStorage.removeItem(key)
+      }
+    })
+  } catch (e) {
+    // Abaikan error storage
+  }
+})
 
 const cancelCheckout = () => {
-  localStorage.removeItem(intentKey.value)
+  try {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('ic_energy_purchase')) {
+        localStorage.removeItem(key)
+      }
+    })
+  } catch (e) {}
   router.push('/shop')
 }
 
 const processPayment = async () => {
   if (state.value === 'processing' || method !== 'coinz') return
-  if (!userProfile.value.id) { errorMsg.value = 'Silakan masuk kembali.'; return }
+  if (!userProfile.value?.id) { errorMsg.value = 'Silakan masuk kembali.'; return }
   errorMsg.value = ''
   state.value = 'processing'
   try {
-    let intent = JSON.parse(localStorage.getItem(intentKey.value) || 'null')
-    if (intent && String(intent.package_id) !== String(pkgId)) {
-      throw new Error('Pembelian sebelumnya belum pasti. Cek kembali paket sebelumnya sebelum membeli paket lain.')
-    }
-    if (!intent) {
-      intent = { key: crypto.randomUUID(), package_id: pkgId, status: 'pending' }
-      localStorage.setItem(intentKey.value, JSON.stringify(intent))
-    }
     if (type === 'border') {
-      const response = await api.post('/shop/purchase/border', { border_id: intent.package_id, price: price })
-      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian belum dapat dikonfirmasi')
-
-      localStorage.removeItem(intentKey.value)
-      await Promise.all([fetchUser(true), fetchWallet()])
+      const response = await api.post('/shop/purchase/border', { border_id: pkgId, price: price })
+      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian border gagal')
     } else if (type === 'item') {
-      const response = await api.post('/shop/purchase/item', { item_id: intent.package_id })
-      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian belum dapat dikonfirmasi')
-      localStorage.removeItem(intentKey.value)
-      await Promise.all([fetchUser(true), fetchWallet()])
+      const response = await api.post('/shop/purchase/item', { item_id: pkgId })
+      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian item gagal')
     } else {
-      const response = await api.post('/shop/purchase/coinz', { package_id: intent.package_id }, {
-        headers: { 'Idempotency-Key': intent.key }
+      const response = await api.post('/shop/purchase/coinz', { package_id: pkgId }, {
+        headers: { 'Idempotency-Key': idempotencyKey.value }
       })
-      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian belum dapat dikonfirmasi')
-      localStorage.removeItem(intentKey.value)
-      await Promise.all([fetchUser(true), fetchWallet()])
+      if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian energi gagal')
     }
+
+    await Promise.all([fetchUser(true), fetchWallet()])
     state.value = 'success'
   } catch (error) {
-    if (error.response?.status === 400 || error.response?.status === 404 || error.response?.status === 409 || error.response?.status === 422) {
-      localStorage.removeItem(intentKey.value)
-    }
+    idempotencyKey.value = crypto.randomUUID()
     state.value = 'confirm'
     errorMsg.value = error.response?.data?.message || error.message || 'Pembelian gagal. Silakan coba lagi.'
   }
 }
 </script>
 <style scoped src="../assets/css/views/ShopCheckoutView.css"></style>
-
