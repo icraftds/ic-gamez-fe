@@ -7,10 +7,22 @@ html {
   flex-direction: column;
   min-height: 100vh;
 }
-.app-layout.workspace-mode {
+.app-layout.workspace-mode,
+.app-layout.fullpage-locked {
   height: 100vh;
   overflow: hidden;
 }
 .app-content {
   flex: 1;
+}
+.app-layout.fullpage-locked .app-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.app-layout.fullpage-locked .route-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }

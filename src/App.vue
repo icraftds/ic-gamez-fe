@@ -1,5 +1,5 @@
 <template>
-  <div class="app-layout" :class="{ 'workspace-mode': isWorkspacePage }">
+  <div class="app-layout" :class="{ 'workspace-mode': isWorkspacePage, 'fullpage-locked': route.name === 'notifications' }">
     <p v-if="cooldownSeconds" role="status" style="position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:999999;background:#222;color:white;padding:12px;border-radius:8px;">Terlalu banyak permintaan. Tunggu {{ cooldownSeconds }} detik.</p>
     
     <template v-if="!isBootstrapping">
