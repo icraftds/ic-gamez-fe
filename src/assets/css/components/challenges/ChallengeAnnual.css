@@ -258,3 +258,53 @@
     font-size: 1.6rem;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .annual-banner {
+  background: linear-gradient(rgba(244, 245, 248, 0.92), rgba(244, 245, 248, 0.96)), url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80');
+  border-bottom: 1px solid rgba(124, 58, 237, 0.12);
+}
+
+body.light-mode .banner-meta span {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .req-card,
+body.light-mode .submit-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.05);
+}
+
+body.light-mode .form-input {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #0f172a;
+}
+
+body.light-mode .form-input:focus {
+  background: #ffffff;
+  border-color: #0284c7;
+}
+
+body.light-mode .file-drop-area {
+  background: #f8fafc;
+  border: 2px dashed rgba(124, 58, 237, 0.25);
+}
+
+body.light-mode .file-drop-area:hover {
+  background: #ffffff;
+  border-color: #7c3aed;
+}
+
+body.light-mode .alert-box {
+  background: rgba(244, 63, 94, 0.08);
+}
+
+body.light-mode .alert-box p {
+  color: #9f1239;
+}
+

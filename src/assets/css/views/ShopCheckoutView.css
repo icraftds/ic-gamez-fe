@@ -488,3 +488,24 @@
     opacity: 0.8;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .checkout-wrapper .checkout-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 10px 40px rgba(124, 58, 237, 0.06);
+}
+
+body.light-mode .checkout-wrapper .section-title {
+  color: #0f172a;
+}
+
+body.light-mode .checkout-wrapper .order-summary {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.06) 0%, rgba(124, 58, 237, 0.04) 100%);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+}
+
+body.light-mode .checkout-wrapper .order-plan-name {
+  color: #0f172a;
+}
+

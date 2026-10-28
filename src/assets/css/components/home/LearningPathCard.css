@@ -383,4 +383,48 @@
   }
 }
 
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR LEARNING PATH CARD
+   ══════════════════════════════════════════════════ */
+body.light-mode .card-inner {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  border-top: 1px solid rgba(124, 58, 237, 0.22);
+  box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.08), 0 25px 50px -15px rgba(124, 58, 237, 0.06);
+}
+
+body.light-mode .headline {
+  color: #0f172a;
+}
+
+body.light-mode .description {
+  color: #475569;
+}
+
+body.light-mode .path-step-indicator {
+  color: #64748b;
+}
+
+body.light-mode .features-panel {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .features-title {
+  color: #0f172a;
+}
+
+body.light-mode .feature-text strong {
+  color: #0f172a;
+}
+
+body.light-mode .feature-text span {
+  color: #64748b;
+}
+
+body.light-mode .btn-start {
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.25);
+}
+
 

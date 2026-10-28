@@ -437,3 +437,119 @@
   .title-with-icon { flex-direction: column; }
   .shop-item-grid { grid-template-columns: 1fr; }
 }
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR GAMEZ SHOP
+   ══════════════════════════════════════════════════ */
+body.light-mode .shop-view-wrapper {
+  background: var(--bg-deep);
+}
+
+body.light-mode .shop-compact-header {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .header-text-group h1 {
+  color: #0f172a;
+}
+
+body.light-mode .header-text-group p {
+  color: #475569;
+}
+
+body.light-mode .wallet-compact-badge {
+  background: #f8fafc;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.08);
+}
+
+body.light-mode .shop-tab {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: #64748b;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+}
+
+body.light-mode .shop-tab:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+body.light-mode .shop-tab.active {
+  background: linear-gradient(135deg, #7c3aed, #0284c7);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+body.light-mode .shop-sort .sort-select {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+}
+
+body.light-mode .shop-sort .sort-select option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+body.light-mode .border-shop-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .border-shop-card:hover {
+  border-color: #7c3aed;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.1), 0 0 25px rgba(124, 58, 237, 0.1);
+}
+
+body.light-mode .border-preview-box {
+  background: radial-gradient(circle at center, #f8fafc 0%, #eef2f6 100%);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .border-info-box h4 {
+  color: #0f172a;
+}
+
+body.light-mode .border-desc {
+  color: #475569;
+}
+
+body.light-mode .border-price-row {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .price-label {
+  color: #64748b;
+}
+
+body.light-mode .empty-state h3 {
+  color: #0f172a;
+}
+
+body.light-mode .empty-state p {
+  color: #475569;
+}
+
+body.light-mode .empty-icon-wrapper {
+  background: #eef2f6;
+  color: #64748b;
+}
+
+body.light-mode .success-content {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+}
+
+body.light-mode .success-content h3 {
+  color: #0f172a;
+}
+

@@ -310,3 +310,53 @@ body.light-mode .method-icon.qris {
     width: 100%;
   }
 }
+
+/* Light Mode Overhauls */
+body.light-mode .order-summary {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.06) 0%, rgba(124, 58, 237, 0.04) 100%);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode .order-plan-name {
+  color: #0f172a;
+}
+
+body.light-mode .order-plan-name i {
+  background: rgba(2, 132, 199, 0.1);
+}
+
+body.light-mode .coupon-input-wrapper {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+body.light-mode .coupon-input-wrapper input {
+  color: #0f172a;
+}
+
+body.light-mode .method-card {
+  background: #ffffff;
+  border: 1.5px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+body.light-mode .method-card:hover {
+  background: #ffffff;
+  border-color: #7c3aed;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.08);
+}
+
+body.light-mode .method-card.selected {
+  background: rgba(2, 132, 199, 0.05);
+  border-color: #0284c7;
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.1);
+}
+
+body.light-mode .method-name {
+  color: #0f172a;
+}
+
+body.light-mode .method-radio {
+  border-color: rgba(124, 58, 237, 0.3);
+}
+

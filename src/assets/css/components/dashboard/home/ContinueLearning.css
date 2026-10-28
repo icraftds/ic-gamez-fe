@@ -427,3 +427,69 @@
     width: 100%;
   }
 }
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR CONTINUE LEARNING
+   ══════════════════════════════════════════════════ */
+body.light-mode .section-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .continue-card {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .continue-card:hover {
+  background: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+}
+
+body.light-mode .cc-info h4 {
+  color: #0f172a;
+}
+
+body.light-mode .cc-info p {
+  color: #475569;
+}
+
+body.light-mode .cc-progress {
+  color: #0284c7;
+}
+
+body.light-mode .cc-bar-bg {
+  background: #e2e8f0;
+}
+
+body.light-mode .btn-continue {
+  background: rgba(2, 132, 199, 0.08);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+body.light-mode .btn-continue:hover {
+  background: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+}
+
+body.light-mode .cl-item {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .cl-item:hover {
+  background: #f1f5f9;
+}
+
+body.light-mode .cl-title {
+  color: #0f172a;
+}
+
+body.light-mode .cl-percent {
+  color: #0284c7;
+}
+

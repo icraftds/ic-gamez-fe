@@ -72,3 +72,31 @@
 .xp-text { color: #f59e0b; font-weight: 600; }
 
 .act-time { font-size: 0.75rem; color: #64748b; }
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR RECENT ACTIVITY
+   ══════════════════════════════════════════════════ */
+body.light-mode .section-card {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .activity-item {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .activity-item:hover {
+  background: #f1f5f9;
+  border-color: rgba(124, 58, 237, 0.15);
+}
+
+body.light-mode .act-detail h4 {
+  color: #0f172a;
+}
+
+body.light-mode .act-detail p {
+  color: #475569;
+}
+

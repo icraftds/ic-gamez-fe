@@ -218,3 +218,55 @@
     gap: 15px;
   }
 }
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR DASHBOARD GREETING CARD
+   ══════════════════════════════════════════════════ */
+body.light-mode .dashboard-hero {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+body.light-mode .dashboard-hero::after {
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
+}
+
+body.light-mode .greeting-text {
+  color: #0f172a;
+}
+
+body.light-mode .highlight-name {
+  background: linear-gradient(135deg, #7c3aed, #0284c7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body.light-mode .motivational-text {
+  color: #475569;
+}
+
+body.light-mode .progress-bar-bg {
+  background: #e2e8f0;
+}
+
+body.light-mode .stat-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+}
+
+body.light-mode .stat-card:hover {
+  background: #f8fafc;
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+body.light-mode .stat-value {
+  color: #0f172a;
+}
+
+body.light-mode .stat-label {
+  color: #64748b;
+}
+

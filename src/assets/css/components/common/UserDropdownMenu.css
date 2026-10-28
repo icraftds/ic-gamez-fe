@@ -100,3 +100,19 @@
 }
 .text-warning { color: #f59e0b; }
 .text-primary { color: #3b82f6; }
+
+/* Light Mode Overhauls */
+body.light-mode .user-dropdown-menu {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.1);
+}
+
+body.light-mode .dropdown-actions button.text-primary {
+  color: #0284c7;
+}
+
+body.light-mode .dropdown-actions button.text-primary:hover {
+  background: rgba(2, 132, 199, 0.08);
+  color: #0369a1;
+}

@@ -478,3 +478,46 @@
   border: 2px solid #a855f7;
   box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
 }
+
+/* Light Mode Overhauls */
+body.light-mode .market-modal-content {
+  background: #ffffff;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .profile-modal {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+body.light-mode .profile-modal .modal-header h3 {
+  color: #0f172a;
+}
+
+body.light-mode .profile-modal .modal-header {
+  border-bottom: 1px solid rgba(124, 58, 237, 0.12);
+}
+
+body.light-mode .profile-form label {
+  color: #334155;
+}
+
+body.light-mode .profile-form .form-control {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #0f172a;
+}
+
+body.light-mode .profile-form .form-control:focus {
+  background: #ffffff;
+  border-color: #0284c7;
+}
+
+body.light-mode .profile-form input[type="file"]::file-selector-button {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+

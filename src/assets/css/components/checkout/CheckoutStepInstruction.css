@@ -307,3 +307,75 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
+
+/* Light Mode Overhauls */
+body.light-mode .order-summary {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.06) 0%, rgba(124, 58, 237, 0.04) 100%);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode .order-plan-name {
+  color: #0f172a;
+}
+
+body.light-mode .order-plan-name i {
+  background: rgba(2, 132, 199, 0.1);
+}
+
+body.light-mode .instruction-method-badge {
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode .qr-box-wrapper {
+  background: rgba(2, 132, 199, 0.03);
+}
+
+body.light-mode .va-bank-name {
+  color: #0f172a;
+}
+
+body.light-mode .va-number-box {
+  background: #f8fafc;
+  border: 1.5px solid rgba(124, 58, 237, 0.15);
+}
+
+body.light-mode .va-number-value {
+  color: #0284c7;
+}
+
+body.light-mode .va-copy-btn {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #7c3aed;
+}
+
+body.light-mode .va-instructions {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+body.light-mode .va-instructions li {
+  color: #475569;
+}
+
+body.light-mode .va-instructions li .step-num {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
+body.light-mode .timer-value {
+  color: #0f172a;
+}
+
+body.light-mode .btn-outline {
+  border: 1.5px solid rgba(124, 58, 237, 0.2);
+  color: #475569;
+}
+
+body.light-mode .btn-outline:hover {
+  background: rgba(124, 58, 237, 0.05);
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+

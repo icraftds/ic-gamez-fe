@@ -180,3 +180,31 @@ p em {
 .modal-leave-to {
   opacity: 0;
 }
+
+/* Light Mode Overhauls */
+:global(body.light-mode) .modal-content {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.1);
+}
+
+:global(body.light-mode) p strong {
+  color: #7c3aed;
+}
+
+:global(body.light-mode) .benefits {
+  background: rgba(124, 58, 237, 0.05);
+  border: 1px solid rgba(124, 58, 237, 0.14);
+}
+
+:global(body.light-mode) .btn-login {
+  background: #f8fafc;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #0f172a;
+}
+
+:global(body.light-mode) .btn-login:hover {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: #7c3aed;
+}
+

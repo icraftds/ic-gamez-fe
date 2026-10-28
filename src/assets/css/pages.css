@@ -625,4 +625,877 @@
           .leaderboard-container { padding: 10px; }
         }
 
-    
+/* ══════════════════════════════════════════════════
+   LIGHT MODE OVERHAUL FOR PAGES & WORKSPACE
+   ══════════════════════════════════════════════════ */
+body.light-mode .orb {
+  opacity: 0.08;
+  filter: blur(180px);
+}
+
+body.light-mode .grid-bg {
+  opacity: 0.4;
+  background-image:
+    linear-gradient(to right, rgba(124, 58, 237, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(124, 58, 237, 0.05) 1px, transparent 1px);
+}
+
+body.light-mode .tech-icon {
+  color: rgba(15, 23, 42, 0.08);
+  filter: none;
+}
+
+body.light-mode .gradient-text {
+  background: linear-gradient(135deg, #7c3aed, #0284c7 50%, #db2777);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+body.light-mode .mockup-window {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.14);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08), 0 0 25px rgba(124, 58, 237, 0.05);
+}
+
+body.light-mode .mockup-header {
+  background: #f8fafc;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .mockup-sidebar {
+  background: #f8fafc;
+  border-right: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .mockup-editor {
+  background: #ffffff;
+}
+
+body.light-mode .mockup-editor .line-nums {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+body.light-mode .iso-leaderboard {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+body.light-mode .badge-small {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.25);
+  color: #7c3aed;
+}
+
+body.light-mode .top-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(124, 58, 237, 0.12);
+  backdrop-filter: blur(20px);
+}
+
+body.light-mode .panel,
+body.light-mode .panel-editor,
+body.light-mode .panel-console {
+  background: #ffffff;
+  border: 1px solid rgba(124, 58, 237, 0.12);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .panel-header {
+  background: #f8fafc;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .editor-toolbar {
+  background: #f8fafc;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .action-bar {
+  background: #f8fafc;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+body.light-mode .example-box,
+body.light-mode .submission-card {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-left: 3px solid #7c3aed;
+  color: #0f172a;
+}
+
+body.light-mode .prose code {
+  background: rgba(2, 132, 199, 0.08);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.15);
+}
+
+body.light-mode .code-editor {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+body.light-mode .token-badge {
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: #0f172a;
+}
+
+body.light-mode .lang-select {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+}
+
+body.light-mode .btn-outline {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+body.light-mode .btn-outline:hover {
+  background: #f1f5f9;
+}
+
+/* ==========================================================================
+   PATH DETAIL VIEW LIGHT MODE
+   ========================================================================== */
+body.light-mode .roadmap-hub-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+}
+
+body.light-mode .hub-header {
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1) !important;
+}
+
+body.light-mode .hub-icon-wrapper {
+  background: #f8fafc !important;
+  border-color: rgba(2, 132, 199, 0.25) !important;
+}
+
+body.light-mode .hub-title {
+  color: #0f172a !important;
+}
+
+body.light-mode .hub-desc {
+  color: #475569 !important;
+}
+
+body.light-mode .hub-progress-track {
+  background: rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode .hub-progress-count {
+  color: #64748b !important;
+}
+
+body.light-mode .stepper-title {
+  color: #64748b !important;
+}
+
+body.light-mode .stepper-badge {
+  background: rgba(2, 132, 199, 0.08) !important;
+  border-color: rgba(2, 132, 199, 0.2) !important;
+  color: #0284c7 !important;
+}
+
+body.light-mode .stepper-track-line {
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.25) 0%, rgba(2, 132, 199, 0.15) 100%) !important;
+}
+
+body.light-mode .stepper-item {
+  color: #64748b !important;
+  background: #f8fafc !important;
+  border: 1.5px solid rgba(124, 58, 237, 0.08) !important;
+}
+
+body.light-mode .stepper-item:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .stepper-item.active {
+  background: rgba(124, 58, 237, 0.08) !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.1) !important;
+}
+
+body.light-mode .stepper-item-title {
+  color: #0f172a !important;
+}
+
+body.light-mode .stepper-item.active .stepper-item-title {
+  color: #7c3aed !important;
+}
+
+body.light-mode .stepper-node {
+  background: #ffffff !important;
+  border-color: rgba(124, 58, 237, 0.2) !important;
+  color: #64748b !important;
+}
+
+body.light-mode .stepper-item.active .stepper-node {
+  background: #7c3aed !important;
+  color: #ffffff !important;
+  border-color: #7c3aed !important;
+}
+
+body.light-mode .stepper-item.completed .stepper-node {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+body.light-mode .chapter-showcase-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.05) !important;
+}
+
+body.light-mode .chapter-visual-core {
+  background: #f8fafc !important;
+  border-color: rgba(2, 132, 199, 0.25) !important;
+}
+
+body.light-mode .chapter-title {
+  color: #0f172a !important;
+}
+
+body.light-mode .chapter-desc {
+  color: #475569 !important;
+}
+
+body.light-mode .meta-tag {
+  background: #f8fafc !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  color: #475569 !important;
+}
+
+body.light-mode .chapter-lessons-container {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.05) !important;
+}
+
+body.light-mode .lessons-bar-header {
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1) !important;
+}
+
+body.light-mode .lessons-header-left {
+  color: #0f172a !important;
+}
+
+body.light-mode .lessons-progress-chip {
+  background: rgba(2, 132, 199, 0.08) !important;
+  border-color: rgba(2, 132, 199, 0.2) !important;
+  color: #0284c7 !important;
+}
+
+body.light-mode .lesson-item-row {
+  background: #f8fafc !important;
+  border: 1px solid rgba(124, 58, 237, 0.08) !important;
+}
+
+body.light-mode .lesson-item-row:hover {
+  background: #ffffff !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.08) !important;
+}
+
+body.light-mode .lesson-name,
+body.light-mode .lesson-title-text {
+  color: #0f172a !important;
+}
+
+body.light-mode .back-btn {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .back-btn:hover {
+  background: rgba(2, 132, 199, 0.08) !important;
+  border-color: #0284c7 !important;
+  color: #0284c7 !important;
+}
+
+body.light-mode .btn-lesson-open {
+  background: rgba(2, 132, 199, 0.08) !important;
+  color: #0284c7 !important;
+  border: 1px solid rgba(2, 132, 199, 0.25) !important;
+}
+
+body.light-mode .lesson-item-row:hover .btn-lesson-open {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+body.light-mode .btn-next-chapter {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+  color: #475569 !important;
+}
+
+body.light-mode .empty-state {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  color: #64748b !important;
+}
+
+/* ==========================================================================
+   WORKSPACE (TOPBAR, SIDEBAR, LESSON PANELS) LIGHT MODE
+   ========================================================================== */
+body.light-mode .ws-topbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.12) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-mode .ws-topbar .back-btn {
+  background: #f8fafc !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .breadcrumb-chapter {
+  color: #64748b !important;
+}
+
+body.light-mode .breadcrumb-lesson.current {
+  color: #0f172a !important;
+}
+
+body.light-mode .step {
+  color: #64748b !important;
+}
+
+body.light-mode .step.active {
+  color: #7c3aed !important;
+}
+
+body.light-mode .step.active .step-dot {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+body.light-mode .step.done .step-dot {
+  background: #10b981 !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+body.light-mode .step-connector {
+  background: rgba(15, 23, 42, 0.1) !important;
+}
+
+body.light-mode .step-connector.active {
+  background: #10b981 !important;
+}
+
+body.light-mode .ws-sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid rgba(124, 58, 237, 0.12) !important;
+}
+
+body.light-mode .toggle-row {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-mode .toggle-btn {
+  background: rgba(124, 58, 237, 0.08) !important;
+  color: #7c3aed !important;
+  border: 1px solid rgba(124, 58, 237, 0.2) !important;
+}
+
+body.light-mode .prev-materi-btn {
+  background: #f8fafc !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+  color: #475569 !important;
+}
+
+body.light-mode .prev-materi-btn:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .path-label {
+  color: #7c3aed !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-mode .chapter-header {
+  color: #475569 !important;
+}
+
+body.light-mode .chapter-header:hover,
+body.light-mode .chapter-header.is-current {
+  color: #0f172a !important;
+  background: #f8fafc !important;
+}
+
+body.light-mode .lesson-item {
+  color: #475569 !important;
+}
+
+body.light-mode .lesson-item:hover {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .lesson-item.is-active {
+  background: rgba(124, 58, 237, 0.08) !important;
+  color: #7c3aed !important;
+  border-left-color: #7c3aed !important;
+}
+
+body.light-mode .sub-items {
+  background: #f8fafc !important;
+}
+
+body.light-mode .sub-item {
+  color: #64748b !important;
+}
+
+body.light-mode .sub-item:not(.locked):hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .sub-item.is-active {
+  background: rgba(124, 58, 237, 0.12) !important;
+  color: #7c3aed !important;
+  font-weight: 700 !important;
+}
+
+body.light-mode .theory-panel {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .theory-panel .lesson-title {
+  color: #0f172a !important;
+}
+
+body.light-mode .theory-panel .panel-footer {
+  background: #ffffff !important;
+  border-top: 1px solid rgba(124, 58, 237, 0.12) !important;
+}
+
+body.light-mode .nav-btn.secondary {
+  background: #f8fafc !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+  color: #475569 !important;
+}
+
+body.light-mode .nav-btn.secondary:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* ==========================================================================
+   MATERIALS & READING VIEW LIGHT MODE
+   ========================================================================== */
+body.light-mode .materials-view {
+  background: #f4f5f8 !important;
+}
+
+body.light-mode .reading-topbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.12) !important;
+}
+
+body.light-mode .reading-topbar .back-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #475569 !important;
+}
+
+body.light-mode .reading-topbar .back-btn:hover {
+  color: #0284c7 !important;
+}
+
+body.light-mode .docs-main {
+  background: #f4f5f8 !important;
+}
+
+body.light-mode .docs-main .lesson-title {
+  background: none !important;
+  -webkit-text-fill-color: #0f172a !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .docs-main .markdown-body {
+  color: #334155 !important;
+}
+
+body.light-mode .docs-main .markdown-body h2,
+body.light-mode .docs-main .markdown-body h3 {
+  color: #0f172a !important;
+  border-bottom-color: rgba(124, 58, 237, 0.12) !important;
+}
+
+body.light-mode .docs-main .markdown-body strong {
+  color: #0f172a !important;
+}
+
+body.light-mode .docs-main .markdown-body pre {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-mode .docs-main .markdown-body p code,
+body.light-mode .docs-main .markdown-body li code {
+  background: rgba(2, 132, 199, 0.08) !important;
+  color: #0284c7 !important;
+}
+
+body.light-mode .docs-main .markdown-body blockquote {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  border-left: 4px solid #7c3aed !important;
+}
+
+/* ==========================================================================
+   AUTH PAGES (LOGIN & REGISTER) LIGHT MODE
+   ========================================================================== */
+body.light-mode .auth-page {
+  background: #f4f5f8 !important;
+}
+
+body.light-mode .auth-container {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.15) !important;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+body.light-mode .auth-panel-left {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.06), rgba(124, 58, 237, 0.06)) !important;
+  border-right: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode .auth-panel-left h2 {
+  color: #0f172a !important;
+}
+
+body.light-mode .auth-panel-left p {
+  color: #475569 !important;
+}
+
+body.light-mode .auth-header p {
+  color: #475569 !important;
+}
+
+body.light-mode .form-group label {
+  color: #334155 !important;
+}
+
+body.light-mode .input-wrapper input {
+  background: #f8fafc !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .input-wrapper input:focus {
+  background: #ffffff !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12) !important;
+}
+
+body.light-mode .input-wrapper i {
+  color: #64748b !important;
+}
+
+body.light-mode .btn-back-auth {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .btn-back-auth:hover {
+  background: #f1f5f9 !important;
+  color: #0284c7 !important;
+}
+
+body.light-mode .remember-me {
+  color: #475569 !important;
+}
+
+body.light-mode .forgot-password {
+  color: #7c3aed !important;
+}
+
+body.light-mode .auth-footer p {
+  color: #64748b !important;
+}
+
+body.light-mode .auth-footer a {
+  color: #7c3aed !important;
+}
+
+body.light-mode .auth-divider span {
+  background: #ffffff !important;
+  color: #64748b !important;
+}
+
+body.light-mode .auth-divider::before {
+  background: rgba(15, 23, 42, 0.1) !important;
+}
+
+body.light-mode .btn-google {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .btn-google:hover {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.25) !important;
+}
+
+body.light-mode .otp-input {
+  background: #f8fafc !important;
+  border: 2px solid rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .otp-input:focus {
+  background: #ffffff !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.2) !important;
+}
+
+/* ==========================================================================
+   DEVELOPER VIEW LIGHT MODE
+   ========================================================================== */
+body.light-mode .developer-page {
+  background: #f4f5f8 !important;
+}
+
+body.light-mode .developer-page .profile-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-mode .developer-page .avatar {
+  border-color: #ffffff !important;
+}
+
+body.light-mode .developer-page .status-badge {
+  background: #f8fafc !important;
+  border-color: #ffffff !important;
+}
+
+body.light-mode .developer-page .dev-name {
+  background: none !important;
+  -webkit-text-fill-color: #0f172a !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .developer-page .social-btn {
+  background: #f8fafc !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  color: #475569 !important;
+}
+
+body.light-mode .developer-page .social-btn:hover {
+  background: #ffffff !important;
+  color: #0284c7 !important;
+  border-color: #0284c7 !important;
+}
+
+body.light-mode .developer-page .about-section {
+  color: #475569 !important;
+  border-top-color: rgba(124, 58, 237, 0.1) !important;
+}
+
+body.light-mode .developer-page .dev-footer {
+  color: #64748b !important;
+}
+
+/* ==========================================================================
+   DASHBOARD SUBCOMPONENTS (STATS, INVENTORY, MEDALS, BORDERS) LIGHT MODE
+   ========================================================================== */
+body.light-mode .gh-box {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-mode .gh-stat-card,
+body.light-mode .gh-rank-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-mode .gh-cell.level-0 {
+  background-color: #e2e8f0 !important;
+}
+
+body.light-mode .gh-heatmap-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+}
+
+body.light-mode .gh-xp-bar-bg {
+  background-color: #e2e8f0 !important;
+}
+
+body.light-mode .gh-header h2 {
+  color: #0f172a !important;
+}
+
+body.light-mode .gh-overview-divider {
+  background: rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode .gh-overview-left h3 {
+  color: #0f172a !important;
+}
+
+body.light-mode .inventory-item {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-mode .inventory-item:hover {
+  border-color: #7c3aed !important;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.1) !important;
+}
+
+body.light-mode .item-details h3 {
+  color: #0f172a !important;
+}
+
+body.light-mode .tab-btn {
+  color: #64748b !important;
+}
+
+body.light-mode .tab-btn.active {
+  color: #7c3aed !important;
+  border-bottom-color: #7c3aed !important;
+  background: linear-gradient(to top, rgba(124, 58, 237, 0.08) 0%, transparent 100%) !important;
+}
+
+body.light-mode .dash-medals h2 {
+  color: #0f172a !important;
+}
+
+body.light-mode .cat-select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+}
+
+body.light-mode .cat-select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .page-tabs button {
+  color: #64748b !important;
+}
+
+body.light-mode .page-tabs button.active {
+  background: rgba(124, 58, 237, 0.1) !important;
+  color: #7c3aed !important;
+}
+
+body.light-mode .cat-btn {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+}
+
+body.light-mode .cat-btn.active {
+  background: rgba(124, 58, 237, 0.08) !important;
+  border-color: #7c3aed !important;
+}
+
+body.light-mode .cat-btn.active .cat-label {
+  color: #7c3aed !important;
+}
+
+body.light-mode .cat-label {
+  color: #0f172a !important;
+}
+
+body.light-mode .cat-count {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+body.light-mode .badges-area {
+  background: #ffffff !important;
+  border: 1px solid rgba(124, 58, 237, 0.14) !important;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.04) !important;
+}
+
+body.light-mode .badges-header h3 {
+  color: #0f172a !important;
+}
+
+body.light-mode .badge-card,
+body.light-mode .trophy-card {
+  background: #f8fafc !important;
+  border: 1px solid rgba(124, 58, 237, 0.1) !important;
+}
+
+body.light-mode .badge-card:hover,
+body.light-mode .trophy-card:hover {
+  background: #ffffff !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.08) !important;
+}
+
+body.light-mode .badge-info h4,
+body.light-mode .badge-name,
+body.light-mode .trophy-name {
+  color: #0f172a !important;
+}
+
+body.light-mode .badge-desc,
+body.light-mode .trophy-desc {
+  color: #475569 !important;
+}
+
+body.light-mode .btn-preview {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15, 23, 42, 0.15) !important;
+}
+
+body.light-mode .btn-preview:hover {
+  background: #f1f5f9 !important;
+}
+
+body.light-mode .badge-hover-actions {
+  background: rgba(244, 245, 248, 0.92) !important;
+}
+
+body.light-mode .dash-borders h2 {
+  color: #0f172a !important;
+}
+
+body.light-mode .cert-showcase {
+  background: #f8fafc !important;
+  border: 1px solid rgba(124, 58, 237, 0.12) !important;
+}
+
+body.light-mode .cert-content h4 {
+  color: #0f172a !important;
+}
+
+body.light-mode .cert-content p {
+  color: #475569 !important;
+}
+
+
+
