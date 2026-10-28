@@ -92,7 +92,12 @@
         </div>
       </div>
 
-      <div class="paths-grid">
+      <!-- Loading state if full paths list is being fetched -->
+      <div v-if="isLoading && paths.length <= 1" class="paths-loading-state" style="display: flex; justify-content: center; align-items: center; min-height: 320px; width: 100%;">
+        <TerminalLoader size="lg" label="seluruh alur belajar" />
+      </div>
+
+      <div v-else class="paths-grid">
         <PathCard 
           v-for="(path, index) in filteredPaths" 
           :key="path.id" 
@@ -159,6 +164,8 @@ const getPathCategory = (path) => {
     slug.includes('php') ||
     slug.includes('laravel') ||
     slug.includes('react') ||
+    slug.includes('software-engineering') ||
+    slug.includes('rest-api') ||
     title.includes('html') ||
     title.includes('css') ||
     title.includes('layout') ||
@@ -168,6 +175,8 @@ const getPathCategory = (path) => {
     title.includes('php') ||
     title.includes('laravel') ||
     title.includes('react') ||
+    title.includes('software engineering') ||
+    title.includes('rest') ||
     title.includes('web')
   ) {
     return 'web'
@@ -177,9 +186,14 @@ const getPathCategory = (path) => {
     slug.includes('python') ||
     slug.includes('database') ||
     slug.includes('sql') ||
+    slug.includes('machine-learning') ||
+    slug.includes('ai-') ||
+    slug.includes('data-science') ||
     title.includes('python') ||
     title.includes('database') ||
     title.includes('sql') ||
+    title.includes('machine learning') ||
+    title.includes('ai') ||
     title.includes('data')
   ) {
     return 'data'
@@ -187,10 +201,15 @@ const getPathCategory = (path) => {
   
   if (
     slug.includes('dasar-pemrograman') ||
+    slug.includes('fondasi') ||
+    slug.includes('object-oriented') ||
     slug.includes('logika') ||
     slug.includes('matematika') ||
     slug.includes('algoritma') ||
     title.includes('dasar pemrograman') ||
+    title.includes('fondasi') ||
+    title.includes('berorientasi objek') ||
+    title.includes('oop') ||
     title.includes('logika') ||
     title.includes('matematika') ||
     title.includes('komputasional') ||
@@ -243,10 +262,8 @@ const resetFilters = () => {
   selectedTier.value = 'all'
 }
 
-onMounted(() => {
-  if (!hasFetchedAllPaths.value) {
-    fetchPaths()
-  }
+onMounted(async () => {
+  await fetchPaths(true)
   isPreparingLesson.value = false
 })
 

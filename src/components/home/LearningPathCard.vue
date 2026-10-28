@@ -12,7 +12,7 @@
               border: `1px solid ${themeColor}40`,
             }"
           >
-            <i :class="path.icon || 'fa-solid fa-code'"></i>
+            <i :class="pathIcon"></i>
           </div>
           <div class="header-labels">
             <div class="path-title-row">
@@ -124,6 +124,7 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useLearningPaths } from "../../composables/useLearningPaths";
 import { useUserAccount } from "../../composables/useUserAccount";
+import { getPathThemeColor, getPathIconClass } from "../../utils/pathTheme";
 
 const props = defineProps({
   path: {
@@ -164,13 +165,11 @@ const cardStyle = computed(() => {
 });
 
 const themeColor = computed(() => {
-  const colors = [
-    "#00f0ff", // Cyan
-    "#ec4899", // Hot Pink
-    "#9333ea", // Neon Purple
-    "#10b981", // Emerald Green
-  ];
-  return colors[props.index % colors.length];
+  return getPathThemeColor(props.path, props.index);
+});
+
+const pathIcon = computed(() => {
+  return getPathIconClass(props.path);
 });
 
 const ambientGlowStyle = computed(() => {

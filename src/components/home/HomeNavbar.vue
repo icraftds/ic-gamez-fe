@@ -62,11 +62,12 @@
         <template v-if="isLoggedIn">
           <!-- Floating Actions Capsule -->
           <div class="nav-capsule nav-actions-capsule">
-            <!-- Notifications / Friend Requests Bell with Red Dot -->
-            <button class="nav-icon-btn notif-btn" @click="toggleFriendsSidebar" aria-label="Notifikasi & Teman">
+            <!-- Notifications / Friend Requests Bell with Red Dot / Gold Gift Pulse -->
+            <button class="nav-icon-btn notif-btn" @click="toggleFriendsSidebar('notifikasi')" aria-label="Notifikasi & Hadiah">
               <i class="fa-regular fa-bell"></i>
-              <span v-if="hasUnreadRequests" class="notif-red-dot"></span>
-              <span class="nav-tooltip">Notifikasi & Teman</span>
+              <span v-if="hasUnclaimedGifts" class="notif-gift-dot" title="Hadiah iCoinz tersedia!"></span>
+              <span v-else-if="hasUnread || hasUnreadRequests" class="notif-red-dot" title="Notifikasi baru"></span>
+              <span class="nav-tooltip">Notifikasi & Hadiah</span>
             </button>
 
             <!-- GameZ Shop Button -->
@@ -186,9 +187,10 @@
         <div class="nav-right-cluster mobile-drawer-actions">
           <template v-if="isLoggedIn">
             <div class="nav-capsule nav-actions-capsule">
-              <button class="nav-icon-btn notif-btn" @click="toggleFriendsSidebar(); mobileMenuOpen = false" title="Notifikasi & Teman">
+              <button class="nav-icon-btn notif-btn" @click="toggleFriendsSidebar('notifikasi'); mobileMenuOpen = false" title="Notifikasi & Hadiah">
                 <i class="fa-regular fa-bell"></i>
-                <span v-if="hasUnreadRequests" class="notif-red-dot"></span>
+                <span v-if="hasUnclaimedGifts" class="notif-gift-dot"></span>
+                <span v-else-if="hasUnread || hasUnreadRequests" class="notif-red-dot"></span>
               </button>
               <button
                 class="nav-icon-btn shop-btn"
@@ -225,12 +227,14 @@ import { useUserAccount } from "../../composables/useUserAccount";
 import { useTheme } from "../../composables/useTheme";
 import UserProfileDropdown from "../common/UserProfileDropdown.vue";
 import { useFriends } from "../../composables/useFriends";
+import { useNotifications } from "../../composables/useNotifications";
 
 const { isLightMode, toggleTheme } = useTheme();
 
 const { credits, maxCredits, isPremiumUser, currentPlan, isLoggedIn, isLoading, userProfile, logout, fetchUser, coinz, walletStatus } =
   useUserAccount();
 const { toggleFriendsSidebar, hasUnreadRequests } = useFriends();
+const { hasUnread, hasUnclaimedGifts, startPolling, stopPolling } = useNotifications();
 
 const formatShortCoinz = (val) => {
   if (val === null || val === undefined) return '—';
@@ -324,9 +328,20 @@ const handleClickOutside = (e) => {
   }
 };
 
+let notifInterval;
+
+watch(isLoggedIn, (logged) => {
+  if (logged) {
+    startPolling();
+  } else {
+    stopPolling(true);
+  }
+});
+
 onMounted(() => {
   if (isLoggedIn.value) {
     fetchUser();
+    startPolling();
   }
   document.addEventListener('click', handleClickOutside);
   window.addEventListener('scroll', handleScroll, { passive: true });
@@ -341,6 +356,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  stopPolling(false);
   document.removeEventListener('click', handleClickOutside);
   window.removeEventListener('scroll', handleScroll);
   window.removeEventListener('resize', updatePill);

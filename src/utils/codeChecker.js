@@ -10,17 +10,23 @@ import { runValidation } from './validators/index.js';
  * @returns {boolean} - True jika output sesuai harapan, False jika tidak
  */
 export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOutputArray, currentCode, lesson = null) => {
-  // Parsing initial code dari JSON jika format baru
-  let initialCodeForCheck = lessonPractice;
+  // Parsing initial code dari JSON jika format baru (string atau object)
+  let initialCodeForCheck = '';
   if (lessonPractice) {
-    try {
-      const json = JSON.parse(lessonPractice);
-      initialCodeForCheck = json.initial_code || json.initial_query || lessonPractice;
-    } catch (e) {}
+    if (typeof lessonPractice === 'object') {
+      initialCodeForCheck = lessonPractice.initial_code || lessonPractice.initial_query || '';
+    } else if (typeof lessonPractice === 'string') {
+      try {
+        const json = JSON.parse(lessonPractice);
+        initialCodeForCheck = json.initial_code || json.initial_query || lessonPractice;
+      } catch (e) {
+        initialCodeForCheck = lessonPractice;
+      }
+    }
   }
 
   // Anti-cheat Universal: Jika kode sama persis dengan template (belum ada perubahan)
-  if (initialCodeForCheck && currentCode.trim() === initialCodeForCheck.trim()) {
+  if (typeof initialCodeForCheck === 'string' && initialCodeForCheck.trim() && currentCode && currentCode.trim() === initialCodeForCheck.trim()) {
     return false;
   }
 
@@ -33,7 +39,7 @@ export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOut
     } catch (e) {}
   }
 
-  const validationType = lesson?.validation_type || (lessonLanguage === 'sql' ? 'sql_result' : null);
+  const validationType = lesson?.validation_type || (lessonLanguage === 'sql' ? 'sql_result' : (testCases && testCases.length > 0 ? 'stdout' : null));
 
   if (validationType && testCases && testCases.length > 0) {
     return await runValidation(validationType, testCases, runnerOutputArray, currentCode, lesson);
@@ -62,9 +68,13 @@ export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOut
     const hasTableOrLog = runnerOutputArray.some(e => e.type === 'table' || e.type === 'log');
     return !hasError && hasTableOrLog;
   }
-  if (!lessonPractice) return true;
+
+  const practiceStr = typeof lessonPractice === 'string'
+    ? lessonPractice
+    : (lessonPractice?.initial_code || lessonPractice?.task_description || '');
+  if (!practiceStr) return true;
   
-  const lines = lessonPractice.split('\n');
+  const lines = practiceStr.split('\n');
   let expectedOutput = '';
   let inOutputSection = false;
   
@@ -95,8 +105,9 @@ export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOut
   
   const actualOutput = runnerOutputArray.map(o => o.text).join(' ').trim();
   const looseExpected = expectedOutput.toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');
-  const looseActual = actualOutput.toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');
-  
-  return looseActual.includes(looseExpected) || looseExpected.includes(looseActual);
+  if (looseActual === looseExpected) return true;
+  const escaped = looseExpected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const boundaryRegex = new RegExp(`(?:^|[\\s,;:()<>\\[\\]{}"'!=])${escaped}(?:$|[\\s,;:()<>\\[\\]{}"'!=])`, 'i');
+  return boundaryRegex.test(looseActual);
 }
 

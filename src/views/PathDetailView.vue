@@ -292,6 +292,7 @@ import { useLearningPaths } from '../composables/useLearningPaths'
 import { useUserAccount } from '../composables/useUserAccount'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import PremiumModal from '../components/common/PremiumModal.vue'
+import { getPathThemeColor, getPathIconClass } from '../utils/pathTheme'
 
 const route = useRoute()
 const router = useRouter()
@@ -305,46 +306,12 @@ const showPremiumModal = ref(false)
 // Path theme color matching /learning
 const pathThemeColor = computed(() => {
   if (!path.value) return '#38bdf8'
-  const slug = path.value.slug || ''
-  const brandColors = {
-    'dasar-pemrograman': '#00f0ff',
-    'logika-dan-berpikir-komputasional': '#ec4899',
-    'dasar-python': '#38bdf8',
-    'matematika-informatika': '#a855f7',
-    'html-css-dasar': '#f97316',
-    'layout-dan-responsive-design': '#8b5cf6',
-    'javascript-pemula': '#facc15',
-    'frontend-web': '#06b6d4',
-    'backend-development': '#22c55e',
-    'frontend-framework': '#00d8ff',
-    'php-laravel': '#f43f5e',
-    'database-sql': '#0284c7',
-    'global-challenges': '#eab308'
-  }
-  if (brandColors[slug]) return brandColors[slug]
-  if (path.value.is_premium || path.value.isPremium) return '#f59e0b'
-  return '#38bdf8'
+  return getPathThemeColor(path.value)
 })
 
 // Path icon class matching /learning
 const pathIconClass = computed(() => {
-  if (path.value?.icon) return path.value.icon
-  const fallbackIcons = {
-    'dasar-pemrograman': 'fa-solid fa-code',
-    'logika-dan-berpikir-komputasional': 'fa-solid fa-brain',
-    'dasar-python': 'fa-brands fa-python',
-    'matematika-informatika': 'fa-solid fa-calculator',
-    'html-css-dasar': 'fa-brands fa-html5',
-    'layout-dan-responsive-design': 'fa-solid fa-table-cells-large',
-    'javascript-pemula': 'fa-brands fa-js',
-    'frontend-web': 'fa-solid fa-globe',
-    'backend-development': 'fa-solid fa-server',
-    'frontend-framework': 'fa-brands fa-react',
-    'php-laravel': 'fa-brands fa-laravel',
-    'database-sql': 'fa-solid fa-database',
-    'global-challenges': 'fa-solid fa-trophy'
-  }
-  return fallbackIcons[path.value?.slug] || 'fa-solid fa-code'
+  return getPathIconClass(path.value)
 })
 
 // Diverse Chapter Themes & Icons per Bab

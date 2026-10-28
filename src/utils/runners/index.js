@@ -25,7 +25,7 @@ export async function executeCode(language = 'javascript', code = '', context = 
       return await runSql(code, context)
 
     case 'python':
-      return await runPython(code)
+      return await runPython(code, context)
 
     case 'php':
       return await runPhp(code, context)

@@ -39,6 +39,19 @@ export async function runJavascript(code, context = null) {
     ? JSON.stringify(testInput)
     : String(testInput ?? '')
 
+  let practiceObj = context?.practice
+  if (typeof practiceObj === 'string') {
+    try { practiceObj = JSON.parse(practiceObj) } catch {}
+  }
+  let customFnName = context?.function_name || practiceObj?.function_name || null
+  if (!customFnName) {
+    const fnMatch = code.match(/function\s+(solve\w*)\s*\(/) || code.match(/(?:const|let|var)\s+(solve\w*)\s*=\s*(?:function|\([^)]*\)\s*=>)/)
+    if (fnMatch) {
+      customFnName = fnMatch[1]
+    }
+  }
+  const setupCode = context?.setup_code || ''
+
   const fakeRequire = (mod) => {
     if (mod === 'fs') {
       return {
@@ -49,6 +62,7 @@ export async function runJavascript(code, context = null) {
   }
 
   const fakeProcess = {
+    argv: ['node', 'solution.js', rawInputStr],
     stdin: {
       read: () => rawInputStr,
       on: () => {}
@@ -60,11 +74,17 @@ export async function runJavascript(code, context = null) {
 
   const harnessCode = `
     let __INPUT__ = ${JSON.stringify(testInput)};
+    ${setupCode ? setupCode + '\n;' : ''}
     ${code}
     ;
-    if (typeof solve === 'function' && !__state.logged) {
+    let __fnToRun = null;
+    ${customFnName ? `try { if (typeof ${customFnName} === 'function') __fnToRun = ${customFnName}; } catch(e){}` : ''}
+    if (!__fnToRun) {
+      try { if (typeof solve === 'function') __fnToRun = solve; } catch(e){}
+    }
+    if (__fnToRun && !__state.logged) {
       try {
-        const __res = solve(__INPUT__);
+        const __res = __fnToRun(__INPUT__);
         if (__res !== undefined) {
           console.log(typeof __res === 'object' && __res !== null ? JSON.stringify(__res) : String(__res));
         }

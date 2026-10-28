@@ -12,11 +12,16 @@ const isLoadingRequests = ref(false)
 
 const hasUnreadRequests = ref(false)
 
+const initialSidebarTab = ref('notifikasi')
+
 export function useFriends() {
   const { isLoggedIn } = useUserAccount()
 
-  const toggleFriendsSidebar = () => {
+  const toggleFriendsSidebar = (targetTab = null) => {
     if (!isLoggedIn.value) return
+    if (targetTab) {
+      initialSidebarTab.value = targetTab
+    }
     isFriendsSidebarOpen.value = !isFriendsSidebarOpen.value
     if (isFriendsSidebarOpen.value) {
       // Hilangkan titik merah ketika sidebar dibuka
@@ -137,6 +142,7 @@ export function useFriends() {
     removeFriend,
     acceptFriendRequest,
     rejectFriendRequest,
-    hasUnreadRequests
+    hasUnreadRequests,
+    initialSidebarTab
   }
 }

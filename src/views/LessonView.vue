@@ -75,6 +75,7 @@
             :is-challenge="route.query.mode === 'challenge'"
             @update:code="runner.code.value = $event; runner.status.value = 'idle'"
             @run="onPracticeRun"
+            @reset="onResetPractice"
             @clear-output="runner.clearOutput()"
             @back="route.query.mode === 'challenge' ? router.push('/challenges') : (activeStep = STEP.QUIZ)"
             @finish="onPracticeFinish"
@@ -309,7 +310,7 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
         return
       }
       if (!lesson.quizPassed) return // Ignore click if locked
-      runner.loadFromStorage(lesson.id, lesson.practice)
+      runner.loadFromStorage(lesson, lesson.practice, lesson.slug, lessonLanguage.value)
       activeStep.value = STEP.PRACTICE
     } else {
       activeStep.value = STEP.THEORY
@@ -395,8 +396,12 @@ const onRequestNextFromQuiz = async () => {
     currentLesson.value.quizPassed = true
   }
 
-  runner.loadFromStorage(currentLesson.value?.id, currentLesson.value?.practice)
+  runner.loadFromStorage(currentLesson.value, currentLesson.value?.practice, currentLesson.value?.slug, lessonLanguage.value)
   activeStep.value = STEP.PRACTICE
+}
+
+const onResetPractice = () => {
+  runner.resetCode(currentLesson.value?.practice)
 }
 
 /** Jalankan kode practice dan beri XP jika berhasil tanpa error. */
@@ -510,12 +515,12 @@ watch(currentLesson, (newLesson) => {
   }
   initStepFromQuery()
   if (newLesson && newLesson.id) {
-    quiz.loadFromStorage(newLesson.id)
+    quiz.loadFromStorage(newLesson, newLesson.quizzes || [])
   } else {
     quiz.reset()
   }
   if (newLesson && newLesson.id) {
-    runner.loadFromStorage(newLesson.id, newLesson?.practice)
+    runner.loadFromStorage(newLesson, newLesson?.practice, newLesson?.slug, lessonLanguage.value)
     if (quiz.isCorrect.value) {
       newLesson.quizPassed = true
     }

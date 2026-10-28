@@ -1,10 +1,26 @@
 import { ref, computed } from 'vue'
 import api from '../services/api'
 
-const globalPaths = ref([])
+const CACHE_KEY = 'ic_learning_paths_cache_v3'
+
+function loadCachedPaths() {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed) && parsed.length > 1) {
+        return parsed
+      }
+    }
+  } catch (e) {}
+  return []
+}
+
+const initialCached = loadCachedPaths()
+const globalPaths = ref(initialCached)
 const globalIsLoading = ref(false)
 const globalIsPreparingLesson = ref(false)
-const globalHasFetchedAllPaths = ref(false)
+const globalHasFetchedAllPaths = ref(initialCached.length > 1)
 
 export function useLearningPaths() {
   const paths = globalPaths
@@ -12,12 +28,39 @@ export function useLearningPaths() {
   const isPreparingLesson = globalIsPreparingLesson
   const hasFetchedAllPaths = globalHasFetchedAllPaths
 
-  const fetchPaths = async () => {
+  const fetchPaths = async (force = false) => {
+    if (isLoading.value && !force) return
     try {
       isLoading.value = true
       const response = await api.get('/paths')
-      paths.value = response.data.data
-      hasFetchedAllPaths.value = true
+      if (response.data && Array.isArray(response.data.data)) {
+        const freshPaths = response.data.data
+
+        // Map existing detailed chapters to retain loaded lessons/quizzes
+        const detailedMap = new Map()
+        paths.value.forEach(p => {
+          if (p.chapters && p.chapters.length > 0) {
+            detailedMap.set(p.slug || String(p.id), p.chapters)
+          }
+        })
+
+        paths.value = freshPaths.map(newPath => {
+          const key = newPath.slug || String(newPath.id)
+          const existingChapters = detailedMap.get(key)
+          if (existingChapters) {
+            return {
+              ...newPath,
+              chapters: existingChapters
+            }
+          }
+          return newPath
+        })
+
+        hasFetchedAllPaths.value = true
+        try {
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(freshPaths))
+        } catch (e) {}
+      }
     } catch (error) {
       console.error('Failed to fetch learning paths', error)
     } finally {
@@ -74,11 +117,15 @@ export function useLearningPaths() {
         });
       }
 
-      const index = paths.value.findIndex(p => p.slug === slug)
+      const index = paths.value.findIndex(p => p.slug === slug || String(p.id) === String(slug))
       if (index !== -1) {
         paths.value[index] = detailedPath
       } else {
         paths.value.push(detailedPath)
+        // If paths list is incomplete, fetch full list in background
+        if (!hasFetchedAllPaths.value || paths.value.length <= 1) {
+          fetchPaths()
+        }
       }
       return detailedPath
     } catch (error) {
@@ -113,19 +160,32 @@ export function useLearningPaths() {
   }
 
   const getLessonById = (pathId, chapterId, lessonId) => {
-    const chapter = getChapterById(pathId, chapterId)
-    if (chapter && chapter.lessons) {
-      const found = chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
-      if (found) return found
+    // 1. Cari secara tepat di path dan chapter yang diminta
+    const path = getPathById(pathId)
+    if (path && path.chapters) {
+      const chapter = path.chapters.find(c => String(c.id) === String(chapterId) || c.slug === chapterId)
+      if (chapter && chapter.lessons) {
+        const found = chapter.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+        if (found) return found
+      }
+      // Jika tidak di chapter tersebut, cari di chapter lain dalam PATH YANG SAMA (jangan bocor ke alur belajar lain)
+      for (const c of path.chapters) {
+        if (c.lessons) {
+          const found = c.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+          if (found) return found
+        }
+      }
     }
 
-    // Fallback: cari di seluruh paths dan chapters jika format ID/slug berbeda
-    for (const p of paths.value) {
-      if (p.chapters) {
-        for (const c of p.chapters) {
-          if (c.lessons) {
-            const found = c.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
-            if (found) return found
+    // 2. Fallback global HANYA JIKA pathId tidak ditentukan sama sekali (misal dari challenge atau search global)
+    if (!pathId) {
+      for (const p of paths.value) {
+        if (p.chapters) {
+          for (const c of p.chapters) {
+            if (c.lessons) {
+              const found = c.lessons.find(l => String(l.id) === String(lessonId) || l.slug === lessonId)
+              if (found) return found
+            }
           }
         }
       }
