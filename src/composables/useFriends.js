@@ -11,62 +11,84 @@ const isLoadingFriends = ref(false)
 const isLoadingRequests = ref(false)
 
 const hasUnreadRequests = ref(false)
+const initialSidebarTab = ref('teman')
 
-const initialSidebarTab = ref('notifikasi')
+let inFlightFriends = null
+let inFlightRequests = null
+let lastRequestsFetchedAt = 0
 
 export function useFriends() {
   const { isLoggedIn } = useUserAccount()
 
   const toggleFriendsSidebar = (targetTab = null) => {
     if (!isLoggedIn.value) return
-    if (targetTab) {
+    if (targetTab === 'teman' || targetTab === 'permintaan') {
       initialSidebarTab.value = targetTab
     }
     isFriendsSidebarOpen.value = !isFriendsSidebarOpen.value
     if (isFriendsSidebarOpen.value) {
-      // Hilangkan titik merah ketika sidebar dibuka
       hasUnreadRequests.value = false
       localStorage.setItem('seen_friend_requests_count', String(friendRequests.value.length || 0))
 
       if (friends.value.length === 0) fetchFriends()
-      fetchFriendRequests()
+      fetchFriendRequests({ force: true })
     }
   }
 
   const fetchFriends = async () => {
-    try {
-      isLoadingFriends.value = true
-      const res = await api.get('/user/friends')
-      friends.value = res.data.data
-    } catch (err) {
-      console.error('Failed to fetch friends', err)
-    } finally {
-      isLoadingFriends.value = false
-    }
+    if (!isLoggedIn.value) return
+    if (inFlightFriends) return inFlightFriends
+
+    inFlightFriends = (async () => {
+      try {
+        isLoadingFriends.value = true
+        const res = await api.get('/user/friends')
+        friends.value = res.data.data || []
+      } catch (err) {
+        console.error('Failed to fetch friends', err)
+      } finally {
+        isLoadingFriends.value = false
+        inFlightFriends = null
+      }
+    })()
+
+    return inFlightFriends
   }
 
-  const fetchFriendRequests = async () => {
-    try {
-      isLoadingRequests.value = true
-      const res = await api.get('/user/friend-requests')
-      const data = res.data.data || []
-      friendRequests.value = data
-
-      // Cek apakah ada permintaan teman baru yang belum dilihat
-      const seenCount = parseInt(localStorage.getItem('seen_friend_requests_count') || '0', 10)
-      if (data.length > 0 && data.length > seenCount && !isFriendsSidebarOpen.value) {
-        hasUnreadRequests.value = true
-      } else if (data.length === 0 || isFriendsSidebarOpen.value) {
-        hasUnreadRequests.value = false
-        if (data.length === 0) {
-          localStorage.setItem('seen_friend_requests_count', '0')
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch friend requests', err)
-    } finally {
-      isLoadingRequests.value = false
+  const fetchFriendRequests = async ({ force = false } = {}) => {
+    if (!isLoggedIn.value) return
+    const now = Date.now()
+    if (!force && lastRequestsFetchedAt > 0 && now - lastRequestsFetchedAt < 20000) {
+      return
     }
+    if (inFlightRequests) return inFlightRequests
+
+    inFlightRequests = (async () => {
+      try {
+        isLoadingRequests.value = true
+        const res = await api.get('/user/friend-requests')
+        const data = res.data.data || []
+        friendRequests.value = data
+        lastRequestsFetchedAt = Date.now()
+
+        const seenCount = parseInt(localStorage.getItem('seen_friend_requests_count') || '0', 10)
+        if (data.length > 0 && data.length > seenCount && !isFriendsSidebarOpen.value) {
+          hasUnreadRequests.value = true
+        } else if (data.length === 0 || isFriendsSidebarOpen.value) {
+          hasUnreadRequests.value = false
+          if (data.length === 0) {
+            localStorage.setItem('seen_friend_requests_count', '0')
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch friend requests', err)
+      } finally {
+        isLoadingRequests.value = false
+        inFlightRequests = null
+      }
+    })()
+
+    return inFlightRequests
   }
 
   const searchUsers = async (q) => {
@@ -77,7 +99,7 @@ export function useFriends() {
     try {
       isSearching.value = true
       const res = await api.get('/users/search', { params: { q } })
-      searchResults.value = res.data.data
+      searchResults.value = res.data.data || []
     } catch (err) {
       console.error('Failed to search users', err)
     } finally {
