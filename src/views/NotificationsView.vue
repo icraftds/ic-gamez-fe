@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotifications } from '../composables/useNotifications'
 import { useUserAccount } from '../composables/useUserAccount'
+import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 
 const router = useRouter()
 const { coinz } = useUserAccount()
@@ -23,10 +24,16 @@ const activeFilter = ref('all') // 'all' | 'unread' | 'gift'
 const selectedId = ref(null)
 const claimToast = ref(null)
 const claimErrorToast = ref(null)
+const showRewardModal = ref(false)
+const rewardedAmount = ref(0)
 let toastTimer = null
 
 onMounted(() => {
   fetchNotifications({ force: true })
+})
+
+onUnmounted(() => {
+  clearTimeout(toastTimer)
 })
 
 const filteredNotifications = computed(() => {
@@ -64,11 +71,14 @@ const closeReaderMobile = () => {
 
 const handleClaimReward = async (notif) => {
   if (!notif) return
+  const amount = Number(notif.reward_coinz) || 0
   const result = await claimReward(notif)
   clearTimeout(toastTimer)
   if (result.success) {
     claimErrorToast.value = null
-    claimToast.value = result.message || `Selamat! +${notif.reward_coinz.toLocaleString('id-ID')} iCoinZ berhasil diklaim!`
+    claimToast.value = result.message || `Selamat! +${amount.toLocaleString('id-ID')} iCoinZ berhasil diklaim!`
+    rewardedAmount.value = amount
+    showRewardModal.value = true
   } else {
     claimToast.value = null
     claimErrorToast.value = result.message || 'Gagal mengklaim hadiah.'
@@ -253,7 +263,7 @@ const getCategoryLabel = (category) => {
           <!-- Empty List State -->
           <div v-else-if="filteredNotifications.length === 0" class="mailbox-list-empty">
             <div class="empty-mail-icon">
-              <i class="fa-regular fa-Folder-open fa-inbox"></i>
+              <i class="fa-solid fa-inbox"></i>
             </div>
             <h4>Tidak Ada Pesan</h4>
             <p v-if="activeFilter === 'unread'">Semua pesan sudah Anda baca.</p>
@@ -437,7 +447,15 @@ const getCategoryLabel = (category) => {
         </main>
       </div>
     </div>
+
+    <!-- Animated iCoinZ Reward Celebration Modal -->
+    <CoinzRewardModal
+      v-model="showRewardModal"
+      :amount="rewardedAmount"
+      plan="gift"
+    />
   </div>
 </template>
 
 <style scoped src="../assets/css/views/NotificationsView.css"></style>
+

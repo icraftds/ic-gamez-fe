@@ -31,13 +31,13 @@
           <!-- Plan badge -->
           <div class="plan-badge" :class="planBadgeClass">
             <i :class="planIcon"></i>
-            Bonus dari Paket {{ planName }}
+            {{ plan === 'gift' ? 'Hadiah dari Kotak Pesan' : `Bonus dari Paket ${planName}` }}
           </div>
 
           <!-- Description -->
           <p class="reward-desc">
             iCoinZ-mu telah ditambahkan ke wallet dan siap digunakan di
-            <strong>IC Market</strong> untuk ditukarkan hadiah menarik!
+            <strong>GameZ Shop & IC Market</strong> untuk ditukarkan hadiah menarik!
           </p>
 
           <!-- CTA Buttons -->
@@ -46,7 +46,7 @@
               <i class="fa-solid fa-store"></i> Tukarkan di IC Market
             </a>
             <button class="btn-later" @click="handleClose">
-              Nanti saja
+              Tutup
             </button>
           </div>
 
@@ -67,7 +67,7 @@ import { ref, computed, watch, onUnmounted } from 'vue'
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   amount:     { type: Number, default: 0 },
-  plan:       { type: String, default: 'pro' }, // 'pro' | 'expert' | 'topup'
+  plan:       { type: String, default: 'pro' }, // 'pro' | 'expert' | 'topup' | 'gift'
 })
 
 const emit = defineEmits(['update:modelValue', 'close'])
@@ -142,16 +142,18 @@ onUnmounted(() => clearTimers())
 const planName = computed(() => {
   if (props.plan === 'expert') return 'Expert'
   if (props.plan === 'topup')  return 'Top Up'
+  if (props.plan === 'gift')   return 'Gift Box'
   return 'Pro'
 })
 const planBadgeClass = computed(() => ({
-  'badge-pro':    props.plan === 'pro',
+  'badge-pro':    props.plan === 'pro' || props.plan === 'gift',
   'badge-expert': props.plan === 'expert',
   'badge-topup':  props.plan === 'topup',
 }))
 const planIcon = computed(() => {
   if (props.plan === 'expert') return 'fa-solid fa-crown'
   if (props.plan === 'topup')  return 'fa-solid fa-plus'
+  if (props.plan === 'gift')   return 'fa-solid fa-gift'
   return 'fa-solid fa-bolt'
 })
 
