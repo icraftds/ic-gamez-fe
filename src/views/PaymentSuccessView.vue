@@ -64,14 +64,15 @@ const coinzPlan       = ref('pro')
 const poll = createPaymentPoll(async (isCurrent) => {
   const saved = JSON.parse(localStorage.getItem('ic_pending_checkout') || 'null')
   await fetchUser(true)
-  const expectedPlan = saved?.userId === userProfile.value.id ? saved.planSlug : null
-  if (!expectedPlan) return false
+  const isMatchUser = !saved?.userId || String(saved.userId) === String(userProfile.value?.id)
+  const expectedPlan = isMatchUser ? (saved?.planSlug || currentPlan.value) : null
+  
   const [user, response] = await Promise.all([fetchUser(true), api.get('/subscription')])
   if (!isCurrent()) return false
-  const active = response.data.data
+  const active = response.data?.data
   const baseline = saved?.paymentDetails?.baselineSubscription
   const newGrant = !baseline || (active && (active.id !== baseline.id || active.expires_at !== baseline.expires_at))
-  if (newGrant && user && isPremiumUser.value && currentPlan.value === expectedPlan && response.data.data?.status === 'active') {
+  if ((newGrant || !baseline) && user && isPremiumUser.value && (!expectedPlan || currentPlan.value === expectedPlan) && active?.status === 'active') {
     await fetchWallet()
     localStorage.removeItem('ic_pending_checkout')
     isLoading.value = false

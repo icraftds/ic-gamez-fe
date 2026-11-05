@@ -231,7 +231,8 @@ body.light-mode .method-icon.qris {
   color: var(--primary);
   border-color: rgba(14, 165, 233, 0.3);
 }
-.method-icon.link {
+.method-icon.link,
+.method-icon.doku {
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.05));
   color: #ec4899;
   border: 1px solid rgba(236, 72, 153, 0.3);

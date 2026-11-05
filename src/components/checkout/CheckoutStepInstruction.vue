@@ -5,7 +5,7 @@
 
     <!-- Method Badge -->
     <div class="instruction-method-badge">
-      <i :class="selectedMethod === 'qris' ? 'fa-solid fa-qrcode' : 'fa-solid fa-building-columns'"></i>
+      <i :class="methodIcon"></i>
       {{ methodLabel }}
     </div>
 
@@ -24,9 +24,40 @@
       </div>
     </div>
 
-    <a v-if="paymentDetails.payment_link" :href="paymentDetails.payment_link" target="_blank" rel="noopener noreferrer" class="btn-outline">Buka tautan pembayaran</a>
+    <!-- DOKU Hosted Checkout Display -->
+    <div v-if="paymentDetails.payment_link && !paymentDetails.qr_string && !paymentDetails.va_number" class="doku-display" :class="{ 'is-expired': countdown === 0 }">
+      <div class="doku-card-wrapper">
+        <div class="doku-icon-wrapper">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="doku-info">
+          <h3 class="doku-title">Pembayaran DOKU Checkout</h3>
+          <p class="doku-desc">
+            Selesaikan transaksi Anda melalui portal pembayaran resmi DOKU. Anda dapat memilih QRIS, Virtual Account Bank (BCA, Mandiri, BRI, BNI), E-Wallet, atau Kartu Kredit.
+          </p>
+          <div v-if="paymentDetails.order_id" class="doku-order-meta">
+            <span class="doku-order-label">Nomor Invoice:</span>
+            <span class="doku-order-id">{{ paymentDetails.order_id }}</span>
+          </div>
+        </div>
+        <a
+          :href="paymentDetails.payment_link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-primary doku-pay-btn"
+        >
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Buka Halaman Pembayaran DOKU</span>
+        </a>
+        <p class="doku-note">
+          <i class="fa-solid fa-circle-info"></i>
+          Halaman ini otomatis mendeteksi pembayaran Anda. Setelah membayar di DOKU, paket akan langsung aktif.
+        </p>
+      </div>
+    </div>
+
     <!-- QRIS Display -->
-    <div v-if="selectedMethod === 'qris'" class="qr-display" :class="{ 'is-expired': countdown === 0 }">
+    <div v-else-if="selectedMethod === 'qris' || paymentDetails.qr_string" class="qr-display" :class="{ 'is-expired': countdown === 0 }">
       <div class="qr-box-wrapper">
         <div class="qr-box">
           <qrcode-vue v-if="paymentDetails.qr_string" :value="paymentDetails.qr_string" :size="200" level="H" />
@@ -72,7 +103,7 @@
     </div>
 
     <button class="btn-outline" @click="$emit('back')">
-      <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
+      <i class="fa-solid fa-arrow-left"></i> Kembali ke Pemilihan Paket
     </button>
   </div>
 </template>
@@ -102,9 +133,19 @@ defineEmits(['back'])
 const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 
 const methodLabel = computed(() => {
-  if (props.selectedMethod === 'qris') return 'QRIS'
-  if (props.selectedMethod === 'va_bca') return 'Virtual Account BCA'
-  return 'Virtual Account BNI'
+  if (props.selectedMethod === 'doku' || props.paymentDetails?.payment_link) return 'DOKU Checkout'
+  if (props.selectedMethod === 'qris') return 'QRIS (DOKU)'
+  if (props.selectedMethod === 'va_bca' || props.selectedMethod === 'bca_va') return 'Virtual Account BCA'
+  if (props.selectedMethod === 'va_bni' || props.selectedMethod === 'bni_va') return 'Virtual Account BNI'
+  if (props.selectedMethod === 'va_bri' || props.selectedMethod === 'bri_va') return 'Virtual Account BRI'
+  if (props.selectedMethod === 'va_mandiri' || props.selectedMethod === 'mandiri_va') return 'Virtual Account Mandiri'
+  return 'DOKU Payment'
+})
+
+const methodIcon = computed(() => {
+  if (props.selectedMethod === 'doku' || props.paymentDetails?.payment_link) return 'fa-solid fa-credit-card'
+  if (props.selectedMethod === 'qris') return 'fa-solid fa-qrcode'
+  return 'fa-solid fa-building-columns'
 })
 
 const isCopied = ref(false)
