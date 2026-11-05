@@ -142,6 +142,7 @@ const onInstruction = (data) => {
 }
 
 const goBackToSelection = () => {
+  localStorage.removeItem('ic_pending_checkout')
   router.push('/pricing')
 }
 
@@ -184,13 +185,9 @@ const stopPolling = () => poll.stop()
 
 onMounted(async () => {
   await bootstrapSession(true)
-  if (localStorage.getItem('ic_returning_from_payment') === 'true') {
-    localStorage.removeItem('ic_returning_from_payment')
-    router.replace('/payment/success')
-    return
-  }
+  localStorage.removeItem('ic_returning_from_payment')
 
-  // Selalu coba restore dari localStorage jika ada pending checkout (agar QR tetap muncul saat refresh)
+  // Selalu coba restore dari localStorage jika ada pending checkout (agar transaksi tetap muncul saat kembali / refresh)
   const saved = localStorage.getItem('ic_pending_checkout')
   if (saved) {
     try {

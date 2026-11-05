@@ -17,7 +17,10 @@
             <p>Anda memiliki transaksi {{ pendingCheckout.planName }} Plan yang belum diselesaikan.</p>
           </div>
         </div>
-        <button class="btn-resume" @click="resumeCheckout">Lanjutkan Pembayaran</button>
+        <div class="pending-actions">
+          <button class="btn-cancel-pending" @click="cancelPendingCheckout">Batalkan</button>
+          <button class="btn-resume" @click="resumeCheckout">Lanjutkan Pembayaran</button>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -152,6 +155,11 @@ const resumeCheckout = () => {
   router.push({ name: 'checkout', query: { resume: 'true' } })
 }
 
+const cancelPendingCheckout = () => {
+  localStorage.removeItem('ic_pending_checkout')
+  pendingCheckout.value = null
+}
+
 const PLAN_CONFIG = {
   pro: {
     icon: 'fa-solid fa-rocket',
@@ -274,6 +282,28 @@ const handlePlanClick = async (slug, plan = null) => {
   font-size: 0.85rem;
   margin: 0;
 }
+.pending-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.btn-cancel-pending {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-cancel-pending:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
 .btn-resume {
   background: linear-gradient(135deg, #10b981, #059669);
   color: #fff;
@@ -300,6 +330,13 @@ const handlePlanClick = async (slug, plan = null) => {
   .pending-info {
     flex-direction: column;
     gap: 10px;
+  }
+  .pending-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  .pending-actions button {
+    flex: 1;
   }
 }
 </style>

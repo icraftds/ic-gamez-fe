@@ -194,7 +194,6 @@ const goToInstruction = async () => {
     }))
 
     if (paymentLink) {
-      localStorage.setItem('ic_returning_from_payment', 'true')
       window.location.href = paymentLink
       return
     }

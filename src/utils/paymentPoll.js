@@ -1,4 +1,9 @@
-export function createPaymentPoll(check, { onTimeout = () => {}, isAuthenticated = () => true } = {}) {
+export function createPaymentPoll(check, {
+  onTimeout = () => {},
+  isAuthenticated = () => true,
+  timeoutMs = 120000,
+  delays = [3000, 5000, 10000, 15000]
+} = {}) {
   let timer = null
   let generation = 0
   let deadline = 0
@@ -14,7 +19,7 @@ export function createPaymentPoll(check, { onTimeout = () => {}, isAuthenticated
     suspend()
     wanted = true
     const run = generation
-    deadline = Date.now() + 120000
+    deadline = Date.now() + timeoutMs
     attempt = 0
     const tick = async () => {
       if (run !== generation || document.hidden) return
@@ -28,8 +33,8 @@ export function createPaymentPoll(check, { onTimeout = () => {}, isAuthenticated
       if (run !== generation) return
       if (done) { stop(); return }
       if (Date.now() >= deadline) { onTimeout(); stop(); return }
-      const delay = [3000, 5000, 10000, 15000][Math.min(attempt++, 3)]
-      timer = setTimeout(tick, Math.min(delay, deadline - Date.now()))
+      const delay = delays[Math.min(attempt++, delays.length - 1)]
+      timer = setTimeout(tick, Math.min(delay, Math.max(0, deadline - Date.now())))
     }
     tick()
   }
