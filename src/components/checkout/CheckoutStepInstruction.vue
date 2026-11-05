@@ -13,7 +13,7 @@
     <div class="order-summary">
       <div class="order-plan-name">
         <i :class="planIcon"></i>
-        <span>{{ planName }} Plan</span>
+        <span>{{ displayPlanName }}</span>
       </div>
       <div class="order-price">
         <div v-if="discountedPrice != null" class="discount-price-wrap">
@@ -100,6 +100,10 @@
       </div>
       <p v-if="countdown > 0" class="awaiting-timer">Selesaikan dalam <span class="timer-value">{{ formattedCountdown }}</span></p>
       <p v-else class="awaiting-timer text-muted">Cek status aktivasi paket sebelum membuat pembayaran lain.</p>
+
+      <button class="btn-check-status" @click="$emit('check-status')">
+        <i class="fa-solid fa-rotate-right"></i> Cek Ulang Status
+      </button>
     </div>
 
     <button class="btn-outline" @click="$emit('back')">
@@ -128,9 +132,14 @@ const props = defineProps({
   expiryTime: Number
 })
 
-defineEmits(['back'])
+defineEmits(['back', 'check-status'])
 
 const formatNumber = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+
+const displayPlanName = computed(() => {
+  const name = props.planName || 'Pro'
+  return name.toLowerCase().endsWith('plan') ? name : `${name} Plan`
+})
 
 const methodLabel = computed(() => {
   if (props.selectedMethod === 'doku' || props.paymentDetails?.payment_link) return 'DOKU Checkout'

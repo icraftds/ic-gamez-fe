@@ -28,8 +28,6 @@
         </div>
       </div>
 
-      <p v-if="pollingMessage" role="status">{{ pollingMessage }}</p>
-      <button v-if="currentStep === 2" class="btn-outline" @click="startPolling">Cek ulang pembayaran</button>
       <!-- Main Card -->
       <div class="checkout-card">
         <Transition name="fade-slide" mode="out-in">
@@ -56,6 +54,7 @@
             :discountedPrice="discountedPrice"
             :expiryTime="expiryTime"
             @back="goBackToSelection"
+            @check-status="startPolling"
           />
 
           <CheckoutStepSuccess

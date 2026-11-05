@@ -7,7 +7,7 @@
     <div class="order-summary">
       <div class="order-plan-name">
         <i :class="planIcon"></i>
-        <span>{{ planName }} Plan</span>
+        <span>{{ displayPlanName }}</span>
       </div>
       <div class="order-price">
         <div v-if="discountedPrice !== null" class="discount-price-wrap">
@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '../../services/api'
 import { useUserAccount } from '../../composables/useUserAccount'
 
@@ -108,6 +108,11 @@ const props = defineProps({
 
 const emit = defineEmits(['instruction', 'success', 'processing'])
 const { userProfile } = useUserAccount()
+
+const displayPlanName = computed(() => {
+  const name = props.planName || 'Pro'
+  return name.toLowerCase().endsWith('plan') ? name : `${name} Plan`
+})
 
 const selectedMethod = ref('doku')
 const isProcessingPayment = ref(false)
