@@ -50,6 +50,8 @@
             :selectedMethod="selectedMethod"
             :planName="planName"
             :planIcon="planIcon"
+            :planSlug="planSlug"
+            :planPrice="planPrice"
             :formattedPrice="formattedPrice"
             :discountedPrice="discountedPrice"
             :expiryTime="expiryTime"
