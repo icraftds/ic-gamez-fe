@@ -39,6 +39,24 @@
     <div class="method-grid">
       <div
         class="method-card"
+        :class="{ selected: selectedMethod === 'doku' }"
+        @click="selectedMethod = 'doku'"
+      >
+        <div class="method-radio">
+          <div class="method-radio-inner"></div>
+        </div>
+        <div class="method-icon doku">
+          <i class="fa-solid fa-credit-card"></i>
+        </div>
+        <div class="method-info">
+          <div class="method-name">DOKU Checkout (Semua Metode)</div>
+          <div class="method-desc">QRIS, Virtual Account Bank (BCA, Mandiri, BRI, BNI), E-Wallet, Kartu Kredit</div>
+        </div>
+        <div class="method-badge">Lengkap & Instan</div>
+      </div>
+
+      <div
+        class="method-card"
         :class="{ selected: selectedMethod === 'qris' }"
         @click="selectedMethod = 'qris'"
       >
@@ -49,12 +67,11 @@
           <i class="fa-solid fa-qrcode"></i>
         </div>
         <div class="method-info">
-          <div class="method-name">QRIS</div>
-          <div class="method-desc">Scan QR menggunakan e-wallet / m-banking</div>
+          <div class="method-name">QRIS (DOKU)</div>
+          <div class="method-desc">Scan via GoPay, OVO, Dana, ShopeePay, BCA, dll</div>
         </div>
         <div class="method-badge">Instan</div>
       </div>
-
     </div>
 
     <div v-if="paymentError" class="payment-error-message">
@@ -78,17 +95,21 @@
 <script setup>
 import { ref } from 'vue'
 import api from '../../services/api'
+import { useUserAccount } from '../../composables/useUserAccount'
 
 const props = defineProps({
   planName: String,
   planIcon: String,
   formattedPrice: String,
-  planSlug: String
+  planSlug: String,
+  planId: Number,
+  rawPrice: Number
 })
 
 const emit = defineEmits(['instruction', 'success', 'processing'])
+const { userProfile } = useUserAccount()
 
-const selectedMethod = ref('qris')
+const selectedMethod = ref('doku')
 const isProcessingPayment = ref(false)
 const couponCode = ref('')
 const isValidatingCoupon = ref(false)
@@ -148,8 +169,33 @@ const goToInstruction = async () => {
       return
     }
 
-    if (tx.payment_method === 'payment_link' && tx.payment_details?.payment_link) {
-      window.location.href = tx.payment_details.payment_link
+    const paymentLink = tx.payment_details?.payment_link || tx.payment_url || tx.checkout_url
+    const expiryTime = tx.payment_details?.expires_at
+      ? new Date(tx.payment_details.expires_at).getTime()
+      : Date.now() + 30 * 60 * 1000
+
+    // Simpan informasi checkout ke localStorage agar persist saat redirect / refresh
+    localStorage.setItem('ic_pending_checkout', JSON.stringify({
+      planSlug: props.planSlug,
+      planName: props.planName,
+      planIcon: props.planIcon,
+      planPrice: props.rawPrice,
+      discountedPrice: discountedPrice.value,
+      paymentDetails: {
+        ...(tx.payment_details || {}),
+        order_id: tx.order_id,
+        amount: tx.amount,
+        payment_link: paymentLink,
+      },
+      selectedMethod: selectedMethod.value,
+      expiryTime: expiryTime,
+      userId: userProfile.value?.id,
+      savedAt: Date.now()
+    }))
+
+    if (paymentLink) {
+      localStorage.setItem('ic_returning_from_payment', 'true')
+      window.location.href = paymentLink
       return
     }
 

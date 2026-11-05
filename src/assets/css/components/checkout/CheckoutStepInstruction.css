@@ -73,6 +73,109 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+/* DOKU Hosted Checkout Card */
+.doku-display {
+  margin-bottom: 35px;
+}
+.doku-card-wrapper {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+  border: 1.5px solid var(--primary);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 240, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.doku-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--white-alpha-0_1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: var(--primary);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+}
+.doku-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.doku-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-light, #e2e8f0);
+}
+.doku-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted, #94a3b8);
+  max-width: 420px;
+  line-height: 1.5;
+}
+.doku-order-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--white-alpha-0_05);
+  border: 1px solid var(--white-alpha-0_1);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  align-self: center;
+  margin-top: 4px;
+}
+.doku-order-label {
+  color: var(--text-muted, #94a3b8);
+}
+.doku-order-id {
+  color: var(--primary);
+  font-family: 'Fira Code', monospace;
+  font-weight: 700;
+}
+.doku-pay-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 380px;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00f0ff 0%, #7c3aed 100%);
+  color: #fff;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+}
+.doku-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.45);
+}
+.doku-note {
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+  max-width: 400px;
+  text-align: center;
+}
+.doku-note i {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
 /* Premium QR Display */
 .qr-display {
   display: flex;

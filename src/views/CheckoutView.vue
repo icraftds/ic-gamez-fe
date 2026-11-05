@@ -134,7 +134,7 @@ const onInstruction = (data) => {
     paymentDetails: paymentDetails.value,
     selectedMethod: selectedMethod.value,
     expiryTime: expiryTime.value,
-    userId: userProfile.value.id,
+    userId: userProfile.value?.id,
     savedAt: Date.now()
   }))
   
@@ -169,10 +169,10 @@ const pollingMessage = ref('')
 const poll = createPaymentPoll(async (isCurrent) => {
   const [user, subscription] = await Promise.all([fetchUser(true), api.get('/subscription')])
   if (!isCurrent()) return false
-  const active = subscription.data.data
-  const baseline = paymentDetails.value.baselineSubscription
+  const active = subscription.data?.data
+  const baseline = paymentDetails.value?.baselineSubscription
   const newGrant = !baseline || (active && (active.id !== baseline.id || active.expires_at !== baseline.expires_at))
-  if (newGrant && user && isPremiumUser.value && currentPlan.value === planSlug.value && active?.status === 'active') {
+  if ((newGrant || !baseline) && user && isPremiumUser.value && currentPlan.value === planSlug.value && active?.status === 'active') {
     await fetchWallet()
     await handlePaymentSuccess()
     return true
@@ -195,13 +195,13 @@ onMounted(async () => {
   if (saved) {
     try {
       const data = JSON.parse(saved)
-      if (data.userId === userProfile.value.id) {
+      if (!data.userId || String(data.userId) === String(userProfile.value?.id)) {
         planName.value = data.planName || planName.value
         planPrice.value = data.planPrice || planPrice.value
         planSlug.value = data.planSlug || planSlug.value
         discountedPrice.value = data.discountedPrice || null
         paymentDetails.value = data.paymentDetails || {}
-        selectedMethod.value = data.selectedMethod || 'qris'
+        selectedMethod.value = data.selectedMethod || 'doku'
         expiryTime.value = data.expiryTime
         currentStep.value = 2
       } else {
