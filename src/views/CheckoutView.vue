@@ -117,7 +117,11 @@ const onInstruction = (data) => {
   discountedPrice.value = data.discountedPrice
   
   if (!expiryTime.value) {
-    expiryTime.value = Date.now() + 15 * 60 * 1000 // 15 mins default
+    if (data.paymentDetails?.expires_at) {
+      expiryTime.value = new Date(data.paymentDetails.expires_at).getTime()
+    } else {
+      expiryTime.value = Date.now() + 15 * 60 * 1000 // 15 mins default
+    }
   }
 
   // Simpan ke local storage
