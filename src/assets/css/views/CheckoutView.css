@@ -80,7 +80,7 @@
   background: var(--glass-bg-card-0_95);
   border: 1px solid var(--white-alpha-0_15);
   border-radius: 24px;
-  padding: 40px 32px;
+  padding: 36px 30px;
   backdrop-filter: blur(20px);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
   position: relative;
@@ -167,19 +167,45 @@
   transform: translateY(-20px);
 }
 
-@media (max-width: 640px) {
-  .checkout-wrapper { padding: 80px 16px 40px; }
-  .checkout-card { padding: 24px 18px; }
-  :deep(.section-title) { font-size: 1.25rem; }
-  .step-line { width: 36px; }
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  .checkout-wrapper {
+    padding: 85px 18px 40px;
+  }
+  .checkout-card {
+    padding: 24px 18px;
+    border-radius: 20px;
+  }
+  .step-indicator {
+    margin-bottom: 28px;
+  }
+  .step-line {
+    width: 40px;
+  }
 }
 
 @media (max-width: 480px) {
   .checkout-wrapper {
-    padding: 80px 16px 40px;
+    padding: 75px 12px 30px;
   }
   .checkout-card {
-    padding: 24px 16px;
+    padding: 18px 12px;
+    border-radius: 16px;
+  }
+  .checkout-breadcrumb {
+    margin-bottom: 18px;
+    font-size: 0.78rem;
+  }
+  .step-indicator {
+    margin-bottom: 20px;
+  }
+  .step-dot {
+    width: 30px;
+    height: 30px;
+    font-size: 0.78rem;
+  }
+  .step-line {
+    width: 24px;
   }
 }
 
@@ -208,4 +234,3 @@ body.light-mode .step-line {
 body.light-mode :deep(.section-title) {
   color: #0f172a;
 }
-

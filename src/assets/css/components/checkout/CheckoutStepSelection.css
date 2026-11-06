@@ -88,6 +88,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  flex-wrap: wrap;
 }
 .plan-icon-wrap {
   width: 48px;
@@ -104,6 +105,7 @@
 }
 .plan-meta-info {
   flex: 1;
+  min-width: 120px;
 }
 .plan-title {
   font-size: 1.15rem;
@@ -145,6 +147,7 @@
   gap: 10px;
   font-size: 0.84rem;
   color: var(--text-light, #e2e8f0);
+  line-height: 1.4;
 }
 .gamez-perks-list li i {
   color: #10b981;
@@ -172,11 +175,13 @@
   align-items: center;
   justify-content: center;
   font-size: 1rem;
+  flex-shrink: 0;
 }
 .account-details {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 .account-caption {
   font-size: 0.72rem;
@@ -186,6 +191,9 @@
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-light, #f1f5f9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .active-dot-indicator {
   width: 8px;
@@ -193,6 +201,7 @@
   border-radius: 50%;
   background: #10b981;
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  flex-shrink: 0;
 }
 
 /* Coupon Section */
@@ -516,10 +525,136 @@
   font-weight: 600;
 }
 
-/* Responsive Breakpoint: Mobile/Tablet Stacking */
+/* Responsive Breakpoint: Mobile & Tablet */
 @media (max-width: 900px) {
   .checkout-2col-layout {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .checkout-col-gamez,
+  .checkout-col-doku {
+    padding: 16px 14px;
+    border-radius: 16px;
+    gap: 14px;
+  }
+  .col-header {
+    margin-bottom: 12px;
+  }
+  .col-title {
+    font-size: 1.15rem;
+  }
+  .col-desc {
+    font-size: 0.8rem;
+  }
+  .gamez-plan-card {
+    padding: 14px 12px;
+    gap: 12px;
+    border-radius: 14px;
+  }
+  .plan-main-row {
+    gap: 10px;
+  }
+  .plan-icon-wrap {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+  }
+  .plan-title {
+    font-size: 1.05rem;
+  }
+  .plan-duration {
+    font-size: 0.76rem;
+  }
+  .plan-energy-pill {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+  }
+  .gamez-perks-list {
+    gap: 6px;
+    padding-top: 10px;
+  }
+  .gamez-perks-list li {
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+  .target-account-box {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  .account-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+  .account-name {
+    font-size: 0.84rem;
+  }
+  .coupon-input-wrapper {
+    padding: 3px 4px 3px 10px;
+  }
+  .coupon-input-wrapper input {
+    font-size: 0.82rem;
+  }
+  .btn-apply-coupon {
+    padding: 7px 12px;
+    font-size: 0.78rem;
+  }
+  .price-breakdown-card {
+    padding: 12px 14px;
+    gap: 6px;
+  }
+  .breakdown-row {
+    font-size: 0.82rem;
+  }
+  .breakdown-row.total .breakdown-value.highlight {
+    font-size: 1.15rem;
+  }
+  .method-card {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+  .method-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.15rem;
+  }
+  .method-name {
+    font-size: 0.88rem;
+  }
+  .method-desc {
+    font-size: 0.74rem;
+  }
+  .btn-doku-submit {
+    padding: 13px 18px;
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-col-gamez,
+  .checkout-col-doku {
+    padding: 14px 10px;
+  }
+  .method-card {
+    padding: 12px 10px;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .method-radio {
+    margin-top: 2px;
+  }
+  .method-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.64rem;
+    padding: 2px 5px;
+  }
+  .trust-pill {
+    font-size: 0.65rem;
+    padding: 2px 5px;
   }
 }

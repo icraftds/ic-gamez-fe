@@ -132,7 +132,7 @@
         >
           <div class="qr-box-wrapper">
             <div class="qr-box">
-              <qrcode-vue v-if="paymentDetails.qr_string" :value="paymentDetails.qr_string" :size="200" level="H" />
+              <qrcode-vue v-if="paymentDetails.qr_string" :value="paymentDetails.qr_string" :size="qrSize" level="H" />
               <div v-else class="qr-dummy-label">
                 <TerminalLoader size="sm" label="QR" />
               </div>
@@ -298,6 +298,13 @@ const methodIcon = computed(() => {
   if (props.selectedMethod === 'doku' || props.paymentDetails?.payment_link) return 'fa-solid fa-credit-card'
   if (props.selectedMethod === 'qris') return 'fa-solid fa-qrcode'
   return 'fa-solid fa-building-columns'
+})
+
+const qrSize = computed(() => {
+  if (typeof window !== 'undefined' && window.innerWidth < 480) {
+    return 160
+  }
+  return 180
 })
 
 const isCopied = ref(false)

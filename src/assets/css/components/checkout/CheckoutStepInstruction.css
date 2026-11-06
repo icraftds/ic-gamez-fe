@@ -88,6 +88,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  flex-wrap: wrap;
 }
 .plan-icon-wrap {
   width: 48px;
@@ -104,6 +105,7 @@
 }
 .plan-meta-info {
   flex: 1;
+  min-width: 120px;
 }
 .plan-title {
   font-size: 1.15rem;
@@ -145,6 +147,7 @@
   gap: 10px;
   font-size: 0.84rem;
   color: var(--text-light, #e2e8f0);
+  line-height: 1.4;
 }
 .gamez-perks-list li i {
   color: #10b981;
@@ -172,11 +175,13 @@
   align-items: center;
   justify-content: center;
   font-size: 1rem;
+  flex-shrink: 0;
 }
 .account-details {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 .account-caption {
   font-size: 0.72rem;
@@ -186,6 +191,9 @@
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--text-light, #f1f5f9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .active-dot-indicator {
   width: 8px;
@@ -193,6 +201,7 @@
   border-radius: 50%;
   background: #10b981;
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  flex-shrink: 0;
 }
 
 /* Price Breakdown Card */
@@ -315,11 +324,13 @@
   font-size: 1.6rem;
   color: #00f0ff;
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+  flex-shrink: 0;
 }
 .doku-info {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
 }
 .doku-title {
   font-size: 1.15rem;
@@ -332,7 +343,7 @@
   color: var(--text-muted, #94a3b8);
   max-width: 400px;
   line-height: 1.45;
-  margin: 0;
+  margin: 0 auto;
 }
 .doku-order-meta {
   display: inline-flex;
@@ -346,6 +357,8 @@
   font-size: 0.8rem;
   align-self: center;
   margin-top: 4px;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 .doku-order-label {
   color: var(--text-muted, #94a3b8);
@@ -354,6 +367,7 @@
   color: #00f0ff;
   font-family: 'Fira Code', monospace;
   font-weight: 700;
+  word-break: break-all;
 }
 .doku-pay-btn {
   display: inline-flex;
@@ -442,6 +456,11 @@
   z-index: 2;
   padding: 8px;
 }
+.qr-box canvas,
+.qr-box svg {
+  max-width: 100% !important;
+  height: auto !important;
+}
 .qr-box .qr-dummy-label {
   position: absolute;
   bottom: 8px;
@@ -505,6 +524,7 @@
   color: #00f0ff;
   font-weight: 800;
   letter-spacing: 2px;
+  word-break: break-all;
 }
 .va-copy-btn {
   background: rgba(255, 255, 255, 0.05);
@@ -519,6 +539,7 @@
   justify-content: center;
   transition: all 0.2s;
   font-size: 0.95rem;
+  flex-shrink: 0;
 }
 .va-copy-btn:hover {
   background: #00f0ff;
@@ -665,11 +686,155 @@
   gap: 5px;
 }
 
-/* Responsive Stacking */
+/* Responsive Breakpoint: Mobile & Tablet */
 @media (max-width: 900px) {
   .checkout-2col-layout {
-    grid-template-columns: 1fr;
-    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  /* On mobile in step 2: DOKU payment portal is shown first, order details below */
+  .checkout-col-doku {
+    order: 1;
+  }
+  .checkout-col-gamez {
+    order: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .checkout-col-gamez,
+  .checkout-col-doku {
+    padding: 16px 14px;
+    border-radius: 16px;
+    gap: 14px;
+  }
+  .col-header {
+    margin-bottom: 12px;
+  }
+  .col-title {
+    font-size: 1.15rem;
+  }
+  .col-desc {
+    font-size: 0.8rem;
+  }
+  .instruction-method-badge {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+  .gamez-plan-card {
+    padding: 14px 12px;
+    gap: 12px;
+    border-radius: 14px;
+  }
+  .plan-main-row {
+    gap: 10px;
+  }
+  .plan-icon-wrap {
+    width: 42px;
+    height: 42px;
+    font-size: 1.25rem;
+  }
+  .plan-title {
+    font-size: 1.05rem;
+  }
+  .plan-duration {
+    font-size: 0.76rem;
+  }
+  .plan-energy-pill {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+  }
+  .gamez-perks-list {
+    gap: 6px;
+    padding-top: 10px;
+  }
+  .gamez-perks-list li {
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+  .target-account-box {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  .account-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+  .account-name {
+    font-size: 0.84rem;
+  }
+  .price-breakdown-card {
+    padding: 12px 14px;
+    gap: 6px;
+  }
+  .breakdown-row {
+    font-size: 0.82rem;
+  }
+  .breakdown-row.total .breakdown-value.highlight {
+    font-size: 1.15rem;
+  }
+  .doku-card-wrapper {
+    padding: 18px 14px;
+    gap: 12px;
+  }
+  .doku-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    font-size: 1.35rem;
+  }
+  .doku-title {
+    font-size: 1.05rem;
+  }
+  .doku-desc {
+    font-size: 0.8rem;
+  }
+  .doku-pay-btn {
+    padding: 13px 18px;
+    font-size: 0.92rem;
+    width: 100%;
+  }
+  .qr-box {
+    width: 175px;
+    height: 175px;
+  }
+  .va-number-box {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .va-number-value {
+    font-size: 1.15rem;
+    letter-spacing: 1.2px;
+  }
+  .va-instructions {
+    padding: 12px;
+  }
+  .btn-check-status {
+    width: 100%;
+  }
+  .btn-cancel-checkout {
+    padding: 11px 14px;
+    font-size: 0.84rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-col-gamez,
+  .checkout-col-doku {
+    padding: 14px 10px;
+  }
+  .qr-box {
+    width: 160px;
+    height: 160px;
+  }
+  .va-number-value {
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+  }
+  .trust-pill {
+    font-size: 0.65rem;
+    padding: 2px 5px;
   }
 }
 
