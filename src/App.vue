@@ -14,7 +14,7 @@
           </transition>
         </router-view>
       </div>
-      <AppFooter v-if="!isWorkspacePage && !isAuthPage && route.name !== 'materials' && route.name !== 'notifications'" />
+      <AppFooter v-if="!isWorkspacePage && !isAuthPage && !isCheckoutPage && route.name !== 'materials' && route.name !== 'notifications'" />
     </template>
     
     <!-- Global Loading Overlay -->
@@ -56,12 +56,13 @@ onUnmounted(() => clearInterval(cooldownTimer))
 const route = useRoute()
 const isWorkspacePage = computed(() => route.name === 'lesson')
 const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
+const isCheckoutPage = computed(() => ['checkout', 'payment-success'].includes(route.name))
 const showHomeNavbar = computed(() => {
-  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials', 'profile-edit']
+  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials', 'profile-edit', 'checkout', 'payment-success']
   return !hiddenRoutes.includes(route.name)
 })
 const showFriendsSidebar = computed(() => {
-  return isLoggedIn.value && !['lesson', 'materials'].includes(route.name)
+  return isLoggedIn.value && !['lesson', 'materials', 'checkout', 'payment-success'].includes(route.name)
 })
 
 const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping } = useUserAccount()

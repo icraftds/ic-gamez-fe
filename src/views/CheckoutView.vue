@@ -3,11 +3,16 @@
     <SimpleBackground />
     
     <div class="checkout-wrapper">
-      <!-- Breadcrumb -->
-      <div class="checkout-breadcrumb">
-        <router-link to="/pricing">Paket</router-link>
-        <span class="separator"><i class="fa-solid fa-chevron-right"></i></span>
-        <span class="current">Pembayaran</span>
+      <!-- Top Navigation: Back to Pricing & Mini Brand -->
+      <div class="checkout-top-bar">
+        <button class="btn-back-pricing" @click="goBackToPricing">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Kembali ke Paket Langganan</span>
+        </button>
+        <div class="checkout-brand-mini">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>iC Game-Z</span>
+        </div>
       </div>
 
       <!-- Step Indicator -->
@@ -146,6 +151,7 @@ const goBackToSelection = () => {
   localStorage.removeItem('ic_pending_checkout')
   router.push('/pricing')
 }
+const goBackToPricing = goBackToSelection
 
 const handlePaymentSuccess = async () => {
   stopPolling()

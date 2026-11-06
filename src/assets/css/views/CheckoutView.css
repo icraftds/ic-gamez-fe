@@ -1,52 +1,78 @@
 .checkout-view {
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 16px;
 }
 
 .checkout-wrapper {
   position: relative;
   z-index: 10;
-  padding: 100px 20px 60px;
-  max-width: 1060px;
+  max-width: 1040px;
   margin: 0 auto;
   width: 100%;
-  flex: 1;
 }
 
-.checkout-breadcrumb {
+/* Top Navigation: Dedicated Back Button */
+.checkout-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.btn-back-pricing {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted, #94a3b8);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-back-pricing:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  transform: translateX(-3px);
+}
+
+.checkout-brand-mini {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 32px;
-  font-size: 0.85rem;
+  color: #00f0ff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
-.checkout-breadcrumb a {
-  color: #64748b;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.checkout-breadcrumb a:hover { color: #00f0ff; }
-.checkout-breadcrumb .separator { color: #334155; }
-.checkout-breadcrumb .current { color: #e2e8f0; font-weight: 600; }
 
 .step-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
-  margin-bottom: 40px;
+  margin-bottom: 18px;
 }
 .step-dot {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
   background: var(--white-alpha-0_05);
   border: 2px solid var(--white-alpha-0_1);
@@ -67,7 +93,7 @@
   color: #fff;
 }
 .step-line {
-  width: 60px;
+  width: 50px;
   height: 2px;
   background: var(--white-alpha-0_1);
   transition: background 0.4s ease;
@@ -79,10 +105,10 @@
 .checkout-card {
   background: var(--glass-bg-card-0_95);
   border: 1px solid var(--white-alpha-0_15);
-  border-radius: 24px;
-  padding: 36px 30px;
+  border-radius: 20px;
+  padding: 24px 22px;
   backdrop-filter: blur(20px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
   position: relative;
   overflow: hidden;
   color: var(--text-light);
@@ -91,42 +117,42 @@
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
 }
 
 :deep(.section-title) {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: var(--text-light);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 :deep(.section-subtitle) {
   color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-bottom: 32px;
-  line-height: 1.5;
+  font-size: 0.88rem;
+  margin-bottom: 24px;
+  line-height: 1.45;
 }
 :deep(.btn-primary) {
   width: 100%;
-  padding: 16px;
+  padding: 14px 20px;
   background: linear-gradient(135deg, var(--secondary), var(--primary));
   color: #fff;
   border: none;
   border-radius: 12px;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 8px 20px rgba(0, 240, 255, 0.2);
+  box-shadow: 0 6px 18px rgba(0, 240, 255, 0.2);
 }
 :deep(.btn-primary:hover:not(:disabled)) {
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(0, 240, 255, 0.35);
+  box-shadow: 0 10px 22px rgba(0, 240, 255, 0.35);
 }
 :deep(.btn-primary:disabled) {
   opacity: 0.5;
@@ -135,13 +161,13 @@
 }
 :deep(.btn-success) {
   width: 100%;
-  padding: 15px;
+  padding: 14px;
   background: linear-gradient(135deg, #10b981, #059669);
   color: #fff;
   border: none;
   border-radius: 10px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -151,7 +177,7 @@
 }
 :deep(.btn-success:hover) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
 .fade-slide-enter-active,
@@ -169,43 +195,50 @@
 
 /* Responsive Breakpoints */
 @media (max-width: 768px) {
-  .checkout-wrapper {
-    padding: 85px 18px 40px;
+  .checkout-view {
+    padding: 20px 12px;
+    justify-content: flex-start;
   }
   .checkout-card {
-    padding: 24px 18px;
-    border-radius: 20px;
+    padding: 18px 14px;
+    border-radius: 18px;
   }
   .step-indicator {
-    margin-bottom: 28px;
+    margin-bottom: 16px;
   }
   .step-line {
-    width: 40px;
+    width: 36px;
   }
 }
 
 @media (max-width: 480px) {
-  .checkout-wrapper {
-    padding: 75px 12px 30px;
+  .checkout-view {
+    padding: 16px 10px;
+  }
+  .checkout-top-bar {
+    margin-bottom: 12px;
+  }
+  .btn-back-pricing {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+  .checkout-brand-mini {
+    font-size: 0.85rem;
   }
   .checkout-card {
-    padding: 18px 12px;
+    padding: 16px 10px;
     border-radius: 16px;
   }
-  .checkout-breadcrumb {
-    margin-bottom: 18px;
-    font-size: 0.78rem;
-  }
   .step-indicator {
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
   .step-dot {
-    width: 30px;
-    height: 30px;
-    font-size: 0.78rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
   }
   .step-line {
-    width: 24px;
+    width: 22px;
   }
 }
 
@@ -217,8 +250,20 @@ body.light-mode .checkout-card {
   color: #0f172a;
 }
 
-body.light-mode .checkout-breadcrumb .current {
-  color: #0f172a;
+body.light-mode .btn-back-pricing {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #475569;
+}
+
+body.light-mode .btn-back-pricing:hover {
+  background: rgba(2, 132, 199, 0.08);
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+body.light-mode .checkout-brand-mini {
+  color: #0284c7;
 }
 
 body.light-mode .step-dot {
