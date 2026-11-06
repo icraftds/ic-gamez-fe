@@ -50,7 +50,7 @@
         <!-- Price Breakdown -->
         <div class="price-breakdown-card">
           <div class="breakdown-row">
-            <span class="breakdown-label">Harga Paket</span>
+            <span class="breakdown-label">Harga Paket <span class="breakdown-plan-tag">({{ displayPlanName }})</span></span>
             <span class="breakdown-value">Rp {{ formattedPrice }}</span>
           </div>
           <div v-if="discountAmount > 0" class="breakdown-row discount">
@@ -70,15 +70,33 @@
         </button>
       </div>
 
-      <!-- Kolom Kanan: Informasi Pembayaran DOKU -->
+      <!-- Kolom Kanan: Informasi Pembayaran -->
       <div class="checkout-col-doku">
         <div class="col-header">
           <div class="gateway-tag">
             <i class="fa-solid fa-shield-halved"></i>
-            <span>DOKU Payment Gateway</span>
+            <span>Payment Gateway</span>
           </div>
           <h2 class="col-title">Instruksi Pembayaran</h2>
           <p class="col-desc">Selesaikan pembayaran sebelum batas waktu berakhir.</p>
+        </div>
+
+        <!-- Stopwatch & Status Pembayaran (Disimpan di paling atas) -->
+        <div class="payment-timer-topbar" :class="{ 'is-expired': countdown === 0 }">
+          <div class="timer-main-content">
+            <div class="timer-icon-wrap">
+              <i class="fa-solid fa-stopwatch" :class="{ 'fa-spin-pulse': countdown > 0 }"></i>
+            </div>
+            <div class="timer-info">
+              <span class="timer-caption">{{ countdown > 0 ? 'Batas Waktu Pembayaran' : 'Waktu Habis' }}</span>
+              <span class="timer-digits">{{ formattedCountdown }}</span>
+            </div>
+          </div>
+          <div class="timer-status-badge">
+            <span v-if="countdown > 0" class="pulse-dot"></span>
+            <i v-else class="fa-solid fa-circle-xmark text-danger"></i>
+            <span class="status-text">{{ countdown > 0 ? 'Menunggu Pembayaran...' : 'Transaksi Kedaluwarsa' }}</span>
+          </div>
         </div>
 
         <!-- Method Badge -->
@@ -87,7 +105,7 @@
           <span>{{ methodLabel }}</span>
         </div>
 
-        <!-- DOKU Hosted Checkout Display -->
+        <!-- Hosted Checkout Display -->
         <div
           v-if="paymentDetails.payment_link && !paymentDetails.qr_string && !paymentDetails.va_number"
           class="doku-display"
@@ -98,9 +116,9 @@
               <i class="fa-solid fa-shield-halved"></i>
             </div>
             <div class="doku-info">
-              <h3 class="doku-title">Pembayaran DOKU Checkout</h3>
+              <h3 class="doku-title">Pembayaran Online Otomatis</h3>
               <p class="doku-desc">
-                Selesaikan transaksi Anda melalui portal resmi DOKU. Tersedia metode QRIS, Virtual Account (BCA, Mandiri, BRI, BNI), E-Wallet, dan Kartu Kredit.
+                Selesaikan transaksi Anda melalui portal pembayaran resmi. Tersedia metode QRIS, Virtual Account (BCA, Mandiri, BRI, BNI), E-Wallet, dan Kartu Kredit.
               </p>
               <div v-if="paymentDetails.order_id" class="doku-order-meta">
                 <span class="doku-order-label">Nomor Invoice:</span>
@@ -114,7 +132,7 @@
               class="btn-primary doku-pay-btn"
             >
               <i class="fa-solid fa-arrow-up-right-from-square"></i>
-              <span>Buka Halaman Pembayaran DOKU</span>
+              <span>Buka Halaman Pembayaran</span>
             </a>
             <p class="doku-note">
               <i class="fa-solid fa-circle-info"></i>
@@ -159,30 +177,18 @@
           </ol>
         </div>
 
-        <!-- Awaiting Status Card -->
-        <div class="awaiting-section">
-          <div v-if="countdown > 0" class="awaiting-pulse">
-            <span class="pulse-dot"></span>
-            <span>Menunggu Pembayaran...</span>
-          </div>
-          <div v-else class="awaiting-pulse expired-text">
-            <i class="fa-solid fa-circle-xmark"></i>
-            <span>Waktu Pembayaran Habis</span>
-          </div>
-          <p v-if="countdown > 0" class="awaiting-timer">
-            Selesaikan dalam <span class="timer-value">{{ formattedCountdown }}</span>
-          </p>
-          <p v-else class="awaiting-timer text-muted">
-            Batas waktu pembayaran telah habis. Silakan batalkan transaksi untuk memilih paket baru.
-          </p>
-
+        <!-- Actions: Cek Ulang Status Pembayaran (di bawah payment box) -->
+        <div class="payment-actions-bottom">
           <button class="btn-check-status" @click="$emit('check-status')">
             <i class="fa-solid fa-rotate-right"></i>
             <span>Cek Ulang Status Pembayaran</span>
           </button>
+          <p v-if="countdown === 0" class="expired-alert-note">
+            <i class="fa-solid fa-triangle-exclamation"></i> Batas waktu pembayaran telah habis. Silakan batalkan transaksi untuk memilih paket baru.
+          </p>
         </div>
 
-        <!-- DOKU Trust Info -->
+        <!-- Trust Info -->
         <div class="doku-trust-card">
           <div class="trust-header">
             <i class="fa-solid fa-lock"></i>
@@ -284,13 +290,13 @@ const discountAmount = computed(() => {
 })
 
 const methodLabel = computed(() => {
-  if (props.selectedMethod === 'doku' || props.paymentDetails?.payment_link) return 'DOKU Checkout'
-  if (props.selectedMethod === 'qris') return 'QRIS (DOKU)'
+  if (props.selectedMethod === 'doku' || props.paymentDetails?.payment_link) return 'Pembayaran Otomatis'
+  if (props.selectedMethod === 'qris') return 'QRIS'
   if (props.selectedMethod === 'va_bca' || props.selectedMethod === 'bca_va') return 'Virtual Account BCA'
   if (props.selectedMethod === 'va_bni' || props.selectedMethod === 'bni_va') return 'Virtual Account BNI'
   if (props.selectedMethod === 'va_bri' || props.selectedMethod === 'bri_va') return 'Virtual Account BRI'
   if (props.selectedMethod === 'va_mandiri' || props.selectedMethod === 'mandiri_va') return 'Virtual Account Mandiri'
-  return 'DOKU Payment'
+  return 'Pembayaran Online'
 })
 
 const methodIcon = computed(() => {

@@ -9,7 +9,7 @@
           <TerminalLoader size="lg" label="verifikasi pembayaran" />
           <h2 class="loading-title">Memverifikasi Pembayaran</h2>
           <p class="loading-subtitle">
-            Mohon tunggu sebentar. Kami sedang menyinkronkan status dengan sistem DOKU dan bank.
+            Mohon tunggu sebentar. Kami sedang menyinkronkan status dengan sistem pembayaran dan bank.
           </p>
 
           <div class="loading-actions">

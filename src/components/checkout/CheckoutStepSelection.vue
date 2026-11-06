@@ -77,7 +77,7 @@
         <!-- Price Breakdown -->
         <div class="price-breakdown-card">
           <div class="breakdown-row">
-            <span class="breakdown-label">Harga Paket</span>
+            <span class="breakdown-label">Harga Paket <span class="breakdown-plan-tag">({{ displayPlanName }})</span></span>
             <span class="breakdown-value">Rp {{ formattedPrice }}</span>
           </div>
           <div v-if="discountAmount > 0" class="breakdown-row discount">
@@ -92,15 +92,15 @@
         </div>
       </div>
 
-      <!-- Kolom Kanan: Informasi Pembayaran DOKU -->
+      <!-- Kolom Kanan: Informasi Pembayaran -->
       <div class="checkout-col-doku">
         <div class="col-header">
           <div class="gateway-tag">
             <i class="fa-solid fa-shield-halved"></i>
-            <span>DOKU Payment Gateway</span>
+            <span>Payment Gateway</span>
           </div>
           <h2 class="col-title">Metode Pembayaran</h2>
-          <p class="col-desc">Pilih channel pembayaran resmi yang didukung DOKU.</p>
+          <p class="col-desc">Pilih channel pembayaran resmi yang tersedia.</p>
         </div>
 
         <!-- Method Selection Grid -->
@@ -117,7 +117,7 @@
               <i class="fa-solid fa-credit-card"></i>
             </div>
             <div class="method-info">
-              <div class="method-name">DOKU Checkout</div>
+              <div class="method-name">Pembayaran Otomatis</div>
               <div class="method-desc">QRIS, VA Bank (BCA, Mandiri, BRI, BNI), E-Wallet & Kartu</div>
             </div>
             <div class="method-badge">Semua Metode</div>
@@ -135,21 +135,21 @@
               <i class="fa-solid fa-qrcode"></i>
             </div>
             <div class="method-info">
-              <div class="method-name">QRIS (DOKU)</div>
+              <div class="method-name">QRIS</div>
               <div class="method-desc">Scan via GoPay, OVO, Dana, ShopeePay, BCA mobile, dll</div>
             </div>
             <div class="method-badge">Instan</div>
           </div>
         </div>
 
-        <!-- DOKU Trust & Security Info -->
+        <!-- Trust & Security Info -->
         <div class="doku-trust-card">
           <div class="trust-header">
             <i class="fa-solid fa-lock"></i>
             <span>Jaminan Keamanan Transaksi</span>
           </div>
           <p class="trust-desc">
-            Seluruh transaksi diproses secara aman dan terenkripsi oleh DOKU Payment Gateway berlisensi Bank Indonesia.
+            Seluruh transaksi diproses secara aman dan terenkripsi berlisensi Bank Indonesia.
           </p>
           <div class="trust-badges-row">
             <div class="trust-pill"><i class="fa-solid fa-shield-check"></i> 256-bit SSL</div>
@@ -169,14 +169,14 @@
             :disabled="!selectedMethod || isProcessingPayment"
             @click="goToInstruction"
           >
-            <TerminalLoader v-if="isProcessingPayment" variant="inline" label="ke DOKU" />
+            <TerminalLoader v-if="isProcessingPayment" variant="inline" label="Memproses" />
             <template v-else>
-              <span>Lanjutkan Pembayaran ke DOKU</span>
+              <span>Lanjutkan Pembayaran</span>
               <i class="fa-solid fa-arrow-right"></i>
             </template>
           </button>
           <p class="doku-terms-note">
-            Dengan menekan tombol di atas, Anda akan dialihkan ke portal pembayaran resmi DOKU.
+            Dengan menekan tombol di atas, Anda akan dialihkan ke portal pembayaran resmi.
           </p>
         </div>
       </div>
