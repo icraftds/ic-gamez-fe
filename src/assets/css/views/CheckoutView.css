@@ -47,17 +47,6 @@
   transform: translateX(-3px);
 }
 
-.checkout-brand-mini {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #00f0ff;
-  font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
 .step-indicator {
   display: flex;
   align-items: center;
@@ -222,9 +211,6 @@
     padding: 6px 12px;
     font-size: 0.78rem;
   }
-  .checkout-brand-mini {
-    font-size: 0.85rem;
-  }
   .checkout-card {
     padding: 16px 10px;
     border-radius: 16px;
@@ -259,10 +245,6 @@ body.light-mode .btn-back-pricing {
 body.light-mode .btn-back-pricing:hover {
   background: rgba(2, 132, 199, 0.08);
   border-color: #0284c7;
-  color: #0284c7;
-}
-
-body.light-mode .checkout-brand-mini {
   color: #0284c7;
 }
 

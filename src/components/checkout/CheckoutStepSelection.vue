@@ -4,8 +4,7 @@
       <!-- Kolom Kiri: Informasi dari Game-Z -->
       <div class="checkout-col-gamez">
         <div class="col-header">
-          <div class="brand-tag">
-            <span class="gamez-logo-text"><i class="fa-solid fa-gamepad"></i> iC Game-Z</span>
+          <div v-if="currentPlanPerks.badge" class="brand-tag">
             <span class="plan-badge-pill">{{ currentPlanPerks.badge }}</span>
           </div>
           <h2 class="col-title">Detail Langganan</h2>

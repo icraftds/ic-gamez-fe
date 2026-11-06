@@ -3,16 +3,12 @@
     <SimpleBackground />
     
     <div class="checkout-wrapper">
-      <!-- Top Navigation: Back to Pricing & Mini Brand -->
+      <!-- Top Navigation: Back to Pricing -->
       <div class="checkout-top-bar">
         <button class="btn-back-pricing" @click="goBackToPricing">
           <i class="fa-solid fa-arrow-left"></i>
           <span>Kembali ke Paket Langganan</span>
         </button>
-        <div class="checkout-brand-mini">
-          <i class="fa-solid fa-gamepad"></i>
-          <span>iC Game-Z</span>
-        </div>
       </div>
 
       <!-- Step Indicator -->
