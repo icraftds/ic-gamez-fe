@@ -103,10 +103,11 @@ const isTopicLoading = ref(false)
 const searchQuery = ref('')
 
 const filteredSections = computed(() => {
-  if (!searchQuery.value.trim()) return encyclopediaData.value
+  const baseData = (encyclopediaData.value || []).filter(section => section.topics && section.topics.length > 0)
+  if (!searchQuery.value.trim()) return baseData
   const query = searchQuery.value.trim().toLowerCase()
 
-  return encyclopediaData.value
+  return baseData
     .map(section => {
       const sectionName = section.title || section.section || ''
       const sectionMatches = sectionName.toLowerCase().includes(query)
