@@ -2,11 +2,11 @@
   <div class="article-reader" v-if="article">
     <div class="article-header">
       <div class="article-meta">
-        <span class="category"><i class="fa-solid fa-folder"></i> {{ article.category }}</span>
-        <span class="read-time"><i class="fa-regular fa-clock"></i> {{ article.readTime }}</span>
+        <span class="category"><i class="fa-solid fa-folder-open"></i> {{ article.category || 'Materi' }}</span>
+        <span class="read-time"><i class="fa-regular fa-clock"></i> {{ formattedReadTime }}</span>
       </div>
       <h1>{{ article.title }}</h1>
-      <p class="subtitle">{{ article.subtitle }}</p>
+      <p class="subtitle" v-if="article.subtitle">{{ article.subtitle }}</p>
     </div>
 
     <div class="article-body markdown-body" v-html="parsedContent">
@@ -39,6 +39,15 @@ const props = defineProps({
     type: Object,
     required: true
   }
+})
+
+const formattedReadTime = computed(() => {
+  if (!props.article) return '5 min read'
+  if (props.article.readTime) return props.article.readTime
+  if (props.article.read_time) {
+    return isNaN(props.article.read_time) ? props.article.read_time : `${props.article.read_time} min read`
+  }
+  return '5 min read'
 })
 
 const parsedContent = computed(() => {
