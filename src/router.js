@@ -178,10 +178,17 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
-router.afterEach(() => {
-  setTimeout(() => {
+router.afterEach((to) => {
+  // Auth views (login / register) dismiss authLoading explicitly via finishAuthLoading()
+  // once their component is mounted on screen so the user never gets stuck on the previous page.
+  if (!['login', 'register', 'auto-login'].includes(to.name)) {
     stopAuthLoading()
-  }, 350)
+  } else {
+    // Safety fallback in case the route view fails to mount
+    setTimeout(() => {
+      stopAuthLoading()
+    }, 2500)
+  }
 })
 
 export default router

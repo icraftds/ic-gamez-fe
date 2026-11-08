@@ -117,7 +117,7 @@
             </button>
           </div>
 
-          <div class="nav-capsule nav-login-capsule" @click="handleAuthClick('masuk')">
+          <div class="nav-capsule nav-login-capsule" @click="handleAuthClick('masuk')" @mouseenter="preloadAuth">
             <router-link to="/login" class="nav-login-link">
               Masuk / Daftar
             </router-link>
@@ -242,13 +242,19 @@ const { isLightMode, toggleTheme } = useTheme();
 const { isPremiumUser, isLoggedIn, isLoading, fetchUser, coinz, startAuthLoading } = useUserAccount();
 const { hasUnread, hasUnclaimedGifts, startPolling, stopPolling } = useNotifications();
 
+const preloadAuth = () => {
+  import("../../views/LoginView.vue");
+};
+
 const handleAuthClick = (type = 'masuk') => {
+  preloadAuth();
   startAuthLoading({
     text: type === 'daftar' ? 'Memuat pendaftaran akun' : 'Memuat autentikasi masuk'
   });
 };
 
 const handleMobileAuthClick = () => {
+  preloadAuth();
   mobileMenuOpen.value = false;
   startAuthLoading({
     text: 'Memuat autentikasi masuk'
@@ -370,6 +376,14 @@ onMounted(() => {
       document.fonts.ready.then(updatePill);
     }
   });
+
+  if (!isLoggedIn.value) {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => preloadAuth());
+    } else {
+      setTimeout(preloadAuth, 1200);
+    }
+  }
 });
 
 onUnmounted(() => {

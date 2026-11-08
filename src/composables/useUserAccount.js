@@ -26,8 +26,10 @@ const isAuthLoading = ref(false)
 const authLoadingLabel = ref('autentikasi')
 const authLoadingText = ref('')
 const activeBorderId = ref(null)
+let authLoadingStartedAt = 0
 
 export function startAuthLoading(options = {}) {
+  authLoadingStartedAt = Date.now()
   isAuthLoading.value = true
   if (typeof options === 'string') {
     if (options.startsWith('Memuat') || options.startsWith('Menghubungkan') || options.startsWith('Mengarahkan') || options.startsWith('Memproses')) {
@@ -47,6 +49,15 @@ export function stopAuthLoading() {
   isAuthLoading.value = false
   authLoadingText.value = ''
   authLoadingLabel.value = 'autentikasi'
+}
+
+export function finishAuthLoading(minDuration = 450) {
+  if (!isAuthLoading.value) return
+  const elapsed = Date.now() - authLoadingStartedAt
+  const remaining = Math.max(0, minDuration - elapsed)
+  setTimeout(() => {
+    stopAuthLoading()
+  }, remaining)
 }
 
 const userProfile = ref({
@@ -502,6 +513,7 @@ export function useUserAccount() {
     authLoadingText,
     startAuthLoading,
     stopAuthLoading,
+    finishAuthLoading,
     deductCredit,
     checkoutPlan,
     resetCredits,

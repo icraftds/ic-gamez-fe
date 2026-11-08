@@ -142,13 +142,19 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onUnmounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { rateLimitUntil } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useToast } from '../composables/useToast'
 
-const { register, verifyOtp, resendOtp, isLoading } = useUserAccount()
+const { register, verifyOtp, resendOtp, isLoading, finishAuthLoading } = useUserAccount()
+
+onMounted(() => {
+  nextTick(() => {
+    finishAuthLoading(450)
+  })
+})
 const { showToast } = useToast()
 const router = useRouter()
 const cooldownNow = ref(Date.now())

@@ -24,13 +24,15 @@
     <TerminalLoader v-if="isBootstrapping" variant="overlay" size="lg" label="sesi" />
 
     <!-- Auth Action / Redirect Loader (Micro-interaction for Masuk/Daftar) -->
-    <TerminalLoader
-      v-if="isAuthLoading && !isBootstrapping"
-      variant="overlay"
-      size="lg"
-      :label="authLoadingLabel"
-      :text="authLoadingText"
-    />
+    <transition name="auth-loader-fade">
+      <TerminalLoader
+        v-if="isAuthLoading && !isBootstrapping"
+        variant="overlay"
+        size="lg"
+        :label="authLoadingLabel"
+        :text="authLoadingText"
+      />
+    </transition>
 
     <AppToast />
     
@@ -170,6 +172,17 @@ onUnmounted(() => {
 .page-fade-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+/* Auth Loader Fade Transition */
+.auth-loader-fade-enter-active,
+.auth-loader-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.auth-loader-fade-enter-from,
+.auth-loader-fade-leave-to {
+  opacity: 0;
 }
 
 .route-wrapper {
