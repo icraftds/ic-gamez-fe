@@ -83,7 +83,7 @@
             <i class="fa-solid fa-bolt"></i> Tingkatkan ke Paket PRO
           </button>
           <template v-else>
-            <button class="btn-upgrade-now" @click="$router.push('/login?redirect=/materials')">
+            <button class="btn-upgrade-now" @click="handleAuthClick">
               <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk / Daftar Akun PRO
             </button>
             <button class="btn-see-pricing" @click="$router.push('/pricing')">
@@ -125,6 +125,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { marked } from 'marked'
+import { startAuthLoading } from '../../composables/useUserAccount'
 
 // Configure marked for code blocks
 marked.use({
@@ -205,6 +206,11 @@ const goToWorkspace = () => {
   if (path && chapter && lesson) {
     router.push(`/learning/${path}/lesson/${chapter}/${lesson}`)
   }
+}
+
+const handleAuthClick = () => {
+  startAuthLoading({ text: 'Memuat autentikasi masuk' })
+  router.push('/login?redirect=/materials')
 }
 </script>
 

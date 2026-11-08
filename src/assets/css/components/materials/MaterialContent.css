@@ -317,6 +317,11 @@
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
 }
 
+.btn-upgrade-now:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+}
+
 .btn-see-pricing {
   background: var(--glass-bg-card-0_8);
   border: 1px solid var(--glass-border);
@@ -327,6 +332,10 @@
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.btn-see-pricing:active {
+  transform: scale(0.96);
 }
 
 .btn-see-pricing:hover {

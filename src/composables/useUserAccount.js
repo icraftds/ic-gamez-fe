@@ -22,7 +22,32 @@ const currentPlan = ref('free')
 const isLoggedIn = ref(!!authIdentity())
 const isLoading = ref(false)
 const isBootstrapping = ref(true)
+const isAuthLoading = ref(false)
+const authLoadingLabel = ref('autentikasi')
+const authLoadingText = ref('')
 const activeBorderId = ref(null)
+
+export function startAuthLoading(options = {}) {
+  isAuthLoading.value = true
+  if (typeof options === 'string') {
+    if (options.startsWith('Memuat') || options.startsWith('Menghubungkan') || options.startsWith('Mengarahkan') || options.startsWith('Memproses')) {
+      authLoadingText.value = options
+      authLoadingLabel.value = ''
+    } else {
+      authLoadingLabel.value = options
+      authLoadingText.value = ''
+    }
+  } else {
+    authLoadingLabel.value = options.label || 'autentikasi'
+    authLoadingText.value = options.text || ''
+  }
+}
+
+export function stopAuthLoading() {
+  isAuthLoading.value = false
+  authLoadingText.value = ''
+  authLoadingLabel.value = 'autentikasi'
+}
 
 const userProfile = ref({
   id: null,
@@ -472,6 +497,11 @@ export function useUserAccount() {
     maxCredits,
     isPremiumUser,
     currentPlan,
+    isAuthLoading,
+    authLoadingLabel,
+    authLoadingText,
+    startAuthLoading,
+    stopAuthLoading,
     deductCredit,
     checkoutPlan,
     resetCredits,

@@ -117,7 +117,7 @@
             </button>
           </div>
 
-          <div class="nav-capsule nav-login-capsule">
+          <div class="nav-capsule nav-login-capsule" @click="handleAuthClick('masuk')">
             <router-link to="/login" class="nav-login-link">
               Masuk / Daftar
             </router-link>
@@ -217,8 +217,8 @@
             </div>
           </template>
           <template v-else>
-            <div class="nav-capsule nav-login-capsule">
-              <router-link to="/login" class="nav-login-link" @click="mobileMenuOpen = false">
+            <div class="nav-capsule nav-login-capsule" @click="handleMobileAuthClick">
+              <router-link to="/login" class="nav-login-link">
                 Masuk / Daftar
               </router-link>
             </div>
@@ -239,8 +239,21 @@ import { useNotifications } from "../../composables/useNotifications";
 
 const { isLightMode, toggleTheme } = useTheme();
 
-const { isPremiumUser, isLoggedIn, isLoading, fetchUser, coinz } = useUserAccount();
+const { isPremiumUser, isLoggedIn, isLoading, fetchUser, coinz, startAuthLoading } = useUserAccount();
 const { hasUnread, hasUnclaimedGifts, startPolling, stopPolling } = useNotifications();
+
+const handleAuthClick = (type = 'masuk') => {
+  startAuthLoading({
+    text: type === 'daftar' ? 'Memuat pendaftaran akun' : 'Memuat autentikasi masuk'
+  });
+};
+
+const handleMobileAuthClick = () => {
+  mobileMenuOpen.value = false;
+  startAuthLoading({
+    text: 'Memuat autentikasi masuk'
+  });
+};
 
 const formatShortCoinz = (val) => {
   if (val === null || val === undefined) return '—';

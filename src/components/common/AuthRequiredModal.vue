@@ -31,11 +31,11 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn-register" @click="$emit('register')">
+          <button class="btn-register" @click="handleRegister">
             <i class="fa-solid fa-user-plus"></i>
             Buat Akun Gratis
           </button>
-          <button class="btn-login" @click="$emit('login')">
+          <button class="btn-login" @click="handleLogin">
             <i class="fa-solid fa-right-to-bracket"></i>
             Login
           </button>
@@ -50,6 +50,8 @@
 </template>
 
 <script setup>
+import { startAuthLoading } from '../../composables/useUserAccount'
+
 defineProps({
   isOpen: {
     type: Boolean,
@@ -61,7 +63,17 @@ defineProps({
   }
 })
 
-defineEmits(['close', 'login', 'register'])
+const emit = defineEmits(['close', 'login', 'register'])
+
+const handleRegister = () => {
+  startAuthLoading({ text: 'Memuat pendaftaran akun' })
+  emit('register')
+}
+
+const handleLogin = () => {
+  startAuthLoading({ text: 'Memuat autentikasi masuk' })
+  emit('login')
+}
 </script>
 
 <style scoped src="../../assets/css/components/common/AuthRequiredModal.css"></style>

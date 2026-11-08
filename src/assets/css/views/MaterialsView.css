@@ -131,6 +131,10 @@
   transform: translateY(-1px);
 }
 
+.auth-btn:active {
+  transform: scale(0.95);
+}
+
 .docs-layout {
   display: flex;
   flex: 1;

@@ -36,7 +36,7 @@
           <UserProfileDropdown />
         </template>
         <template v-else>
-          <button class="auth-btn" @click="$router.push('/login?redirect=/materials')">Masuk/Daftar</button>
+          <button class="auth-btn" @click="handleAuthClick">Masuk/Daftar</button>
         </template>
       </div>
     </div>
@@ -87,7 +87,12 @@ import { useUserAccount } from '../composables/useUserAccount'
 
 const router = useRouter()
 const { materials, meta, isLoading, selectedTier, searchQuery, fetchMaterials, getPathById, getChapterById, getLessonById } = useMaterials()
-const { isLoggedIn, isPremiumUser } = useUserAccount()
+const { isLoggedIn, isPremiumUser, startAuthLoading } = useUserAccount()
+
+const handleAuthClick = () => {
+  startAuthLoading({ text: 'Memuat autentikasi masuk' })
+  router.push('/login?redirect=/materials')
+}
 
 const activePathId = ref(null)
 const activeChapterId = ref(null)

@@ -1,4 +1,5 @@
 import { ssoEnabled, loadSsoSession } from './services/sso'
+import { startAuthLoading, stopAuthLoading } from './composables/useUserAccount'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 
@@ -143,6 +144,14 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
+  if (['login', 'register', 'auto-login'].includes(to.name)) {
+    if (to.name === 'register') {
+      startAuthLoading({ text: 'Memuat pendaftaran akun' })
+    } else {
+      startAuthLoading({ text: 'Memuat autentikasi masuk' })
+    }
+  }
+
   if (ssoEnabled) {
     if (['login', 'register', 'auto-login'].includes(to.name)) {
       const target = typeof to.query.redirect === 'string' ? to.query.redirect : '/dashboard'
@@ -152,6 +161,7 @@ router.beforeEach(async (to, from, next) => {
     if (to.meta.requiresAuth) {
       try {
         if (!await loadSsoSession()) {
+          startAuthLoading({ text: 'Memuat autentikasi masuk' })
           window.location.assign('/auth/start?return_to=' + encodeURIComponent(to.fullPath))
           return next(false)
         }
@@ -161,10 +171,17 @@ router.beforeEach(async (to, from, next) => {
   }
   const token = localStorage.getItem('auth_token')
   if (to.meta.requiresAuth && !token) {
+    startAuthLoading({ text: 'Memuat autentikasi masuk' })
     next('/login')
   } else {
     next()
   }
+})
+
+router.afterEach(() => {
+  setTimeout(() => {
+    stopAuthLoading()
+  }, 350)
 })
 
 export default router

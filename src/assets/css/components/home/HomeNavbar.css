@@ -435,6 +435,20 @@ body:not(.light-mode) .nav-coinz-val {
 /* Guest Login Capsule */
 .nav-login-capsule {
   padding: 0 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-login-capsule:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.18);
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+.nav-login-capsule:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 240, 255, 0.25);
 }
 
 .nav-login-link {
@@ -442,7 +456,14 @@ body:not(.light-mode) .nav-coinz-val {
   font-weight: 600;
   font-size: 0.9rem;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-login-link:active {
+  transform: scale(0.96);
 }
 
 .nav-login-link:hover {

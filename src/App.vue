@@ -22,6 +22,16 @@
 
     <!-- Initial App Loader for Session Bootstrap -->
     <TerminalLoader v-if="isBootstrapping" variant="overlay" size="lg" label="sesi" />
+
+    <!-- Auth Action / Redirect Loader (Micro-interaction for Masuk/Daftar) -->
+    <TerminalLoader
+      v-if="isAuthLoading && !isBootstrapping"
+      variant="overlay"
+      size="lg"
+      :label="authLoadingLabel"
+      :text="authLoadingText"
+    />
+
     <AppToast />
     
     <!-- Global WIP Modal -->
@@ -65,7 +75,7 @@ const showFriendsSidebar = computed(() => {
   return isLoggedIn.value && !['lesson', 'materials', 'checkout', 'payment-success', 'cheatsheet-reader'].includes(route.name)
 })
 
-const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping } = useUserAccount()
+const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping, isAuthLoading, authLoadingLabel, authLoadingText } = useUserAccount()
 const { isPreparingLesson } = useLearningPaths()
 const { showWipModal } = useWipModal()
 const { isLightMode, toggleTheme } = useTheme()
