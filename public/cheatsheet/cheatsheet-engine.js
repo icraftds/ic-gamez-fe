@@ -3,13 +3,25 @@
    Shared Engine for Theme, Sidebar, Copy Toast, Search, Favorites & Quiz
    ========================================================================== */
 
+// Immediately detect if embedded inside GameZ iframe or embed param
+(function checkEmbedded() {
+  const isEmbedded = (window.self !== window.top) || (window.location.search.indexOf('embed=1') !== -1);
+  if (isEmbedded) {
+    if (document.documentElement) {
+      document.documentElement.classList.add('is-embedded');
+    }
+    if (document.body) {
+      document.body.classList.add('is-embedded');
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        if (document.body) document.body.classList.add('is-embedded');
+      });
+    }
+  }
+})();
+
 function setupCheatsheetPage({ catalog = [], questions = [] }) {
   document.addEventListener('DOMContentLoaded', () => {
-    // Detect if embedded inside GameZ iframe
-    if (window.self !== window.top) {
-      document.body.classList.add('is-embedded');
-    }
-
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
     }
@@ -117,6 +129,9 @@ function initSharedSidebar() {
         navLinks.forEach((link) => {
           if (link.getAttribute('href') === `#${id}`) {
             link.classList.add('active');
+            if (window.innerWidth <= 860 && sidebar) {
+              link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
           } else {
             link.classList.remove('active');
           }

@@ -69,7 +69,7 @@
       <!-- 1. Akses Penuh untuk Expert -->
       <iframe
         v-if="isExpert && currentModule"
-        :src="`/cheatsheet/${currentModule.file}`"
+        :src="`/cheatsheet/${currentModule.file}?embed=1`"
         class="fullpage-cheatsheet-frame"
         title="Cheatsheet Reader Fullpage"
       ></iframe>

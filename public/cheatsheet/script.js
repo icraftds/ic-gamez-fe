@@ -3,12 +3,24 @@
    Theme Toggle, Live Search, Copy to Clipboard, ScrollSpy, Quiz Engine
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Detect if embedded inside GameZ iframe
-  if (window.self !== window.top) {
-    document.body.classList.add('is-embedded');
+// Immediately detect if embedded inside GameZ iframe or embed param
+(function checkEmbedded() {
+  const isEmbedded = (window.self !== window.top) || (window.location.search.indexOf('embed=1') !== -1);
+  if (isEmbedded) {
+    if (document.documentElement) {
+      document.documentElement.classList.add('is-embedded');
+    }
+    if (document.body) {
+      document.body.classList.add('is-embedded');
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        if (document.body) document.body.classList.add('is-embedded');
+      });
+    }
   }
+})();
 
+document.addEventListener('DOMContentLoaded', () => {
   // Initialize Lucide Icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
@@ -133,6 +145,9 @@ function initSidebar() {
         navLinks.forEach((link) => {
           if (link.getAttribute('href') === `#${id}`) {
             link.classList.add('active');
+            if (window.innerWidth <= 860 && sidebar) {
+              link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
           } else {
             link.classList.remove('active');
           }
