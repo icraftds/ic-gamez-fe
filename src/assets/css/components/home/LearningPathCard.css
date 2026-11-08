@@ -31,7 +31,11 @@
   border-top: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 28px;
   padding: 44px 48px;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5), 0 30px 60px -15px rgba(0, 0, 0, 0.85);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
+    0 4px 16px -2px rgba(0, 0, 0, 0.25),
+    0 16px 36px -6px rgba(0, 0, 0, 0.4),
+    0 32px 64px -12px rgba(0, 0, 0, 0.35);
   
   /* 2 Column Layout for Desktop */
   display: grid;
