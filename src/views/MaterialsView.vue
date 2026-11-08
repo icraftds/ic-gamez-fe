@@ -87,11 +87,10 @@ import { useUserAccount } from '../composables/useUserAccount'
 
 const router = useRouter()
 const { materials, meta, isLoading, selectedTier, searchQuery, fetchMaterials, getPathById, getChapterById, getLessonById } = useMaterials()
-const { isLoggedIn, isPremiumUser, startAuthLoading } = useUserAccount()
+const { isLoggedIn, isPremiumUser, redirectToSso } = useUserAccount()
 
 const handleAuthClick = () => {
-  startAuthLoading({ text: 'Memuat autentikasi masuk' })
-  router.push('/login?redirect=/materials')
+  redirectToSso('/materials', 'masuk')
 }
 
 const activePathId = ref(null)

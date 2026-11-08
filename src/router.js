@@ -1,5 +1,5 @@
 import { ssoEnabled, loadSsoSession } from './services/sso'
-import { startAuthLoading, stopAuthLoading } from './composables/useUserAccount'
+import { startAuthLoading, stopAuthLoading, redirectToSso } from './composables/useUserAccount'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 
@@ -145,6 +145,11 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   if (['login', 'register', 'auto-login'].includes(to.name)) {
+    if (ssoEnabled) {
+      const target = typeof to.query.redirect === 'string' ? to.query.redirect : '/dashboard'
+      redirectToSso(target, to.name === 'register' ? 'daftar' : 'masuk')
+      return next(false)
+    }
     if (to.name === 'register') {
       startAuthLoading({ text: 'Memuat pendaftaran akun' })
     } else {
@@ -153,16 +158,10 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (ssoEnabled) {
-    if (['login', 'register', 'auto-login'].includes(to.name)) {
-      const target = typeof to.query.redirect === 'string' ? to.query.redirect : '/dashboard'
-      window.location.replace('/auth/start?return_to=' + encodeURIComponent(target))
-      return next(false)
-    }
     if (to.meta.requiresAuth) {
       try {
         if (!await loadSsoSession()) {
-          startAuthLoading({ text: 'Memuat autentikasi masuk' })
-          window.location.assign('/auth/start?return_to=' + encodeURIComponent(to.fullPath))
+          redirectToSso(to.fullPath, 'masuk')
           return next(false)
         }
       } catch { return next(false) }

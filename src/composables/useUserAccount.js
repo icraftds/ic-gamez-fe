@@ -23,10 +23,20 @@ const isLoggedIn = ref(!!authIdentity())
 const isLoading = ref(false)
 const isBootstrapping = ref(true)
 const isAuthLoading = ref(false)
+const isRedirectingToSso = ref(false)
 const authLoadingLabel = ref('autentikasi')
 const authLoadingText = ref('')
 const activeBorderId = ref(null)
 let authLoadingStartedAt = 0
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      isRedirectingToSso.value = false
+      stopAuthLoading(true)
+    }
+  })
+}
 
 export function startAuthLoading(options = {}) {
   authLoadingStartedAt = Date.now()
@@ -45,7 +55,24 @@ export function startAuthLoading(options = {}) {
   }
 }
 
-export function stopAuthLoading() {
+export function redirectToSso(target = '/dashboard', type = 'masuk') {
+  isRedirectingToSso.value = true
+  startAuthLoading({
+    text: type === 'daftar' ? 'Memuat pendaftaran akun' : 'Memuat autentikasi masuk'
+  })
+
+  const returnTo = encodeURIComponent(target)
+  const ssoUrl = `/auth/start?return_to=${returnTo}`
+
+  // Direct immediately to SSO endpoint; loader remains permanently on-screen until page unloads
+  window.location.assign(ssoUrl)
+}
+
+export function stopAuthLoading(force = false) {
+  // If an SSO redirect is in progress, NEVER dismiss the loader on Game Z!
+  // The loader must stay visible until the browser arrives at SSO.
+  if (isRedirectingToSso.value && !force) return
+
   isAuthLoading.value = false
   authLoadingText.value = ''
   authLoadingLabel.value = 'autentikasi'
@@ -509,11 +536,13 @@ export function useUserAccount() {
     isPremiumUser,
     currentPlan,
     isAuthLoading,
+    isRedirectingToSso,
     authLoadingLabel,
     authLoadingText,
     startAuthLoading,
     stopAuthLoading,
     finishAuthLoading,
+    redirectToSso,
     deductCredit,
     checkoutPlan,
     resetCredits,

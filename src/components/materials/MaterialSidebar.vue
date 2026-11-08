@@ -16,9 +16,9 @@
               <router-link v-else-if="isLoggedIn" to="/pricing" class="tier-badge-pill upgrade">
                 Upgrade <i class="fa-solid fa-arrow-up-right-from-square"></i>
               </router-link>
-              <router-link v-else to="/login?redirect=/materials" class="tier-badge-pill login">
+              <a v-else href="/auth/start?return_to=%2Fmaterials" class="tier-badge-pill login" @click.prevent="handleAuthClick">
                 Masuk <i class="fa-solid fa-arrow-right"></i>
-              </router-link>
+              </a>
             </div>
             <p class="sidebar-subtitle">Dokumentasi & Modul Teori</p>
           </div>
@@ -225,6 +225,11 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { redirectToSso } from '../../composables/useUserAccount'
+
+const handleAuthClick = () => {
+  redirectToSso('/materials', 'masuk')
+}
 
 const props = defineProps({
   paths: {

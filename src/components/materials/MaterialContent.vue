@@ -125,7 +125,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { marked } from 'marked'
-import { startAuthLoading } from '../../composables/useUserAccount'
+import { redirectToSso } from '../../composables/useUserAccount'
 
 // Configure marked for code blocks
 marked.use({
@@ -209,8 +209,7 @@ const goToWorkspace = () => {
 }
 
 const handleAuthClick = () => {
-  startAuthLoading({ text: 'Memuat autentikasi masuk' })
-  router.push('/login?redirect=/materials')
+  redirectToSso('/materials', 'masuk')
 }
 </script>
 

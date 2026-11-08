@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { startAuthLoading } from '../../composables/useUserAccount'
+import { redirectToSso } from '../../composables/useUserAccount'
 
 defineProps({
   isOpen: {
@@ -66,12 +66,12 @@ defineProps({
 const emit = defineEmits(['close', 'login', 'register'])
 
 const handleRegister = () => {
-  startAuthLoading({ text: 'Memuat pendaftaran akun' })
+  redirectToSso('/dashboard', 'daftar')
   emit('register')
 }
 
 const handleLogin = () => {
-  startAuthLoading({ text: 'Memuat autentikasi masuk' })
+  redirectToSso('/dashboard', 'masuk')
   emit('login')
 }
 </script>

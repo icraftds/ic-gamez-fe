@@ -117,10 +117,10 @@
             </button>
           </div>
 
-          <div class="nav-capsule nav-login-capsule" @click="handleAuthClick('masuk')" @mouseenter="preloadAuth">
-            <router-link to="/login" class="nav-login-link">
+          <div class="nav-capsule nav-login-capsule" @click="handleAuthClick('masuk')">
+            <a href="/auth/start?return_to=%2Fdashboard" class="nav-login-link" @click.prevent="handleAuthClick('masuk')">
               Masuk / Daftar
-            </router-link>
+            </a>
           </div>
         </template>
       </div>
@@ -218,9 +218,9 @@
           </template>
           <template v-else>
             <div class="nav-capsule nav-login-capsule" @click="handleMobileAuthClick">
-              <router-link to="/login" class="nav-login-link">
+              <a href="/auth/start?return_to=%2Fdashboard" class="nav-login-link" @click.prevent="handleMobileAuthClick">
                 Masuk / Daftar
-              </router-link>
+              </a>
             </div>
           </template>
         </div>
@@ -239,26 +239,16 @@ import { useNotifications } from "../../composables/useNotifications";
 
 const { isLightMode, toggleTheme } = useTheme();
 
-const { isPremiumUser, isLoggedIn, isLoading, fetchUser, coinz, startAuthLoading } = useUserAccount();
+const { isPremiumUser, isLoggedIn, isLoading, fetchUser, coinz, redirectToSso } = useUserAccount();
 const { hasUnread, hasUnclaimedGifts, startPolling, stopPolling } = useNotifications();
 
-const preloadAuth = () => {
-  import("../../views/LoginView.vue");
-};
-
 const handleAuthClick = (type = 'masuk') => {
-  preloadAuth();
-  startAuthLoading({
-    text: type === 'daftar' ? 'Memuat pendaftaran akun' : 'Memuat autentikasi masuk'
-  });
+  redirectToSso('/dashboard', type);
 };
 
 const handleMobileAuthClick = () => {
-  preloadAuth();
   mobileMenuOpen.value = false;
-  startAuthLoading({
-    text: 'Memuat autentikasi masuk'
-  });
+  redirectToSso('/dashboard', 'masuk');
 };
 
 const formatShortCoinz = (val) => {
@@ -376,14 +366,6 @@ onMounted(() => {
       document.fonts.ready.then(updatePill);
     }
   });
-
-  if (!isLoggedIn.value) {
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(() => preloadAuth());
-    } else {
-      setTimeout(preloadAuth, 1200);
-    }
-  }
 });
 
 onUnmounted(() => {
