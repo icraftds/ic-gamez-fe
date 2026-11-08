@@ -616,206 +616,137 @@
   color: #fff;
 }
 
-/* 5. In-App Reader Modal */
-.cheat-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 7, 18, 0.94);
-  backdrop-filter: blur(16px);
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.cheat-modal-container {
-  background: #090e17;
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 1240px;
-  height: 92vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7);
-}
-
-.cheat-modal-header {
-  padding: 14px 22px;
-  background: rgba(15, 23, 42, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-shrink: 0;
-}
-
-.modal-header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.modal-header-badge {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.modal-title-wrap {
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header-title {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #f8fafc;
-  margin: 0;
-  line-height: 1.25;
-}
-
-.modal-category-sub {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-
-.modal-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.btn-modal-action {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94a3b8;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.btn-modal-action:hover {
-  background: rgba(56, 189, 248, 0.12);
-  color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.3);
-}
-
-.btn-modal-close {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #cbd5e1;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.btn-modal-close:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #f87171;
-}
-
-.cheat-modal-body {
-  flex: 1;
-  width: 100%;
-  height: calc(100% - 65px);
-  position: relative;
-  background: #090e17;
-}
-
-.cheat-modal-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
-}
-
-/* Teaser Modal */
-.cheat-modal-container.teaser-modal {
-  max-width: 500px;
-  height: auto;
-  padding: 30px 26px;
-  text-align: center;
-  border-color: rgba(245, 158, 11, 0.3);
-}
-
-.teaser-icon {
-  font-size: 2.4rem;
-  color: #fbbf24;
-  margin-bottom: 12px;
-}
-
-.teaser-title {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #f8fafc;
-  margin: 0 0 8px 0;
-}
-
-.teaser-desc {
-  color: #94a3b8;
-  font-size: 0.88rem;
-  line-height: 1.55;
-  margin: 0 0 20px 0;
-}
-
-.teaser-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
+/* Responsive Breakpoints & Clean Layout */
+@media (max-width: 1080px) {
+  .cheatsheet-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
 }
 
 @media (max-width: 768px) {
   .cheatsheet-container {
-    padding: 85px 16px 40px 16px;
+    padding: 80px 14px 40px 14px;
+  }
+
+  .vault-badge-pill {
+    font-size: 0.72rem;
+    padding: 4px 10px;
   }
 
   .vault-title {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
+    line-height: 1.25;
   }
 
-  .cheatsheet-grid {
-    grid-template-columns: 1fr;
+  .vault-desc {
+    font-size: 0.88rem;
+    line-height: 1.5;
   }
 
   .vault-controls-bar {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+  }
+
+  .vault-category-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 6px;
+    gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .vault-category-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 
   .vault-search-box {
     max-width: 100%;
+    min-width: 100%;
   }
 
-  .cheat-modal-header {
+  .vault-unlocked-banner {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 10px;
+    padding: 14px;
   }
 
-  .modal-header-actions {
+  .unlocked-stats {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: space-between;
+    font-size: 0.82rem;
+  }
+
+  .vault-paywall-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .paywall-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-upgrade-vault,
+  .btn-outline-plans {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cheatsheet-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .cheat-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cheatsheet-mode-switcher {
+    gap: 8px;
+  }
+
+  .mode-tab {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+  }
+
+  .vault-title {
+    font-size: 1.35rem;
+  }
+
+  .cheat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    border-radius: 9px;
+  }
+
+  .cheat-title {
+    font-size: 0.98rem;
+  }
+
+  .card-meta-row {
+    gap: 6px;
+  }
+
+  .meta-chip.highlight {
+    max-width: 150px;
   }
 }

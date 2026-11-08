@@ -5,18 +5,18 @@
       <div class="toolbar-left">
         <router-link to="/cheatsheet" class="btn-toolbar-back" title="Kembali ke Daftar Cheatsheet">
           <i class="fa-solid fa-arrow-left"></i>
-          <span>Kembali</span>
+          <span class="back-text">Kembali</span>
         </router-link>
         
-        <div class="toolbar-divider"></div>
+        <div class="toolbar-divider hide-mobile"></div>
 
-        <span class="toolbar-badge"><i class="fa-solid fa-crown"></i> Expert Vault</span>
+        <span class="toolbar-badge hide-tablet"><i class="fa-solid fa-crown"></i> Expert Vault</span>
 
-        <h1 class="toolbar-title" v-if="currentModule">
+        <h1 class="toolbar-title" v-if="currentModule" :title="currentModule.title">
           {{ currentModule.title }}
         </h1>
         
-        <span class="toolbar-category-pill" v-if="currentModule">
+        <span class="toolbar-category-pill hide-tablet" v-if="currentModule">
           {{ currentModule.categoryLabel }}
         </span>
       </div>
@@ -31,7 +31,7 @@
           <i class="fa-solid fa-chevron-left"></i>
         </button>
 
-        <span class="module-counter-text">
+        <span class="module-counter-text hide-mobile">
           Modul {{ currentIndex + 1 }} dari {{ totalModules }}
         </span>
 
@@ -46,9 +46,9 @@
       </div>
 
       <div class="toolbar-right" v-if="currentModule">
-        <span class="questions-chip">
+        <span class="questions-chip hide-mobile">
           <i class="fa-solid fa-clipboard-question"></i>
-          <span>{{ currentModule.questions }} Soal Latihan</span>
+          <span>{{ currentModule.questions }} Soal</span>
         </span>
 
         <a 
@@ -183,8 +183,8 @@ const goToUpgrade = () => {
 
 <style scoped>
 .cheatsheet-reader-view {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: #090e17;
@@ -196,14 +196,14 @@ const goToUpgrade = () => {
 
 /* Toolbar Header */
 .reader-toolbar {
-  height: 56px;
+  height: 54px;
   background: #0b1120;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 18px;
-  gap: 16px;
+  padding: 0 16px;
+  gap: 12px;
   flex-shrink: 0;
   z-index: 10;
 }
@@ -211,8 +211,9 @@ const goToUpgrade = () => {
 .toolbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
+  flex: 1;
 }
 
 .btn-toolbar-back {
@@ -266,6 +267,7 @@ const goToUpgrade = () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 380px;
 }
 
 .toolbar-category-pill {
@@ -283,7 +285,7 @@ const goToUpgrade = () => {
 .toolbar-center {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -324,7 +326,7 @@ const goToUpgrade = () => {
 .toolbar-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
@@ -366,7 +368,7 @@ const goToUpgrade = () => {
 .reader-main {
   flex: 1;
   width: 100%;
-  height: calc(100vh - 56px);
+  min-height: 0;
   position: relative;
   background: #0b0f19;
   overflow: hidden;
@@ -389,11 +391,13 @@ const goToUpgrade = () => {
   justify-content: center;
   padding: 24px;
   background: radial-gradient(circle at center, rgba(124, 58, 237, 0.08) 0%, rgba(9, 14, 23, 1) 70%);
+  overflow-y: auto;
 }
 
 .paywall-card-box {
   max-width: 540px;
-  background: rgba(15, 23, 42, 0.75);
+  width: 100%;
+  background: rgba(15, 23, 42, 0.85);
   border: 1.5px solid rgba(245, 158, 11, 0.35);
   border-radius: 20px;
   padding: 36px 30px;
@@ -459,6 +463,7 @@ const goToUpgrade = () => {
 .feature-item i {
   color: #10b981;
   font-size: 0.95rem;
+  flex-shrink: 0;
 }
 
 .paywall-actions-row {
@@ -531,25 +536,75 @@ const goToUpgrade = () => {
   margin: 0 0 10px 0;
 }
 
-@media (max-width: 768px) {
-  .reader-toolbar {
-    padding: 0 12px;
-  }
-
-  .toolbar-center {
-    display: none;
-  }
-
-  .hide-mobile {
-    display: none;
+/* Responsive Breakpoints */
+@media (max-width: 992px) {
+  .hide-tablet {
+    display: none !important;
   }
 
   .toolbar-title {
-    max-width: 150px;
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .reader-toolbar {
+    padding: 0 10px;
+    height: 50px;
+    gap: 8px;
   }
 
-  .toolbar-category-pill {
+  .toolbar-left {
+    gap: 8px;
+  }
+
+  .btn-toolbar-back {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+
+  .toolbar-title {
+    max-width: 160px;
+    font-size: 0.95rem;
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .btn-nav-module {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .btn-external-tab {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  .paywall-card-box {
+    padding: 26px 20px;
+  }
+
+  .paywall-title {
+    font-size: 1.35rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-text {
     display: none;
+  }
+
+  .btn-toolbar-back {
+    padding: 6px 9px;
+  }
+
+  .toolbar-title {
+    max-width: 120px;
+    font-size: 0.88rem;
   }
 }
 </style>
+

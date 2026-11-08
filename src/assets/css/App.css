@@ -15,14 +15,20 @@ html {
 .app-content {
   flex: 1;
 }
+.app-layout.workspace-mode .app-content,
 .app-layout.fullpage-locked .app-content {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  height: 100%;
   overflow: hidden;
 }
+.app-layout.workspace-mode .route-wrapper,
 .app-layout.fullpage-locked .route-wrapper {
   flex: 1;
   min-height: 0;
+  height: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }

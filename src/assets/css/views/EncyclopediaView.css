@@ -312,6 +312,43 @@
   }
 }
 
+@media (max-width: 768px) {
+  .encyclopedia-container {
+    padding-top: 80px;
+    padding-bottom: 35px;
+  }
+
+  .encyclopedia-mode-switcher {
+    gap: 8px;
+  }
+
+  .mode-tab {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    border-radius: 10px;
+  }
+
+  .encyclopedia-sidebar {
+    padding: 14px;
+    max-height: 340px;
+    border-radius: 14px;
+  }
+
+  .search-box {
+    margin-bottom: 14px;
+  }
+
+  .search-box input {
+    padding: 8px 36px;
+    font-size: 0.84rem;
+  }
+
+  .topic-nav a {
+    padding: 7px 10px;
+    font-size: 0.84rem;
+  }
+}
+
 /* Light Mode Overhauls */
 body.light-mode .encyclopedia-sidebar {
   background: #ffffff;

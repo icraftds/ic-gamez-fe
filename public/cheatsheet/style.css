@@ -301,6 +301,7 @@ code, kbd, samp, pre {
 .header-search {
   flex: 1;
   max-width: 460px;
+  min-width: 0;
   margin: 0 1.5rem;
   position: relative;
 }
@@ -1661,6 +1662,12 @@ code, kbd, samp, pre {
    Responsive Breakpoints
    ========================================================================== */
 
+/* Embedded Mode inside GameZ Full Page Reader */
+body.is-embedded .site-header .btn-pill[href="index.html"],
+body.is-embedded .header-container .btn-pill[href="index.html"] {
+  display: none !important;
+}
+
 @media (max-width: 1024px) {
   .app-sidebar {
     width: 250px;
@@ -1668,11 +1675,25 @@ code, kbd, samp, pre {
   .main-content {
     padding: 2rem 1.5rem 4rem 1.5rem;
   }
+  .header-actions .btn-pill span {
+    display: none;
+  }
+  .header-actions .btn-pill {
+    padding: 0.45rem 0.65rem;
+  }
+  .header-search {
+    margin: 0 0.75rem;
+    max-width: 320px;
+  }
 }
 
 @media (max-width: 860px) {
   .mobile-menu-toggle {
     display: inline-flex;
+  }
+
+  .header-search {
+    display: none;
   }
 
   .app-sidebar {
@@ -1706,30 +1727,32 @@ code, kbd, samp, pre {
     display: block;
   }
 
-  .header-search {
-    margin: 0 0.5rem;
-  }
-
   .brand-text p {
     display: none;
   }
 }
 
 @media (max-width: 640px) {
-  .header-search {
-    display: none;
+  .hero-banner {
+    padding: 1.25rem 1rem;
+    margin-bottom: 1.75rem;
   }
 
-  .header-actions .btn-pill span {
-    display: none;
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 
   .hero-title {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 
   .main-content {
-    padding: 1.5rem 1rem 3rem 1rem;
+    padding: 1.25rem 0.85rem 3rem 0.85rem;
+  }
+
+  .formula-card {
+    padding: 1rem;
   }
 
   .formula-card-header {
@@ -1741,8 +1764,13 @@ code, kbd, samp, pre {
     display: none;
   }
 
+  .code-box {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.84rem;
+  }
+
   .quiz-container {
-    padding: 1.25rem;
+    padding: 1.1rem;
   }
 }
 

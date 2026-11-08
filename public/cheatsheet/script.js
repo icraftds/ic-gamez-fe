@@ -4,6 +4,11 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Detect if embedded inside GameZ iframe
+  if (window.self !== window.top) {
+    document.body.classList.add('is-embedded');
+  }
+
   // Initialize Lucide Icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();

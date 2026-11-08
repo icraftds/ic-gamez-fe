@@ -5,6 +5,11 @@
 
 function setupCheatsheetPage({ catalog = [], questions = [] }) {
   document.addEventListener('DOMContentLoaded', () => {
+    // Detect if embedded inside GameZ iframe
+    if (window.self !== window.top) {
+      document.body.classList.add('is-embedded');
+    }
+
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
     }

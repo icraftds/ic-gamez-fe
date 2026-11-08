@@ -283,3 +283,4 @@ export const cheatsheets = [
 export const getCheatsheetBySlug = (slug) => {
   return cheatsheets.find(c => c.slug === slug) || null
 }
+
