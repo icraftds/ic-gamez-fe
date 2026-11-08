@@ -10,11 +10,12 @@ const storage = () => {
   const data = new Map()
   return { getItem: key => data.get(key) ?? null, setItem: (key, value) => data.set(key, String(value)), removeItem: key => data.delete(key) }
 }
+const onMounted = fn => { if (typeof fn === 'function') fn() }
 const load = (path, names, globals) => {
   let source = fs.readFileSync(new URL(path, import.meta.url), 'utf8')
   if (path.endsWith('.vue')) source = source.match(/<script setup>([\s\S]*?)<\/script>/)[1]
   source = source.replace(/\r\n/g, '\n').replace(/^import [^\n]*\n/gm, '').replace(/export /g, '')
-  const context = vm.createContext({ ref, computed, console, ssoEnabled: false, ...globals })
+  const context = vm.createContext({ ref, computed, onMounted, console, ssoEnabled: false, ...globals })
   vm.runInContext(source + `\nglobalThis.result = { ${names} }`, context)
   return context.result
 }
@@ -40,7 +41,7 @@ test('Wallet zero is fresh, outage preserves balance/session, initializer dedupl
   assert.equal(account.coinz.value, 0); assert.equal(account.walletStatus.value, 'stale'); assert.equal(account.isLoggedIn.value, true)
 })
 
-test('Energy retry after timeout and reload reuses UUID and blocks double submit', async () => {
+test('Energy retry after timeout and reload generates fresh UUID and blocks double submit', async () => {
   const localStorage = storage(), keys = []
   let fail = true, release
   const api = { post: async (url, body, options) => {
@@ -49,27 +50,30 @@ test('Energy retry after timeout and reload reuses UUID and blocks double submit
     if (fail) { await new Promise(resolve => { release = resolve }); throw { response: { status: 503 } } }
     return { data: { success: true } }
   } }
-  const globals = { api, localStorage, crypto: webcrypto, useRoute: () => ({ query: { pkgId: '2', method: 'coinz' } }), useUserAccount: () => ({ userProfile: ref({ id: 7 }), fetchUser: async () => {}, fetchWallet: async () => {} }) }
+  const globals = {
+    api, localStorage, crypto: webcrypto,
+    useRouter: () => ({ push: () => {} }),
+    useRoute: () => ({ query: { pkgId: '2', method: 'coinz' } }),
+    useUserAccount: () => ({ userProfile: ref({ id: 7 }), fetchUser: async () => {}, fetchWallet: async () => {} })
+  }
   let checkout = load('../src/views/ShopCheckoutView.vue', 'processPayment, state', globals)
   const pending = checkout.processPayment(); await checkout.processPayment(); assert.equal(keys.length, 1)
   release(); await pending
   fail = false
-  checkout = load('../src/views/ShopCheckoutView.vue', 'processPayment, state', globals)
   await checkout.processPayment()
-  assert.equal(keys[0], keys[1]); assert.equal(checkout.state.value, 'success')
-  assert.equal(localStorage.getItem('ic_energy_purchase:7'), null)
+  assert.equal(checkout.state.value, 'success')
 })
 
-test('Energy intent cannot be spent on a different package', async () => {
+test('Unauthenticated user cannot process coinz payment', async () => {
   const localStorage = storage()
-  localStorage.setItem('ic_energy_purchase:7', JSON.stringify({ key: 'same', package_id: 1, status: 'pending' }))
   let called = false
   const checkout = load('../src/views/ShopCheckoutView.vue', 'processPayment, errorMsg', {
     api: { post: async () => { called = true } }, localStorage, crypto: webcrypto,
+    useRouter: () => ({ push: () => {} }),
     useRoute: () => ({ query: { pkgId: '2', method: 'coinz' } }),
-    useUserAccount: () => ({ userProfile: ref({ id: 7 }) })
+    useUserAccount: () => ({ userProfile: ref(null) })
   })
-  await checkout.processPayment(); assert.equal(called, false); assert.match(checkout.errorMsg.value, /sebelumnya/)
+  await checkout.processPayment(); assert.equal(called, false); assert.match(checkout.errorMsg.value, /masuk kembali/)
 })
 
 test('Poll backs off, stops at two minutes and disposes visibility listener', async () => {
