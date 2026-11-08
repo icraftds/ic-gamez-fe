@@ -80,6 +80,11 @@ const router = createRouter({
       component: () => import('./views/CheatsheetView.vue')
     },
     {
+      path: '/cheatsheet/:slug',
+      name: 'cheatsheet-reader',
+      component: () => import('./views/CheatsheetReaderView.vue')
+    },
+    {
       path: '/shop',
       name: 'shop',
       component: () => import('./views/ShopView.vue'),

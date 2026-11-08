@@ -54,15 +54,15 @@ let cooldownTimer
 onMounted(() => { cooldownTimer = setInterval(() => { now.value = Date.now() }, 1000) })
 onUnmounted(() => clearInterval(cooldownTimer))
 const route = useRoute()
-const isWorkspacePage = computed(() => route.name === 'lesson')
+const isWorkspacePage = computed(() => ['lesson', 'cheatsheet-reader'].includes(route.name))
 const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
 const isCheckoutPage = computed(() => ['checkout', 'payment-success'].includes(route.name))
 const showHomeNavbar = computed(() => {
-  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials', 'profile-edit', 'checkout', 'payment-success']
+  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials', 'profile-edit', 'checkout', 'payment-success', 'cheatsheet-reader']
   return !hiddenRoutes.includes(route.name)
 })
 const showFriendsSidebar = computed(() => {
-  return isLoggedIn.value && !['lesson', 'materials', 'checkout', 'payment-success'].includes(route.name)
+  return isLoggedIn.value && !['lesson', 'materials', 'checkout', 'payment-success', 'cheatsheet-reader'].includes(route.name)
 })
 
 const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping } = useUserAccount()
