@@ -10,7 +10,7 @@
         
         <div class="toolbar-divider hide-mobile"></div>
 
-        <span class="toolbar-badge hide-tablet"><i class="fa-solid fa-crown"></i> Expert Vault</span>
+        <span class="toolbar-badge hide-tablet"><i class="fa-solid fa-bolt"></i> Game Z Cheatsheet</span>
 
         <h1 class="toolbar-title" v-if="currentModule" :title="currentModule.title">
           {{ currentModule.title }}
@@ -91,9 +91,9 @@
       <div v-else-if="!isExpert && currentModule" class="fullpage-paywall-container">
         <div class="paywall-card-box">
           <div class="paywall-crown-icon">
-            <i class="fa-solid fa-crown"></i>
+            <i class="fa-solid fa-bolt"></i>
           </div>
-          <span class="paywall-badge">Koleksi Eksklusif Expert Plan</span>
+          <span class="paywall-badge">Game-Z Cheatsheet Expert</span>
           <h2 class="paywall-title">{{ currentModule.title }}</h2>
           <p class="paywall-desc">
             Modul ini mencakup formula teknis mendalam, panduan arsitektur industri, dan 
@@ -267,9 +267,9 @@ const goToUpgrade = () => {
 }
 
 .toolbar-badge {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #a5b4fc;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 3px 8px;
@@ -455,7 +455,7 @@ const goToUpgrade = () => {
 
 .paywall-crown-icon {
   font-size: 2.8rem;
-  color: #fbbf24;
+  color: #818cf8;
   margin-bottom: 14px;
 }
 
@@ -465,9 +465,9 @@ const goToUpgrade = () => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #fbbf24;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.35);
   padding: 4px 12px;
   border-radius: 99px;
   margin-bottom: 12px;
@@ -521,8 +521,8 @@ const goToUpgrade = () => {
 }
 
 .btn-paywall-upgrade {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #090e17;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #ffffff;
   font-weight: 800;
   font-size: 0.92rem;
   padding: 12px 24px;
@@ -533,12 +533,13 @@ const goToUpgrade = () => {
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 18px rgba(99, 102, 241, 0.4);
 }
 
 .btn-paywall-upgrade:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.55);
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.55);
 }
 
 .btn-paywall-back {

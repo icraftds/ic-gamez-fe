@@ -17,6 +17,9 @@
           <button class="encyclopedia-btn" @click="$router.push('/encyclopedia')">
             <i class="fa-solid fa-book-bookmark"></i> Ensiklopedia
           </button>
+          <button class="cheatsheet-btn" @click="$router.push('/cheatsheet')">
+            <i class="fa-solid fa-bolt"></i> Game Z Cheatsheet
+          </button>
         </div>
       </div>
       

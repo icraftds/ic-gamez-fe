@@ -3,27 +3,31 @@
     <SimpleBackground />
 
     <div class="cheatsheet-container">
-      <!-- 0. Mode Switcher: Ensiklopedia vs Cheatsheet Vault -->
-      <div class="cheatsheet-mode-switcher">
-        <router-link to="/encyclopedia" class="mode-tab">
-          <i class="fa-solid fa-book-atlas"></i>
-          <span>Ensiklopedia Teori</span>
+      <!-- 0. Top Navigation: Back to Alur Belajar -->
+      <div class="cheatsheet-top-nav">
+        <router-link to="/learning" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Kembali ke Alur Belajar</span>
         </router-link>
-        <button class="mode-tab active vault-tab">
-          <i class="fa-solid fa-crown"></i>
-          <span>Cheatsheet Vault (Expert)</span>
-        </button>
       </div>
 
       <!-- 1. Header Vault Section -->
       <header class="vault-header">
         <div class="vault-badge-pill">
-          <i class="fa-solid fa-crown"></i>
-          <span>Expert Vault • Benefit Eksklusif</span>
+          <i class="fa-solid fa-bolt"></i>
+          <span>Game-Z Knowledge Vault • 24 Modul Industri</span>
         </div>
-        <h1 class="vault-title">Career Technical Cheatsheet & Test Guide</h1>
+
+        <div class="vault-brand-header">
+          <div class="vault-logo-wrap">
+            <img src="/images/Logo iC GameZ darkmode.png" alt="iC Game-Z" class="brand-logo-img logo-dark" />
+            <img src="/images/Logo iC GameZ Lightmode.png" alt="iC Game-Z" class="brand-logo-img logo-light" />
+          </div>
+          <h1 class="vault-title">Game Z <span class="gradient-text">Cheatsheet</span></h1>
+        </div>
+
         <p class="vault-desc">
-          Panduan komprehensif formula teknis industri, kumpulan referensi cepat, dan 300+ simulasi soal tes kerja interaktif untuk mengasah kompetensi profesional.
+          Panduan komprehensif formula teknis industri, kumpulan referensi cepat, dan 305+ simulasi soal tes kerja interaktif untuk mengasah kompetensi profesional.
         </p>
       </header>
 

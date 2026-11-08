@@ -3,15 +3,11 @@
     <SimpleBackground />
     
     <div class="container encyclopedia-container">
-      <!-- Mode Switcher: Ensiklopedia vs Cheatsheet Vault -->
-      <div class="encyclopedia-mode-switcher">
-        <button class="mode-tab active">
-          <i class="fa-solid fa-book-atlas"></i>
-          <span>Ensiklopedia Teori</span>
-        </button>
-        <router-link to="/cheatsheet" class="mode-tab vault-tab">
-          <i class="fa-solid fa-crown"></i>
-          <span>Cheatsheet Vault (Expert)</span>
+      <!-- Top Navigation: Back to Alur Belajar -->
+      <div class="encyclopedia-top-nav">
+        <router-link to="/learning" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Kembali ke Alur Belajar</span>
         </router-link>
       </div>
 

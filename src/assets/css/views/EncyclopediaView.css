@@ -7,6 +7,34 @@
   padding-bottom: 50px;
 }
 
+.encyclopedia-top-nav {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.back-link:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: translateX(-2px);
+}
+
 .encyclopedia-mode-switcher {
   display: flex;
   gap: 12px;
@@ -318,7 +346,35 @@
     padding-bottom: 35px;
   }
 
-  .encyclopedia-mode-switcher {
+  .encyclopedia-top-nav {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.back-link:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: translateX(-2px);
+}
+
+.encyclopedia-mode-switcher {
     gap: 8px;
   }
 

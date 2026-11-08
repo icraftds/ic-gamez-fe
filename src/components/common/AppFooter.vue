@@ -24,6 +24,7 @@
           <ul class="footer-links">
             <li><router-link to="/learning">Alur Belajar</router-link></li>
             <li><router-link to="/encyclopedia">Ensiklopedia</router-link></li>
+            <li><router-link to="/cheatsheet">Game Z Cheatsheet</router-link></li>
             <li><router-link to="/challenges">Tantangan</router-link></li>
             <li><router-link to="/leaderboard">Leaderboard</router-link></li>
           </ul>
