@@ -1727,7 +1727,7 @@ body.is-embedded .app-sidebar {
   }
 
   .header .header-container {
-    padding: 0 0.85rem;
+    padding: 0 0.75rem;
     gap: 0.5rem;
   }
 
@@ -1736,20 +1736,39 @@ body.is-embedded .app-sidebar {
   }
 
   .logo-title {
-    font-size: 0.95rem;
-    max-width: 180px;
+    font-size: 0.92rem;
+    max-width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .nav-back-link span {
-    display: none;
+    display: none !important;
   }
 
   .nav-back-link {
-    padding: 5px 8px;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .header-right {
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .header-right .btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .brand-text p {
-    display: none;
+    display: none !important;
   }
 
   /* Main Container Stacks Vertically */
@@ -1765,7 +1784,7 @@ body.is-embedded .app-sidebar {
     width: 100% !important;
     height: auto !important;
     position: sticky !important;
-    top: 0 !important;
+    top: 52px !important;
     z-index: 50 !important;
     background: rgba(11, 17, 32, 0.97) !important;
     backdrop-filter: blur(16px) !important;
@@ -1779,6 +1798,18 @@ body.is-embedded .app-sidebar {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
     scrollbar-width: none !important;
     transform: none !important;
+  }
+
+  .site-header ~ .app-layout .app-sidebar {
+    top: var(--header-height, 64px) !important;
+  }
+
+  /* Embedded Mode inside GameZ Full Page Reader: top is 0 because GameZ handles toolbar */
+  html.is-embedded .sidebar,
+  html.is-embedded .app-sidebar,
+  body.is-embedded .sidebar,
+  body.is-embedded .app-sidebar {
+    top: 0 !important;
   }
 
   .sidebar::-webkit-scrollbar,
