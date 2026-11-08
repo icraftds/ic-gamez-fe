@@ -12,15 +12,14 @@
 .cheatsheet-container {
   max-width: 1200px;
   margin: 0 auto;
-  /* 95px padding-top guarantees clearance below the fixed navbar */
-  padding: 95px 24px 60px 24px;
+  padding: 78px 24px 48px 24px;
   position: relative;
   z-index: 5;
 }
 
 /* 0. Top Navigation (Back to Alur Belajar) */
 .cheatsheet-top-nav {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
 }
@@ -50,7 +49,7 @@
 /* 1. Header Vault Section */
 .vault-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -60,20 +59,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 4px;
+  margin: 0;
 }
 
 .vault-logo-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 
 .brand-logo-img {
-  height: 38px;
+  height: 36px;
   width: auto;
   object-fit: contain;
+  display: block;
 }
 
 .logo-light {
@@ -88,42 +89,19 @@ body.light-mode .logo-light {
   display: inline-block;
 }
 
-.vault-badge-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.35);
-  color: #a5b4fc;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 5px 14px;
-  border-radius: 99px;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-
 .vault-title {
-  font-size: 2.2rem;
+  font-size: 2.1rem;
   font-weight: 800;
-  margin: 0 0 6px 0;
+  margin: 0;
   color: #f8fafc;
   letter-spacing: -0.5px;
-  line-height: 1.25;
+  line-height: 1.15;
 }
 
 .gradient-text {
   background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.vault-desc {
-  font-size: 0.98rem;
-  color: #94a3b8;
-  max-width: 640px;
-  margin: 0 auto;
-  line-height: 1.6;
 }
 
 /* 2. Status Banners */
@@ -648,22 +626,20 @@ body.light-mode .logo-light {
 
 @media (max-width: 768px) {
   .cheatsheet-container {
-    padding: 80px 14px 40px 14px;
+    padding: 70px 14px 36px 14px;
   }
 
-  .vault-badge-pill {
-    font-size: 0.72rem;
-    padding: 4px 10px;
+  .brand-logo-img {
+    height: 30px;
+  }
+
+  .vault-brand-header {
+    gap: 3px;
   }
 
   .vault-title {
     font-size: 1.6rem;
-    line-height: 1.25;
-  }
-
-  .vault-desc {
-    font-size: 0.88rem;
-    line-height: 1.5;
+    line-height: 1.15;
   }
 
   .vault-controls-bar {
@@ -747,6 +723,10 @@ body.light-mode .logo-light {
   .mode-tab {
     padding: 7px 12px;
     font-size: 0.8rem;
+  }
+
+  .brand-logo-img {
+    height: 26px;
   }
 
   .vault-title {

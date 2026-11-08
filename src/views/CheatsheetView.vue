@@ -13,22 +13,13 @@
 
       <!-- 1. Header Vault Section -->
       <header class="vault-header">
-        <div class="vault-badge-pill">
-          <i class="fa-solid fa-bolt"></i>
-          <span>Game-Z Knowledge Vault • 24 Modul Industri</span>
-        </div>
-
         <div class="vault-brand-header">
           <div class="vault-logo-wrap">
             <img src="/images/Logo iC GameZ darkmode.png" alt="iC Game-Z" class="brand-logo-img logo-dark" />
             <img src="/images/Logo iC GameZ Lightmode.png" alt="iC Game-Z" class="brand-logo-img logo-light" />
           </div>
-          <h1 class="vault-title">Game Z <span class="gradient-text">Cheatsheet</span></h1>
+          <h1 class="vault-title"><span class="gradient-text">Cheatsheet</span></h1>
         </div>
-
-        <p class="vault-desc">
-          Panduan komprehensif formula teknis industri, kumpulan referensi cepat, dan 305+ simulasi soal tes kerja interaktif untuk mengasah kompetensi profesional.
-        </p>
       </header>
 
       <!-- 2. Paywall Banner (Tampil jika BUKAN Expert) -->
