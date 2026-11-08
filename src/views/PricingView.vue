@@ -182,6 +182,7 @@ const PLAN_CONFIG = {
     energyLabel: '25 Energi / minggu',
     energyIcon: 'fa-solid fa-bolt',
     benefits: [
+      'Akses 24 Cheatsheets & 300+ Soal Tes Kerja',
       'Semua fitur Pro Plan',
       '25 Energi bonus setiap minggu',
       '300.000 iCoinZ bonus bergabung',

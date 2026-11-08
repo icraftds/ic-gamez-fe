@@ -3,6 +3,18 @@
     <SimpleBackground />
     
     <div class="container" style="margin-top: 40px">
+      <!-- Mode Switcher: Ensiklopedia vs Cheatsheet Vault -->
+      <div class="encyclopedia-mode-switcher">
+        <button class="mode-tab active">
+          <i class="fa-solid fa-book-atlas"></i>
+          <span>Ensiklopedia Teori</span>
+        </button>
+        <router-link to="/cheatsheet" class="mode-tab vault-tab">
+          <i class="fa-solid fa-crown"></i>
+          <span>Cheatsheet Vault (Expert)</span>
+        </router-link>
+      </div>
+
       <div class="encyclopedia-layout">
         <!-- Sidebar Navigation -->
         <aside class="encyclopedia-sidebar">

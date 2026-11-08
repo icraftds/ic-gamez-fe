@@ -3,6 +3,51 @@
   padding-bottom: 50px;
 }
 
+.encyclopedia-mode-switcher {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.mode-tab {
+  background: var(--glass-bg-heavy-0_6, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--white-alpha-0_15, rgba(255, 255, 255, 0.15));
+  color: var(--text-muted, #94a3b8);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.mode-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.mode-tab.active {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(124, 58, 237, 0.2));
+  border-color: #00f0ff;
+  color: #00f0ff;
+}
+
+.mode-tab.vault-tab {
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.mode-tab.vault-tab:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #fbbf24;
+  transform: translateY(-1px);
+}
+
 .encyclopedia-layout {
   display: flex;
   gap: 30px;

@@ -31,6 +31,9 @@
       <button v-if="allowProfileEdit" @click="handleProfileClick" class="text-primary" title="Edit Profil Anda">
         <i class="fa-solid fa-user-pen"></i> Edit Profil
       </button>
+      <button @click="goToCheatsheet" class="text-warning" title="Cheatsheet Vault (Expert)">
+        <i class="fa-solid fa-crown text-warning"></i> Cheatsheet Vault
+      </button>
       <button @click="toggleTheme" class="text-primary" title="Ganti Tema Warna">
         <i :class="isLightMode ? 'fas fa-moon' : 'fas fa-sun'"></i> 
         {{ isLightMode ? 'Mode Gelap' : 'Mode Terang' }}
@@ -103,6 +106,11 @@ const handleDashboardClick = async () => {
 
 const handleProfileClick = () => {
   router.push('/profile/edit');
+  emit('close');
+};
+
+const goToCheatsheet = () => {
+  router.push('/cheatsheet');
   emit('close');
 };
 

@@ -224,6 +224,7 @@ const PLAN_PERKS = {
     duration: '180 Hari',
     energy: '+25 Energi / minggu',
     features: [
+      'Akses 24 Cheatsheets & 300+ Soal Tes Kerja',
       'Semua fitur Pro Plan',
       '25 Energi bonus setiap minggu',
       '300.000 iCoinZ bonus langsung masuk',
