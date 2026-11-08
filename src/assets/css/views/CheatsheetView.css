@@ -271,7 +271,18 @@ body.light-mode .logo-light {
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+}
+
+.tab-icon {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tab-btn:hover .tab-icon,
+.tab-btn.active .tab-icon {
+  opacity: 1;
 }
 
 .tab-btn:hover {
@@ -283,6 +294,10 @@ body.light-mode .logo-light {
   background: rgba(56, 189, 248, 0.12);
   color: #38bdf8;
   font-weight: 700;
+}
+
+.tab-btn:active {
+  transform: scale(0.96);
 }
 
 .tab-count {

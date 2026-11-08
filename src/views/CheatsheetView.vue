@@ -69,7 +69,8 @@
             :class="{ active: selectedCategory === cat.id }"
             @click="selectedCategory = cat.id"
           >
-            <span>{{ cat.label }}</span>
+            <i v-if="cat.icon" :class="cat.icon" class="tab-icon"></i>
+            <span class="tab-label">{{ cat.label }}</span>
             <span class="tab-count">{{ getCategoryCount(cat.id) }}</span>
           </button>
         </div>

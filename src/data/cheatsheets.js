@@ -1,9 +1,9 @@
 export const categories = [
-  { id: 'all', label: 'Semua Modul' },
-  { id: 'data', label: '📊 Data & Bisnis' },
-  { id: 'dev', label: '💻 Developer & DevOps' },
-  { id: 'sys', label: '⚙️ Sistem & Keamanan' },
-  { id: 'ai', label: '🚀 Desain & AI' },
+  { id: 'all', label: 'Semua Modul', icon: 'fa-solid fa-layer-group' },
+  { id: 'data', label: 'Data & Bisnis', icon: 'fa-solid fa-chart-column' },
+  { id: 'dev', label: 'Developer & DevOps', icon: 'fa-solid fa-code' },
+  { id: 'sys', label: 'Sistem & Keamanan', icon: 'fa-solid fa-shield-halved' },
+  { id: 'ai', label: 'Desain & AI', icon: 'fa-solid fa-wand-magic-sparkles' },
 ]
 
 export const cheatsheets = [
