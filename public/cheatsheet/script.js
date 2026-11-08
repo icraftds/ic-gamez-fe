@@ -99,10 +99,16 @@ function initThemeToggle() {
 
 function initSidebar() {
   const mobileToggle = document.getElementById('mobileMenuToggle');
-  const sidebar = document.getElementById('appSidebar');
-  const backdrop = document.getElementById('sidebarBackdrop');
-  const navLinks = document.querySelectorAll('.sidebar-link');
-  const sections = document.querySelectorAll('.content-section');
+  const sidebar = document.getElementById('appSidebar') || document.getElementById('sidebar');
+  let backdrop = document.getElementById('sidebarBackdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'sidebarBackdrop';
+    backdrop.className = 'sidebar-backdrop';
+    document.body.appendChild(backdrop);
+  }
+  const navLinks = document.querySelectorAll('.sidebar-link, .sidebar-nav .nav-item');
+  const sections = document.querySelectorAll('.content-section, .category-section');
 
   // Mobile menu toggle
   const toggleMobileSidebar = (open) => {
@@ -116,11 +122,66 @@ function initSidebar() {
       const isOpen = sidebar.classList.contains('open');
       toggleMobileSidebar(!isOpen);
     });
+  } else {
+    // If standalone header exists without a toggle button, inject one dynamically
+    const headerContainer = document.querySelector('.header-container, .header, .site-header');
+    if (headerContainer && !headerContainer.querySelector('.mobile-menu-toggle')) {
+      const injectedToggle = document.createElement('button');
+      injectedToggle.className = 'btn-icon mobile-menu-toggle';
+      injectedToggle.id = 'mobileMenuToggle';
+      injectedToggle.setAttribute('aria-label', 'Buka Navigasi');
+      injectedToggle.innerHTML = '<i data-lucide="menu">☰</i>';
+      injectedToggle.addEventListener('click', () => {
+        if (sidebar) toggleMobileSidebar(!sidebar.classList.contains('open'));
+      });
+      const brand = headerContainer.querySelector('.header-brand, .header-left, .brand-text');
+      if (brand && brand.parentNode) {
+        brand.parentNode.insertBefore(injectedToggle, brand);
+      } else {
+        headerContainer.prepend(injectedToggle);
+      }
+    }
   }
 
   if (backdrop) {
     backdrop.addEventListener('click', () => toggleMobileSidebar(false));
   }
+
+  // Floating Action Button for Mobile TOC
+  if (!document.getElementById('mobileTocFloatingBtn')) {
+    const fab = document.createElement('button');
+    fab.id = 'mobileTocFloatingBtn';
+    fab.className = 'mobile-toc-fab';
+    fab.setAttribute('aria-label', 'Buka Daftar Isi');
+    fab.innerHTML = '<i data-lucide="menu">☰</i><span>Daftar Isi</span>';
+    fab.addEventListener('click', () => {
+      const isOpen = sidebar.classList.contains('open');
+      toggleMobileSidebar(!isOpen);
+    });
+    document.body.appendChild(fab);
+  }
+
+  // Close Header inside Sidebar Drawer
+  if (sidebar && !sidebar.querySelector('.sidebar-drawer-header')) {
+    const drawerHeader = document.createElement('div');
+    drawerHeader.className = 'sidebar-drawer-header';
+    drawerHeader.innerHTML = `
+      <span class="sidebar-drawer-title"><i data-lucide="layers" style="margin-right:6px;">☰</i>Daftar Isi</span>
+      <button class="sidebar-close-btn" aria-label="Tutup"><i data-lucide="x">✕</i></button>
+    `;
+    drawerHeader.querySelector('.sidebar-close-btn').addEventListener('click', () => toggleMobileSidebar(false));
+    sidebar.prepend(drawerHeader);
+  }
+
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+
+  // Cross-frame messaging from GameZ reader toolbar
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.action === 'toggleSidebar') {
+      const isOpen = sidebar.classList.contains('open');
+      toggleMobileSidebar(!isOpen);
+    }
+  });
 
   // Close sidebar on link click (mobile)
   navLinks.forEach((link) => {

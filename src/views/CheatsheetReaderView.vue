@@ -46,6 +46,18 @@
       </div>
 
       <div class="toolbar-right" v-if="currentModule">
+        <!-- Hamburger Menu Button for Mobile TOC -->
+        <button
+          v-if="isExpert"
+          class="btn-toolbar-toc hide-desktop"
+          @click="toggleIframeSidebar"
+          title="Buka Daftar Isi"
+          aria-label="Buka Daftar Isi"
+        >
+          <i class="fa-solid fa-bars"></i>
+          <span class="toc-text">Daftar Isi</span>
+        </button>
+
         <span class="questions-chip hide-mobile">
           <i class="fa-solid fa-clipboard-question"></i>
           <span>{{ currentModule.questions }} Soal</span>
@@ -69,6 +81,7 @@
       <!-- 1. Akses Penuh untuk Expert -->
       <iframe
         v-if="isExpert && currentModule"
+        ref="cheatsheetIframe"
         :src="`/cheatsheet/${currentModule.file}?embed=1`"
         class="fullpage-cheatsheet-frame"
         title="Cheatsheet Reader Fullpage"
@@ -128,7 +141,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import { cheatsheets, getCheatsheetBySlug } from '../data/cheatsheets'
@@ -136,6 +149,14 @@ import { cheatsheets, getCheatsheetBySlug } from '../data/cheatsheets'
 const route = useRoute()
 const router = useRouter()
 const { isLoggedIn, currentPlan } = useUserAccount()
+
+const cheatsheetIframe = ref(null)
+
+const toggleIframeSidebar = () => {
+  if (cheatsheetIframe.value && cheatsheetIframe.value.contentWindow) {
+    cheatsheetIframe.value.contentWindow.postMessage({ action: 'toggleSidebar' }, '*')
+  }
+}
 
 const isExpert = computed(() => {
   return isLoggedIn.value && currentPlan.value === 'expert'
@@ -362,6 +383,32 @@ const goToUpgrade = () => {
   background: rgba(56, 189, 248, 0.15);
   color: #38bdf8;
   border-color: #38bdf8;
+}
+
+.btn-toolbar-toc {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  padding: 6px 11px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-toolbar-toc:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.hide-desktop {
+  display: none !important;
 }
 
 /* Main Content: Fullpage Frame */
@@ -592,12 +639,20 @@ const goToUpgrade = () => {
   }
 }
 
+@media (max-width: 860px) {
+  .hide-desktop {
+    display: inline-flex !important;
+  }
+}
+
 @media (max-width: 480px) {
-  .back-text {
+  .back-text,
+  .btn-toolbar-toc .toc-text {
     display: none;
   }
 
-  .btn-toolbar-back {
+  .btn-toolbar-back,
+  .btn-toolbar-toc {
     padding: 6px 9px;
   }
 
