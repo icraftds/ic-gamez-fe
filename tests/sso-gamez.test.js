@@ -134,9 +134,9 @@ async function sessionFixture(overrides = {}) {
     let exchanges = 0, refreshes = 0
     const deadline = Date.now() + 120000
     const oauth = {
-        exchange: async () => { exchanges++; return { accessToken: 'a1', refreshToken: 'r1', expiresAt: Date.now() + 10000 } },
+        exchange: async () => { exchanges++; return { accessToken: 'test-access-rev-1', refreshToken: 'test-refresh-rev-1', expiresAt: Date.now() + 10000 } },
         profile: async () => ({ identity: { id: 501 }, expiresAt: Date.now() + 10000, absoluteDeadline: deadline }),
-        refresh: async () => { refreshes++; return { accessToken: 'a2', refreshToken: 'r2', expiresAt: Date.now() + 60000 } },
+        refresh: async () => { refreshes++; return { accessToken: 'test-access-rev-2', refreshToken: 'test-refresh-rev-2', expiresAt: Date.now() + 60000 } },
         logout: async () => {}, ...overrides,
     }
     const sessions = gamezSessions({ store, encryption, oauth, configuration, productProfile: async () => ({ id: 3, role: 'buyer' }), initializeWallet: async () => { throw { status: 503 } } })
@@ -166,11 +166,11 @@ test('Rotation persists both tokens with fixed absolute deadline; stale revision
     const result = await fixture.sessions.callback(new URLSearchParams({ state, code: 'opaque' }), fixture.transaction.binding)
     const before = await fixture.sessions.read(result.id)
     const after = await fixture.sessions.authorize(result.id, before.revision)
-    assert.equal(after.accessToken, 'a2'); assert.equal(after.refreshToken, 'r2')
+    assert.equal(after.accessToken, 'test-access-rev-2'); assert.equal(after.refreshToken, 'test-refresh-rev-2')
     assert.equal(after.absoluteDeadline, before.absoluteDeadline)
     const again = await fixture.sessions.authorize(result.id, before.revision)
     assert.equal(again.revision, after.revision); assert.equal(fixture.refreshes(), 1)
-    for (const record of fixture.store.rows.values()) assert.equal(record.ciphertext.includes('a2'), false)
+    for (const record of fixture.store.rows.values()) assert.equal(record.ciphertext.includes('test-access-rev-2'), false)
 })
 
 test('Local logout retires durable session and retains encrypted retry if central revocation fails', async () => {
@@ -250,7 +250,7 @@ test('Expired access is rotated under the logout lock before product-wide revoca
     const fixture = await sessionFixture({ exchange: async () => ({ accessToken: 'expired', refreshToken: 'r1', expiresAt: Date.now() - 1 }), logout: async token => { revokedToken = token } })
     const result = await fixture.sessions.callback(new URLSearchParams({ state, code: 'opaque' }), fixture.transaction.binding)
     assert.equal((await fixture.sessions.logout(result.id)).revoked, true)
-    assert.equal(revokedToken, 'a2')
+    assert.equal(revokedToken, 'test-access-rev-2')
     assert.equal(fixture.refreshes(), 1)
     await assert.rejects(fixture.sessions.read(result.id), error => error.status === 401)
 })

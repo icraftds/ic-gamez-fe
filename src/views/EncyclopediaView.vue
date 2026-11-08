@@ -2,7 +2,7 @@
   <div class="encyclopedia-view">
     <SimpleBackground />
     
-    <div class="container" style="margin-top: 40px">
+    <div class="container encyclopedia-container">
       <!-- Mode Switcher: Ensiklopedia vs Cheatsheet Vault -->
       <div class="encyclopedia-mode-switcher">
         <button class="mode-tab active">
