@@ -1668,10 +1668,16 @@ html.is-embedded .site-header,
 body.is-embedded .header,
 body.is-embedded .site-header {
   display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
 html.is-embedded .nav-back-link,
-body.is-embedded .nav-back-link {
+body.is-embedded .nav-back-link,
+html.is-embedded .btn-pill[href="index.html"],
+body.is-embedded .btn-pill[href="index.html"] {
   display: none !important;
 }
 
@@ -1680,13 +1686,18 @@ html.is-embedded .app-layout,
 body.is-embedded .main-container,
 body.is-embedded .app-layout {
   min-height: 100vh;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 html.is-embedded .sidebar,
 html.is-embedded .app-sidebar,
+html.is-embedded .site-header ~ .app-layout .app-sidebar,
 body.is-embedded .sidebar,
-body.is-embedded .app-sidebar {
+body.is-embedded .app-sidebar,
+body.is-embedded .site-header ~ .app-layout .app-sidebar {
   top: 0 !important;
+  margin-top: 0 !important;
 }
 
 @media (max-width: 1024px) {
@@ -1817,18 +1828,26 @@ body.is-embedded .app-sidebar {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
     scrollbar-width: none !important;
     transform: none !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
   }
 
   .site-header ~ .app-layout .app-sidebar {
     top: 52px !important;
   }
 
-  /* Embedded Mode inside GameZ Full Page Reader: top is 0 because GameZ handles toolbar */
+  /* Embedded Mode inside GameZ Full Page Reader: STRICTLY 0 */
   html.is-embedded .sidebar,
   html.is-embedded .app-sidebar,
+  html.is-embedded .site-header ~ .app-layout .app-sidebar,
   body.is-embedded .sidebar,
-  body.is-embedded .app-sidebar {
+  body.is-embedded .app-sidebar,
+  body.is-embedded .site-header ~ .app-layout .app-sidebar {
     top: 0 !important;
+    margin-top: 0 !important;
   }
 
   .sidebar::-webkit-scrollbar,
@@ -1841,12 +1860,29 @@ body.is-embedded .app-sidebar {
   }
 
   .sidebar-header,
-  .sidebar-heading {
+  .sidebar-heading,
+  .app-sidebar .sidebar-heading {
     display: none !important;
   }
 
-  .sidebar-nav,
-  .sidebar-nav-list {
+  /* Flatten all <ul> lists inside .app-sidebar so all <li> elements flow on ONE continuous horizontal row */
+  .app-sidebar .sidebar-nav-list {
+    display: contents !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+  }
+
+  .app-sidebar .sidebar-nav-list > li {
+    display: inline-flex !important;
+    flex-shrink: 0 !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Template B sidebar nav */
+  .sidebar-nav {
     display: flex !important;
     flex-direction: row !important;
     gap: 8px !important;
@@ -2852,11 +2888,29 @@ body.is-embedded .app-sidebar {
 }
 
 /* Copy Button */
-.copy-btn,
-.btn-copy {
+.formula-card,
+.formula-card-header,
+.card,
+.card-header,
+.formula-syntax,
+.code-box,
+.syntax-container {
+  position: relative !important;
+}
+
+.formula-syntax .copy-btn,
+.formula-syntax .btn-copy,
+.code-box .copy-btn,
+.code-box .btn-copy,
+.syntax-container .copy-btn,
+.syntax-container .btn-copy {
   position: absolute !important;
   top: 10px !important;
   right: 10px !important;
+}
+
+.copy-btn,
+.btn-copy {
   background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
   color: #94a3b8 !important;
@@ -2870,6 +2924,14 @@ body.is-embedded .app-sidebar {
   display: inline-flex !important;
   align-items: center !important;
   gap: 5px !important;
+}
+
+.card-header .btn-copy,
+.card-header .copy-btn,
+.formula-card-header .btn-copy,
+.formula-card-header .copy-btn {
+  position: static !important;
+  margin-left: auto !important;
 }
 
 .copy-btn:hover,
