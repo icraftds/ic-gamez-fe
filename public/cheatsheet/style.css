@@ -3458,15 +3458,37 @@ body.is-embedded .site-header ~ .app-layout .app-sidebar {
   display: none !important;
 }
 
-/* 2. Desktop Sidebar Collapse */
+/* 2. Desktop Sidebar Smooth Slide In & Out */
 @media (min-width: 861px) {
+  .sidebar,
+  .app-sidebar {
+    transition: margin-left 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.28s ease,
+                border-color 0.25s ease !important;
+    will-change: margin-left, transform, opacity;
+  }
+
   body.sidebar-collapsed .sidebar,
   body.sidebar-collapsed .app-sidebar {
-    display: none !important;
-    width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
+    margin-left: -290px !important;
+    transform: translate3d(-20px, 0, 0) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    border-color: transparent !important;
+    visibility: hidden;
+    transition: margin-left 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.25s ease,
+                visibility 0.38s !important;
+  }
+
+  .content,
+  .main-content {
+    transition: max-width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                padding 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                width 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: max-width, width, padding;
   }
 
   body.sidebar-collapsed .content,
@@ -3475,15 +3497,10 @@ body.is-embedded .site-header ~ .app-layout .app-sidebar {
     width: 100% !important;
     padding-left: clamp(2rem, 5vw, 5rem) !important;
     padding-right: clamp(2rem, 5vw, 5rem) !important;
-    transition: all 0.25s ease !important;
   }
 
   /* Floating reopen button on desktop when sidebar collapsed */
   .sidebar-reopen-btn {
-    display: none;
-  }
-
-  body.sidebar-collapsed .sidebar-reopen-btn {
     display: inline-flex !important;
     position: fixed !important;
     top: 14px !important;
@@ -3491,26 +3508,41 @@ body.is-embedded .site-header ~ .app-layout .app-sidebar {
     z-index: 100 !important;
     align-items: center !important;
     gap: 8px !important;
-    padding: 7px 14px !important;
-    background: #0b1120 !important;
+    padding: 8px 16px !important;
+    background: rgba(11, 17, 32, 0.94) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
     border: 1px solid rgba(56, 189, 248, 0.35) !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(56, 189, 248, 0.15) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 14px rgba(56, 189, 248, 0.2) !important;
     color: #38bdf8 !important;
-    border-radius: 8px !important;
-    font-size: 0.82rem !important;
+    border-radius: 10px !important;
+    font-size: 0.84rem !important;
     font-weight: 600 !important;
     cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    opacity: 0 !important;
+    transform: translate3d(-30px, 0, 0) scale(0.9) !important;
+    pointer-events: none !important;
+    transition: opacity 0.26s ease,
+                transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.2s ease,
+                box-shadow 0.2s ease !important;
   }
 
-  body.sidebar-collapsed .sidebar-reopen-btn:hover {
-    background: #131c31 !important;
+  body.sidebar-collapsed .sidebar-reopen-btn {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) scale(1) !important;
+    pointer-events: auto !important;
+  }
+
+  .sidebar-reopen-btn:hover {
+    background: rgba(19, 28, 49, 0.98) !important;
     border-color: #38bdf8 !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.3) !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6), 0 0 18px rgba(56, 189, 248, 0.35) !important;
+    transform: translate3d(2px, 0, 0) scale(1.02) !important;
   }
 }
 
-/* 3. Per-Materi Focused View */
+/* 3. Per-Materi Focused View & Silky Transitions */
 .materi-top-bar {
   display: flex !important;
   align-items: center !important;
@@ -3546,26 +3578,110 @@ body.is-embedded .site-header ~ .app-layout .app-sidebar {
   height: 100% !important;
   background: linear-gradient(90deg, #38bdf8, #818cf8) !important;
   border-radius: 999px !important;
-  transition: width 0.3s ease !important;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .materi-active {
   display: block !important;
-  animation: materiFadeIn 0.22s ease !important;
+  will-change: transform, opacity;
 }
 
 .materi-hidden {
   display: none !important;
 }
 
-@keyframes materiFadeIn {
-  from {
+/* Entering animations */
+.materi-enter-next {
+  animation: materiSlideInNext 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.materi-enter-prev {
+  animation: materiSlideInPrev 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.materi-enter-fade {
+  animation: materiFadeInSoft 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+/* Exiting animations */
+.materi-exit-next {
+  animation: materiSlideOutNext 0.14s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+  pointer-events: none !important;
+}
+
+.materi-exit-prev {
+  animation: materiSlideOutPrev 0.14s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+  pointer-events: none !important;
+}
+
+.materi-exit-fade {
+  animation: materiFadeOutSoft 0.12s ease-in forwards !important;
+  pointer-events: none !important;
+}
+
+@keyframes materiSlideInNext {
+  0% {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translate3d(26px, 0, 0);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes materiSlideInPrev {
+  0% {
+    opacity: 0;
+    transform: translate3d(-26px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes materiFadeInSoft {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes materiSlideOutNext {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-20px, 0, 0);
+  }
+}
+
+@keyframes materiSlideOutPrev {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(20px, 0, 0);
+  }
+}
+
+@keyframes materiFadeOutSoft {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0);
   }
 }
 

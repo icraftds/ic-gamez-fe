@@ -260,54 +260,96 @@ function initMateriPagination() {
   });
 
   let currentActiveIndex = 0;
+  let isTransitioning = false;
 
-  const showMateri = (index, shouldScroll = true) => {
+  const showMateri = (index, { shouldScroll = true, direction = 'fade' } = {}) => {
     if (index < 0) index = 0;
     if (index >= total) index = total - 1;
-    currentActiveIndex = index;
 
-    materiList.forEach((m, idx) => {
-      if (idx === index) {
-        m.element.classList.add('materi-active');
-        m.element.classList.remove('materi-hidden');
-        m.element.style.display = 'block';
-      } else {
-        m.element.classList.remove('materi-active');
-        m.element.classList.add('materi-hidden');
-        m.element.style.display = 'none';
-      }
-    });
+    if (isTransitioning) return;
+    const prevIndex = currentActiveIndex;
+    const currentSec = materiList[prevIndex]?.element;
 
-    if (heroBanner) {
-      heroBanner.style.display = index === 0 ? '' : 'none';
-    }
+    const finalizeMateri = () => {
+      currentActiveIndex = index;
 
-    // Update active highlight in sidebar
-    navLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      if (href === '#' + materiList[index].id) {
-        link.classList.add('active');
-        if (sidebar && typeof link.scrollIntoView === 'function') {
-          link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      materiList.forEach((m, idx) => {
+        if (idx === index) {
+          m.element.classList.remove('materi-hidden');
+          m.element.classList.add('materi-active');
+          m.element.style.display = 'block';
+
+          m.element.classList.remove('materi-enter-next', 'materi-enter-prev', 'materi-enter-fade');
+          if (direction === 'next') {
+            m.element.classList.add('materi-enter-next');
+          } else if (direction === 'prev') {
+            m.element.classList.add('materi-enter-prev');
+          } else if (direction === 'fade') {
+            m.element.classList.add('materi-enter-fade');
+          }
+
+          setTimeout(() => {
+            m.element.classList.remove('materi-enter-next', 'materi-enter-prev', 'materi-enter-fade');
+          }, 360);
+        } else {
+          m.element.classList.remove('materi-active', 'materi-enter-next', 'materi-enter-prev', 'materi-enter-fade');
+          m.element.classList.add('materi-hidden');
+          m.element.style.display = 'none';
         }
-      } else {
-        link.classList.remove('active');
-      }
-    });
+      });
 
-    try {
-      history.replaceState(null, '', '#' + materiList[index].id);
-    } catch (e) {}
-
-    if (shouldScroll) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      const mainContent = document.querySelector('.main-content, .content, .main-container');
-      if (mainContent && mainContent.scrollTop) {
-        mainContent.scrollTop = 0;
+      if (heroBanner) {
+        heroBanner.style.display = index === 0 ? '' : 'none';
       }
+
+      // Update active highlight in sidebar
+      navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === '#' + materiList[index].id) {
+          link.classList.add('active');
+          if (sidebar && typeof link.scrollIntoView === 'function') {
+            link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
+        } else {
+          link.classList.remove('active');
+        }
+      });
+
+      try {
+        history.replaceState(null, '', '#' + materiList[index].id);
+      } catch (e) {}
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+
+    // If first load or direction is none, show directly without animation
+    if (!currentSec || prevIndex === index || direction === 'none') {
+      finalizeMateri();
+      if (shouldScroll) {
+        window.scrollTo(0, 0);
+      }
+      return;
     }
 
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    // Two-phase silky smooth transition
+    isTransitioning = true;
+    const exitClass = direction === 'next' ? 'materi-exit-next' : (direction === 'prev' ? 'materi-exit-prev' : 'materi-exit-fade');
+    currentSec.classList.add(exitClass);
+
+    setTimeout(() => {
+      currentSec.classList.remove(exitClass);
+      finalizeMateri();
+
+      if (shouldScroll) {
+        window.scrollTo(0, 0);
+        const mainContent = document.querySelector('.main-content, .content, .main-container');
+        if (mainContent && mainContent.scrollTop) {
+          mainContent.scrollTop = 0;
+        }
+      }
+
+      isTransitioning = false;
+    }, 130);
   };
 
   // Click on Prev / Next buttons
@@ -316,7 +358,8 @@ function initMateriPagination() {
     if (!btn || btn.disabled) return;
     const targetIdx = parseInt(btn.getAttribute('data-target-index'), 10);
     if (!isNaN(targetIdx) && targetIdx >= 0 && targetIdx < total) {
-      showMateri(targetIdx, true);
+      const dir = targetIdx > currentActiveIndex ? 'next' : 'prev';
+      showMateri(targetIdx, { shouldScroll: true, direction: dir });
     }
   });
 
@@ -329,7 +372,8 @@ function initMateriPagination() {
         const matchIdx = materiList.findIndex(m => m.id === secId);
         if (matchIdx !== -1) {
           e.preventDefault();
-          showMateri(matchIdx, true);
+          const dir = matchIdx > currentActiveIndex ? 'next' : (matchIdx < currentActiveIndex ? 'prev' : 'fade');
+          showMateri(matchIdx, { shouldScroll: true, direction: dir });
           if (window.innerWidth <= 860 && sidebar) {
             sidebar.classList.remove('open');
             const backdrop = document.getElementById('sidebarBackdrop');
@@ -344,13 +388,14 @@ function initMateriPagination() {
   // Initial load hash detection
   const initialHash = window.location.hash ? window.location.hash.substring(1) : '';
   const initialIdx = materiList.findIndex(m => m.id === initialHash);
-  showMateri(initialIdx !== -1 ? initialIdx : 0, false);
+  showMateri(initialIdx !== -1 ? initialIdx : 0, { shouldScroll: false, direction: 'none' });
 
   window.addEventListener('hashchange', () => {
     const h = window.location.hash ? window.location.hash.substring(1) : '';
     const idx = materiList.findIndex(m => m.id === h);
     if (idx !== -1 && idx !== currentActiveIndex) {
-      showMateri(idx, true);
+      const dir = idx > currentActiveIndex ? 'next' : 'prev';
+      showMateri(idx, { shouldScroll: true, direction: dir });
     }
   });
 
