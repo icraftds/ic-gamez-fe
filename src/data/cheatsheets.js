@@ -1,3 +1,5 @@
+import { cheatsheetTopics } from './cheatsheetTopics.js'
+
 export const categories = [
   { id: 'all', label: 'Semua Modul', icon: 'fa-solid fa-layer-group' },
   { id: 'data', label: 'Data & Bisnis', icon: 'fa-solid fa-chart-column' },
@@ -6,7 +8,7 @@ export const categories = [
   { id: 'ai', label: 'Desain & AI', icon: 'fa-solid fa-wand-magic-sparkles' },
 ]
 
-export const cheatsheets = [
+const baseCheatsheets = [
   // 1. Data & Bisnis
   {
     slug: 'excel',
@@ -279,6 +281,11 @@ export const cheatsheets = [
     file: 'markdown.html'
   }
 ]
+
+export const cheatsheets = baseCheatsheets.map(item => ({
+  ...item,
+  topics: cheatsheetTopics[item.slug] || []
+}))
 
 export const getCheatsheetBySlug = (slug) => {
   return cheatsheets.find(c => c.slug === slug) || null

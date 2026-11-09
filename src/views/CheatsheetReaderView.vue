@@ -82,7 +82,7 @@
       <iframe
         v-if="isExpert && currentModule"
         ref="cheatsheetIframe"
-        :src="`/cheatsheet/${currentModule.file}?embed=1`"
+        :src="iframeSrc"
         class="fullpage-cheatsheet-frame"
         title="Cheatsheet Reader Fullpage"
       ></iframe>
@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import { cheatsheets, getCheatsheetBySlug } from '../data/cheatsheets'
@@ -166,6 +166,21 @@ const currentSlug = computed(() => route.params.slug)
 
 const currentModule = computed(() => {
   return getCheatsheetBySlug(currentSlug.value) || cheatsheets[0]
+})
+
+const iframeSrc = computed(() => {
+  if (!currentModule.value) return ''
+  const hash = route.hash || ''
+  return `/cheatsheet/${currentModule.value.file}?embed=1${hash}`
+})
+
+// Watch route.hash perubahan saat di halaman yang sama
+watch(() => route.hash, (newHash) => {
+  if (cheatsheetIframe.value && cheatsheetIframe.value.contentWindow && newHash) {
+    try {
+      cheatsheetIframe.value.contentWindow.location.hash = newHash
+    } catch (e) {}
+  }
 })
 
 const currentIndex = computed(() => {

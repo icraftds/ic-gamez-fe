@@ -715,3 +715,177 @@ body.light-mode .logo-light {
     max-width: 150px;
   }
 }
+
+/* ==========================================================================
+   Search Preview Snippets Inside Cheatsheet Cards
+   ========================================================================== */
+.card-search-preview {
+  margin-top: 10px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.cheat-card:hover .card-search-preview {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.search-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.preview-badge i {
+  font-size: 0.78rem;
+  color: #fbbf24;
+}
+
+.search-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preview-topic-item {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.preview-topic-item:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.45);
+  transform: translateX(2px);
+}
+
+.topic-header-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.topic-name {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #f8fafc;
+  font-family: 'JetBrains Mono', monospace, ui-monospace, sans-serif;
+  letter-spacing: -0.2px;
+}
+
+.topic-category-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+}
+
+.topic-syntax-box {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 4px 8px;
+  overflow-x: auto;
+}
+
+.topic-syntax-box code {
+  font-size: 0.76rem;
+  font-family: 'JetBrains Mono', monospace, ui-monospace, monospace;
+  color: #38bdf8;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.topic-desc {
+  font-size: 0.77rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.search-preview-more {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  padding-top: 2px;
+}
+
+/* Search Term Highlighting */
+mark.search-hl {
+  background: rgba(245, 158, 11, 0.28);
+  color: #fbbf24;
+  border-radius: 3px;
+  padding: 1px 3px;
+  font-weight: 700;
+}
+
+/* Light Mode Overrides for Preview */
+body.light-mode .card-search-preview {
+  background: rgba(241, 245, 249, 0.85);
+  border-color: rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode .cheat-card:hover .card-search-preview {
+  background: rgba(241, 245, 249, 0.98);
+  border-color: rgba(2, 132, 199, 0.45);
+}
+
+body.light-mode .preview-topic-item {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .preview-topic-item:hover {
+  background: rgba(2, 132, 199, 0.08);
+  border-color: #0284c7;
+}
+
+body.light-mode .topic-name {
+  color: #0f172a;
+}
+
+body.light-mode .topic-syntax-box {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .topic-syntax-box code {
+  color: #0284c7;
+}
+
+body.light-mode .topic-desc {
+  color: #64748b;
+}
+
+body.light-mode mark.search-hl {
+  background: rgba(245, 158, 11, 0.35);
+  color: #92400e;
+}

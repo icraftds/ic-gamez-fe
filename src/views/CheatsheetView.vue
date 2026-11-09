@@ -107,8 +107,39 @@
               <i :class="item.icon"></i>
             </div>
             <div class="cheat-content">
-              <h3 class="cheat-title">{{ item.title }}</h3>
-              <p class="cheat-desc">{{ item.desc }}</p>
+              <h3 class="cheat-title" v-html="highlightText(item.title, trimmedQuery)"></h3>
+              <p class="cheat-desc" v-html="highlightText(item.desc, trimmedQuery)"></p>
+            </div>
+          </div>
+
+          <!-- Search Preview Snippet (Tampil saat kata kunci pencarian cocok dengan rumus / materi) -->
+          <div v-if="trimmedQuery && item.matchedTopics?.length" class="card-search-preview">
+            <div class="search-preview-header">
+              <span class="preview-badge">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>{{ item.matchedTopics.length }} Materi / Rumus Cocok:</span>
+              </span>
+            </div>
+            <div class="search-preview-list">
+              <div
+                v-for="(topic, tIdx) in item.matchedTopics.slice(0, 3)"
+                :key="tIdx"
+                class="preview-topic-item"
+                :title="`Buka materi ${topic.name}`"
+                @click.stop="goToCheatsheet(item.slug, topic.sectionId)"
+              >
+                <div class="topic-header-line">
+                  <span class="topic-name" v-html="highlightText(topic.name, trimmedQuery)"></span>
+                  <span v-if="topic.category" class="topic-category-tag">{{ topic.category }}</span>
+                </div>
+                <div v-if="topic.syntax" class="topic-syntax-box">
+                  <code v-html="highlightText(topic.syntax, trimmedQuery)"></code>
+                </div>
+                <p v-if="topic.desc" class="topic-desc" v-html="highlightText(topic.desc, trimmedQuery)"></p>
+              </div>
+            </div>
+            <div v-if="item.matchedTopics.length > 3" class="search-preview-more">
+              +{{ item.matchedTopics.length - 3 }} materi / rumus lainnya cocok
             </div>
           </div>
 
@@ -144,7 +175,21 @@
         </div>
       </div>
 
-      <!-- 4B. Empty State -->
+      <!-- 4B. Empty State: Ada hasil di kategori lain -->
+      <div v-else-if="searchResults.length > 0 && selectedCategory !== 'all'" class="empty-cheatsheet-state">
+        <i class="fa-solid fa-layer-group"></i>
+        <h3>Tidak Ada Modul di Kategori Ini</h3>
+        <p>
+          Kata kunci "<strong>{{ searchQuery }}</strong>" tidak ditemukan pada kategori terpilih, tetapi ditemukan
+          <strong>{{ searchResults.length }} modul</strong> di kategori lainnya.
+        </p>
+        <button class="btn-reset-filter" @click="selectedCategory = 'all'">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>Tampilkan Semua Kategori ({{ searchResults.length }} Hasil)</span>
+        </button>
+      </div>
+
+      <!-- 4C. Empty State: Tidak ada hasil sama sekali -->
       <div v-else class="empty-cheatsheet-state">
         <i class="fa-solid fa-file-circle-question"></i>
         <h3>Tidak Ada Cheatsheet Ditemukan</h3>
@@ -175,26 +220,138 @@ const isExpert = computed(() => {
 const searchQuery = ref('')
 const selectedCategory = ref('all')
 
-const getCategoryCount = (catId) => {
-  if (catId === 'all') return cheatsheets.length
-  return cheatsheets.filter(c => c.category === catId).length
+const trimmedQuery = computed(() => searchQuery.value.trim())
+
+// Helper sanitasi HTML dan highlight kata kunci pencarian
+const escapeHtml = (str) => {
+  if (!str) return ''
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
 }
 
-const filteredCheatsheets = computed(() => {
-  return cheatsheets.filter(item => {
-    const matchesCat = selectedCategory.value === 'all' || item.category === selectedCategory.value
-    const q = searchQuery.value.toLowerCase().trim()
-    if (!q) return matchesCat
+const highlightText = (text, query) => {
+  if (!text) return ''
+  const safeText = escapeHtml(text)
+  const q = (query || '').trim()
+  if (!q) return safeText
 
-    const matchesQuery = item.title.toLowerCase().includes(q) ||
-      item.desc.toLowerCase().includes(q) ||
-      item.highlight.toLowerCase().includes(q)
-    return matchesCat && matchesQuery
-  })
+  const escapedQuery = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(`(${escapedQuery})`, 'gi')
+  return safeText.replace(regex, '<mark class="search-hl">$1</mark>')
+}
+
+// Deep search across titles, descriptions, and topics/formulas
+const searchResults = computed(() => {
+  const q = trimmedQuery.value.toLowerCase()
+  if (!q) {
+    return cheatsheets.map(item => ({
+      ...item,
+      matchedTopics: []
+    }))
+  }
+
+  const terms = q.split(/\s+/).filter(Boolean)
+  const scored = []
+
+  for (const item of cheatsheets) {
+    const titleLower = item.title.toLowerCase()
+    const descLower = item.desc.toLowerCase()
+    const highlightLower = item.highlight.toLowerCase()
+
+    const matchedTopics = []
+    if (item.topics && item.topics.length > 0) {
+      for (const topic of item.topics) {
+        const nameLower = (topic.name || '').toLowerCase()
+        const syntaxLower = (topic.syntax || '').toLowerCase()
+        const topicDescLower = (topic.desc || '').toLowerCase()
+        const keywords = (topic.keywords || []).map(k => k.toLowerCase())
+
+        const matchesTopic = nameLower.includes(q) ||
+          syntaxLower.includes(q) ||
+          topicDescLower.includes(q) ||
+          keywords.some(k => k.includes(q)) ||
+          terms.every(t =>
+            nameLower.includes(t) ||
+            syntaxLower.includes(t) ||
+            topicDescLower.includes(t) ||
+            keywords.some(k => k.includes(t))
+          )
+
+        if (matchesTopic) {
+          let topicScore = 0
+          if (nameLower === q) topicScore += 100
+          else if (nameLower.startsWith(q)) topicScore += 70
+          else if (nameLower.includes(q)) topicScore += 50
+          else if (syntaxLower.includes(q)) topicScore += 30
+          else if (topicDescLower.includes(q)) topicScore += 20
+          else topicScore += 10
+
+          matchedTopics.push({
+            ...topic,
+            _score: topicScore
+          })
+        }
+      }
+
+      matchedTopics.sort((a, b) => b._score - a._score)
+    }
+
+    const matchesCardMeta = titleLower.includes(q) ||
+      descLower.includes(q) ||
+      highlightLower.includes(q) ||
+      terms.every(t => titleLower.includes(t) || descLower.includes(t) || highlightLower.includes(t))
+
+    if (matchesCardMeta || matchedTopics.length > 0) {
+      let cardScore = 0
+      if (titleLower === q) cardScore += 200
+      else if (titleLower.startsWith(q)) cardScore += 120
+      else if (titleLower.includes(q)) cardScore += 80
+
+      if (matchedTopics.length > 0) {
+        cardScore += matchedTopics[0]._score + (matchedTopics.length * 10)
+      }
+
+      if (descLower.includes(q)) cardScore += 25
+      if (highlightLower.includes(q)) cardScore += 20
+
+      scored.push({
+        item: {
+          ...item,
+          matchedTopics
+        },
+        score: cardScore
+      })
+    }
+  }
+
+  scored.sort((a, b) => b.score - a.score)
+  return scored.map(s => s.item)
 })
 
-const goToCheatsheet = (slug) => {
-  router.push(`/cheatsheet/${slug}`)
+const filteredCheatsheets = computed(() => {
+  const list = searchResults.value
+  if (selectedCategory.value === 'all') {
+    return list
+  }
+  return list.filter(item => item.category === selectedCategory.value)
+})
+
+const getCategoryCount = (catId) => {
+  const list = searchResults.value
+  if (catId === 'all') return list.length
+  return list.filter(c => c.category === catId).length
+}
+
+const goToCheatsheet = (slug, sectionId) => {
+  if (sectionId) {
+    router.push({ path: `/cheatsheet/${slug}`, hash: `#${sectionId}` })
+  } else {
+    router.push(`/cheatsheet/${slug}`)
+  }
 }
 
 const goToUpgrade = () => {
