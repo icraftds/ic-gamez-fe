@@ -255,17 +255,31 @@ body:not(.light-mode) .nav-icon-btn.active {
 
 .notif-red-dot {
   position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 7px;
-  height: 7px;
-  background: #ef4444;
+  top: 6px;
+  right: 6px;
+  width: 9px;
+  height: 9px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   border-radius: 50%;
   border: 1.5px solid #ffffff;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.9), 0 0 4px #ef4444;
+  animation: redDotPulse 1.8s infinite ease-in-out;
 }
 
 body:not(.light-mode) .notif-red-dot {
   border-color: #121622;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.9), 0 0 6px #ef4444;
+}
+
+@keyframes redDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.8;
+  }
 }
 
 .notif-gift-dot {
@@ -294,6 +308,38 @@ body:not(.light-mode) .notif-gift-dot {
   50% {
     transform: scale(1.35);
     opacity: 0.8;
+  }
+}
+
+/* Real-time Badge Pop-in Animation */
+.badge-pop-enter-active {
+  animation: badgePopIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.badge-pop-leave-active {
+  animation: badgePopOut 0.2s cubic-bezier(0.4, 0, 1, 1);
+}
+@keyframes badgePopIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes badgePopOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
   }
 }
 

@@ -59,6 +59,7 @@ import { ssoEnabled, ssoState, loadSsoSession } from './services/sso'
 import { useLearningPaths } from './composables/useLearningPaths'
 import { useWipModal } from './composables/useWipModal'
 import { useTheme } from './composables/useTheme'
+import { useNotifications } from './composables/useNotifications'
 
 const now = ref(Date.now())
 const cooldownSeconds = computed(() => Math.max(0, Math.ceil((rateLimitUntil.value - now.value) / 1000)))
@@ -81,6 +82,15 @@ const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping, isAuthLoading,
 const { isPreparingLesson } = useLearningPaths()
 const { showWipModal } = useWipModal()
 const { isLightMode, toggleTheme } = useTheme()
+const { startPolling, stopPolling } = useNotifications()
+
+watch(isLoggedIn, (logged) => {
+  if (logged) {
+    startPolling()
+  } else {
+    stopPolling(true)
+  }
+}, { immediate: true })
 
 onMounted(() => {
 

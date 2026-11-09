@@ -70,8 +70,10 @@
               aria-label="Kotak Pesan & Notifikasi"
             >
               <i class="fa-regular fa-bell"></i>
-              <span v-if="hasUnclaimedGifts" class="notif-gift-dot" title="Hadiah iCoinz tersedia!"></span>
-              <span v-else-if="hasUnread" class="notif-red-dot" title="Pesan baru belum dibaca"></span>
+              <Transition name="badge-pop">
+                <span v-if="hasUnclaimedGifts" class="notif-gift-dot" title="Hadiah iCoinz tersedia!"></span>
+                <span v-else-if="hasUnread" class="notif-red-dot" title="Pesan baru belum dibaca"></span>
+              </Transition>
               <span class="nav-tooltip">Kotak Pesan & Hadiah</span>
             </button>
 
@@ -200,8 +202,10 @@
                 title="Kotak Pesan & Hadiah"
               >
                 <i class="fa-regular fa-bell"></i>
-                <span v-if="hasUnclaimedGifts" class="notif-gift-dot"></span>
-                <span v-else-if="hasUnread" class="notif-red-dot"></span>
+                <Transition name="badge-pop">
+                  <span v-if="hasUnclaimedGifts" class="notif-gift-dot"></span>
+                  <span v-else-if="hasUnread" class="notif-red-dot"></span>
+                </Transition>
               </button>
               <button
                 class="nav-icon-btn shop-btn"
@@ -241,7 +245,7 @@ import { useNotifications } from "../../composables/useNotifications";
 const { isLightMode, toggleTheme } = useTheme();
 
 const { isPremiumUser, isLoggedIn, isLoading, fetchUser, coinz, redirectToSso } = useUserAccount();
-const { hasUnread, hasUnclaimedGifts, startPolling, stopPolling } = useNotifications();
+const { hasUnread, hasUnclaimedGifts, fetchUnreadSummary } = useNotifications();
 
 const handleAuthClick = (type = 'masuk') => {
   redirectToSso('/dashboard', type);
@@ -344,18 +348,10 @@ const handleClickOutside = (e) => {
   }
 };
 
-watch(isLoggedIn, (logged) => {
-  if (logged) {
-    startPolling();
-  } else {
-    stopPolling(true);
-  }
-}, { immediate: true });
-
 onMounted(() => {
   if (isLoggedIn.value) {
     fetchUser();
-    startPolling();
+    fetchUnreadSummary({ force: true });
   }
   document.addEventListener('click', handleClickOutside);
   window.addEventListener('scroll', handleScroll, { passive: true });
@@ -370,7 +366,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  stopPolling(false);
   document.removeEventListener('click', handleClickOutside);
   window.removeEventListener('scroll', handleScroll);
   window.removeEventListener('resize', updatePill);

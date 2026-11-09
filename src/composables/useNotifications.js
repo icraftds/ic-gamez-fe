@@ -16,10 +16,48 @@ let lastListFetchedAt = 0
 let lastSummaryFetchedAt = 0
 let pollTimer = null
 let expiryTimer = null
-let visibilityListenerAttached = false
+let listenersAttached = false
 
-const LIST_CACHE_TTL_MS = 15000
-const SUMMARY_POLL_INTERVAL_MS = 20000
+const LIST_CACHE_TTL_MS = 10000
+const ACTIVE_POLL_INTERVAL_MS = 4000 // 4s active polling for real-time notification badge
+const BACKGROUND_POLL_INTERVAL_MS = 25000 // 25s when browser tab is inactive / minimized
+const MIN_FETCH_GAP_MS = 1500 // 1.5s debounce to prevent duplicate network spam
+
+// Cross-tab synchronization via BroadcastChannel & localStorage
+const notifChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('gamez_notif_sync') : null
+
+const broadcastSync = () => {
+  if (typeof window === 'undefined') return
+  const payload = {
+    unread: unreadCount.value,
+    unclaimed: unclaimedRewardsCount.value,
+    timestamp: Date.now()
+  }
+  try {
+    notifChannel?.postMessage(payload)
+    localStorage.setItem('gamez_notif_sync', JSON.stringify(payload))
+  } catch (e) {}
+}
+
+if (typeof window !== 'undefined') {
+  if (notifChannel) {
+    notifChannel.onmessage = (e) => {
+      if (e.data) {
+        unreadCount.value = Number(e.data.unread) || 0
+        unclaimedRewardsCount.value = Number(e.data.unclaimed) || 0
+      }
+    }
+  }
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'gamez_notif_sync' && e.newValue) {
+      try {
+        const data = JSON.parse(e.newValue)
+        unreadCount.value = Number(data.unread) || 0
+        unclaimedRewardsCount.value = Number(data.unclaimed) || 0
+      } catch (err) {}
+    }
+  })
+}
 
 const isNotificationExpired = (notif) => {
   if (!notif?.expires_at) return false
@@ -93,12 +131,13 @@ export function useNotifications() {
     if (!isLoggedIn.value) return
     pruneExpiredClientSide()
 
-    if (typeof document !== 'undefined' && document.visibilityState === 'hidden' && !force) {
+    const isHidden = typeof document !== 'undefined' && document.visibilityState === 'hidden'
+    if (isHidden && !force) {
       return
     }
 
     const now = Date.now()
-    if (!force && lastSummaryFetchedAt > 0 && now - lastSummaryFetchedAt < 10000) {
+    if (!force && lastSummaryFetchedAt > 0 && now - lastSummaryFetchedAt < MIN_FETCH_GAP_MS) {
       return
     }
     if (inFlightSummaryPromise) {
@@ -107,11 +146,20 @@ export function useNotifications() {
 
     inFlightSummaryPromise = (async () => {
       try {
-        const res = await api.get('/notifications/unread-summary')
+        const url = force ? '/notifications/unread-summary?fresh=1' : '/notifications/unread-summary'
+        const res = await api.get(url)
         if (res.data?.status === 'success' && res.data?.data) {
-          unreadCount.value = res.data.data.unread_count || 0
-          unclaimedRewardsCount.value = res.data.data.unclaimed_rewards_count || 0
+          const newUnread = Number(res.data.data.unread_count) || 0
+          const newUnclaimed = Number(res.data.data.unclaimed_rewards_count) || 0
+
+          const changed = unreadCount.value !== newUnread || unclaimedRewardsCount.value !== newUnclaimed
+          unreadCount.value = newUnread
+          unclaimedRewardsCount.value = newUnclaimed
           lastSummaryFetchedAt = Date.now()
+
+          if (changed) {
+            broadcastSync()
+          }
         }
       } catch (err) {
         // Silent fail on background polling
@@ -129,6 +177,7 @@ export function useNotifications() {
 
     item.is_read = true
     if (unreadCount.value > 0) unreadCount.value--
+    broadcastSync()
 
     try {
       await api.post(`/notifications/${id}/read`)
@@ -136,6 +185,7 @@ export function useNotifications() {
       // Rollback optimistic update on failure
       item.is_read = false
       unreadCount.value++
+      broadcastSync()
       console.error('Failed to mark notification as read:', err)
     }
   }
@@ -147,6 +197,7 @@ export function useNotifications() {
     const prevUnreadCount = unreadCount.value
     unreadItems.forEach(n => { n.is_read = true })
     unreadCount.value = 0
+    broadcastSync()
 
     try {
       await api.post('/notifications/read-all')
@@ -154,6 +205,7 @@ export function useNotifications() {
       // Rollback optimistic update on failure
       unreadItems.forEach(n => { n.is_read = false })
       unreadCount.value = prevUnreadCount
+      broadcastSync()
       console.error('Failed to mark all notifications as read:', err)
     }
   }
@@ -181,6 +233,7 @@ export function useNotifications() {
         if (unclaimedRewardsCount.value > 0) {
           unclaimedRewardsCount.value--
         }
+        broadcastSync()
 
         lastClaimedReward.value = {
           id: notification.id,
@@ -206,13 +259,31 @@ export function useNotifications() {
     }
   }
 
+  const restartPollTimer = (intervalMs) => {
+    if (pollTimer) clearInterval(pollTimer)
+    pollTimer = setInterval(() => {
+      fetchUnreadSummary()
+    }, intervalMs)
+  }
+
   const handleVisibilityChange = () => {
-    if (typeof document !== 'undefined' && document.visibilityState === 'visible' && isLoggedIn.value) {
-      pruneExpiredClientSide()
-      if (Date.now() - lastSummaryFetchedAt >= SUMMARY_POLL_INTERVAL_MS) {
-        fetchUnreadSummary()
-      }
+    if (typeof document === 'undefined' || !isLoggedIn.value) return
+    pruneExpiredClientSide()
+
+    if (document.visibilityState === 'visible') {
+      // Instantly refresh when returning to tab
+      lastSummaryFetchedAt = 0
+      fetchUnreadSummary({ force: true })
+      restartPollTimer(ACTIVE_POLL_INTERVAL_MS)
+    } else {
+      restartPollTimer(BACKGROUND_POLL_INTERVAL_MS)
     }
+  }
+
+  const handleWindowFocus = () => {
+    if (!isLoggedIn.value) return
+    lastSummaryFetchedAt = 0
+    fetchUnreadSummary({ force: true })
   }
 
   const startPolling = () => {
@@ -220,11 +291,7 @@ export function useNotifications() {
     lastSummaryFetchedAt = 0
     fetchUnreadSummary({ force: true })
 
-    if (!pollTimer) {
-      pollTimer = setInterval(() => {
-        fetchUnreadSummary()
-      }, SUMMARY_POLL_INTERVAL_MS)
-    }
+    restartPollTimer(ACTIVE_POLL_INTERVAL_MS)
 
     if (!expiryTimer) {
       expiryTimer = setInterval(() => {
@@ -232,16 +299,18 @@ export function useNotifications() {
       }, 30000)
     }
 
-    if (typeof document !== 'undefined' && !visibilityListenerAttached) {
+    if (typeof window !== 'undefined' && !listenersAttached) {
       document.addEventListener('visibilitychange', handleVisibilityChange)
-      visibilityListenerAttached = true
-    }
-
-    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleWindowFocus)
       window.addEventListener('gamez-session-loaded', () => {
         lastSummaryFetchedAt = 0
         fetchUnreadSummary({ force: true })
-      }, { once: false })
+      })
+      window.addEventListener('gamez-profile-updated', () => {
+        lastSummaryFetchedAt = 0
+        fetchUnreadSummary({ force: true })
+      })
+      listenersAttached = true
     }
   }
 
@@ -254,9 +323,10 @@ export function useNotifications() {
       clearInterval(expiryTimer)
       expiryTimer = null
     }
-    if (typeof document !== 'undefined' && visibilityListenerAttached) {
+    if (typeof window !== 'undefined' && listenersAttached) {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
-      visibilityListenerAttached = false
+      window.removeEventListener('focus', handleWindowFocus)
+      listenersAttached = false
     }
     if (resetState) {
       notifications.value = []

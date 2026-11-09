@@ -1,5 +1,6 @@
 import { ssoEnabled, loadSsoSession } from './services/sso'
 import { startAuthLoading, stopAuthLoading, redirectToSso } from './composables/useUserAccount'
+import { useNotifications } from './composables/useNotifications'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 
@@ -188,6 +189,10 @@ router.afterEach((to) => {
       stopAuthLoading()
     }, 2500)
   }
+
+  // Refresh notification summary on navigation
+  const { fetchUnreadSummary } = useNotifications()
+  fetchUnreadSummary()
 })
 
 export default router
