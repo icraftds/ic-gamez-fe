@@ -162,8 +162,9 @@ function initSharedSidebar() {
     mobileToggle.addEventListener('click', () => toggleSidebar());
   }
 
-  // Floating Action Button for Mobile TOC
-  if (!document.getElementById('mobileTocFloatingBtn')) {
+  // Floating Action Button for Mobile TOC (Only in standalone mobile mode, never when embedded or on desktop)
+  const isEmbedded = (window.self !== window.top) || (window.location.search.indexOf('embed=1') !== -1);
+  if (!isEmbedded && window.innerWidth <= 860 && !document.getElementById('mobileTocFloatingBtn')) {
     const fab = document.createElement('button');
     fab.id = 'mobileTocFloatingBtn';
     fab.className = 'mobile-toc-fab';

@@ -1666,7 +1666,17 @@ code, kbd, samp, pre {
 html.is-embedded .header,
 html.is-embedded .site-header,
 body.is-embedded .header,
-body.is-embedded .site-header {
+body.is-embedded .site-header,
+html.is-embedded footer,
+html.is-embedded .app-footer,
+html.is-embedded .site-footer,
+html.is-embedded .footer,
+body.is-embedded footer,
+body.is-embedded .app-footer,
+body.is-embedded .site-footer,
+body.is-embedded .footer,
+html.is-embedded .mobile-toc-fab,
+body.is-embedded .mobile-toc-fab {
   display: none !important;
   height: 0 !important;
   margin: 0 !important;
@@ -1720,6 +1730,11 @@ body.is-embedded .site-header ~ .app-layout .app-sidebar {
     margin: 0 0.75rem;
     max-width: 300px;
   }
+}
+
+/* Base Mobile TOC FAB - Hidden by default on Desktop and Embedded */
+.mobile-toc-fab {
+  display: none !important;
 }
 
 @media (max-width: 860px) {
@@ -1998,8 +2013,8 @@ body.is-embedded .site-header ~ .app-layout .app-sidebar {
     color: #cbd5e1 !important;
   }
 
-  /* Floating Action Button for Instant Mobile Drawer Access */
-  .mobile-toc-fab {
+  /* Floating Action Button for Instant Mobile Drawer Access (Standalone mobile only) */
+  body:not(.is-embedded) .mobile-toc-fab {
     display: inline-flex !important;
     position: fixed !important;
     bottom: 22px !important;
