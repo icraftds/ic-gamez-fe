@@ -90,10 +90,11 @@ function initSharedTheme() {
   });
 }
 
-/* 2. Sidebar & Scroll Spy */
+/* 2. Sidebar Management (Desktop Collapse & Mobile Off-canvas) */
 function initSharedSidebar() {
-  const mobileToggle = document.getElementById('mobileMenuToggle');
   const sidebar = document.getElementById('appSidebar') || document.getElementById('sidebar');
+  if (!sidebar) return;
+
   let backdrop = document.getElementById('sidebarBackdrop');
   if (!backdrop) {
     backdrop = document.createElement('div');
@@ -101,42 +102,63 @@ function initSharedSidebar() {
     backdrop.className = 'sidebar-backdrop';
     document.body.appendChild(backdrop);
   }
-  const navLinks = document.querySelectorAll('.sidebar-link, .sidebar-nav .nav-item');
-  const sections = document.querySelectorAll('.content-section, .category-section');
 
-  const toggleMobileSidebar = (open) => {
-    if (sidebar) sidebar.classList.toggle('open', open);
-    if (backdrop) backdrop.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-  };
-
-  if (mobileToggle) {
-    mobileToggle.addEventListener('click', () => {
-      toggleMobileSidebar(!sidebar.classList.contains('open'));
-    });
-  } else {
-    // If standalone header exists without a toggle button, inject one dynamically
-    const headerContainer = document.querySelector('.header-container, .header, .site-header');
-    if (headerContainer && !headerContainer.querySelector('.mobile-menu-toggle')) {
-      const injectedToggle = document.createElement('button');
-      injectedToggle.className = 'btn-icon mobile-menu-toggle';
-      injectedToggle.id = 'mobileMenuToggle';
-      injectedToggle.setAttribute('aria-label', 'Buka Navigasi');
-      injectedToggle.innerHTML = '<i data-lucide="menu">☰</i>';
-      injectedToggle.addEventListener('click', () => {
-        if (sidebar) toggleMobileSidebar(!sidebar.classList.contains('open'));
-      });
-      const brand = headerContainer.querySelector('.header-brand, .header-left, .brand-text, .brand');
-      if (brand && brand.parentNode) {
-        brand.parentNode.insertBefore(injectedToggle, brand);
-      } else {
-        headerContainer.prepend(injectedToggle);
-      }
-    }
+  // Unified Header inside Sidebar
+  let drawerHeader = sidebar.querySelector('.sidebar-drawer-header');
+  if (!drawerHeader) {
+    drawerHeader = document.createElement('div');
+    drawerHeader.className = 'sidebar-drawer-header';
+    drawerHeader.innerHTML = `
+      <span class="sidebar-drawer-title"><i data-lucide="layers" style="width:16px;height:16px;margin-right:6px;"></i>Daftar Isi</span>
+      <button class="sidebar-close-btn" aria-label="Tutup Sidebar" title="Tutup Sidebar"><i data-lucide="x" style="width:16px;height:16px;">✕</i></button>
+    `;
+    sidebar.prepend(drawerHeader);
   }
 
-  if (backdrop) {
-    backdrop.addEventListener('click', () => toggleMobileSidebar(false));
+  // Floating Reopen Button on Desktop when sidebar collapsed
+  let reopenBtn = document.getElementById('sidebarReopenBtn');
+  if (!reopenBtn) {
+    reopenBtn = document.createElement('button');
+    reopenBtn.id = 'sidebarReopenBtn';
+    reopenBtn.className = 'sidebar-reopen-btn';
+    reopenBtn.setAttribute('aria-label', 'Buka Daftar Isi');
+    reopenBtn.setAttribute('title', 'Buka Daftar Isi');
+    reopenBtn.innerHTML = '<i data-lucide="panel-left-open" style="width:15px;height:15px;margin-right:6px;"></i><span>Daftar Isi</span>';
+    document.body.appendChild(reopenBtn);
+  }
+
+  const isMobile = () => window.innerWidth <= 860;
+
+  const toggleSidebar = (forceState) => {
+    if (isMobile()) {
+      const open = typeof forceState === 'boolean' ? forceState : !sidebar.classList.contains('open');
+      sidebar.classList.toggle('open', open);
+      backdrop.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    } else {
+      const isCurrentlyCollapsed = document.body.classList.contains('sidebar-collapsed');
+      const shouldCollapse = typeof forceState === 'boolean' ? !forceState : !isCurrentlyCollapsed;
+      document.body.classList.toggle('sidebar-collapsed', shouldCollapse);
+      try {
+        localStorage.setItem('gamez-cheatsheet-sidebar-collapsed', shouldCollapse ? '1' : '0');
+      } catch (e) {}
+    }
+  };
+
+  // Restore saved desktop collapse preference
+  try {
+    if (!isMobile() && localStorage.getItem('gamez-cheatsheet-sidebar-collapsed') === '1') {
+      document.body.classList.add('sidebar-collapsed');
+    }
+  } catch (e) {}
+
+  drawerHeader.querySelector('.sidebar-close-btn')?.addEventListener('click', () => toggleSidebar(false));
+  reopenBtn?.addEventListener('click', () => toggleSidebar(true));
+  backdrop?.addEventListener('click', () => toggleSidebar(false));
+
+  const mobileToggle = document.getElementById('mobileMenuToggle');
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', () => toggleSidebar());
   }
 
   // Floating Action Button for Mobile TOC
@@ -146,60 +168,18 @@ function initSharedSidebar() {
     fab.className = 'mobile-toc-fab';
     fab.setAttribute('aria-label', 'Buka Daftar Isi');
     fab.innerHTML = '<i data-lucide="menu">☰</i><span>Daftar Isi</span>';
-    fab.addEventListener('click', () => {
-      if (sidebar) toggleMobileSidebar(!sidebar.classList.contains('open'));
-    });
+    fab.addEventListener('click', () => toggleSidebar(true));
     document.body.appendChild(fab);
   }
-
-  // Close Header inside Sidebar Drawer
-  if (sidebar && !sidebar.querySelector('.sidebar-drawer-header')) {
-    const drawerHeader = document.createElement('div');
-    drawerHeader.className = 'sidebar-drawer-header';
-    drawerHeader.innerHTML = `
-      <span class="sidebar-drawer-title"><i data-lucide="layers" style="margin-right:6px;">☰</i>Daftar Isi</span>
-      <button class="sidebar-close-btn" aria-label="Tutup"><i data-lucide="x">✕</i></button>
-    `;
-    drawerHeader.querySelector('.sidebar-close-btn').addEventListener('click', () => toggleMobileSidebar(false));
-    sidebar.prepend(drawerHeader);
-  }
-
-  if (typeof lucide !== 'undefined') lucide.createIcons();
 
   // Cross-frame messaging from GameZ reader toolbar
   window.addEventListener('message', (e) => {
     if (e.data && e.data.action === 'toggleSidebar') {
-      if (sidebar) toggleMobileSidebar(!sidebar.classList.contains('open'));
+      toggleSidebar();
     }
   });
 
-  navLinks.forEach((link) => {
-    link.addEventListener('click', () => {
-      if (window.innerWidth <= 860) {
-        toggleMobileSidebar(false);
-      }
-    });
-  });
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const id = entry.target.getAttribute('id');
-        navLinks.forEach((link) => {
-          if (link.getAttribute('href') === `#${id}`) {
-            link.classList.add('active');
-            if (window.innerWidth <= 860 && sidebar) {
-              link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
-          } else {
-            link.classList.remove('active');
-          }
-        });
-      }
-    });
-  }, { root: null, rootMargin: '-20% 0px -70% 0px', threshold: 0 });
-
-  sections.forEach((sec) => observer.observe(sec));
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 /* 3. Copy to Clipboard & Toast */
@@ -770,6 +750,7 @@ window.CheatsheetEngine = {
 
     initSharedTheme();
     initSharedSidebar();
+    initMateriPagination();
     initSharedCopyButtons();
     initFormulaFavorites();
     initPageLiveSearch();

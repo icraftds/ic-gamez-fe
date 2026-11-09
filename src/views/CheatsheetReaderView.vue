@@ -46,13 +46,13 @@
       </div>
 
       <div class="toolbar-right" v-if="currentModule">
-        <!-- Hamburger Menu Button for Mobile TOC -->
+        <!-- Toggle Button for Sidebar TOC (Desktop & Mobile) -->
         <button
           v-if="isExpert"
-          class="btn-toolbar-toc hide-desktop"
+          class="btn-toolbar-toc"
           @click="toggleIframeSidebar"
-          title="Buka Daftar Isi"
-          aria-label="Buka Daftar Isi"
+          title="Buka / Tutup Daftar Isi"
+          aria-label="Buka / Tutup Daftar Isi"
         >
           <i class="fa-solid fa-bars"></i>
           <span class="toc-text">Daftar Isi</span>
