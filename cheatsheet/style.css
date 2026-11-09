@@ -3510,3 +3510,169 @@ body.is-embedded .site-header ~ .app-layout .app-sidebar {
   }
 }
 
+/* 3. Per-Materi Focused View */
+.materi-top-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 1.5rem !important;
+  padding: 8px 14px !important;
+  background: rgba(15, 23, 42, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 10px !important;
+}
+
+.materi-badge-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  color: #38bdf8 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+}
+
+.materi-progress-track {
+  width: 120px !important;
+  height: 6px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+}
+
+.materi-progress-fill {
+  display: block !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, #38bdf8, #818cf8) !important;
+  border-radius: 999px !important;
+  transition: width 0.3s ease !important;
+}
+
+.materi-active {
+  display: block !important;
+  animation: materiFadeIn 0.22s ease !important;
+}
+
+.materi-hidden {
+  display: none !important;
+}
+
+@keyframes materiFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Materi Navigation Footer (Next / Prev) */
+.materi-nav-footer {
+  margin-top: 3.5rem !important;
+  padding-top: 2rem !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+}
+
+.btn-materi-step {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 12px 18px !important;
+  background: rgba(15, 23, 42, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  color: #f1f5f9 !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  max-width: 45% !important;
+  min-width: 180px !important;
+}
+
+.btn-materi-step:not(:disabled):hover {
+  background: rgba(56, 189, 248, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), 0 0 12px rgba(56, 189, 248, 0.12) !important;
+  transform: translateY(-1px) !important;
+}
+
+.btn-materi-step:disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.btn-materi-step .step-text-col {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+}
+
+.btn-materi-step .step-text-col.text-right {
+  text-align: right !important;
+  align-items: flex-end !important;
+}
+
+.btn-materi-step .step-sublabel {
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: #94a3b8 !important;
+}
+
+.btn-materi-step .step-title {
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 220px !important;
+}
+
+.btn-materi-step i,
+.btn-materi-step svg {
+  flex-shrink: 0 !important;
+  color: #38bdf8 !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.materi-step-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 14px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 999px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: #cbd5e1 !important;
+}
+
+@media (max-width: 640px) {
+  .materi-nav-footer {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .btn-materi-step {
+    max-width: 100% !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+  .materi-step-pill {
+    order: -1 !important;
+    align-self: center !important;
+  }
+}
+

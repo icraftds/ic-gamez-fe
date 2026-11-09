@@ -28,6 +28,7 @@ function setupCheatsheetPage({ catalog = [], questions = [] }) {
 
     initSharedTheme();
     initSharedSidebar();
+    initMateriPagination();
     initSharedCopyButtons();
     initFormulaFavorites();
 
@@ -181,6 +182,204 @@ function initSharedSidebar() {
 
   if (typeof lucide !== 'undefined') lucide.createIcons();
 }
+
+/* 2B. Per-Materi Focused Learning Mode */
+function initMateriPagination() {
+  const sections = Array.from(document.querySelectorAll('.category-section, .content-section')).filter(s => s.id);
+  if (sections.length <= 1) return;
+
+  const sidebar = document.getElementById('appSidebar') || document.getElementById('sidebar');
+  const navLinks = Array.from(document.querySelectorAll('.sidebar-link, .sidebar-nav .nav-item'));
+  const heroBanner = document.querySelector('.hero-banner');
+
+  const materiList = sections.map((sec, idx) => {
+    const h = sec.querySelector('h2, h3, .section-title, .category-tag, .formula-name');
+    let title = h ? h.textContent.replace(/<[^>]+>/g, '').trim() : sec.id;
+    title = title.replace(/^[0-9\.\s\-]+/, '').trim();
+    return {
+      index: idx,
+      id: sec.id,
+      title: title || `Materi ${idx + 1}`,
+      element: sec
+    };
+  });
+
+  const total = materiList.length;
+
+  materiList.forEach((m, idx) => {
+    const sec = m.element;
+
+    // Inject Top Indicator Bar
+    if (!sec.querySelector('.materi-top-bar')) {
+      const topBar = document.createElement('div');
+      topBar.className = 'materi-top-bar';
+      const pct = Math.round(((idx + 1) / total) * 100);
+      topBar.innerHTML = `
+        <span class="materi-badge-pill">
+          <i data-lucide="book-marked" style="width:14px;height:14px;"></i>
+          <span>Materi ${idx + 1} dari ${total}</span>
+        </span>
+        <span class="materi-progress-track" title="${pct}% Selesai">
+          <span class="materi-progress-fill" style="width: ${pct}%;"></span>
+        </span>
+      `;
+      sec.insertBefore(topBar, sec.firstChild);
+    }
+
+    // Inject Bottom Navigation Footer (Prev / Next)
+    if (!sec.querySelector('.materi-nav-footer')) {
+      const prev = idx > 0 ? materiList[idx - 1] : null;
+      const next = idx < total - 1 ? materiList[idx + 1] : null;
+
+      const navFooter = document.createElement('div');
+      navFooter.className = 'materi-nav-footer';
+      navFooter.innerHTML = `
+        <button type="button" class="btn-materi-step btn-prev-materi" ${!prev ? 'disabled' : ''} data-target-index="${idx - 1}">
+          <i data-lucide="chevron-left"></i>
+          <div class="step-text-col">
+            <span class="step-sublabel">Sebelumnya</span>
+            <span class="step-title">${prev ? prev.title : 'Awal Modul'}</span>
+          </div>
+        </button>
+
+        <div class="materi-step-pill">
+          <i data-lucide="book-open" style="width:14px;height:14px;"></i>
+          <span>${idx + 1} / ${total}</span>
+        </div>
+
+        <button type="button" class="btn-materi-step btn-next-materi" ${!next ? 'disabled' : ''} data-target-index="${idx + 1}">
+          <div class="step-text-col text-right">
+            <span class="step-sublabel">Selanjutnya</span>
+            <span class="step-title">${next ? next.title : 'Selesai'}</span>
+          </div>
+          <i data-lucide="chevron-right"></i>
+        </button>
+      `;
+      sec.appendChild(navFooter);
+    }
+  });
+
+  let currentActiveIndex = 0;
+
+  const showMateri = (index, shouldScroll = true) => {
+    if (index < 0) index = 0;
+    if (index >= total) index = total - 1;
+    currentActiveIndex = index;
+
+    materiList.forEach((m, idx) => {
+      if (idx === index) {
+        m.element.classList.add('materi-active');
+        m.element.classList.remove('materi-hidden');
+        m.element.style.display = 'block';
+      } else {
+        m.element.classList.remove('materi-active');
+        m.element.classList.add('materi-hidden');
+        m.element.style.display = 'none';
+      }
+    });
+
+    if (heroBanner) {
+      heroBanner.style.display = index === 0 ? '' : 'none';
+    }
+
+    // Update active highlight in sidebar
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href === '#' + materiList[index].id) {
+        link.classList.add('active');
+        if (sidebar && typeof link.scrollIntoView === 'function') {
+          link.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    try {
+      history.replaceState(null, '', '#' + materiList[index].id);
+    } catch (e) {}
+
+    if (shouldScroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const mainContent = document.querySelector('.main-content, .content, .main-container');
+      if (mainContent && mainContent.scrollTop) {
+        mainContent.scrollTop = 0;
+      }
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  };
+
+  // Click on Prev / Next buttons
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-materi-step');
+    if (!btn || btn.disabled) return;
+    const targetIdx = parseInt(btn.getAttribute('data-target-index'), 10);
+    if (!isNaN(targetIdx) && targetIdx >= 0 && targetIdx < total) {
+      showMateri(targetIdx, true);
+    }
+  });
+
+  // Click on Sidebar Nav Links
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        const secId = href.substring(1);
+        const matchIdx = materiList.findIndex(m => m.id === secId);
+        if (matchIdx !== -1) {
+          e.preventDefault();
+          showMateri(matchIdx, true);
+          if (window.innerWidth <= 860 && sidebar) {
+            sidebar.classList.remove('open');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (backdrop) backdrop.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        }
+      }
+    });
+  });
+
+  // Initial load hash detection
+  const initialHash = window.location.hash ? window.location.hash.substring(1) : '';
+  const initialIdx = materiList.findIndex(m => m.id === initialHash);
+  showMateri(initialIdx !== -1 ? initialIdx : 0, false);
+
+  window.addEventListener('hashchange', () => {
+    const h = window.location.hash ? window.location.hash.substring(1) : '';
+    const idx = materiList.findIndex(m => m.id === h);
+    if (idx !== -1 && idx !== currentActiveIndex) {
+      showMateri(idx, true);
+    }
+  });
+
+  // Search compatibility
+  const searchInput = document.getElementById('cheatsheetSearch') || document.getElementById('searchRumus');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        showMateri(currentActiveIndex, false);
+      } else {
+        materiList.forEach(m => {
+          const cards = m.element.querySelectorAll('.formula-card');
+          const hasMatches = Array.from(cards).some(card => {
+            return card.textContent.toLowerCase().includes(q);
+          });
+          if (hasMatches) {
+            m.element.classList.remove('materi-hidden');
+            m.element.style.display = 'block';
+          } else {
+            m.element.classList.add('materi-hidden');
+            m.element.style.display = 'none';
+          }
+        });
+      }
+    });
+  }
+}
+
 
 /* 3. Copy to Clipboard & Toast */
 function showToast(message = 'Tersalin ke clipboard!') {
