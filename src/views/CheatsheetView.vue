@@ -46,19 +46,6 @@
         </div>
       </div>
 
-      <!-- 2B. Unlocked Status Banner (Tampil jika SUDAH Expert) -->
-      <div v-else class="vault-unlocked-banner">
-        <div class="unlocked-info">
-          <i class="fa-solid fa-circle-check"></i>
-          <span>Status Akun: Expert Plan Aktif • Akses Seluruh Vault Terbuka Penuh</span>
-        </div>
-        <div class="unlocked-stats">
-          <span><i class="fa-solid fa-book-bookmark"></i> 24 Modul</span>
-          <span class="stat-divider">•</span>
-          <span><i class="fa-solid fa-list-check"></i> 305+ Soal Latihan</span>
-        </div>
-      </div>
-
       <!-- 3. Filter Categories & Search Bar -->
       <div class="vault-controls-bar">
         <div class="vault-category-tabs">

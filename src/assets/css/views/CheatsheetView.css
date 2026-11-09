@@ -104,46 +104,6 @@ body.light-mode .logo-light {
   -webkit-text-fill-color: transparent;
 }
 
-/* 2. Status Banners */
-.vault-unlocked-banner {
-  background: rgba(16, 185, 129, 0.07);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  border-radius: 14px;
-  padding: 12px 20px;
-  margin-bottom: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.unlocked-info {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: #34d399;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.unlocked-stats {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.86rem;
-  color: #94a3b8;
-}
-
-.unlocked-stats span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.stat-divider {
-  color: rgba(255, 255, 255, 0.2);
-}
 
 .vault-paywall-banner {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(124, 58, 237, 0.1) 100%);
@@ -688,18 +648,6 @@ body.light-mode .logo-light {
     min-width: 100%;
   }
 
-  .vault-unlocked-banner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 14px;
-  }
-
-  .unlocked-stats {
-    width: 100%;
-    justify-content: space-between;
-    font-size: 0.82rem;
-  }
 
   .vault-paywall-banner {
     flex-direction: column;

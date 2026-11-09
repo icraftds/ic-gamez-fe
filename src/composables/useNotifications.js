@@ -19,7 +19,7 @@ let expiryTimer = null
 let visibilityListenerAttached = false
 
 const LIST_CACHE_TTL_MS = 15000
-const SUMMARY_POLL_INTERVAL_MS = 45000
+const SUMMARY_POLL_INTERVAL_MS = 20000
 
 const isNotificationExpired = (notif) => {
   if (!notif?.expires_at) return false
@@ -217,7 +217,8 @@ export function useNotifications() {
 
   const startPolling = () => {
     if (!isLoggedIn.value) return
-    fetchUnreadSummary()
+    lastSummaryFetchedAt = 0
+    fetchUnreadSummary({ force: true })
 
     if (!pollTimer) {
       pollTimer = setInterval(() => {
@@ -234,6 +235,13 @@ export function useNotifications() {
     if (typeof document !== 'undefined' && !visibilityListenerAttached) {
       document.addEventListener('visibilitychange', handleVisibilityChange)
       visibilityListenerAttached = true
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('gamez-session-loaded', () => {
+        lastSummaryFetchedAt = 0
+        fetchUnreadSummary({ force: true })
+      }, { once: false })
     }
   }
 

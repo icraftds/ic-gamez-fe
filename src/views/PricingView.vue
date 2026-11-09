@@ -106,6 +106,7 @@ import api from '../services/api'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import AuthRequiredModal from '../components/common/AuthRequiredModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
+import { useToast } from '../composables/useToast'
 
 const props = defineProps({
   isEmbedded: {
@@ -116,6 +117,7 @@ const props = defineProps({
 
 const router = useRouter()
 const { isLoggedIn, isPremiumUser, currentPlan } = useUserAccount()
+const { showToast } = useToast()
 
 const plans = ref([])
 const isLoadingPlans = ref(false)
@@ -213,7 +215,7 @@ const handlePlanClick = async (slug, plan = null) => {
 
   if (slug === 'free') {
     if (isLoggedIn.value) {
-      alert('Anda sudah berada di Free Plan saat ini.')
+      showToast('Anda sudah berada di Free Plan saat ini.', 'info')
       return
     }
     pendingStepLabel.value = 'menggunakan fitur gratis'

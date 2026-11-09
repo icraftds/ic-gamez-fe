@@ -2,6 +2,20 @@ import { ref, computed } from 'vue'
 import api, { initCsrf } from '../services/api'
 import { ssoEnabled, ssoState, loadSsoSession, logoutSso } from '../services/sso'
 
+export function sanitizeAvatarUrl(url, name = 'User') {
+  if (!url || typeof url !== 'string' || url.includes('dicebear.com')) {
+    return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name || 'User') + '&background=random'
+  }
+  // If avatar URL has localhost:8000 but client is accessing from non-localhost environment
+  if (url.includes('localhost:8000') || url.includes('127.0.0.1:8000')) {
+    const isLocalhostEnv = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    if (!isLocalhostEnv) {
+      return url.replace(/^https?:\/\/(?:localhost|127\.0\.0\.1):8000/, 'https://icgamez.unikom.my.id')
+    }
+  }
+  return url
+}
+
 const authIdentity = () => ssoEnabled ? ssoState.user.value?.id ?? null : localStorage.getItem('auth_token')
 
 const credits = ref(10)
@@ -141,7 +155,7 @@ export function useUserAccount() {
         last_username_change_at: data.last_username_change_at,
         email: data.email,
         phone: data.phone || '',
-        avatar: (data.avatar_url && !data.avatar_url.includes('dicebear.com')) ? data.avatar_url : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.name || 'User') + '&background=random',
+        avatar: sanitizeAvatarUrl(data.avatar_url, data.name),
         level: Number(data.level) || 1,
         xp: Number(data.xp) || 0,
         totalXp: Number(data.total_xp ?? data.xp) || 0,
@@ -228,6 +242,9 @@ export function useUserAccount() {
         }
       }
       await fetchWallet()
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('gamez-session-loaded'))
+      }
       return true
     } finally {
       if (!silent) isBootstrapping.value = false

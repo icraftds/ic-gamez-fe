@@ -59,6 +59,7 @@ import { ref, watch } from 'vue'
 import * as confettiPkg from 'canvas-confetti'
 const confetti = confettiPkg.default || confettiPkg
 import { useUserAccount } from '../../composables/useUserAccount'
+import { useToast } from '../../composables/useToast'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -71,6 +72,7 @@ const emit = defineEmits(['close', 'success-closed', 'success'])
 const isLoading = ref(true)
 const isSuccess = ref(false)
 const userAccount = useUserAccount()
+const { showToast } = useToast()
 
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
@@ -85,7 +87,7 @@ watch(() => props.isOpen, (newVal) => {
 
 const copyVA = () => {
   navigator.clipboard.writeText("88000123456789999")
-  alert("Nomor Virtual Account berhasil disalin!")
+  showToast("Nomor Virtual Account berhasil disalin!", 'success')
 }
 
 const simulateSuccess = async () => {

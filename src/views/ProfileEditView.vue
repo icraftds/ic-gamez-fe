@@ -1,13 +1,15 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserAccount } from '../composables/useUserAccount'
+import { useUserAccount, sanitizeAvatarUrl } from '../composables/useUserAccount'
+import { useToast } from '../composables/useToast'
 import api from '../services/api'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import ChangeNameUsn from '../components/common/ChangeNameUsn.vue'
 
 const router = useRouter()
 const { userProfile, fetchUser } = useUserAccount()
+const { showToast } = useToast()
 
 const isSavingProfile = ref(false)
 const isSuccess = ref(false)
@@ -41,14 +43,14 @@ const handleAvatarChange = (e) => {
     // Check file type
     const isJpeg = file.type === 'image/jpeg' || file.name.toLowerCase().endsWith('.jpg') || file.name.toLowerCase().endsWith('.jpeg')
     if (!isJpeg) {
-      alert('Hanya format .jpg dan .jpeg yang diperbolehkan!')
+      showToast('Hanya format .jpg dan .jpeg yang diperbolehkan!', 'warning')
       e.target.value = ''
       return
     }
 
     // Check file size (Max 1MB)
     if (file.size > 1 * 1024 * 1024) {
-      alert('Ukuran file maksimal 1 MB!')
+      showToast('Ukuran file maksimal 1 MB!', 'warning')
       e.target.value = ''
       return
     }
@@ -81,11 +83,12 @@ const saveProfile = async () => {
     userProfile.value.name = profileForm.value.name
     
     if (response.data && response.data.data && response.data.data.avatar_url) {
-      userProfile.value.avatar = response.data.data.avatar_url
+      userProfile.value.avatar = sanitizeAvatarUrl(response.data.data.avatar_url, profileForm.value.name)
+      previewAvatarUrl.value = userProfile.value.avatar
     }
     
     isSuccess.value = true
-    alert('Profil berhasil diperbarui!')
+    showToast('Profil berhasil diperbarui!', 'success')
     
     // Optional: go back after short delay
     setTimeout(() => {
@@ -93,7 +96,7 @@ const saveProfile = async () => {
     }, 1500)
     
   } catch (err) {
-    alert('Gagal memperbarui profil: ' + (err.response?.data?.message || err.message))
+    showToast('Gagal memperbarui profil: ' + (err.response?.data?.message || err.message), 'error')
   } finally {
     isSavingProfile.value = false
   }

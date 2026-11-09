@@ -138,6 +138,7 @@
           aria-label="Toggle menu"
         >
           <i :class="mobileMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
+          <span v-if="!mobileMenuOpen && (hasUnclaimedGifts || hasUnread)" class="hamburger-notif-dot" :class="{ 'gift-style': hasUnclaimedGifts }"></span>
         </button>
       </div>
 
@@ -349,7 +350,7 @@ watch(isLoggedIn, (logged) => {
   } else {
     stopPolling(true);
   }
-});
+}, { immediate: true });
 
 onMounted(() => {
   if (isLoggedIn.value) {

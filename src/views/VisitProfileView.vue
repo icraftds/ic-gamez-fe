@@ -245,11 +245,13 @@ import DashboardStats from '../components/dashboard/DashboardStats.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useFriends } from '../composables/useFriends'
 import { buildMedals, buildTrophies } from '../composables/useAchievements'
+import { useToast } from '../composables/useToast'
 
 const route = useRoute()
 const router = useRouter()
 const { userProfile: loggedInUser } = useUserAccount()
 const { friends, fetchFriends } = useFriends()
+const { showToast } = useToast()
 
 const isLoading = ref(true)
 const isAddingFriend = ref(false)
@@ -323,9 +325,9 @@ const handleAddFriend = async () => {
     }
   } catch (error) {
     if (error.response?.status === 400 && error.response?.data?.message?.includes('yourself')) {
-      alert('Tidak bisa menambah diri sendiri.')
+      showToast('Tidak bisa menambah diri sendiri.', 'warning')
     } else {
-      alert('Gagal menambah teman')
+      showToast('Gagal menambah teman', 'error')
     }
   } finally {
     isAddingFriend.value = false
@@ -343,7 +345,7 @@ const handleAcceptFriend = async () => {
       fetchFriends()
     }
   } catch (error) {
-    alert('Gagal menerima pertemanan')
+    showToast('Gagal menerima pertemanan', 'error')
   } finally {
     isAddingFriend.value = false
   }

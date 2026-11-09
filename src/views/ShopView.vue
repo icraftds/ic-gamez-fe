@@ -185,6 +185,9 @@ import confetti from 'canvas-confetti'
 import { TIERS } from '../utils/tiers.js'
 import CyberBorder from '../components/ui/CyberBorder.vue'
 import CyberEnergy from '../components/ui/CyberEnergy.vue'
+import { useToast } from '../composables/useToast'
+
+const { showToast } = useToast()
 
 const getImageUrl = (url) => {
   if (!url) return null
@@ -307,7 +310,7 @@ const playSuccessAnimation = (msg) => {
 
 const purchaseEnergy = (pkg) => {
   if (coinz.value < pkg.price_icoinz) {
-    alert('Saldo iCoinZ kamu tidak cukup.')
+    showToast('Saldo iCoinZ kamu tidak cukup.', 'warning')
     return
   }
   
@@ -326,7 +329,7 @@ const purchaseEnergy = (pkg) => {
 const buyBorder = (id) => {
   const price = getBorderPrice(id)
   if (coinz.value < price) {
-    alert('Saldo iCoinZ tidak cukup untuk membeli border ini.')
+    showToast('Saldo iCoinZ tidak cukup untuk membeli border ini.', 'warning')
     return
   }
   
@@ -347,7 +350,7 @@ const buyBorder = (id) => {
 
 const buyItem = (item) => {
   if (coinz.value < item.price) {
-    alert('Saldo iCoinZ tidak cukup untuk membeli item ini.')
+    showToast('Saldo iCoinZ tidak cukup untuk membeli item ini.', 'warning')
     return
   }
   
