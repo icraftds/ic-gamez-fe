@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { rateLimitUntil } from './services/api'
 import { useRoute } from 'vue-router'
 import HomeNavbar from './components/home/HomeNavbar.vue'
