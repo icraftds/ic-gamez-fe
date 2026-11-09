@@ -20,17 +20,37 @@
   }
 })();
 
-function setupCheatsheetPage({ catalog = [], questions = [] }) {
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
-    }
+// Helper: ensure callback runs when DOM is ready, even if already loaded
+function onDocReady(fn) {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(fn, 0);
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
 
-    initSharedTheme();
-    initSharedSidebar();
-    initMateriPagination();
-    initSharedCopyButtons();
-    initFormulaFavorites();
+let coreCheatsheetInitialized = false;
+function autoInitCheatsheetCore() {
+  if (coreCheatsheetInitialized) return;
+  coreCheatsheetInitialized = true;
+
+  if (typeof lucide !== 'undefined') {
+    try { lucide.createIcons(); } catch (e) {}
+  }
+
+  initSharedTheme();
+  initSharedSidebar();
+  initMateriPagination();
+  initSharedCopyButtons();
+  initFormulaFavorites();
+}
+
+// Auto-run core features on DOM ready across ALL 24 cheatsheets
+onDocReady(autoInitCheatsheetCore);
+
+function setupCheatsheetPage({ catalog = [], questions = [] } = {}) {
+  onDocReady(() => {
+    autoInitCheatsheetCore();
 
     if (catalog && catalog.length > 0) {
       initPageLiveSearch(catalog);
@@ -185,9 +205,12 @@ function initSharedSidebar() {
 }
 
 /* 2B. Per-Materi Focused Learning Mode */
+let materiPaginationDone = false;
 function initMateriPagination() {
+  if (materiPaginationDone) return;
   const sections = Array.from(document.querySelectorAll('.category-section, .content-section')).filter(s => s.id);
   if (sections.length <= 1) return;
+  materiPaginationDone = true;
 
   const sidebar = document.getElementById('appSidebar') || document.getElementById('sidebar');
   const navLinks = Array.from(document.querySelectorAll('.sidebar-link, .sidebar-nav .nav-item'));
@@ -406,13 +429,14 @@ function initMateriPagination() {
     searchInput.addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase().trim();
       if (!q) {
-        showMateri(currentActiveIndex, false);
+        showMateri(currentActiveIndex, { shouldScroll: false, direction: 'none' });
       } else {
         materiList.forEach(m => {
           const cards = m.element.querySelectorAll('.formula-card');
           const hasMatches = Array.from(cards).some(card => {
             return card.textContent.toLowerCase().includes(q);
-          });
+          }) || m.title.toLowerCase().includes(q);
+
           if (hasMatches) {
             m.element.classList.remove('materi-hidden');
             m.element.style.display = 'block';
@@ -624,8 +648,8 @@ function initPageLiveSearch(catalog) {
   if (!searchInput) return;
 
   const cards = document.querySelectorAll('.formula-card');
-  const sections = document.querySelectorAll('.category-section, .content-section');
 
+  // Filter individual formula cards; section visibility is orchestrated cleanly by initMateriPagination
   searchInput.addEventListener('input', (e) => {
     const q = e.target.value.toLowerCase().trim();
 
@@ -636,13 +660,6 @@ function initPageLiveSearch(catalog) {
       } else {
         card.style.display = 'none';
       }
-    });
-
-    sections.forEach((sec) => {
-      if (sec.id === 'practice-questions' || sec.id === 'quiz-section' || sec.id === 'quick-reference') return;
-      const visible = sec.querySelectorAll('.formula-card[style*="display: flex"], .formula-card:not([style*="display: none"])');
-      const hasVisible = Array.from(sec.querySelectorAll('.formula-card')).some(c => c.style.display !== 'none');
-      sec.style.display = !q || hasVisible ? '' : 'none';
     });
   });
 
@@ -989,19 +1006,13 @@ function initStepperQuiz(quizData) {
 /* 9. Global CheatsheetEngine Object */
 window.CheatsheetEngine = {
   init: function(opts = {}) {
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
-    }
+    onDocReady(() => {
+      autoInitCheatsheetCore();
+      initPageLiveSearch();
 
-    initSharedTheme();
-    initSharedSidebar();
-    initMateriPagination();
-    initSharedCopyButtons();
-    initFormulaFavorites();
-    initPageLiveSearch();
-
-    if (opts.quizData && opts.quizData.length > 0) {
-      initStepperQuiz(opts.quizData);
-    }
+      if (opts.quizData && opts.quizData.length > 0) {
+        initStepperQuiz(opts.quizData);
+      }
+    });
   }
 };

@@ -20,7 +20,15 @@
   }
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
+function onDocReady(fn) {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(fn, 0);
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+onDocReady(() => {
   // Initialize Lucide Icons
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
