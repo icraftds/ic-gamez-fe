@@ -1,6 +1,6 @@
 /* ==========================================================================
-   ABOUT VIEW (TENTANG KAMI) - STYLESHEET
-   Rich Storytelling, Modern Stats Grid, Clean Proportions, Zero Dead Space
+   TENTANG KAMI - STYLESHEET
+   Clean Minimalist Architecture - Zero Slop, Compact Padding, Zero Dead Space
    ========================================================================== */
 
 .about-view {
@@ -8,96 +8,132 @@
   position: relative;
   color: var(--text-main-hex, #f8fafc);
   background: var(--bg-deep, #05050f);
-  padding-bottom: 70px;
+  padding-bottom: 48px;
+  overflow-x: hidden;
 }
 
 .about-container {
-  max-width: 1040px;
+  max-width: 1140px;
   margin: 0 auto;
-  padding: 92px 20px 40px 20px;
+  padding: 24px 24px 40px 24px;
   position: relative;
   z-index: 5;
 }
 
-/* Top Breadcrumb */
+/* ==========================================================================
+   0. TOP NAVIGATION
+   ========================================================================== */
 .about-top-nav {
-  margin-bottom: 18px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.top-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  transition: opacity 0.2s ease;
+}
+
+.brand-link:hover {
+  opacity: 0.85;
+}
+
+.brand-ic {
+  color: #38bdf8;
+}
+
+.brand-gamez {
+  color: #f8fafc;
+}
+
+.nav-sep {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.nav-breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.nav-breadcrumbs .separator {
+  font-size: 0.65rem;
+  color: #475569;
+}
+
+.nav-breadcrumbs .current {
+  color: #38bdf8;
+  font-weight: 600;
 }
 
 .back-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #94a3b8;
-  padding: 7px 14px;
-  border-radius: 10px;
+  padding: 8px 16px;
+  border-radius: 9999px;
   font-size: 0.84rem;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
 }
 
 .back-link:hover {
   background: rgba(56, 189, 248, 0.12);
-  border-color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
   color: #38bdf8;
-  transform: translateX(-2px);
+  transform: translateX(-3px);
 }
 
-/* Hero Header */
+/* ==========================================================================
+   1. HERO HEADER
+   ========================================================================== */
 .about-header {
-  text-align: center;
-  margin-bottom: 36px;
-}
-
-.hero-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 14px;
-  background: rgba(192, 132, 252, 0.12);
-  border: 1px solid rgba(192, 132, 252, 0.3);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #c084fc;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-}
-
-.hero-pill i {
-  color: #fbbf24;
+  margin-bottom: 32px;
 }
 
 .about-title {
-  font-size: 2.2rem;
+  font-size: clamp(2rem, 3.8vw, 2.75rem);
   font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
   margin: 0 0 10px 0;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .about-subtitle {
   color: #94a3b8;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  max-width: 700px;
-  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 780px;
+  margin: 0;
 }
 
-/* Stats Counter Grid */
+/* ==========================================================================
+   2. STATS GRID
+   ========================================================================== */
 .about-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -106,195 +142,189 @@
 }
 
 .stat-card {
-  background: rgba(15, 23, 42, 0.65);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.01) 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 18px 16px;
+  padding: 18px 20px;
   text-align: center;
-  backdrop-filter: blur(12px);
-  transition: all 0.22s ease;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .stat-card:hover {
-  border-color: rgba(56, 189, 248, 0.35);
   transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.3);
 }
 
 .stat-number {
-  font-size: 2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #38bdf8;
-  font-family: 'JetBrains Mono', monospace, sans-serif;
-  margin-bottom: 4px;
-  line-height: 1;
+  line-height: 1.1;
+  margin-bottom: 6px;
 }
 
 .stat-label {
   font-size: 0.8rem;
-  font-weight: 600;
   color: #94a3b8;
+  font-weight: 500;
 }
 
-/* Story Section */
+/* ==========================================================================
+   3. STORY CARD
+   ========================================================================== */
 .about-story-card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 28px;
-  margin-bottom: 32px;
-  backdrop-filter: blur(12px);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.06) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 18px;
+  padding: 32px;
+  margin-bottom: 36px;
 }
 
-.story-badge {
-  font-size: 0.74rem;
+.story-header {
+  margin-bottom: 14px;
+}
+
+.story-kicker {
+  font-size: 0.72rem;
   font-weight: 700;
-  color: #818cf8;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  color: #38bdf8;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .about-story-card h2 {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #f8fafc;
-  margin: 0 0 14px 0;
-}
-
-.story-paragraphs {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  color: #cbd5e1;
-  font-size: 0.9rem;
-  line-height: 1.65;
+  margin: 0;
+  letter-spacing: -0.3px;
 }
 
 .story-paragraphs p {
-  margin: 0;
+  color: #cbd5e1;
+  font-size: 0.94rem;
+  line-height: 1.7;
+  margin: 0 0 14px 0;
 }
 
-/* 4 Core Pillars */
+.story-paragraphs p:last-child {
+  margin-bottom: 0;
+}
+
+.story-paragraphs strong {
+  color: #f8fafc;
+}
+
+.story-paragraphs em {
+  color: #38bdf8;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   4. PILLARS SECTION
+   ========================================================================== */
 .pillars-section {
   margin-bottom: 36px;
 }
 
 .section-heading-center {
-  text-align: center;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 .section-heading-center h2 {
-  font-size: 1.45rem;
-  font-weight: 800;
+  font-size: 1.3rem;
+  font-weight: 700;
   color: #f8fafc;
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
 }
 
 .section-heading-center p {
-  color: #94a3b8;
   font-size: 0.88rem;
+  color: #94a3b8;
   margin: 0;
 }
 
 .pillars-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  gap: 16px;
 }
 
 .pillar-card {
-  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.01) 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 20px;
-  display: flex;
-  gap: 16px;
-  backdrop-filter: blur(12px);
-  transition: all 0.22s ease;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .pillar-card:hover {
-  border-color: rgba(56, 189, 248, 0.35);
   transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.3);
 }
 
 .pillar-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   flex-shrink: 0;
-}
-
-.pillar-icon-wrap.gaming {
-  background: rgba(192, 132, 252, 0.15);
-  border: 1px solid rgba(192, 132, 252, 0.35);
-  color: #c084fc;
-}
-
-.pillar-icon-wrap.coding {
-  background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(56, 189, 248, 0.12);
   color: #38bdf8;
 }
 
-.pillar-icon-wrap.career {
-  background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.35);
-  color: #4ade80;
-}
-
-.pillar-icon-wrap.community {
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #fbbf24;
-}
-
 .pillar-content h3 {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: #f8fafc;
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
 }
 
 .pillar-content p {
+  font-size: 0.84rem;
   color: #94a3b8;
-  font-size: 0.85rem;
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 0;
 }
 
-/* Ecosystem Banner */
+/* ==========================================================================
+   5. ECOSYSTEM BANNER
+   ========================================================================== */
 .ecosystem-banner {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 24px;
+  padding: 24px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
-  backdrop-filter: blur(12px);
 }
 
 .ecosystem-text h3 {
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #f8fafc;
   margin: 0 0 4px 0;
 }
 
 .ecosystem-text p {
-  color: #94a3b8;
   font-size: 0.86rem;
+  color: #94a3b8;
   margin: 0;
-  line-height: 1.45;
 }
 
 .ecosystem-actions {
@@ -308,101 +338,119 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #0284c7, #6366f1);
-  color: #ffffff;
   padding: 10px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
   border-radius: 10px;
-  font-size: 0.86rem;
-  font-weight: 700;
+  font-size: 0.84rem;
+  font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 
 .btn-eco-site:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
 }
 
 .btn-eco-learning {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #cbd5e1;
-  padding: 9px 16px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  color: #05050f;
   border-radius: 10px;
-  font-size: 0.86rem;
-  font-weight: 600;
+  font-size: 0.84rem;
+  font-weight: 700;
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 .btn-eco-learning:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35);
 }
 
-/* Light Mode Support */
+/* ==========================================================================
+   LIGHT MODE SUPPORT
+   ========================================================================== */
 body.light-mode .about-view {
   background: #f8fafc;
   color: #0f172a;
 }
 
-body.light-mode .stat-card,
-body.light-mode .about-story-card,
-body.light-mode .pillar-card {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .stat-number {
-  color: #0284c7;
-}
-
-body.light-mode .about-story-card h2,
-body.light-mode .section-heading-center h2,
-body.light-mode .pillar-content h3 {
+body.light-mode .brand-gamez {
   color: #0f172a;
 }
 
-body.light-mode .story-paragraphs,
-body.light-mode .pillar-content p {
-  color: #475569;
-}
-
-body.light-mode .ecosystem-banner {
+body.light-mode .back-link {
   background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border-color: #e2e8f0;
+  color: #475569;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
+body.light-mode .about-title,
+body.light-mode .about-story-card h2,
+body.light-mode .section-heading-center h2,
+body.light-mode .pillar-content h3,
 body.light-mode .ecosystem-text h3 {
   color: #0f172a;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .about-container {
-    padding: 82px 16px 40px 16px;
-  }
+body.light-mode .about-subtitle,
+body.light-mode .stat-label,
+body.light-mode .section-heading-center p,
+body.light-mode .pillar-content p,
+body.light-mode .ecosystem-text p {
+  color: #475569;
+}
 
-  .about-title {
-    font-size: 1.7rem;
-  }
+body.light-mode .stat-card,
+body.light-mode .pillar-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
 
+body.light-mode .about-story-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+  border-color: #bae6fd;
+}
+
+body.light-mode .story-paragraphs p {
+  color: #334155;
+}
+
+body.light-mode .story-paragraphs strong {
+  color: #0f172a;
+}
+
+body.light-mode .ecosystem-banner {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .btn-eco-site {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #334155;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 860px) {
   .about-stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
   .pillars-grid {
     grid-template-columns: 1fr;
-  }
-
-  .about-story-card {
-    padding: 20px;
   }
 
   .ecosystem-banner {
@@ -412,10 +460,26 @@ body.light-mode .ecosystem-text h3 {
 
   .ecosystem-actions {
     width: 100%;
+    flex-direction: column;
   }
 
-  .btn-eco-site, .btn-eco-learning {
-    flex: 1;
+  .btn-eco-site,
+  .btn-eco-learning {
+    width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-container {
+    padding: 20px 16px 36px 16px;
+  }
+
+  .about-title {
+    font-size: 1.75rem;
+  }
+
+  .about-story-card {
+    padding: 20px;
   }
 }

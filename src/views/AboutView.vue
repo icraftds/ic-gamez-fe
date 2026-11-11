@@ -5,25 +5,36 @@
     <div class="about-container">
       <!-- 0. Top Navigation -->
       <div class="about-top-nav">
-        <router-link to="/" class="back-link">
-          <i class="fa-solid fa-arrow-left"></i>
-          <span>Kembali ke Beranda</span>
-        </router-link>
+        <div class="top-nav-left">
+          <router-link to="/" class="brand-link" title="Beranda iC Game-Z">
+            <span class="brand-ic">iC</span>
+            <span class="brand-gamez">Game-Z</span>
+          </router-link>
+          <span class="nav-sep">/</span>
+          <div class="nav-breadcrumbs">
+            <span>Pusat Informasi</span>
+            <i class="fa-solid fa-chevron-right separator"></i>
+            <span class="current">Tentang Kami</span>
+          </div>
+        </div>
+
+        <div class="top-nav-right">
+          <router-link to="/" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Kembali ke Beranda</span>
+          </router-link>
+        </div>
       </div>
 
-      <!-- 1. Hero Header -->
+      <!-- Hero Header -->
       <header class="about-header">
-        <div class="hero-pill">
-          <i class="fa-solid fa-rocket"></i>
-          <span>Visi Edukasi Koding Modern</span>
-        </div>
-        <h1 class="about-title"><span class="gradient-text">Tentang iC Game-Z & iCraft Studio</span></h1>
+        <h1 class="about-title">Tentang iC Game-Z & iCraft Studio</h1>
         <p class="about-subtitle">
           Mendobrak cara lama belajar coding yang kaku. Mengubah kerumitan sintaks menjadi petualangan gamifikasi yang seru, interaktif, dan terarah menuju kesiapan karir industri nyata.
         </p>
       </header>
 
-      <!-- 2. Platform Milestones & Stats Counter -->
+      <!-- Platform Milestones & Stats Counter -->
       <section class="about-stats-grid" aria-label="Statistik Platform">
         <div class="stat-card">
           <div class="stat-number">24+</div>
@@ -43,10 +54,12 @@
         </div>
       </section>
 
-      <!-- 3. Our Origin Story & Mission -->
+      <!-- Our Origin Story & Mission -->
       <section class="about-story-card">
-        <span class="story-badge">Latar Belakang & Filosofi</span>
-        <h2>Mengapa Kami Membangun iC Game-Z?</h2>
+        <div class="story-header">
+          <span class="story-kicker">FILOSOFI & MISI</span>
+          <h2>Mengapa Kami Membangun iC Game-Z?</h2>
+        </div>
         <div class="story-paragraphs">
           <p>
             Banyak orang bermimpi menjadi software engineer, data analyst, atau web developer. Namun di tengah jalan, lebih dari <strong>70% pemula menyerah</strong> karena tutorial video satu arah yang membosankan, frustrasi saat instalasi compiler lokal yang rumit, dan minimnya feedback saat kode mengalami error.
@@ -57,7 +70,7 @@
         </div>
       </section>
 
-      <!-- 4. 4 Core Pillars of iC Game-Z -->
+      <!-- 4 Core Pillars of iC Game-Z -->
       <section class="pillars-section">
         <div class="section-heading-center">
           <h2>4 Pilar Fondasi Pembelajaran</h2>
@@ -107,7 +120,7 @@
         </div>
       </section>
 
-      <!-- 5. Ecosystem & Call to Action -->
+      <!-- Ecosystem & Call to Action -->
       <footer class="ecosystem-banner">
         <div class="ecosystem-text">
           <h3>Bagian dari Ekosistem iCraft Digital Service</h3>

@@ -8,14 +8,14 @@
   position: relative;
   color: var(--text-main-hex, #f8fafc);
   background: var(--bg-deep, #05050f);
-  padding-bottom: 80px;
+  padding-bottom: 48px;
   overflow-x: hidden;
 }
 
 .faq-container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 88px 24px 60px 24px;
+  padding: 24px 24px 40px 24px;
   position: relative;
   z-index: 5;
 }
@@ -30,6 +30,39 @@
   margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.top-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  transition: opacity 0.2s ease;
+}
+
+.brand-link:hover {
+  opacity: 0.85;
+}
+
+.brand-ic {
+  color: #38bdf8;
+}
+
+.brand-gamez {
+  color: #f8fafc;
+}
+
+.nav-sep {
+  color: #475569;
+  font-size: 0.9rem;
 }
 
 .back-link {
@@ -94,11 +127,11 @@
 
 .sidebar-sticky-panel {
   position: sticky;
-  top: 90px;
+  top: 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-height: calc(100vh - 110px);
+  max-height: calc(100vh - 48px);
   overflow-y: auto;
   padding-right: 4px;
   scrollbar-width: thin;
@@ -614,7 +647,7 @@
    3. APPLE-STYLE Q&A EXPLORER SECTION
    ========================================================================== */
 .qa-explorer-section {
-  scroll-margin-top: 90px;
+  scroll-margin-top: 24px;
 }
 
 .results-header {

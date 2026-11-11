@@ -1,6 +1,7 @@
 /* ==========================================================================
-   GUIDE VIEW (PANDUAN PENGGUNA) - STYLESHEET
-   Compact, Dynamic Flow, Rich Gamified Callouts, Zero Dead Space
+   PANDUAN PENGGUNA - STYLESHEET
+   Benchmark: Notion & Apple Documentation (2-Column Architecture)
+   Zero Monotony, Compact Padding, No Dead Blank Space
    ========================================================================== */
 
 .guide-view {
@@ -8,32 +9,562 @@
   position: relative;
   color: var(--text-main-hex, #f8fafc);
   background: var(--bg-deep, #05050f);
-  padding-bottom: 70px;
+  padding-bottom: 48px;
+  overflow-x: hidden;
 }
 
 .guide-container {
-  max-width: 1040px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 92px 20px 40px 20px;
+  padding: 24px 24px 40px 24px;
   position: relative;
   z-index: 5;
 }
 
-/* Top Breadcrumbs */
+/* ==========================================================================
+   0. TOP NAVIGATION
+   ========================================================================== */
 .guide-top-nav {
-  margin-bottom: 18px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.top-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  transition: opacity 0.2s ease;
+}
+
+.brand-link:hover {
+  opacity: 0.85;
+}
+
+.brand-ic {
+  color: #38bdf8;
+}
+
+.brand-gamez {
+  color: #f8fafc;
+}
+
+.nav-sep {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.nav-breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.nav-breadcrumbs .separator {
+  font-size: 0.65rem;
+  color: #475569;
+}
+
+.nav-breadcrumbs .current {
+  color: #38bdf8;
+  font-weight: 600;
 }
 
 .back-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #94a3b8;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+}
+
+.back-link:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  transform: translateX(-3px);
+}
+
+/* ==========================================================================
+   2-COLUMN MASTER DOCUMENTATION LAYOUT
+   ========================================================================== */
+.guide-layout-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* ==========================================================================
+   LEFT COLUMN: STICKY STAGE NAVIGATOR
+   ========================================================================== */
+.guide-sidebar {
+  position: relative;
+}
+
+.sidebar-sticky-panel {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 10px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-subtitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.total-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.guide-stage-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stage-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #94a3b8;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.stage-btn-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.stage-nav-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.stage-nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stage-arrow {
+  font-size: 0.68rem;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+.stage-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8fafc;
+  transform: translateX(2px);
+}
+
+.stage-nav-btn:hover .stage-arrow {
+  color: #38bdf8;
+  transform: translateX(2px);
+}
+
+.stage-nav-btn.active {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
+  box-shadow: inset 3px 0 0 #38bdf8;
+}
+
+.stage-nav-btn.active .stage-nav-icon {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.stage-nav-btn.active .stage-arrow {
+  color: #38bdf8;
+}
+
+/* Sidebar Guide Box */
+.sidebar-guide-box {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 6px;
+}
+
+.sg-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+}
+
+.sidebar-guide-box h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 6px 0;
+}
+
+.sidebar-guide-box p {
+  font-size: 0.76rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.btn-guide-wa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: #10b981;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.btn-guide-wa:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+}
+
+/* ==========================================================================
+   RIGHT COLUMN: MAIN STEPS STREAM
+   ========================================================================== */
+.guide-main-stream {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.guide-doc-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 18px;
+}
+
+.guide-title {
+  font-size: clamp(2rem, 3.6vw, 2.6rem);
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+  margin: 0 0 8px 0;
+}
+
+.guide-subtitle {
+  font-size: 0.96rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 680px;
+}
+
+/* Steps Cards List */
+.guide-steps-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.guide-step-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.guide-step-card:hover {
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.4);
+}
+
+.step-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.step-number-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #38bdf8;
+}
+
+.step-icon-bubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+  font-size: 0.95rem;
+}
+
+.step-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-stage-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #64748b;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.step-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.step-card-body {
+  padding-left: 56px;
+}
+
+.step-card-desc {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+
+/* Checkpoints */
+.checkpoints-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.cp-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.cp-icon {
+  font-size: 0.9rem;
+  color: #38bdf8;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+/* Pro Tip */
+.guide-pro-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.22);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+
+.guide-pro-tip .tip-icon {
+  color: #fbbf24;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.guide-pro-tip strong {
+  color: #fbbf24;
+}
+
+/* Action button */
+.step-action-bar {
+  display: flex;
+  align-items: center;
+}
+
+.btn-step-navigate {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 7px 14px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  color: #38bdf8;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-step-navigate:hover {
+  background: rgba(56, 189, 248, 0.2);
+  transform: translateX(3px);
+}
+
+/* Bottom Summary Dock */
+.guide-dock-banner {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.dock-text h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 6px 0;
+}
+
+.dock-text p {
+  font-size: 0.86rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.dock-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-dock-action-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  color: #05050f;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-dock-action-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.35);
+}
+
+.btn-dock-action-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
   border-radius: 10px;
   font-size: 0.84rem;
   font-weight: 600;
@@ -41,443 +572,166 @@
   transition: all 0.2s ease;
 }
 
-.back-link:hover {
-  background: rgba(56, 189, 248, 0.12);
-  border-color: #38bdf8;
-  color: #38bdf8;
-  transform: translateX(-2px);
-}
-
-/* Hero Header */
-.guide-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.hero-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 14px;
-  background: rgba(129, 140, 248, 0.12);
-  border: 1px solid rgba(129, 140, 248, 0.3);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #a5b4fc;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-}
-
-.hero-pill i {
-  color: #fbbf24;
-}
-
-.guide-title {
-  font-size: 2.2rem;
-  font-weight: 800;
-  margin: 0 0 10px 0;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.guide-subtitle {
-  color: #94a3b8;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  max-width: 680px;
-  margin: 0 auto;
-}
-
-/* Quick Jump Stage Navigator Pills */
-.guide-nav-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 32px;
-}
-
-.nav-pill-btn {
-  background: rgba(15, 23, 42, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 7px 14px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #94a3b8;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  transition: all 0.2s ease;
-}
-
-.nav-pill-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #f1f5f9;
-  border-color: rgba(255, 255, 255, 0.18);
-}
-
-.nav-pill-btn.active {
-  background: rgba(56, 189, 248, 0.14);
-  border-color: #38bdf8;
-  color: #38bdf8;
-  box-shadow: 0 2px 12px rgba(56, 189, 248, 0.18);
-}
-
-/* Step Cards Layout */
-.guide-steps-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 36px;
-}
-
-.step-card {
-  background: rgba(15, 23, 42, 0.68);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 22px 24px;
-  display: flex;
-  gap: 22px;
-  transition: all 0.22s ease;
-  backdrop-filter: blur(12px);
-  position: relative;
-  overflow: hidden;
-}
-
-.step-card:hover {
-  border-color: rgba(56, 189, 248, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px -8px rgba(0, 0, 0, 0.45);
-}
-
-/* Step Left Col (Number & Icon) */
-.step-left-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.step-number-badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.25));
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  color: #38bdf8;
-  font-weight: 800;
-  font-size: 1.15rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', monospace, sans-serif;
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.15);
-}
-
-.step-icon-wrap {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  color: #a5b4fc;
-}
-
-/* Step Right Col (Content) */
-.step-content-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.step-header {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.step-stage-tag {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #38bdf8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.step-title {
-  font-size: 1.22rem;
-  font-weight: 800;
-  color: #f8fafc;
-  margin: 0;
-  line-height: 1.3;
-}
-
-.step-desc {
-  font-size: 0.9rem;
-  color: #cbd5e1;
-  line-height: 1.55;
-  margin: 0;
-}
-
-/* Feature Checkpoints / Grid Items */
-.step-checkpoints-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.checkpoint-item {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 9px;
-  padding: 8px 12px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 0.83rem;
-  color: #cbd5e1;
-  line-height: 1.4;
-}
-
-.checkpoint-item i {
-  color: #34d399;
-  font-size: 0.85rem;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-/* Tip Callout Box */
-.step-tip-box {
-  background: rgba(245, 158, 11, 0.08);
-  border-left: 3px solid #f59e0b;
-  border-radius: 0 8px 8px 0;
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.83rem;
-  color: #fde68a;
-}
-
-.step-tip-box i {
-  color: #fbbf24;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-/* Step Action Button */
-.step-action-row {
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-}
-
-.btn-step-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f1f5f9;
-  padding: 7px 14px;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.btn-step-action:hover {
-  background: rgba(56, 189, 248, 0.14);
-  border-color: #38bdf8;
-  color: #38bdf8;
-  transform: translateX(3px);
-}
-
-/* Bottom Adventure Summary */
-.guide-bottom-summary {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  backdrop-filter: blur(12px);
-}
-
-.summary-text h3 {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #f8fafc;
-  margin: 0 0 4px 0;
-}
-
-.summary-text p {
-  color: #94a3b8;
-  font-size: 0.86rem;
-  margin: 0;
-  line-height: 1.45;
-}
-
-.summary-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.btn-summary-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #0284c7, #6366f1);
-  color: #ffffff;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 0.86rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
-}
-
-.btn-summary-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
-}
-
-.btn-summary-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #cbd5e1;
-  padding: 9px 16px;
-  border-radius: 10px;
-  font-size: 0.86rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.btn-summary-secondary:hover {
+.btn-dock-action-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
+  transform: translateY(-2px);
 }
 
-/* Light Mode Support */
+/* ==========================================================================
+   LIGHT MODE SUPPORT
+   ========================================================================== */
 body.light-mode .guide-view {
   background: #f8fafc;
   color: #0f172a;
 }
 
-body.light-mode .step-card {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-}
-
-body.light-mode .step-title {
+body.light-mode .brand-gamez {
   color: #0f172a;
 }
 
-body.light-mode .step-desc {
+body.light-mode .back-link {
+  background: #ffffff;
+  border-color: #e2e8f0;
   color: #475569;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
-body.light-mode .checkpoint-item {
-  background: #f8fafc;
-  border-color: rgba(0, 0, 0, 0.06);
+body.light-mode .guide-title,
+body.light-mode .step-card-title,
+body.light-mode .dock-text h3 {
+  color: #0f172a;
+}
+
+body.light-mode .guide-doc-header {
+  border-bottom-color: #e2e8f0;
+}
+
+body.light-mode .guide-step-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+body.light-mode .step-card-desc,
+body.light-mode .cp-item {
   color: #334155;
 }
 
-body.light-mode .step-tip-box {
-  background: rgba(245, 158, 11, 0.12);
-  color: #92400e;
+body.light-mode .cp-item {
+  background: #f8fafc;
+  border-color: #e2e8f0;
 }
 
-body.light-mode .nav-pill-btn {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #64748b;
+body.light-mode .stage-nav-btn {
+  color: #475569;
 }
 
-body.light-mode .nav-pill-btn.active {
-  background: rgba(2, 132, 199, 0.1);
-  border-color: #0284c7;
-  color: #0284c7;
-}
-
-body.light-mode .guide-bottom-summary {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-}
-
-body.light-mode .summary-text h3 {
+body.light-mode .stage-nav-btn:hover {
+  background: #f1f5f9;
   color: #0f172a;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+body.light-mode .stage-nav-btn.active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #0284c7;
+}
+
+body.light-mode .stage-nav-icon {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+body.light-mode .sidebar-guide-box {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .sidebar-guide-box h4 {
+  color: #0f172a;
+}
+
+body.light-mode .guide-dock-banner {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode .btn-dock-action-secondary {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #334155;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 960px) {
+  .guide-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .sidebar-sticky-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .guide-stage-menu {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+
+  .guide-stage-menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  .stage-nav-btn {
+    white-space: nowrap;
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .stage-arrow {
+    display: none;
+  }
+
+  .sidebar-guide-box {
+    display: none;
+  }
+
+  .step-card-body {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
   .guide-container {
-    padding: 82px 16px 40px 16px;
+    padding: 20px 16px 36px 16px;
   }
 
   .guide-title {
-    font-size: 1.7rem;
+    font-size: 1.75rem;
   }
 
-  .step-card {
-    flex-direction: column;
-    gap: 14px;
-    padding: 18px;
-  }
-
-  .step-left-col {
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .step-checkpoints-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .guide-bottom-summary {
+  .guide-dock-banner {
+    padding: 20px;
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .summary-actions {
+  .dock-actions {
     width: 100%;
+    flex-direction: column;
   }
 
-  .btn-summary-primary, .btn-summary-secondary {
-    flex: 1;
+  .btn-dock-action-primary,
+  .btn-dock-action-secondary {
+    width: 100%;
     justify-content: center;
   }
 }

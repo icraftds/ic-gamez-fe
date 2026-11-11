@@ -70,12 +70,20 @@ const route = useRoute()
 const isWorkspacePage = computed(() => ['lesson', 'cheatsheet-reader'].includes(route.name))
 const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
 const isCheckoutPage = computed(() => ['checkout', 'payment-success'].includes(route.name))
+const isSupportPage = computed(() => ['faq', 'guide', 'contact', 'about', 'privacy', 'terms'].includes(route.name))
 const showHomeNavbar = computed(() => {
-  const hiddenRoutes = ['lesson', 'login', 'register', 'developer', 'auto-login', 'not-found', 'materials', 'profile-edit', 'checkout', 'payment-success', 'cheatsheet-reader']
+  const hiddenRoutes = [
+    'lesson', 'login', 'register', 'developer', 'auto-login', 'not-found',
+    'materials', 'profile-edit', 'checkout', 'payment-success', 'cheatsheet-reader',
+    'faq', 'guide', 'contact', 'about', 'privacy', 'terms'
+  ]
   return !hiddenRoutes.includes(route.name)
 })
 const showFriendsSidebar = computed(() => {
-  return isLoggedIn.value && !['lesson', 'materials', 'checkout', 'payment-success', 'cheatsheet-reader'].includes(route.name)
+  return isLoggedIn.value && ![
+    'lesson', 'materials', 'checkout', 'payment-success', 'cheatsheet-reader',
+    'faq', 'guide', 'contact', 'about', 'privacy', 'terms'
+  ].includes(route.name)
 })
 
 const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping, isAuthLoading, authLoadingLabel, authLoadingText } = useUserAccount()

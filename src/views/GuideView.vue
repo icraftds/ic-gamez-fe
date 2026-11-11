@@ -5,108 +5,159 @@
     <div class="guide-container">
       <!-- 0. Top Navigation -->
       <div class="guide-top-nav">
-        <router-link to="/" class="back-link">
-          <i class="fa-solid fa-arrow-left"></i>
-          <span>Kembali ke Beranda</span>
-        </router-link>
+        <div class="top-nav-left">
+          <router-link to="/" class="brand-link" title="Beranda iC Game-Z">
+            <span class="brand-ic">iC</span>
+            <span class="brand-gamez">Game-Z</span>
+          </router-link>
+          <span class="nav-sep">/</span>
+          <div class="nav-breadcrumbs">
+            <span>Pusat Panduan</span>
+            <i class="fa-solid fa-chevron-right separator"></i>
+            <span class="current">Panduan Pengguna</span>
+          </div>
+        </div>
+
+        <div class="top-nav-right">
+          <router-link to="/" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Kembali ke Beranda</span>
+          </router-link>
+        </div>
       </div>
 
-      <!-- 1. Hero Header -->
-      <header class="guide-header">
-        <div class="hero-pill">
-          <i class="fa-solid fa-gamepad"></i>
-          <span>Panduan Petualangan Coder</span>
-        </div>
-        <h1 class="guide-title"><span class="gradient-text">Panduan Pengguna iC Game-Z</span></h1>
-        <p class="guide-subtitle">
-          Kuasai setiap fitur platform: alur belajar berjenjang, coding sandbox in-browser, mekanisme XP & Daily Streak, hingga rahasia menembus tes kerja teknis.
-        </p>
-      </header>
+      <!-- Master 2-Column Documentation Layout -->
+      <div class="guide-layout-grid">
+        <!-- LEFT COLUMN: Sticky Stage Navigator -->
+        <aside class="guide-sidebar">
+          <div class="sidebar-sticky-panel">
+            <div class="sidebar-header">
+              <span class="sidebar-subtitle">TAHAPAN PETUALANGAN</span>
+              <span class="total-badge">6 Tahap</span>
+            </div>
 
-      <!-- 2. Quick Filter / Jump Stage Buttons -->
-      <nav class="guide-nav-bar" aria-label="Navigasi Tahapan">
-        <button
-          v-for="filter in stageFilters"
-          :key="filter.id"
-          class="nav-pill-btn"
-          :class="{ active: selectedStage === filter.id }"
-          @click="selectedStage = filter.id"
-        >
-          <i :class="filter.icon"></i>
-          <span>{{ filter.label }}</span>
-        </button>
-      </nav>
+            <nav class="guide-stage-menu" aria-label="Tahapan Panduan">
+              <button
+                v-for="filter in stageFilters"
+                :key="filter.id"
+                type="button"
+                class="stage-nav-btn"
+                :class="{ active: selectedStage === filter.id }"
+                @click="selectedStage = filter.id"
+              >
+                <div class="stage-btn-left">
+                  <div class="stage-nav-icon">
+                    <i :class="filter.icon"></i>
+                  </div>
+                  <span class="stage-nav-label">{{ filter.label }}</span>
+                </div>
+                <i class="fa-solid fa-chevron-right stage-arrow"></i>
+              </button>
+            </nav>
 
-      <!-- 3. Steps Timeline List -->
-      <main class="guide-steps-list">
-        <article
-          v-for="step in filteredSteps"
-          :key="step.number"
-          class="step-card"
-        >
-          <!-- Left Badge & Icon -->
-          <div class="step-left-col">
-            <div class="step-number-badge">{{ step.number }}</div>
-            <div class="step-icon-wrap">
-              <i :class="step.icon"></i>
+            <!-- Quick Start Hotline Card -->
+            <div class="sidebar-guide-box">
+              <div class="sg-icon">
+                <i class="fa-solid fa-gamepad"></i>
+              </div>
+              <h4>Bingung Mulai dari Mana?</h4>
+              <p>Konsultasikan alur belajar terbaik untuk target karirmu dengan tim mentor iCraft.</p>
+              <a
+                href="https://wa.me/6285174264123?text=Halo%20Tim%20Mentor%20iCraft,%20saya%20butuh%20rekomendasi%20alur%20belajar%20coding..."
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-guide-wa"
+              >
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>Tanya Mentor WhatsApp</span>
+              </a>
             </div>
           </div>
+        </aside>
 
-          <!-- Right Content -->
-          <div class="step-content-col">
-            <div class="step-header">
-              <span class="step-stage-tag">{{ step.stageLabel }}</span>
-              <h2 class="step-title">{{ step.title }}</h2>
-            </div>
+        <!-- RIGHT COLUMN: Main Steps Stream -->
+        <main class="guide-main-stream">
+          <!-- Guide Header -->
+          <header class="guide-doc-header">
+            <h1 class="guide-title">Panduan Pengguna iC Game-Z</h1>
+            <p class="guide-subtitle">
+              Kuasai alur belajar gamifikasi, coding sandbox in-browser, sistem XP & Daily Streak, hingga persiapan teknis tes kerja.
+            </p>
+          </header>
 
-            <p class="step-desc">{{ step.desc }}</p>
-
-            <!-- Key Checkpoints -->
-            <div class="step-checkpoints-grid">
-              <div
-                v-for="(point, pIdx) in step.checkpoints"
-                :key="pIdx"
-                class="checkpoint-item"
-              >
-                <i class="fa-solid fa-circle-check"></i>
-                <span>{{ point }}</span>
+          <!-- Steps Stream (Clean Typographic Flow) -->
+          <div class="guide-steps-stream">
+            <article
+              v-for="step in filteredSteps"
+              :key="step.number"
+              class="guide-step-card"
+            >
+              <div class="step-card-header">
+                <div class="step-number-wrap">
+                  <span class="step-number">{{ step.number }}</span>
+                  <div class="step-icon-bubble">
+                    <i :class="step.icon"></i>
+                  </div>
+                </div>
+                <div class="step-header-text">
+                  <span class="step-stage-name">{{ step.stageLabel }}</span>
+                  <h2 class="step-card-title">{{ step.title }}</h2>
+                </div>
               </div>
-            </div>
 
-            <!-- Pro-tip Box -->
-            <div v-if="step.proTip" class="step-tip-box">
-              <i class="fa-solid fa-lightbulb"></i>
-              <span><strong>Pro-Tip:</strong> {{ step.proTip }}</span>
-            </div>
+              <div class="step-card-body">
+                <p class="step-card-desc">{{ step.desc }}</p>
 
-            <!-- Action Button -->
-            <div v-if="step.action" class="step-action-row">
-              <router-link :to="step.action.to" class="btn-step-action">
-                <span>{{ step.action.label }}</span>
-                <i class="fa-solid fa-arrow-right"></i>
+                <!-- Checkpoints Grid -->
+                <div class="checkpoints-container">
+                  <div
+                    v-for="(point, pIdx) in step.checkpoints"
+                    :key="pIdx"
+                    class="cp-item"
+                  >
+                    <i class="fa-solid fa-circle-check cp-icon"></i>
+                    <span>{{ point }}</span>
+                  </div>
+                </div>
+
+                <!-- Pro-tip Box -->
+                <div v-if="step.proTip" class="guide-pro-tip">
+                  <i class="fa-solid fa-lightbulb tip-icon"></i>
+                  <div class="tip-body">
+                    <strong>Tips Coder:</strong> {{ step.proTip }}
+                  </div>
+                </div>
+
+                <!-- Action Button -->
+                <div v-if="step.action" class="step-action-bar">
+                  <router-link :to="step.action.to" class="btn-step-navigate">
+                    <span>{{ step.action.label }}</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </router-link>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Bottom Summary Banner -->
+          <footer class="guide-dock-banner">
+            <div class="dock-text">
+              <h3>Siap Memulai Petualangan Coding?</h3>
+              <p>Tentukan alur belajar pilihanmu hari ini dan buktikan kemampuanmu di leaderboard global.</p>
+            </div>
+            <div class="dock-actions">
+              <router-link to="/learning" class="btn-dock-action-primary">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Jelajahi Alur Belajar</span>
+              </router-link>
+              <router-link to="/faq" class="btn-dock-action-secondary">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Buka FAQ</span>
               </router-link>
             </div>
-          </div>
-        </article>
-      </main>
-
-      <!-- 4. Bottom Summary Banner -->
-      <footer class="guide-bottom-summary">
-        <div class="summary-text">
-          <h3>Siap Memulai Petualangan Coding?</h3>
-          <p>Tentukan alur belajar pilihanmu hari ini dan buktikan kemampuanmu di papan peringkat dunia.</p>
-        </div>
-        <div class="summary-actions">
-          <router-link to="/learning" class="btn-summary-primary">
-            <i class="fa-solid fa-graduation-cap"></i>
-            <span>Jelajahi Alur Belajar</span>
-          </router-link>
-          <router-link to="/faq" class="btn-summary-secondary">
-            <i class="fa-solid fa-circle-question"></i>
-            <span>Lihat FAQ</span>
-          </router-link>
-        </div>
-      </footer>
+          </footer>
+        </main>
+      </div>
     </div>
   </div>
 </template>
@@ -118,13 +169,13 @@ import SimpleBackground from '../components/common/SimpleBackground.vue'
 const selectedStage = ref('all')
 
 const stageFilters = [
-  { id: 'all', label: 'Semua Langkah', icon: 'fa-solid fa-list-check' },
-  { id: 'start', label: '1. Persona & Akun', icon: 'fa-solid fa-user-gear' },
-  { id: 'path', label: '2. Alur Belajar', icon: 'fa-solid fa-route' },
-  { id: 'coding', label: '3. Coding Sandbox', icon: 'fa-solid fa-code' },
-  { id: 'gamification', label: '4. XP & Gamifikasi', icon: 'fa-solid fa-fire' },
-  { id: 'cheatsheet', label: '5. Cheatsheet Vault', icon: 'fa-solid fa-bolt' },
-  { id: 'shop', label: '6. Shop & Upgrade', icon: 'fa-solid fa-crown' }
+  { id: 'all', label: 'Semua Tahapan', icon: 'fa-solid fa-list-check' },
+  { id: 'start', label: 'Persona & Akun', icon: 'fa-solid fa-user-gear' },
+  { id: 'path', label: 'Alur Belajar', icon: 'fa-solid fa-route' },
+  { id: 'coding', label: 'Coding Sandbox', icon: 'fa-solid fa-code' },
+  { id: 'gamification', label: 'XP & Gamifikasi', icon: 'fa-solid fa-fire' },
+  { id: 'cheatsheet', label: 'Cheatsheet Vault', icon: 'fa-solid fa-vault' },
+  { id: 'shop', label: 'Shop & Upgrade', icon: 'fa-solid fa-cart-shopping' }
 ]
 
 const steps = [
@@ -138,7 +189,7 @@ const steps = [
     checkpoints: [
       'Daftar akun gratis atau login cepat menggunakan Google / SSO iCraft ID.',
       'Buka menu Edit Profil untuk memilih avatar karakter dan menuliskan bio developer impian.',
-      'Tautkan tautan akun GitHub, LinkedIn, atau portofolio publikmu ke kartu profil Coder.'
+      'Tautkan akun GitHub, LinkedIn, atau portofolio publikmu ke kartu profil Coder.'
     ],
     proTip: 'Username yang unik dan foto profil menarik akan muncul di Leaderboard global saat kamu menduduki peringkat teratas.',
     action: {
@@ -154,11 +205,11 @@ const steps = [
     title: 'Memilih Jalur Belajar (Learning Path)',
     desc: 'iC Game-Z menyusun kurikulum bertahap agar kamu tidak tersesat di lautan tutorial yang membingungkan.',
     checkpoints: [
-      'Buka menu Alur Belajar untuk memilih spesialisasi (Frontend, Backend, Database SQL, Python Data, DevOps).',
+      'Buka menu Alur Belajar untuk memilih spesialisasi (Frontend, Backend, SQL Database, Python Data, DevOps).',
       'Setiap alur terdiri dari Chapter tematik berjenjang mulai dari level dasar hingga studi kasus industri.',
       'Sistem otomatis menyimpan progres checkpoint belajarmu di cloud sehingga kamu bisa melanjutkan kapan saja.'
     ],
-    proTip: 'Fokus tuntaskan satu alur belajar terlebih dahulu sebelum beralih untuk membentuk pemahaman fundamental yang kuat.',
+    proTip: 'Fokus tuntaskan satu alur belajar terlebih dahulu sebelum beralih untuk membentuk fondasi logika koding yang kokoh.',
     action: {
       to: '/learning',
       label: 'Pilih Jalur Belajar'
@@ -176,83 +227,58 @@ const steps = [
       'Jawab Kuis 5-Dimensi yang menguji logika algoritma, sintaks, pemecahan bug, arsitektur, dan best practice.',
       'Dapatkan ulasan langsung pada setiap jawaban kuis untuk memahami letak kesalahan secara cepat.'
     ],
-    proTip: 'Setiap jawaban kuis yang benar memberikan tambahan +15 XP dan membantu memperkuat rantai pemahaman sebelum menulis kode.',
+    proTip: 'Setiap jawaban kuis yang benar memberikan tambahan +15 XP dan membantu memperkuat pemahaman sebelum menulis kode.',
     action: null
   },
   {
     number: '04',
     category: 'coding',
     stageLabel: 'Tahap 4: Praktik Koding Nyata',
-    icon: 'fa-solid fa-terminal',
-    title: 'Menguasai Coding Sandbox & Evaluasi Otomatis',
-    desc: 'Bukan sekadar menonton video! Kamu langsung menulis kode di editor terintegrasi dengan validasi instan.',
+    icon: 'fa-solid fa-laptop-code',
+    title: 'Coding Sandbox & Automated Test Cases',
+    desc: 'Tulis kode sesungguhnya di workspace editor browser tanpa perlu setup compiler lokal yang rumit.',
     checkpoints: [
-      'Tulis kode pada workspace editor browser dengan dukungan syntax highlighting dan auto-complete.',
-      'Klik tombol "Jalankan Kode" untuk melihat output live di terminal console.',
-      'Gunakan tombol "Uji Solusi" untuk mengevaluasi kode terhadap test cases otomatis yang teruji.',
-      'Jika mengalami kebuntuan, gunakan tombol Hint cerdas untuk memandu langkah demi langkah.'
+      'Tulis kode solusi pada panel editor (mendukung HTML, CSS, JavaScript, Python, dan SQL Query).',
+      'Tekan tombol Jalankan Kode untuk melihat output terminal instan dan verifikasi test case otomatis.',
+      'Jika mengalami kebuntuan logika, gunakan tombol Hint AI untuk memperoleh petunjuk bertahap tanpa membocorkan jawaban.'
     ],
-    proTip: 'Perhatikan pesan error pada terminal console; pesan error dibuat deskriptif untuk melatih kebiasaan debugging profesional.',
-    action: {
-      to: '/challenges',
-      label: 'Coba Tantangan Coding'
-    }
+    proTip: 'Perhatikan pesan error terminal dengan teliti; debugging adalah keterampilan paling berharga seorang software engineer.',
+    action: null
   },
   {
     number: '05',
     category: 'gamification',
-    stageLabel: 'Tahap 5: Mekanisme Gamifikasi',
-    icon: 'fa-solid fa-fire-flame-curved',
-    title: 'Menaikkan Level XP, Daily Streak & Mengelola Energy',
-    desc: 'Belajar coding dengan adrenalin layaknya bermain game RPG bersama ribuan coder Indonesia.',
+    stageLabel: 'Tahap 5: Mekanisme XP & Energy',
+    icon: 'fa-solid fa-bolt',
+    title: 'Mempertahankan Daily Streak & Papan Peringkat',
+    desc: 'Konsistensi adalah kunci utama menjadi developer handal. Sistem gamifikasi menjaga api semangat belajarmu.',
     checkpoints: [
-      'XP (Experience Points): Kumpulkan XP dari setiap lesson untuk meningkatkan rank Coder dan bersaing di Leaderboard.',
-      'Daily Streak: Belajar minimal 1 lesson setiap hari agar streak tidak patah dan mendapatkan multiplier bonus XP.',
-      'Energy (Jantung): Alokasi nyawa harian saat submit evaluasi. Terisi penuh otomatis setiap tengah malam.',
-      'iCoinz: Koin reward yang kamu kumpulkan bisa dibelanjakan untuk avatar eksklusif atau refill energy instan.'
+      'Setiap aktivitas belajar menyumbang XP untuk menaikkan level rank dan memanjat Leaderboard global.',
+      'Selesaikan minimal 1 lesson setiap hari sebelum pukul 23:59 WIB untuk mempertahankan Daily Streak.',
+      'Energy (Jantung) berkurang bila solusi salah. Energy pulih otomatis setiap pukul 00:00 WIB atau melalui refill di GameZ Shop.'
     ],
-    proTip: 'Gunakan fitur pengingat belajar harian agar Daily Streak-mu tetap menyala dan tidak ter-reset ke angka 0.',
+    proTip: 'Daily Streak yang panjang memberikan bonus multiplier XP sehingga kamu lebih cepat menembus peringkat top 10.',
     action: {
       to: '/leaderboard',
-      label: 'Pantau Leaderboard'
+      label: 'Cek Leaderboard'
     }
   },
   {
     number: '06',
     category: 'cheatsheet',
-    stageLabel: 'Tahap 6: Persiapan Karir Industri',
-    icon: 'fa-solid fa-vault',
-    title: 'Memaksimalkan Game Z Cheatsheet Vault & Bank Soal',
-    desc: 'Referensi senjata wajib kerja: 24 modul cheatsheet sintaks lengkap dengan bank soal simulasi tes wawancara kerja.',
+    stageLabel: 'Tahap 6: Cheatsheet & Sertifikasi',
+    icon: 'fa-solid fa-award',
+    title: 'Cheatsheet Vault & Klaim e-Sertifikat Resmi',
+    desc: 'Persiapkan dirimu menembus technical interview dan lengkapi portofolio kredensial profesional.',
     checkpoints: [
-      'Gunakan fitur Deep Search untuk mencari rumus spesifik (misal: "Count", "VLOOKUP", "Docker", "JWT").',
-      'Preview langsung formula dan sintaks pada kartu cheatsheet sebelum masuk ke modul.',
-      'Pelajari cheatsheet dengan mode baca per-materi yang nyaman dan bebas distraksi.',
-      'Kerjakan latihan soal tes rekrutmen kerja dengan pembahasan mendalam di setiap akhir modul.'
+      'Gunakan Cheatsheet Vault (24 modul rumus industri) untuk referensi cepat saat bekerja atau belajar.',
+      'Latih pemahamanmu dengan bank soal ujian technical screening rekrutmen kerja.',
+      'Klaim e-Sertifikat resmi ber-Credential ID dan QR verification setelah menuntaskan alur belajar.'
     ],
-    proTip: 'Simpan cheatsheet yang sering kamu gunakan sebagai PDF via tombol print atau bookmark di browser untuk acuan kerja harian.',
+    proTip: 'Tautkan link e-Sertifikat ke profil LinkedIn dan CV kamu untuk meningkatkan daya tawar saat melamar kerja.',
     action: {
       to: '/cheatsheet',
       label: 'Buka Cheatsheet Vault'
-    }
-  },
-  {
-    number: '07',
-    category: 'shop',
-    stageLabel: 'Tahap 7: Peningkatan Kapabilitas',
-    icon: 'fa-solid fa-cart-shopping',
-    title: 'GameZ Shop & Peningkatan Paket Langganan',
-    desc: 'Buka seluruh potensi belajarmu dengan akses Pro atau Expert untuk persiapan karir tanpa hambatan.',
-    checkpoints: [
-      'Kunjungi GameZ Shop untuk menukarkan iCoinz dengan item boost atau booster pemulih Energy.',
-      'Upgrade ke Pro Plan untuk menikmati seluruh alur belajar lanjutan, unlimited energy, dan e-Sertifikat resmi.',
-      'Upgrade ke Expert Plan untuk akses tanpa batas ke 24 Cheatsheet Vault Full Page dan 305+ Bank Soal Teknis.',
-      'Pembayaran otomatis instan via QRIS (BCA, Mandiri, BRI, GoPay, OVO, ShopeePay, DANA) aktif < 1 menit.'
-    ],
-    proTip: 'Paket langganan tidak menggunakan auto-debit diam-diam, kamu memiliki kontrol penuh kapan ingin memperpanjang akses.',
-    action: {
-      to: '/shop',
-      label: 'Kunjungi GameZ Shop'
     }
   }
 ]

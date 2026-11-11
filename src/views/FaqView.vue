@@ -3,16 +3,26 @@
     <SimpleBackground />
 
     <div class="faq-container">
-      <!-- 0. Top Breadcrumb Nav -->
+      <!-- 0. Top Navigation -->
       <div class="faq-top-nav">
-        <router-link to="/" class="back-link">
-          <i class="fa-solid fa-arrow-left"></i>
-          <span>Kembali ke Beranda</span>
-        </router-link>
-        <div class="nav-breadcrumbs">
-          <span>Pusat Bantuan</span>
-          <i class="fa-solid fa-chevron-right separator"></i>
-          <span class="current">FAQ</span>
+        <div class="top-nav-left">
+          <router-link to="/" class="brand-link" title="Beranda iC Game-Z">
+            <span class="brand-ic">iC</span>
+            <span class="brand-gamez">Game-Z</span>
+          </router-link>
+          <span class="nav-sep">/</span>
+          <div class="nav-breadcrumbs">
+            <span>Pusat Bantuan</span>
+            <i class="fa-solid fa-chevron-right separator"></i>
+            <span class="current">FAQ</span>
+          </div>
+        </div>
+
+        <div class="top-nav-right">
+          <router-link to="/" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Kembali ke Beranda</span>
+          </router-link>
         </div>
       </div>
 

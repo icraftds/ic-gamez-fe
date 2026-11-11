@@ -5,18 +5,29 @@
     <div class="contact-container">
       <!-- 0. Top Navigation -->
       <div class="contact-top-nav">
-        <router-link to="/" class="back-link">
-          <i class="fa-solid fa-arrow-left"></i>
-          <span>Kembali ke Beranda</span>
-        </router-link>
+        <div class="top-nav-left">
+          <router-link to="/" class="brand-link" title="Beranda iC Game-Z">
+            <span class="brand-ic">iC</span>
+            <span class="brand-gamez">Game-Z</span>
+          </router-link>
+          <span class="nav-sep">/</span>
+          <div class="nav-breadcrumbs">
+            <span>Pusat Bantuan</span>
+            <i class="fa-solid fa-chevron-right separator"></i>
+            <span class="current">Hubungi Kami</span>
+          </div>
+        </div>
+
+        <div class="top-nav-right">
+          <router-link to="/" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Kembali ke Beranda</span>
+          </router-link>
+        </div>
       </div>
 
       <!-- 1. Hero Header -->
       <header class="contact-header">
-        <div class="hero-pill">
-          <i class="fa-solid fa-headset"></i>
-          <span>Layanan Dukungan & Bantuan</span>
-        </div>
         <h1 class="contact-title"><span class="gradient-text">Hubungi Tim iC Game-Z</span></h1>
         <p class="contact-subtitle">
           Punya pertanyaan seputar materi belajar, kendala akun, transaksi QRIS, atau ide kolaborasi? Kami siap mendengarkan dan membantu Anda.
