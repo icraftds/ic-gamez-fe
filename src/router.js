@@ -140,6 +140,41 @@ const router = createRouter({
       path: '/materials',
       name: 'materials',
       component: () => import('./views/MaterialsView.vue')
+    },
+    {
+      path: '/faq',
+      name: 'faq',
+      component: () => import('./views/FaqView.vue')
+    },
+    {
+      path: '/panduan',
+      alias: '/guide',
+      name: 'guide',
+      component: () => import('./views/GuideView.vue')
+    },
+    {
+      path: '/hubungi-kami',
+      alias: '/contact',
+      name: 'contact',
+      component: () => import('./views/ContactView.vue')
+    },
+    {
+      path: '/tentang-kami',
+      alias: '/about',
+      name: 'about',
+      component: () => import('./views/AboutView.vue')
+    },
+    {
+      path: '/kebijakan-privasi',
+      alias: '/privacy',
+      name: 'privacy',
+      component: () => import('./views/PrivacyView.vue')
+    },
+    {
+      path: '/syarat-ketentuan',
+      alias: '/terms',
+      name: 'terms',
+      component: () => import('./views/TermsView.vue')
     }
   ]
 })

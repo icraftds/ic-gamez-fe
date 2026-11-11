@@ -35,9 +35,9 @@
           <h4 class="footer-heading">Dukungan</h4>
           <ul class="footer-links">
             <li><router-link to="/shop">GameZ Shop</router-link></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Panduan Pengguna</a></li>
-            <li><a href="#">Hubungi Kami</a></li>
+            <li><router-link to="/faq">FAQ</router-link></li>
+            <li><router-link to="/panduan">Panduan Pengguna</router-link></li>
+            <li><router-link to="/hubungi-kami">Hubungi Kami</router-link></li>
           </ul>
         </div>
 
@@ -45,10 +45,10 @@
         <div class="footer-col">
           <h4 class="footer-heading">Lainnya</h4>
           <ul class="footer-links">
-            <li><a href="https://www.icraftds.id/">iCraft Digital Service</a></li>
-            <li><a href="https://instagram.com/icraft.ds">Tentang Kami</a></li>
-            <li><a href="#">Kebijakan Privasi</a></li>
-            <li><a href="#">Syarat & Ketentuan</a></li>
+            <li><a href="https://www.icraftds.id/" target="_blank" rel="noopener noreferrer">iCraft Digital Service</a></li>
+            <li><router-link to="/tentang-kami">Tentang Kami</router-link></li>
+            <li><router-link to="/kebijakan-privasi">Kebijakan Privasi</router-link></li>
+            <li><router-link to="/syarat-ketentuan">Syarat & Ketentuan</router-link></li>
           </ul>
         </div>
       </div>
