@@ -70,16 +70,10 @@
 
         <!-- RIGHT COLUMN: Main Content Area (Hero + Popular Topics + Q&A + Support Dock) -->
         <main class="faq-main-content">
-          <!-- 1. Hero Section (Notion & Figma Style) -->
+          <!-- 1. Hero Section (Notion & Figma Clean Style) -->
           <header class="faq-hero">
-            <div class="hero-badge">
-              <span class="badge-dot"></span>
-              <i class="fa-solid fa-circle-question"></i>
-              <span>Pusat Bantuan & Tanya Jawab</span>
-            </div>
-
             <h1 class="hero-title">
-              Ada yang bisa kami <span class="gradient-text">bantu hari ini?</span>
+              Ada yang bisa kami bantu?
             </h1>
             <p class="hero-subtitle">
               Temukan solusi instan, panduan alur belajar koding, mekanisme gamifikasi XP & Energy, hingga bantuan pembayaran di iC Game-Z.
@@ -135,11 +129,7 @@
           <!-- 2. Popular Topics Section (Notion Style Grid Cards) -->
           <section v-if="!searchQuery" class="popular-topics-section">
             <div class="section-header-row">
-              <div>
-                <h2 class="section-title">Topik Populer</h2>
-                <p class="section-desc">Pilih kategori utama untuk langsung memfilter panduan dan solusi terkait.</p>
-              </div>
-              <span class="topics-count-badge">{{ categories.length - 1 }} Kategori</span>
+              <h2 class="section-title">Topik Populer</h2>
             </div>
 
             <div class="popular-grid">
@@ -159,10 +149,6 @@
                     <i class="fa-solid fa-arrow-right topic-arrow"></i>
                   </div>
                   <p class="topic-desc">{{ topic.desc }}</p>
-                  <div class="topic-meta">
-                    <span class="topic-badge">{{ topic.badge }}</span>
-                    <span class="topic-articles">{{ getCategoryCount(topic.categoryId) }} Pertanyaan</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -210,11 +196,10 @@
 
             <!-- Featured Diagnostic Solution Callout (Apple Support Style) -->
             <div v-if="featuredCallout && !searchQuery" class="featured-solution-card">
-              <div class="fs-badge">
-                <i class="fa-solid fa-star"></i>
-                <span>Solusi Unggulan & Cepat</span>
+              <div class="fs-header">
+                <span class="fs-label">Solusi Cepat</span>
+                <h3 class="fs-title">{{ featuredCallout.title }}</h3>
               </div>
-              <h3 class="fs-title">{{ featuredCallout.title }}</h3>
               <p class="fs-desc">{{ featuredCallout.desc }}</p>
               <div class="fs-steps">
                 <div v-for="(step, sIdx) in featuredCallout.steps" :key="sIdx" class="fs-step-item">
@@ -330,13 +315,9 @@
               <div class="dock-glow"></div>
               <div class="dock-grid">
                 <div class="dock-content">
-                  <div class="dock-pill">
-                    <i class="fa-solid fa-headset"></i>
-                    <span>Bantuan Langsung</span>
-                  </div>
-                  <h2 class="dock-title">Masih membutuhkan jawaban atau kendala belum selesai?</h2>
+                  <h2 class="dock-title">Masih butuh bantuan?</h2>
                   <p class="dock-desc">
-                    Tim technical support dan kurikulum iCraft siap mendampingi perjalanan kodingmu. Hubungi kami melalui kanal resmi di bawah ini.
+                    Tim technical support dan kurikulum iCraft siap mendampingi kendala teknis dan alur belajarmu.
                   </p>
                 </div>
 
@@ -404,14 +385,13 @@ const categories = [
   { id: 'account', label: 'Akun & Keamanan', icon: 'fa-solid fa-user-shield' }
 ]
 
-// Popular Topic Cards (Notion Help Center style)
+// Popular Topic Cards (Notion Help Center style - clean, no slop badges)
 const popularTopics = [
   {
     id: 'pt-1',
     categoryId: 'getting-started',
     title: 'Mulai Petualangan',
     desc: 'Workspace coding di browser, materi ramah pemula, kuis interaktif, dan cara pakai Hint AI.',
-    badge: 'Pemula Friendly',
     icon: 'fa-solid fa-rocket',
     glowColor: 'rgba(56, 189, 248, 0.4)'
   },
@@ -420,7 +400,6 @@ const popularTopics = [
     categoryId: 'gamification',
     title: 'Energy & Nyawa',
     desc: 'Aturan pengurangan nyawa, reset harian jam 00:00 WIB, isi ulang pakai iCoinz, dan Unlimited Pro.',
-    badge: 'Mekanik Game',
     icon: 'fa-solid fa-heart-pulse',
     glowColor: 'rgba(239, 68, 68, 0.4)'
   },
@@ -429,7 +408,6 @@ const popularTopics = [
     categoryId: 'payment',
     title: 'Pembayaran & QRIS',
     desc: 'Aktivasi otomatis via QRIS (BCA, Mandiri, GoPay, OVO), paket Pro & Expert tanpa perpanjangan paksa.',
-    badge: 'Aktivasi Instan',
     icon: 'fa-solid fa-qrcode',
     glowColor: 'rgba(16, 185, 129, 0.4)'
   },
@@ -438,7 +416,6 @@ const popularTopics = [
     categoryId: 'gamification',
     title: 'XP & Leaderboard',
     desc: 'Kalkulasi poin XP per lesson, multiplier daily streak, dan perebutan tahta di papan peringkat global.',
-    badge: 'Kompetisi',
     icon: 'fa-solid fa-trophy',
     glowColor: 'rgba(251, 191, 36, 0.4)'
   },
@@ -447,7 +424,6 @@ const popularTopics = [
     categoryId: 'cheatsheet',
     title: 'Cheatsheet Vault',
     desc: '24 modul sintaks siap kerja (Excel, SQL, Python, Docker) lengkap dengan mode fokus dan search.',
-    badge: 'Sintaks Industri',
     icon: 'fa-solid fa-vault',
     glowColor: 'rgba(168, 85, 247, 0.4)'
   },
@@ -456,7 +432,6 @@ const popularTopics = [
     categoryId: 'account',
     title: 'Akun & Keamanan',
     desc: 'Pengaturan profil coder, ganti password aman, enkripsi sesi, dan kebijakan privasi data pengguna.',
-    badge: 'Data Aman',
     icon: 'fa-solid fa-shield-halved',
     glowColor: 'rgba(6, 182, 212, 0.4)'
   }
