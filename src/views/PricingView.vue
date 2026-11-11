@@ -14,7 +14,7 @@
           <i class="fa-solid fa-clock-rotate-left"></i>
           <div>
             <strong>Menunggu Pembayaran</strong>
-            <p>Anda memiliki transaksi {{ pendingCheckout.planName }} Plan yang belum diselesaikan.</p>
+            <p>Anda memiliki transaksi {{ (pendingCheckout.planName || 'Pro').replace(/\s*Plan$/i, '') }} Plan yang belum diselesaikan.</p>
           </div>
         </div>
         <div class="pending-actions">

@@ -48,7 +48,7 @@
           <div v-if="savedCheckout" class="order-summary-box">
             <div class="summary-row">
               <span class="label">Paket</span>
-              <span class="value highlight">{{ savedCheckout.planName || 'Pro' }} Plan</span>
+              <span class="value highlight">{{ (savedCheckout.planName || 'Pro').replace(/\s*Plan$/i, '') }} Plan</span>
             </div>
             <div v-if="savedCheckout.paymentDetails?.order_id" class="summary-row">
               <span class="label">No. Invoice</span>
