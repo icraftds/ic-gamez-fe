@@ -41,10 +41,7 @@
 .brand-link {
   display: inline-flex;
   align-items: center;
-  font-size: 1.15rem;
-  font-weight: 800;
   text-decoration: none;
-  letter-spacing: -0.5px;
   transition: opacity 0.2s ease;
 }
 
@@ -52,13 +49,25 @@
   opacity: 0.85;
 }
 
-.brand-ic {
-  color: #38bdf8;
+.brand-logo-img {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
 }
 
-.brand-gamez {
-  color: #f8fafc;
+.logo-light {
+  display: block;
 }
+
+.logo-dark {
+  display: none;
+  height: 22px;
+}
+
+body.light-mode .logo-dark { display: none; }
+body.light-mode .logo-light { display: block; }
+body:not(.light-mode) .logo-light { display: none; }
+body:not(.light-mode) .logo-dark { display: block; }
 
 .nav-sep {
   color: #475569;
