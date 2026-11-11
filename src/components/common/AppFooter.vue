@@ -56,7 +56,7 @@
       <!-- Bottom Bar -->
       <div class="footer-bottom">
         <div class="copyright">
-          &copy; {{ new Date().getFullYear() }} iC Game-Z &middot; iCraft Studio. All rights reserved.
+          &copy; {{ new Date().getFullYear() }} iC Game-Z &middot; PT. Nirmala Kreasi Bersama. All rights reserved.
         </div>
         <div class="made-with">
           Made with <i class="fa-solid fa-heart text-danger"></i> in Indonesia

@@ -118,7 +118,7 @@
           <div v-if="!isSubmitted">
             <div class="form-header">
               <h2>Kirimkan Pesan atau Tiket Bantuan</h2>
-              <p>Isi formulir di bawah ini. Pesan Anda akan langsung diformat secara rapi dan diteruskan ke WhatsApp Hotline Resmi iCraft Studio.</p>
+              <p>Isi formulir di bawah ini. Pesan Anda akan langsung diformat secara rapi dan diteruskan ke WhatsApp Hotline Resmi PT. Nirmala Kreasi Bersama (iCraft Digital Service).</p>
             </div>
 
             <form @submit.prevent="handleSubmitForm" class="form-grid">

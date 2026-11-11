@@ -665,7 +665,7 @@ const faqs = [
     icon: 'fa-solid fa-certificate',
     question: 'Apakah saya mendapatkan sertifikat setelah menuntaskan alur belajar?',
     answerHtml: `
-      <p><strong>Ya, Tentu Saja!</strong> Setelah menuntaskan seluruh chapter dan proyek akhir pada suatu Learning Path, kamu berhak mengklaim <strong>e-Sertifikat Kelulusan Resmi</strong> dari iCraft Studio.</p>
+      <p><strong>Ya, Tentu Saja!</strong> Setelah menuntaskan seluruh chapter dan proyek akhir pada suatu Learning Path, kamu berhak mengklaim <strong>e-Sertifikat Kelulusan Resmi</strong> dari PT. Nirmala Kreasi Bersama (iCraft Digital Service).</p>
       <p>Sertifikat dilengkapi dengan QR code verifikasi keaslian daring dan <em>Credential ID</em> unik yang dapat ditautkan langsung ke profil LinkedIn atau CV kerja kamu.</p>
     `,
     tip: 'Sertifikat dapat diunduh dalam format PDF resolusi tinggi dan berlaku selamanya tanpa tanggal kedaluwarsa.'

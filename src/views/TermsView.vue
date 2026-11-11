@@ -108,7 +108,7 @@
           <header class="terms-doc-header">
             <h1 class="terms-title">Syarat & Ketentuan Layanan iC Game-Z</h1>
             <p class="terms-meta-date">
-              Terakhir Diperbarui: <strong>10 November 2026</strong> &middot; Berlaku untuk Seluruh Pengguna Platform iCraft Studio
+              Terakhir Diperbarui: <strong>10 November 2026</strong> &middot; Berlaku untuk Seluruh Pengguna Platform PT. Nirmala Kreasi Bersama
             </p>
           </header>
 
@@ -168,7 +168,7 @@
               </div>
               <div class="article-body">
                 <p>
-                  Platform <strong>iC Game-Z</strong> ("Platform") dikelola dan dioperasikan secara resmi oleh <strong>iCraft Studio</strong> (iCraft Digital Service, "Kami").
+                  Platform <strong>iC Game-Z</strong> ("Platform") dikelola dan dioperasikan secara resmi oleh <strong>PT. Nirmala Kreasi Bersama</strong> melalui divisi teknologi <strong>iCraft Digital Service</strong> ("Kami").
                 </p>
                 <p>
                   "Pengguna" atau "Anda" adalah setiap individu yang mengakses platform, baik sebagai pengguna gratis, pembeli item di GameZ Shop, maupun pelanggan paket langganan Pro atau Expert.
@@ -261,7 +261,7 @@
               </div>
               <div class="article-body">
                 <p>
-                  Seluruh kurikulum alur belajar, naskah materi, soal kuis, aset visual/ilustrasi, modul cheatsheet, algoritma evaluasi kode, serta merek dagang <strong>iC Game-Z</strong> dan <strong>iCraft Studio</strong> adalah hak kekayaan intelektual eksklusif milik iCraft Studio yang dilindungi undang-undang hak cipta Republik Indonesia.
+                  Seluruh kurikulum alur belajar, naskah materi, soal kuis, aset visual/ilustrasi, modul cheatsheet, algoritma evaluasi kode, serta merek dagang <strong>iC Game-Z</strong> dan <strong>iCraft Digital Service</strong> adalah hak kekayaan intelektual eksklusif milik <strong>PT. Nirmala Kreasi Bersama</strong> yang dilindungi undang-undang hak cipta Republik Indonesia.
                 </p>
                 <p>
                   Pengguna diberikan lisensi terbatas, non-eksklusif, dan tidak dapat dipindahtangankan semata-mata untuk keperluan pembelajaran pribadi non-komersial. Dilarang keras mendistribusikan ulang, menyalin secara massal, menjual kembali, atau mempublikasikan materi berbayar iC Game-Z ke platform lain tanpa izin tertulis dari kami.
@@ -362,7 +362,7 @@ const sections = [
   { id: 'account-terms', num: '02', title: 'Akun & Kredensial', keywords: 'pendaftaran akun password kredensial login account sharing tanggung jawab' },
   { id: 'learning-integrity', num: '03', title: 'Integritas Belajar & Komunitas', keywords: 'kecurangan bot scraper manipulasi xp compiler reverse engineering peretasan sanksi diskualifikasi' },
   { id: 'payment-subs', num: '04', title: 'Pembayaran & Langganan', keywords: 'qris pro expert langganan refund invoice perpanjangan mutasi perbankan' },
-  { id: 'intellectual-prop', num: '05', title: 'Hak Kekayaan Intelektual', keywords: 'hak cipta lisensi materi modul kurikulum naskah karya intelektual icraft studio' },
+  { id: 'intellectual-prop', num: '05', title: 'Hak Kekayaan Intelektual', keywords: 'hak cipta lisensi materi modul kurikulum naskah karya intelektual pt nirmala kreasi bersama icraft digital service' },
   { id: 'service-availability', num: '06', title: 'Ketersediaan Layanan', keywords: 'maintenance ketersediaan downtime server as is gangguan pihak ketiga' }
 ]
 

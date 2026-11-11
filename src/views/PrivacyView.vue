@@ -108,7 +108,7 @@
           <header class="privacy-doc-header">
             <h1 class="privacy-title">Kebijakan Privasi iC Game-Z</h1>
             <p class="privacy-meta-date">
-              Terakhir Diperbarui: <strong>10 November 2026</strong> &middot; Berlaku Efektif untuk Seluruh Layanan iCraft Studio
+              Terakhir Diperbarui: <strong>10 November 2026</strong> &middot; Berlaku Efektif untuk Seluruh Layanan PT. Nirmala Kreasi Bersama
             </p>
           </header>
 
@@ -118,7 +118,7 @@
               <i class="fa-solid fa-circle-check"></i>
             </div>
             <div class="trust-text">
-              <strong>Komitmen Mutlak Privasi:</strong> iCraft Studio menghargai privasi Anda sepenuhnya. Kami <strong>tidak pernah dan tidak akan pernah menjual, menyewakan, atau memperdagangkan data pribadi Anda</strong> kepada pihak ketiga mana pun untuk tujuan periklanan eksternal.
+              <strong>Komitmen Mutlak Privasi:</strong> PT. Nirmala Kreasi Bersama (iCraft Digital Service) menghargai privasi Anda sepenuhnya. Kami <strong>tidak pernah dan tidak akan pernah menjual, menyewakan, atau memperdagangkan data pribadi Anda</strong> kepada pihak ketiga mana pun untuk tujuan periklanan eksternal.
             </div>
           </div>
 

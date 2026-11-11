@@ -28,7 +28,7 @@
 
       <!-- Hero Header -->
       <header class="about-header">
-        <h1 class="about-title">Tentang iC Game-Z & iCraft Studio</h1>
+        <h1 class="about-title">Tentang iC Game-Z & PT. Nirmala Kreasi Bersama</h1>
         <p class="about-subtitle">
           Mendobrak cara lama belajar coding yang kaku. Mengubah kerumitan sintaks menjadi petualangan gamifikasi yang seru, interaktif, dan terarah menuju kesiapan karir industri nyata.
         </p>
@@ -65,7 +65,7 @@
             Banyak orang bermimpi menjadi software engineer, data analyst, atau web developer. Namun di tengah jalan, lebih dari <strong>70% pemula menyerah</strong> karena tutorial video satu arah yang membosankan, frustrasi saat instalasi compiler lokal yang rumit, dan minimnya feedback saat kode mengalami error.
           </p>
           <p>
-            Diinisiasi oleh tim <strong>iCraft Studio</strong> (iCraft Digital Service), kami merancang <strong>iC Game-Z</strong> dengan keyakinan kuat bahwa <em>"Belajar coding harus semenyenangkan dan se-adiktif bermain game RPG"</em>. Setiap sintaks yang kamu pelajari langsung dipraktikkan di code sandbox browser, setiap baris kode diuji secara instan oleh test runner otomatis, dan setiap tantangan yang berhasil diselesaikan diganjar dengan XP, kenaikan level, dan apresiasi nyata.
+            Diinisiasi oleh <strong>PT. Nirmala Kreasi Bersama</strong> melalui unit teknologi <strong>iCraft Digital Service</strong>, kami merancang <strong>iC Game-Z</strong> dengan keyakinan kuat bahwa <em>"Belajar coding harus semenyenangkan dan se-adiktif bermain game RPG"</em>. Setiap sintaks yang kamu pelajari langsung dipraktikkan di code sandbox browser, setiap baris kode diuji secara instan oleh test runner otomatis, dan setiap tantangan yang berhasil diselesaikan diganjar dengan XP, kenaikan level, dan apresiasi nyata.
           </p>
         </div>
       </section>
@@ -124,7 +124,7 @@
       <footer class="ecosystem-banner">
         <div class="ecosystem-text">
           <h3>Bagian dari Ekosistem iCraft Digital Service</h3>
-          <p>Selain platform edukasi, iCraft Studio mengembangkan solusi software enterprise, mobile apps, dan infrastruktur cloud modern.</p>
+          <p>Selain platform edukasi, PT. Nirmala Kreasi Bersama (iCraft Digital Service) mengembangkan solusi software enterprise, mobile apps, dan infrastruktur cloud modern.</p>
         </div>
         <div class="ecosystem-actions">
           <a
