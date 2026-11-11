@@ -33,22 +33,53 @@
           <div class="sidebar-sticky-panel">
             <div class="sidebar-header">
               <span class="sidebar-subtitle">DAFTAR KLAUSUL</span>
-              <span class="total-badge">6 Pasal</span>
+              <span class="total-badge">{{ sections.length }} Pasal</span>
+            </div>
+
+            <!-- Quick Search inside Sidebar -->
+            <div class="sidebar-search-box">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Cari kata kunci pasal..."
+                class="sidebar-search-input"
+              />
+              <button v-if="searchQuery" class="clear-search-btn" @click="searchQuery = ''" title="Bersihkan">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
             </div>
 
             <nav class="toc-menu" aria-label="Daftar Isi Syarat & Ketentuan">
-              <a
+              <button
+                type="button"
+                class="toc-item-link"
+                :class="{ active: activeSection === 'all' && !searchQuery }"
+                @click="selectSection('all')"
+              >
+                <div class="toc-btn-left">
+                  <span class="toc-icon"><i class="fa-solid fa-layer-group"></i></span>
+                  <span class="toc-label">Semua Klausul (Lengkap)</span>
+                </div>
+                <span class="toc-badge-all">{{ sections.length }}</span>
+              </button>
+
+              <div class="toc-divider"></div>
+
+              <button
                 v-for="item in sections"
                 :key="item.id"
-                :href="`#${item.id}`"
+                type="button"
                 class="toc-item-link"
-                :class="{ active: activeSection === item.id }"
-                @click.prevent="scrollToSection(item.id)"
+                :class="{ active: activeSection === item.id && !searchQuery }"
+                @click="selectSection(item.id)"
               >
-                <span class="toc-num">{{ item.num }}</span>
-                <span class="toc-label">{{ item.title }}</span>
+                <div class="toc-btn-left">
+                  <span class="toc-num">{{ item.num }}</span>
+                  <span class="toc-label">{{ item.title }}</span>
+                </div>
                 <i class="fa-solid fa-chevron-right toc-arrow"></i>
-              </a>
+              </button>
             </nav>
 
             <!-- Legal Inquiry Box in Sidebar -->
@@ -91,10 +122,46 @@
             </div>
           </div>
 
+          <!-- Active Focus Bar (Tampil saat memilih salah satu pasal) -->
+          <div v-if="activeSection !== 'all' && !searchQuery && currentSection" class="active-clause-bar">
+            <div class="clause-indicator">
+              <span class="clause-pill">Pasal {{ currentSection.num }} dari {{ sections.length }}</span>
+              <span class="clause-current-name">{{ currentSection.title }}</span>
+            </div>
+            <button class="btn-view-all" @click="selectSection('all')">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Tampilkan Semua Pasal</span>
+            </button>
+          </div>
+
+          <!-- Search Result Bar -->
+          <div v-if="searchQuery" class="active-clause-bar search-bar-result">
+            <div class="clause-indicator">
+              <span class="clause-pill"><i class="fa-solid fa-magnifying-glass"></i> Cari</span>
+              <span class="clause-current-name">Filter: "{{ searchQuery }}" ({{ matchedSectionIds.length }} pasal cocok)</span>
+            </div>
+            <button class="btn-view-all" @click="searchQuery = ''">
+              <i class="fa-solid fa-xmark"></i>
+              <span>Bersihkan</span>
+            </button>
+          </div>
+
+          <!-- Empty search state -->
+          <div v-if="searchQuery && matchedSectionIds.length === 0" class="empty-search-box">
+            <i class="fa-solid fa-circle-question empty-icon"></i>
+            <p>Tidak ditemukan pasal yang memuat kata kunci "<strong>{{ searchQuery }}</strong>".</p>
+            <button class="btn-view-all" @click="searchQuery = ''">Kembali ke Semua Pasal</button>
+          </div>
+
           <!-- Document Articles (Clean Typographic Dividers - No Box Monotony) -->
           <div class="terms-articles-list">
             <!-- Article 1 -->
-            <article id="general-terms" class="policy-article">
+            <article
+              v-show="isSectionVisible('general-terms')"
+              id="general-terms"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'general-terms' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">01</span>
                 <h2>Ketentuan Umum & Definisi</h2>
@@ -113,7 +180,12 @@
             </article>
 
             <!-- Article 2 -->
-            <article id="account-terms" class="policy-article">
+            <article
+              v-show="isSectionVisible('account-terms')"
+              id="account-terms"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'account-terms' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">02</span>
                 <h2>Pendaftaran Akun & Tanggung Jawab Kredensial</h2>
@@ -129,7 +201,12 @@
             </article>
 
             <!-- Article 3 -->
-            <article id="learning-integrity" class="policy-article">
+            <article
+              v-show="isSectionVisible('learning-integrity')"
+              id="learning-integrity"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'learning-integrity' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">03</span>
                 <h2>Integritas Belajar & Aturan Komunitas</h2>
@@ -151,7 +228,12 @@
             </article>
 
             <!-- Article 4 -->
-            <article id="payment-subs" class="policy-article">
+            <article
+              v-show="isSectionVisible('payment-subs')"
+              id="payment-subs"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'payment-subs' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">04</span>
                 <h2>Paket Langganan & Kebijakan Pembayaran</h2>
@@ -167,7 +249,12 @@
             </article>
 
             <!-- Article 5 -->
-            <article id="intellectual-prop" class="policy-article">
+            <article
+              v-show="isSectionVisible('intellectual-prop')"
+              id="intellectual-prop"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'intellectual-prop' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">05</span>
                 <h2>Hak Kekayaan Intelektual</h2>
@@ -183,7 +270,12 @@
             </article>
 
             <!-- Article 6 -->
-            <article id="service-availability" class="policy-article">
+            <article
+              v-show="isSectionVisible('service-availability')"
+              id="service-availability"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'service-availability' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">06</span>
                 <h2>Ketersediaan Layanan & Batasan Tanggung Jawab</h2>
@@ -197,6 +289,36 @@
                 </p>
               </div>
             </article>
+          </div>
+
+          <!-- Bottom Clause Pagination (Hanya tampil saat mode pasal tunggal) -->
+          <div v-if="activeSection !== 'all' && !searchQuery && currentSection" class="clause-pagination">
+            <button
+              v-if="prevSection"
+              type="button"
+              class="btn-clause-nav prev"
+              @click="selectSection(prevSection.id)"
+            >
+              <i class="fa-solid fa-arrow-left"></i>
+              <div class="nav-text">
+                <span class="nav-label">Pasal Sebelumnya</span>
+                <span class="nav-title">{{ prevSection.num }}. {{ prevSection.title }}</span>
+              </div>
+            </button>
+            <div v-else class="pagination-spacer"></div>
+
+            <button
+              v-if="nextSection"
+              type="button"
+              class="btn-clause-nav next"
+              @click="selectSection(nextSection.id)"
+            >
+              <div class="nav-text">
+                <span class="nav-label">Pasal Selanjutnya</span>
+                <span class="nav-title">{{ nextSection.num }}. {{ nextSection.title }}</span>
+              </div>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
           </div>
 
           <!-- Bottom Contact Dock -->
@@ -228,26 +350,47 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 
+// Default to general-terms (Pasal 01) so the page is focused and clean on initial open
 const activeSection = ref('general-terms')
+const searchQuery = ref('')
 
 const sections = [
-  { id: 'general-terms', num: '01', title: 'Ketentuan Umum & Definisi' },
-  { id: 'account-terms', num: '02', title: 'Akun & Kredensial' },
-  { id: 'learning-integrity', num: '03', title: 'Integritas Belajar' },
-  { id: 'payment-subs', num: '04', title: 'Pembayaran & Langganan' },
-  { id: 'intellectual-prop', num: '05', title: 'Hak Kekayaan Intelektual' },
-  { id: 'service-availability', num: '06', title: 'Ketersediaan Layanan' }
+  { id: 'general-terms', num: '01', title: 'Ketentuan Umum & Definisi', keywords: 'platform icraft definisi pengguna perubahan ketentuan hukum regulasi' },
+  { id: 'account-terms', num: '02', title: 'Akun & Kredensial', keywords: 'pendaftaran akun password kredensial login account sharing tanggung jawab' },
+  { id: 'learning-integrity', num: '03', title: 'Integritas Belajar & Komunitas', keywords: 'kecurangan bot scraper manipulasi xp compiler reverse engineering peretasan sanksi diskualifikasi' },
+  { id: 'payment-subs', num: '04', title: 'Pembayaran & Langganan', keywords: 'qris pro expert langganan refund invoice perpanjangan mutasi perbankan' },
+  { id: 'intellectual-prop', num: '05', title: 'Hak Kekayaan Intelektual', keywords: 'hak cipta lisensi materi modul kurikulum naskah karya intelektual icraft studio' },
+  { id: 'service-availability', num: '06', title: 'Ketersediaan Layanan', keywords: 'maintenance ketersediaan downtime server as is gangguan pihak ketiga' }
 ]
 
-const scrollToSection = (id) => {
-  activeSection.value = id
-  const el = document.getElementById(id)
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+const currentIndex = computed(() => sections.findIndex(s => s.id === activeSection.value))
+const currentSection = computed(() => sections[currentIndex.value] || null)
+const prevSection = computed(() => currentIndex.value > 0 ? sections[currentIndex.value - 1] : null)
+const nextSection = computed(() => (currentIndex.value >= 0 && currentIndex.value < sections.length - 1) ? sections[currentIndex.value + 1] : null)
+
+const matchedSectionIds = computed(() => {
+  if (!searchQuery.value.trim()) return sections.map(s => s.id)
+  const q = searchQuery.value.toLowerCase().trim()
+  return sections
+    .filter(s => s.title.toLowerCase().includes(q) || s.keywords.toLowerCase().includes(q) || s.num.includes(q))
+    .map(s => s.id)
+})
+
+const isSectionVisible = (id) => {
+  if (searchQuery.value.trim()) {
+    return matchedSectionIds.value.includes(id)
   }
+  if (activeSection.value === 'all') return true
+  return activeSection.value === id
+}
+
+const selectSection = (id) => {
+  searchQuery.value = ''
+  activeSection.value = id
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 

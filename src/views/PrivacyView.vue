@@ -36,19 +36,50 @@
               <span class="total-badge">6 Klausul</span>
             </div>
 
+            <!-- Quick Search inside Sidebar -->
+            <div class="sidebar-search-box">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Cari isi klausul..."
+                class="sidebar-search-input"
+              />
+              <button v-if="searchQuery" class="clear-search-btn" @click="searchQuery = ''" title="Bersihkan">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
             <nav class="toc-menu" aria-label="Daftar Isi Klausul">
-              <a
+              <button
+                type="button"
+                class="toc-item-link"
+                :class="{ active: activeSection === 'all' && !searchQuery }"
+                @click="selectSection('all')"
+              >
+                <div class="toc-btn-left">
+                  <span class="toc-icon"><i class="fa-solid fa-layer-group"></i></span>
+                  <span class="toc-label">Semua Klausul (Lengkap)</span>
+                </div>
+                <span class="toc-badge-all">{{ sections.length }}</span>
+              </button>
+
+              <div class="toc-divider"></div>
+
+              <button
                 v-for="item in sections"
                 :key="item.id"
-                :href="`#${item.id}`"
+                type="button"
                 class="toc-item-link"
-                :class="{ active: activeSection === item.id }"
-                @click.prevent="scrollToSection(item.id)"
+                :class="{ active: activeSection === item.id && !searchQuery }"
+                @click="selectSection(item.id)"
               >
-                <span class="toc-num">{{ item.num }}</span>
-                <span class="toc-label">{{ item.title }}</span>
+                <div class="toc-btn-left">
+                  <span class="toc-num">{{ item.num }}</span>
+                  <span class="toc-label">{{ item.title }}</span>
+                </div>
                 <i class="fa-solid fa-chevron-right toc-arrow"></i>
-              </a>
+              </button>
             </nav>
 
             <!-- DPO Contact Help Box in Sidebar -->
@@ -91,10 +122,46 @@
             </div>
           </div>
 
+          <!-- Active Focus Bar (Tampil saat memilih salah satu klausul) -->
+          <div v-if="activeSection !== 'all' && !searchQuery && currentSection" class="active-clause-bar">
+            <div class="clause-indicator">
+              <span class="clause-pill">Klausul {{ currentSection.num }} dari {{ sections.length }}</span>
+              <span class="clause-current-name">{{ currentSection.title }}</span>
+            </div>
+            <button class="btn-view-all" @click="selectSection('all')">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Tampilkan Semua Klausul</span>
+            </button>
+          </div>
+
+          <!-- Search Result Bar -->
+          <div v-if="searchQuery" class="active-clause-bar search-bar-result">
+            <div class="clause-indicator">
+              <span class="clause-pill"><i class="fa-solid fa-magnifying-glass"></i> Cari</span>
+              <span class="clause-current-name">Filter: "{{ searchQuery }}" ({{ matchedSectionIds.length }} klausul cocok)</span>
+            </div>
+            <button class="btn-view-all" @click="searchQuery = ''">
+              <i class="fa-solid fa-xmark"></i>
+              <span>Bersihkan</span>
+            </button>
+          </div>
+
+          <!-- Empty search state -->
+          <div v-if="searchQuery && matchedSectionIds.length === 0" class="empty-search-box">
+            <i class="fa-solid fa-circle-question empty-icon"></i>
+            <p>Tidak ditemukan klausul yang memuat kata kunci "<strong>{{ searchQuery }}</strong>".</p>
+            <button class="btn-view-all" @click="searchQuery = ''">Kembali ke Semua Klausul</button>
+          </div>
+
           <!-- Document Articles (Clean Typographic Dividers - No Monotonous Stacked Boxes) -->
           <div class="privacy-articles-list">
             <!-- Article 1 -->
-            <article id="data-collected" class="policy-article">
+            <article
+              v-show="isSectionVisible('data-collected')"
+              id="data-collected"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'data-collected' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">01</span>
                 <h2>Informasi yang Kami Kumpulkan</h2>
@@ -112,7 +179,12 @@
             </article>
 
             <!-- Article 2 -->
-            <article id="data-usage" class="policy-article">
+            <article
+              v-show="isSectionVisible('data-usage')"
+              id="data-usage"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'data-usage' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">02</span>
                 <h2>Tujuan Penggunaan Informasi</h2>
@@ -130,7 +202,12 @@
             </article>
 
             <!-- Article 3 -->
-            <article id="data-security" class="policy-article">
+            <article
+              v-show="isSectionVisible('data-security')"
+              id="data-security"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'data-security' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">03</span>
                 <h2>Keamanan & Enkripsi Data</h2>
@@ -152,7 +229,12 @@
             </article>
 
             <!-- Article 4 -->
-            <article id="third-parties" class="policy-article">
+            <article
+              v-show="isSectionVisible('third-parties')"
+              id="third-parties"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'third-parties' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">04</span>
                 <h2>Pembagian Data kepada Pihak Ketiga</h2>
@@ -167,7 +249,12 @@
             </article>
 
             <!-- Article 5 -->
-            <article id="cookies" class="policy-article">
+            <article
+              v-show="isSectionVisible('cookies')"
+              id="cookies"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'cookies' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">05</span>
                 <h2>Kebijakan Cookies & Local Storage</h2>
@@ -184,7 +271,12 @@
             </article>
 
             <!-- Article 6 -->
-            <article id="user-rights" class="policy-article">
+            <article
+              v-show="isSectionVisible('user-rights')"
+              id="user-rights"
+              class="policy-article"
+              :class="{ 'single-focused': activeSection === 'user-rights' && !searchQuery }"
+            >
               <div class="article-header">
                 <span class="article-num">06</span>
                 <h2>Hak Pengguna atas Data Pribadi (UU PDP)</h2>
@@ -198,6 +290,36 @@
                 </ul>
               </div>
             </article>
+          </div>
+
+          <!-- Bottom Clause Pagination (Hanya tampil saat mode klausul tunggal) -->
+          <div v-if="activeSection !== 'all' && !searchQuery && currentSection" class="clause-pagination">
+            <button
+              v-if="prevSection"
+              type="button"
+              class="btn-clause-nav prev"
+              @click="selectSection(prevSection.id)"
+            >
+              <i class="fa-solid fa-arrow-left"></i>
+              <div class="nav-text">
+                <span class="nav-label">Klausul Sebelumnya</span>
+                <span class="nav-title">{{ prevSection.num }}. {{ prevSection.title }}</span>
+              </div>
+            </button>
+            <div v-else class="pagination-spacer"></div>
+
+            <button
+              v-if="nextSection"
+              type="button"
+              class="btn-clause-nav next"
+              @click="selectSection(nextSection.id)"
+            >
+              <div class="nav-text">
+                <span class="nav-label">Klausul Selanjutnya</span>
+                <span class="nav-title">{{ nextSection.num }}. {{ nextSection.title }}</span>
+              </div>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
           </div>
 
           <!-- Bottom Contact Dock -->
@@ -229,26 +351,47 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 
+// Default to Pasal 01 so the page opens cleanly in a focused single-clause view
 const activeSection = ref('data-collected')
+const searchQuery = ref('')
 
 const sections = [
-  { id: 'data-collected', num: '01', title: 'Data yang Dikumpulkan' },
-  { id: 'data-usage', num: '02', title: 'Tujuan Penggunaan Data' },
-  { id: 'data-security', num: '03', title: 'Keamanan & Enkripsi' },
-  { id: 'third-parties', num: '04', title: 'Pembagian Pihak Ketiga' },
-  { id: 'cookies', num: '05', title: 'Cookies & Penyimpanan Sesi' },
-  { id: 'user-rights', num: '06', title: 'Hak Pengguna (UU PDP)' }
+  { id: 'data-collected', num: '01', title: 'Data yang Dikumpulkan', keywords: 'informasi akun username nama email gamifikasi koding transaksi pembayaran log ip peramban' },
+  { id: 'data-usage', num: '02', title: 'Tujuan Penggunaan Data', keywords: 'tujuan penggunaan alur belajar kelola xp leaderboard qris notifikasi cegah botting fraud' },
+  { id: 'data-security', num: '03', title: 'Keamanan & Enkripsi', keywords: 'keamanan enkripsi https ssl 256 bcrypt argon2 cookie httponly xss owasp' },
+  { id: 'third-parties', num: '04', title: 'Pembagian Pihak Ketiga', keywords: 'pihak ketiga payment gateway bank indonesia kewajiban hukum pengadilan' },
+  { id: 'cookies', num: '05', title: 'Cookies & Penyimpanan Sesi', keywords: 'cookies local storage sesi login dark mode light mode cache' },
+  { id: 'user-rights', num: '06', title: 'Hak Pengguna (UU PDP)', keywords: 'uu pdp hak akses perbaikan portabilitas penghapusan data permohonan tutup akun' }
 ]
 
-const scrollToSection = (id) => {
-  activeSection.value = id
-  const el = document.getElementById(id)
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+const currentIndex = computed(() => sections.findIndex(s => s.id === activeSection.value))
+const currentSection = computed(() => sections[currentIndex.value] || null)
+const prevSection = computed(() => currentIndex.value > 0 ? sections[currentIndex.value - 1] : null)
+const nextSection = computed(() => (currentIndex.value >= 0 && currentIndex.value < sections.length - 1) ? sections[currentIndex.value + 1] : null)
+
+const matchedSectionIds = computed(() => {
+  if (!searchQuery.value.trim()) return sections.map(s => s.id)
+  const q = searchQuery.value.toLowerCase().trim()
+  return sections
+    .filter(s => s.title.toLowerCase().includes(q) || s.keywords.toLowerCase().includes(q) || s.num.includes(q))
+    .map(s => s.id)
+})
+
+const isSectionVisible = (id) => {
+  if (searchQuery.value.trim()) {
+    return matchedSectionIds.value.includes(id)
   }
+  if (activeSection.value === 'all') return true
+  return activeSection.value === id
+}
+
+const selectSection = (id) => {
+  searchQuery.value = ''
+  activeSection.value = id
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 

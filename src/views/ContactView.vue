@@ -118,7 +118,7 @@
           <div v-if="!isSubmitted">
             <div class="form-header">
               <h2>Kirimkan Pesan atau Tiket Bantuan</h2>
-              <p>Isi formulir di bawah ini dan tim kami akan merespons melalui email dalam kurun waktu 1x24 jam.</p>
+              <p>Isi formulir di bawah ini. Pesan Anda akan langsung diformat secara rapi dan diteruskan ke WhatsApp Hotline Resmi iCraft Studio.</p>
             </div>
 
             <form @submit.prevent="handleSubmitForm" class="form-grid">
@@ -221,12 +221,12 @@
 
               <button
                 type="submit"
-                class="btn-submit-contact"
+                class="btn-submit-contact btn-submit-wa"
                 :disabled="isSubmitting"
               >
                 <i v-if="isSubmitting" class="fa-solid fa-spinner fa-spin"></i>
-                <i v-else class="fa-solid fa-paper-plane"></i>
-                <span>{{ isSubmitting ? 'Mengirim Pesan...' : 'Kirim Pesan Sekarang' }}</span>
+                <i v-else class="fa-brands fa-whatsapp"></i>
+                <span>{{ isSubmitting ? 'Membuka WhatsApp...' : 'Kirim via WhatsApp' }}</span>
               </button>
             </form>
           </div>
@@ -236,20 +236,31 @@
             <div class="success-icon-wrap">
               <i class="fa-solid fa-circle-check"></i>
             </div>
-            <h3>Pesan Berhasil Terkirim!</h3>
+            <h3>Pesan Siap & Terhubung ke WhatsApp!</h3>
             <p>
-              Terima kasih, <strong>{{ form.name }}</strong>. Tiket bantuanmu telah kami terima dan tercatat di sistem dukungan kami.
+              Terima kasih, <strong>{{ form.name }}</strong>. Tiket bantuan telah berhasil dibuat dan disiapkan untuk diteruskan ke WhatsApp Hotline Resmi.
             </p>
             <div class="ticket-number-badge">
               Tiket ID: #TICKET-{{ ticketNumber }}
             </div>
-            <p>
-              Salinan konfirmasi telah diteruskan ke <strong>{{ form.email }}</strong>. Tim support kami akan menghubungi Anda kembali melalui email atau WhatsApp sesegera mungkin.
+            <p class="success-hint">
+              Jika jendela WhatsApp tidak terbuka otomatis, silakan klik tombol di bawah ini:
             </p>
-            <button class="btn-send-again" @click="resetForm">
-              <i class="fa-solid fa-rotate-left"></i>
-              <span>Kirim Pesan Lainnya</span>
-            </button>
+            <div class="success-actions">
+              <a
+                :href="lastWaUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-open-wa"
+              >
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>Buka WhatsApp Sekarang</span>
+              </a>
+              <button class="btn-send-again" @click="resetForm">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Kirim Pesan Lainnya</span>
+              </button>
+            </div>
           </div>
         </main>
       </div>
@@ -273,9 +284,20 @@ const form = ref({
   message: ''
 })
 
+const categoryLabels = {
+  account: 'Kendala Akun, Password & Login',
+  learning: 'Alur Belajar & Coding Sandbox',
+  payment: 'Pembayaran QRIS / GameZ Shop',
+  cheatsheet: 'Cheatsheet Vault & Bank Soal',
+  bug: 'Laporan Bug / Kerentanan Teknis',
+  partnership: 'Kerja Sama & B2B Partnership',
+  other: 'Pertanyaan Lainnya'
+}
+
 const isSubmitting = ref(false)
 const isSubmitted = ref(false)
 const ticketNumber = ref('')
+const lastWaUrl = ref('')
 
 onMounted(() => {
   if (isLoggedIn.value && user.value) {
@@ -287,10 +309,39 @@ onMounted(() => {
 const handleSubmitForm = async () => {
   isSubmitting.value = true
 
-  // Simulate ticket generation & safe handling
-  await new Promise(resolve => setTimeout(resolve, 800))
+  const ticketId = Math.floor(100000 + Math.random() * 900000)
+  ticketNumber.value = String(ticketId)
 
-  ticketNumber.value = Math.floor(100000 + Math.random() * 900000)
+  const catName = categoryLabels[form.value.category] || form.value.category || 'Pertanyaan Umum'
+  const phoneText = form.value.phone ? form.value.phone : '-'
+
+  const waText = [
+    `*TIKET BANTUAN RESMI - iC GAME-Z*`,
+    `━━━━━━━━━━━━━━━━━━━━━━`,
+    `📌 *No. Tiket:* #TICKET-${ticketId}`,
+    `👤 *Nama Lengkap:* ${form.value.name}`,
+    `📧 *Email:* ${form.value.email}`,
+    `📱 *No. WhatsApp:* ${phoneText}`,
+    `📂 *Kategori:* ${catName}`,
+    `📝 *Subjek:* ${form.value.subject}`,
+    ``,
+    `💬 *Detail Pesan / Kendala:*`,
+    `${form.value.message}`,
+    `━━━━━━━━━━━━━━━━━━━━━━`,
+    `_Pesan otomatis via Form Bantuan iC Game-Z_`
+  ].join('\n')
+
+  const waUrl = `https://wa.me/6285174264123?text=${encodeURIComponent(waText)}`
+  lastWaUrl.value = waUrl
+
+  await new Promise(resolve => setTimeout(resolve, 350))
+
+  try {
+    window.open(waUrl, '_blank')
+  } catch (err) {
+    console.error('Failed to auto open window:', err)
+  }
+
   isSubmitting.value = false
   isSubmitted.value = true
 }
@@ -305,6 +356,7 @@ const resetForm = () => {
     message: ''
   }
   isSubmitted.value = false
+  lastWaUrl.value = ''
 }
 </script>
 

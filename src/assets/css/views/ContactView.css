@@ -400,27 +400,27 @@ body:not(.light-mode) .logo-dark { display: block; }
 }
 
 .btn-submit-contact {
-  background: linear-gradient(135deg, #0284c7, #6366f1);
+  background: linear-gradient(135deg, #059669, #10b981);
   color: #ffffff;
   border: none;
-  padding: 12px 24px;
+  padding: 13px 24px;
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   transition: all 0.22s ease;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
   width: 100%;
 }
 
 .btn-submit-contact:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(99, 102, 241, 0.5);
-  background: linear-gradient(135deg, #0369a1, #4f46e5);
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #047857, #059669);
 }
 
 .btn-submit-contact:disabled {
@@ -479,11 +479,48 @@ body:not(.light-mode) .logo-dark { display: block; }
   margin: 6px 0;
 }
 
+.success-hint {
+  font-size: 0.82rem !important;
+  color: #94a3b8 !important;
+  margin-top: 4px !important;
+}
+
+.success-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-open-wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25d366;
+  color: #ffffff;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+}
+
+.btn-open-wa:hover {
+  background: #20ba5a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.5);
+  color: #ffffff;
+}
+
 .btn-send-again {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #f1f5f9;
-  padding: 8px 18px;
+  padding: 9px 18px;
   border-radius: 8px;
   font-size: 0.82rem;
   font-weight: 600;
