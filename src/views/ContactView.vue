@@ -29,7 +29,7 @@
         <aside class="contact-channels-col">
           <!-- WhatsApp Support -->
           <a
-            href="https://wa.me/6281234567890?text=Halo%20Tim%20Support%20iC%20Game-Z,%20saya%20butuh%20bantuan%20terkait..."
+            href="https://wa.me/6285174264123?text=Halo%20Tim%20Support%20iC%20Game-Z,%20saya%20butuh%20bantuan%20terkait..."
             target="_blank"
             rel="noopener noreferrer"
             class="channel-card"
@@ -39,8 +39,8 @@
             </div>
             <div class="channel-info">
               <span class="channel-badge">Respon Tercepat</span>
-              <h3 class="channel-title">WhatsApp Support</h3>
-              <p class="channel-desc">Chat langsung dengan customer support kami (< 15 menit pada jam kerja).</p>
+              <h3 class="channel-title">WhatsApp Hotline</h3>
+              <p class="channel-desc">+62 851-7426-4123 (Chat langsung respon &lt; 15 menit pada jam operasional).</p>
             </div>
             <i class="fa-solid fa-chevron-right channel-action-arrow"></i>
           </a>

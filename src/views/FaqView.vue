@@ -56,7 +56,7 @@
               <h4>Butuh Respon Cepat?</h4>
               <p>Kendala pembayaran QRIS atau akun diprioritaskan &lt; 15 menit via WhatsApp.</p>
               <a
-                href="https://wa.me/6281234567890?text=Halo%20Tim%20iC%20Game-Z,%20saya%20butuh%20bantuan..."
+                href="https://wa.me/6285174264123?text=Halo%20Tim%20iC%20Game-Z,%20saya%20butuh%20bantuan..."
                 target="_blank"
                 rel="noopener noreferrer"
                 class="sh-btn"
@@ -323,7 +323,7 @@
 
                 <div class="dock-buttons">
                   <a
-                    href="https://wa.me/6281234567890?text=Halo%20Tim%20iC%20Game-Z,%20saya%20ingin%20berkonsultasi..."
+                    href="https://wa.me/6285174264123?text=Halo%20Tim%20iC%20Game-Z,%20saya%20ingin%20berkonsultasi..."
                     target="_blank"
                     rel="noopener noreferrer"
                     class="btn-dock-primary"
