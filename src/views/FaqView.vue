@@ -16,156 +16,160 @@
         </div>
       </div>
 
-      <!-- 1. Hero Section (Notion & Figma Style) -->
-      <header class="faq-hero">
-        <div class="hero-badge">
-          <span class="badge-dot"></span>
-          <i class="fa-solid fa-circle-question"></i>
-          <span>Pusat Bantuan & Tanya Jawab</span>
-        </div>
-
-        <h1 class="hero-title">
-          Ada yang bisa kami <span class="gradient-text">bantu hari ini?</span>
-        </h1>
-        <p class="hero-subtitle">
-          Temukan solusi instan, panduan teknis alur belajar, mekanisme gamifikasi XP & Energy, hingga kendala pembayaran di iC Game-Z.
-        </p>
-
-        <!-- Command / Search Pill Box (Figma & Notion Style) -->
-        <div class="search-hero-box">
-          <div class="search-input-pill" :class="{ focused: isSearchFocused }">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input
-              ref="searchInputRef"
-              v-model="searchQuery"
-              type="text"
-              class="search-input"
-              placeholder="Cari solusi atau kata kunci (contoh: Energy, QRIS, Sertifikat, XP, Sandi)..."
-              @focus="isSearchFocused = true"
-              @blur="isSearchFocused = false"
-            />
-            <button
-              v-if="searchQuery"
-              type="button"
-              class="clear-btn"
-              @click="clearSearch"
-              title="Hapus pencarian"
-            >
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div v-else class="shortcut-pill" title="Tekan Ctrl + K untuk mencari">
-              <kbd>Ctrl</kbd> + <kbd>K</kbd>
+      <!-- Notion & Apple Master 2-Column Layout -->
+      <div class="faq-notion-layout">
+        <!-- LEFT COLUMN: Sticky Documentation / Category Navigator -->
+        <aside class="faq-sidebar">
+          <div class="sidebar-sticky-panel">
+            <div class="sidebar-header">
+              <span class="sidebar-subtitle">KATEGORI BANTUAN</span>
+              <span class="total-badge">{{ faqs.length }} Q&A</span>
             </div>
-          </div>
 
-          <!-- Quick Suggestion Pill Tags (Figma / Notion Style) -->
-          <div class="quick-keywords">
-            <span class="keywords-label">Paling Sering Dicari:</span>
-            <div class="keyword-tags">
+            <nav class="category-menu" aria-label="Kategori FAQ">
               <button
-                v-for="kw in quickKeywords"
-                :key="kw.label"
+                v-for="cat in categories"
+                :key="cat.id"
                 type="button"
-                class="kw-tag"
-                :class="{ active: searchQuery.toLowerCase() === kw.query.toLowerCase() }"
-                @click="applyKeyword(kw.query)"
+                class="category-nav-btn"
+                :class="{ active: selectedCategory === cat.id && !searchQuery }"
+                @click="handleCategorySelect(cat.id)"
               >
-                <i :class="kw.icon"></i>
-                <span>{{ kw.label }}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <!-- 2. Popular Topics Section (Notion Style Grid Cards) -->
-      <section v-if="!searchQuery" class="popular-topics-section">
-        <div class="section-header-row">
-          <div>
-            <h2 class="section-title">Topik Populer</h2>
-            <p class="section-desc">Pilih kategori utama untuk langsung memfilter panduan dan solusi terkait.</p>
-          </div>
-          <span class="topics-count-badge">{{ categories.length - 1 }} Kategori</span>
-        </div>
-
-        <div class="popular-grid">
-          <div
-            v-for="topic in popularTopics"
-            :key="topic.id"
-            class="topic-card"
-            :class="{ active: selectedCategory === topic.categoryId }"
-            @click="selectCategoryAndScroll(topic.categoryId)"
-          >
-            <div class="topic-icon-wrap" :style="{ '--topic-glow': topic.glowColor }">
-              <i :class="topic.icon"></i>
-            </div>
-            <div class="topic-content">
-              <div class="topic-title-row">
-                <h3 class="topic-title">{{ topic.title }}</h3>
-                <i class="fa-solid fa-arrow-right topic-arrow"></i>
-              </div>
-              <p class="topic-desc">{{ topic.desc }}</p>
-              <div class="topic-meta">
-                <span class="topic-badge">{{ topic.badge }}</span>
-                <span class="topic-articles">{{ getCategoryCount(topic.categoryId) }} Pertanyaan</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3. Apple-style Split Explorer Section -->
-      <section ref="qaSectionRef" class="qa-explorer-section">
-        <div class="explorer-grid">
-          <!-- Left Sticky Sidebar Navigator (Apple Support / Linear style) -->
-          <aside class="explorer-sidebar">
-            <div class="sidebar-sticky-panel">
-              <div class="sidebar-header">
-                <span class="sidebar-subtitle">KATEGORI PERTANYAAN</span>
-                <span class="total-badge">{{ faqs.length }} Total</span>
-              </div>
-
-              <div class="category-menu">
-                <button
-                  v-for="cat in categories"
-                  :key="cat.id"
-                  type="button"
-                  class="category-nav-btn"
-                  :class="{ active: selectedCategory === cat.id && !searchQuery }"
-                  @click="handleCategorySelect(cat.id)"
-                >
-                  <div class="cat-nav-left">
-                    <div class="cat-nav-icon">
-                      <i :class="cat.icon"></i>
-                    </div>
-                    <span class="cat-nav-label">{{ cat.label }}</span>
+                <div class="cat-nav-left">
+                  <div class="cat-nav-icon">
+                    <i :class="cat.icon"></i>
                   </div>
+                  <span class="cat-nav-label">{{ cat.label }}</span>
+                </div>
+                <div class="cat-nav-right">
                   <span class="cat-nav-count">{{ getCategoryCount(cat.id) }}</span>
+                  <i class="fa-solid fa-chevron-right cat-chevron"></i>
+                </div>
+              </button>
+            </nav>
+
+            <!-- Quick Diagnostic Hotline Card inside sidebar -->
+            <div class="sidebar-help-box">
+              <div class="sh-icon">
+                <i class="fa-solid fa-bolt-lightning"></i>
+              </div>
+              <h4>Butuh Respon Cepat?</h4>
+              <p>Kendala pembayaran QRIS atau akun diprioritaskan &lt; 15 menit via WhatsApp.</p>
+              <a
+                href="https://wa.me/6281234567890?text=Halo%20Tim%20iC%20Game-Z,%20saya%20butuh%20bantuan..."
+                target="_blank"
+                rel="noopener noreferrer"
+                class="sh-btn"
+              >
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>Chat Hotline</span>
+              </a>
+            </div>
+          </div>
+        </aside>
+
+        <!-- RIGHT COLUMN: Main Content Area (Hero + Popular Topics + Q&A + Support Dock) -->
+        <main class="faq-main-content">
+          <!-- 1. Hero Section (Notion & Figma Style) -->
+          <header class="faq-hero">
+            <div class="hero-badge">
+              <span class="badge-dot"></span>
+              <i class="fa-solid fa-circle-question"></i>
+              <span>Pusat Bantuan & Tanya Jawab</span>
+            </div>
+
+            <h1 class="hero-title">
+              Ada yang bisa kami <span class="gradient-text">bantu hari ini?</span>
+            </h1>
+            <p class="hero-subtitle">
+              Temukan solusi instan, panduan alur belajar koding, mekanisme gamifikasi XP & Energy, hingga bantuan pembayaran di iC Game-Z.
+            </p>
+
+            <!-- Command / Search Pill Box (Figma & Notion Style) -->
+            <div class="search-hero-box">
+              <div class="search-input-pill" :class="{ focused: isSearchFocused }">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input
+                  ref="searchInputRef"
+                  v-model="searchQuery"
+                  type="text"
+                  class="search-input"
+                  placeholder="Cari solusi atau kata kunci (contoh: Energy, QRIS, Sertifikat, XP, Sandi)..."
+                  @focus="isSearchFocused = true"
+                  @blur="isSearchFocused = false"
+                />
+                <button
+                  v-if="searchQuery"
+                  type="button"
+                  class="clear-btn"
+                  @click="clearSearch"
+                  title="Hapus pencarian"
+                >
+                  <i class="fa-solid fa-xmark"></i>
                 </button>
+                <div v-else class="shortcut-pill" title="Tekan Ctrl + K untuk mencari">
+                  <kbd>Ctrl</kbd> + <kbd>K</kbd>
+                </div>
               </div>
 
-              <!-- Quick Diagnostic Hotline Card inside sidebar -->
-              <div class="sidebar-help-box">
-                <div class="sh-icon">
-                  <i class="fa-solid fa-bolt-lightning"></i>
+              <!-- Quick Suggestion Pill Tags (Figma / Notion Style) -->
+              <div class="quick-keywords">
+                <span class="keywords-label">Paling Sering Dicari:</span>
+                <div class="keyword-tags">
+                  <button
+                    v-for="kw in quickKeywords"
+                    :key="kw.label"
+                    type="button"
+                    class="kw-tag"
+                    :class="{ active: searchQuery.toLowerCase() === kw.query.toLowerCase() }"
+                    @click="applyKeyword(kw.query)"
+                  >
+                    <i :class="kw.icon"></i>
+                    <span>{{ kw.label }}</span>
+                  </button>
                 </div>
-                <h4>Butuh Respon Cepat?</h4>
-                <p>Kendala pembayaran QRIS atau akun diprioritaskan &lt; 15 menit via WhatsApp.</p>
-                <a
-                  href="https://wa.me/6281234567890?text=Halo%20Tim%20iC%20Game-Z,%20saya%20butuh%20bantuan..."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="sh-btn"
-                >
-                  <i class="fa-brands fa-whatsapp"></i>
-                  <span>Chat Hotline</span>
-                </a>
               </div>
             </div>
-          </aside>
+          </header>
 
-          <!-- Right Content Column: Q&A List & Instant Solutions -->
-          <main class="explorer-main">
+          <!-- 2. Popular Topics Section (Notion Style Grid Cards) -->
+          <section v-if="!searchQuery" class="popular-topics-section">
+            <div class="section-header-row">
+              <div>
+                <h2 class="section-title">Topik Populer</h2>
+                <p class="section-desc">Pilih kategori utama untuk langsung memfilter panduan dan solusi terkait.</p>
+              </div>
+              <span class="topics-count-badge">{{ categories.length - 1 }} Kategori</span>
+            </div>
+
+            <div class="popular-grid">
+              <div
+                v-for="topic in popularTopics"
+                :key="topic.id"
+                class="topic-card"
+                :class="{ active: selectedCategory === topic.categoryId }"
+                @click="selectCategoryAndScroll(topic.categoryId)"
+              >
+                <div class="topic-icon-wrap" :style="{ '--topic-glow': topic.glowColor }">
+                  <i :class="topic.icon"></i>
+                </div>
+                <div class="topic-content">
+                  <div class="topic-title-row">
+                    <h3 class="topic-title">{{ topic.title }}</h3>
+                    <i class="fa-solid fa-arrow-right topic-arrow"></i>
+                  </div>
+                  <p class="topic-desc">{{ topic.desc }}</p>
+                  <div class="topic-meta">
+                    <span class="topic-badge">{{ topic.badge }}</span>
+                    <span class="topic-articles">{{ getCategoryCount(topic.categoryId) }} Pertanyaan</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. Apple-style Q&A Section -->
+          <section ref="qaSectionRef" class="qa-explorer-section">
             <!-- Active Filter Status Banner -->
             <div class="results-header">
               <div class="results-info">
@@ -318,51 +322,51 @@
                 </router-link>
               </div>
             </div>
-          </main>
-        </div>
-      </section>
+          </section>
 
-      <!-- 4. Need More Help Dock (Apple Support Style) -->
-      <section class="support-dock-section">
-        <div class="dock-card">
-          <div class="dock-glow"></div>
-          <div class="dock-grid">
-            <div class="dock-content">
-              <div class="dock-pill">
-                <i class="fa-solid fa-headset"></i>
-                <span>Bantuan Langsung</span>
+          <!-- 4. Need More Help Dock (Apple Support Style) -->
+          <section class="support-dock-section">
+            <div class="dock-card">
+              <div class="dock-glow"></div>
+              <div class="dock-grid">
+                <div class="dock-content">
+                  <div class="dock-pill">
+                    <i class="fa-solid fa-headset"></i>
+                    <span>Bantuan Langsung</span>
+                  </div>
+                  <h2 class="dock-title">Masih membutuhkan jawaban atau kendala belum selesai?</h2>
+                  <p class="dock-desc">
+                    Tim technical support dan kurikulum iCraft siap mendampingi perjalanan kodingmu. Hubungi kami melalui kanal resmi di bawah ini.
+                  </p>
+                </div>
+
+                <div class="dock-buttons">
+                  <a
+                    href="https://wa.me/6281234567890?text=Halo%20Tim%20iC%20Game-Z,%20saya%20ingin%20berkonsultasi..."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn-dock-primary"
+                  >
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <div class="btn-dock-text">
+                      <strong>WhatsApp Hotline</strong>
+                      <small>Respon instan dalam hitungan menit</small>
+                    </div>
+                  </a>
+
+                  <router-link to="/hubungi-kami" class="btn-dock-secondary">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                    <div class="btn-dock-text">
+                      <strong>Kirim Tiket / Pesan</strong>
+                      <small>Form keluhan akun & transaksi</small>
+                    </div>
+                  </router-link>
+                </div>
               </div>
-              <h2 class="dock-title">Masih membutuhkan jawaban atau kendala belum selesai?</h2>
-              <p class="dock-desc">
-                Tim technical support dan kurikulum iCraft siap mendampingi perjalanan kodingmu. Hubungi kami melalui kanal resmi di bawah ini.
-              </p>
             </div>
-
-            <div class="dock-buttons">
-              <a
-                href="https://wa.me/6281234567890?text=Halo%20Tim%20iC%20Game-Z,%20saya%20ingin%20berkonsultasi..."
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn-dock-primary"
-              >
-                <i class="fa-brands fa-whatsapp"></i>
-                <div class="btn-dock-text">
-                  <strong>WhatsApp Hotline</strong>
-                  <small>Respon instan dalam hitungan menit</small>
-                </div>
-              </a>
-
-              <router-link to="/hubungi-kami" class="btn-dock-secondary">
-                <i class="fa-solid fa-envelope-open-text"></i>
-                <div class="btn-dock-text">
-                  <strong>Kirim Tiket / Pesan</strong>
-                  <small>Form keluhan akun & transaksi</small>
-                </div>
-              </router-link>
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        </main>
+      </div>
     </div>
   </div>
 </template>
@@ -390,7 +394,7 @@ const quickKeywords = [
   { label: 'Sandi & Akun', query: 'sandi', icon: 'fa-solid fa-key' }
 ]
 
-// Category classification
+// Category classification (Notion Reference Docs Sidebar)
 const categories = [
   { id: 'all', label: 'Semua Topik', icon: 'fa-solid fa-layer-group' },
   { id: 'getting-started', label: 'Mulai Belajar & Teori', icon: 'fa-solid fa-graduation-cap' },
@@ -500,7 +504,7 @@ const featuredSolutionsMap = {
     title: 'Solusi: Cara Menemukan Rumus & Mengklaim e-Sertifikat Kelulusan',
     desc: 'Maksimalkan modul sintaks industri dan portofolio profesional kamu:',
     steps: [
-      '<strong>Pencarian Instan Rumus:</strong> Ketik nama fungsi (misal: <code>VLOOKUP</code>, <code>JOIN</code>, <code>REGEX</code>) di Cheatsheet Vault untuk melihat cuplikan sintaks.',
+      '<strong>Pencarian Instan Rumus:</strong> Ketik nama formula (misal: <code>VLOOKUP</code>, <code>JOIN</code>, <code>REGEX</code>) di Cheatsheet Vault untuk melihat cuplikan sintaks.',
       '<strong>Mode Fokus Per-Materi:</strong> Klik cheatsheet pilihan untuk membaca lembar referensi lengkap tanpa distraksi.',
       '<strong>Unduh e-Sertifikat:</strong> Setelah menyelesaikan 100% chapter alur belajar, unduh e-sertifikat ber-QR verifikasi resmi.'
     ]

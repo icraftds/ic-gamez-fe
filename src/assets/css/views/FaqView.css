@@ -1,6 +1,6 @@
 /* ==========================================================================
    iC Game-Z FAQ & Help Center Stylesheet
-   Inspired by Apple Support, Figma Learn & Notion Help Centers
+   Benchmark: Notion & Apple Help Centers (Two-Column Layout)
    Aesthetic Glassmorphism, Zero Clutter, Fluid Micro-interactions
    ========================================================================== */
 
@@ -14,9 +14,9 @@
 }
 
 .faq-container {
-  max-width: 1180px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 88px 24px 40px 24px;
+  padding: 88px 24px 60px 24px;
   position: relative;
   z-index: 5;
 }
@@ -76,29 +76,274 @@
 }
 
 /* ==========================================================================
-   1. HERO SECTION (Figma & Notion Style)
+   MASTER NOTION 2-COLUMN LAYOUT
+   Sidebar on the Left, Full Content on the Right
+   ========================================================================== */
+.faq-notion-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* ==========================================================================
+   LEFT COLUMN: STICKY CATEGORY SIDEBAR (Notion Reference Docs Style)
+   ========================================================================== */
+.faq-sidebar {
+  position: relative;
+}
+
+.sidebar-sticky-panel {
+  position: sticky;
+  top: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.sidebar-sticky-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-sticky-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 10px;
+}
+
+.sidebar-subtitle {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.total-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.category-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #94a3b8;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.category-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8fafc;
+  transform: translateX(2px);
+}
+
+.category-nav-btn.active {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
+  box-shadow: inset 3px 0 0 #38bdf8;
+}
+
+.cat-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cat-nav-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.category-nav-btn.active .cat-nav-icon {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.cat-nav-label {
+  font-size: 0.86rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cat-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cat-nav-count {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 7px;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+.category-nav-btn.active .cat-nav-count {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.cat-chevron {
+  font-size: 0.68rem;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+.category-nav-btn:hover .cat-chevron {
+  color: #94a3b8;
+  transform: translateX(2px);
+}
+
+.category-nav-btn.active .cat-chevron {
+  color: #38bdf8;
+}
+
+/* Sidebar Diagnostic / Quick Help Card */
+.sidebar-help-box {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 16px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.sh-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+}
+
+.sidebar-help-box h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 6px 0;
+}
+
+.sidebar-help-box p {
+  font-size: 0.76rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+}
+
+.sh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: #10b981;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.sh-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+}
+
+/* ==========================================================================
+   RIGHT COLUMN: MAIN CONTENT STREAM
+   Hero -> Popular Topics -> Q&A Explorer -> Support Dock
+   ========================================================================== */
+.faq-main-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ==========================================================================
+   1. HERO SECTION (Notion & Figma Style)
    ========================================================================== */
 .faq-hero {
-  text-align: center;
-  padding: 16px 0 36px 0;
-  max-width: 820px;
-  margin: 0 auto;
+  text-align: left;
+  padding: 0 0 8px 0;
+  position: relative;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 16px;
+  padding: 5px 14px;
   background: rgba(56, 189, 248, 0.08);
   border: 1px solid rgba(56, 189, 248, 0.22);
   border-radius: 9999px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: #38bdf8;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.08);
 }
 
@@ -117,11 +362,11 @@
 }
 
 .hero-title {
-  font-size: clamp(2.1rem, 4.5vw, 3rem);
+  font-size: clamp(2rem, 3.8vw, 2.75rem);
   font-weight: 800;
   line-height: 1.18;
   letter-spacing: -0.8px;
-  margin: 0 0 14px 0;
+  margin: 0 0 12px 0;
   color: #f8fafc;
 }
 
@@ -134,16 +379,15 @@
 
 .hero-subtitle {
   color: #94a3b8;
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   line-height: 1.6;
-  max-width: 640px;
-  margin: 0 auto 32px auto;
+  max-width: 680px;
+  margin: 0 0 24px 0;
 }
 
 /* Command / Search Box */
 .search-hero-box {
-  max-width: 680px;
-  margin: 0 auto;
+  max-width: 100%;
 }
 
 .search-input-pill {
@@ -154,7 +398,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
   padding: 6px 14px 6px 20px;
-  height: 56px;
+  height: 54px;
   box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: blur(12px);
@@ -240,13 +484,12 @@
   margin-top: 14px;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
 .keywords-label {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   color: #64748b;
   font-weight: 600;
   text-transform: uppercase;
@@ -258,7 +501,6 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  justify-content: center;
 }
 
 .kw-tag {
@@ -300,19 +542,19 @@
    2. POPULAR TOPICS GRID (Notion Help Center style)
    ========================================================================== */
 .popular-topics-section {
-  margin-bottom: 48px;
+  position: relative;
 }
 
 .section-header-row {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   gap: 16px;
 }
 
 .section-title {
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: #f8fafc;
   letter-spacing: -0.3px;
@@ -320,7 +562,7 @@
 }
 
 .section-desc {
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   color: #94a3b8;
   margin: 0;
 }
@@ -338,7 +580,7 @@
 .popular-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 16px;
 }
 
 .topic-card {
@@ -346,11 +588,11 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.01) 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  padding: 22px;
+  padding: 20px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
-  gap: 16px;
+  gap: 14px;
   align-items: flex-start;
   backdrop-filter: blur(10px);
 }
@@ -358,7 +600,7 @@
 .topic-card:hover {
   border-color: rgba(56, 189, 248, 0.35);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(56, 189, 248, 0.03) 100%);
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.1);
 }
 
@@ -369,15 +611,15 @@
 }
 
 .topic-icon-wrap {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   color: #f8fafc;
   flex-shrink: 0;
   transition: all 0.3s ease;
@@ -403,7 +645,7 @@
 }
 
 .topic-title {
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: #f8fafc;
   margin: 0;
@@ -411,7 +653,7 @@
 }
 
 .topic-arrow {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #64748b;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -422,10 +664,10 @@
 }
 
 .topic-desc {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #94a3b8;
   line-height: 1.5;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
 }
 
 .topic-meta {
@@ -433,11 +675,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
 }
 
 .topic-badge {
-  padding: 3px 8px;
+  padding: 2px 7px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
@@ -451,215 +693,25 @@
 }
 
 /* ==========================================================================
-   3. APPLE-STYLE SPLIT EXPLORER SECTION
+   3. APPLE-STYLE Q&A EXPLORER SECTION
    ========================================================================== */
 .qa-explorer-section {
-  margin-bottom: 64px;
-  scroll-margin-top: 80px;
-}
-
-.explorer-grid {
-  display: grid;
-  grid-template-columns: 290px 1fr;
-  gap: 36px;
-  align-items: flex-start;
-}
-
-/* Left Sidebar Navigator */
-.explorer-sidebar {
-  position: relative;
-}
-
-.sidebar-sticky-panel {
-  position: sticky;
-  top: 90px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 4px;
-}
-
-.sidebar-subtitle {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-}
-
-.total-badge {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #94a3b8;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 2px 8px;
-  border-radius: 9999px;
-}
-
-.category-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.category-nav-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 10px 14px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  color: #94a3b8;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  text-align: left;
-}
-
-.category-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: #f8fafc;
-  transform: translateX(2px);
-}
-
-.category-nav-btn.active {
-  background: rgba(56, 189, 248, 0.1);
-  border-color: rgba(56, 189, 248, 0.25);
-  color: #38bdf8;
-  box-shadow: inset 3px 0 0 #38bdf8;
-}
-
-.cat-nav-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.cat-nav-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.82rem;
-  color: #cbd5e1;
-  transition: all 0.2s ease;
-}
-
-.category-nav-btn.active .cat-nav-icon {
-  background: rgba(56, 189, 248, 0.2);
-  color: #38bdf8;
-}
-
-.cat-nav-label {
-  font-size: 0.88rem;
-}
-
-.cat-nav-count {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: #64748b;
-  background: rgba(255, 255, 255, 0.04);
-  padding: 2px 7px;
-  border-radius: 9999px;
-  transition: all 0.2s ease;
-}
-
-.category-nav-btn.active .cat-nav-count {
-  background: rgba(56, 189, 248, 0.2);
-  color: #38bdf8;
-}
-
-/* Sidebar Quick Help Card */
-.sidebar-help-box {
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  border-radius: 16px;
-  padding: 18px;
-  position: relative;
-  overflow: hidden;
-}
-
-.sh-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  margin-bottom: 12px;
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
-}
-
-.sidebar-help-box h4 {
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: #f8fafc;
-  margin: 0 0 6px 0;
-}
-
-.sidebar-help-box p {
-  font-size: 0.78rem;
-  color: #94a3b8;
-  line-height: 1.5;
-  margin: 0 0 14px 0;
-}
-
-.sh-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 9px 14px;
-  background: #10b981;
-  color: #ffffff;
-  border-radius: 10px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
-}
-
-.sh-btn:hover {
-  background: #059669;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
-}
-
-/* Right Explorer Main Content */
-.explorer-main {
-  min-width: 0;
+  scroll-margin-top: 90px;
 }
 
 .results-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   gap: 16px;
   flex-wrap: wrap;
 }
 
 .active-category-title {
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #f8fafc;
   letter-spacing: -0.3px;
@@ -667,7 +719,7 @@
 }
 
 .results-count-text {
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   color: #94a3b8;
   margin: 0;
 }
@@ -710,8 +762,8 @@
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(129, 140, 248, 0.05) 50%, rgba(15, 23, 42, 0.6) 100%);
   border: 1px solid rgba(56, 189, 248, 0.28);
   border-radius: 16px;
-  padding: 22px 24px;
-  margin-bottom: 28px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
   position: relative;
   box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.4);
 }
@@ -733,7 +785,7 @@
 }
 
 .fs-title {
-  font-size: 1.12rem;
+  font-size: 1.08rem;
   font-weight: 700;
   color: #f8fafc;
   margin: 0 0 6px 0;
@@ -741,9 +793,9 @@
 }
 
 .fs-desc {
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   color: #94a3b8;
-  margin: 0 0 16px 0;
+  margin: 0 0 14px 0;
   line-height: 1.5;
 }
 
@@ -801,12 +853,12 @@
 
 .qa-item {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 20px 4px;
+  padding: 18px 4px;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .qa-item:first-child {
-  padding-top: 8px;
+  padding-top: 6px;
 }
 
 .qa-item.is-open {
@@ -851,15 +903,15 @@
 }
 
 .qa-badge-icon {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: var(--icon-tint, #38bdf8);
   flex-shrink: 0;
   transition: all 0.25s ease;
@@ -887,7 +939,7 @@
 }
 
 .qa-question-text {
-  font-size: 1.04rem;
+  font-size: 1.02rem;
   font-weight: 600;
   color: #f1f5f9;
   margin: 0;
@@ -931,7 +983,7 @@
 
 /* Collapsible Answer Styling */
 .qa-answer-container {
-  padding-left: 54px;
+  padding-left: 52px;
   padding-top: 14px;
   padding-bottom: 8px;
 }
@@ -1166,7 +1218,7 @@
    4. SUPPORT DOCK SECTION (Apple Support Style)
    ========================================================================== */
 .support-dock-section {
-  margin-top: 48px;
+  margin-top: 10px;
 }
 
 .dock-card {
@@ -1174,7 +1226,7 @@
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 20px;
-  padding: 36px 40px;
+  padding: 32px 36px;
   overflow: hidden;
   box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(14px);
@@ -1195,7 +1247,7 @@
   z-index: 2;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 36px;
+  gap: 32px;
   align-items: center;
 }
 
@@ -1212,11 +1264,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .dock-title {
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #f8fafc;
   line-height: 1.3;
@@ -1225,7 +1277,7 @@
 }
 
 .dock-desc {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: #94a3b8;
   line-height: 1.55;
   margin: 0;
@@ -1236,14 +1288,14 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 260px;
+  min-width: 250px;
 }
 
 .btn-dock-primary {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 20px;
+  padding: 12px 18px;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #ffffff;
   border-radius: 12px;
@@ -1253,7 +1305,7 @@
 }
 
 .btn-dock-primary i {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
 }
 
 .btn-dock-primary:hover {
@@ -1265,7 +1317,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 12px 20px;
+  padding: 12px 18px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #cbd5e1;
@@ -1275,7 +1327,7 @@
 }
 
 .btn-dock-secondary i {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   color: #38bdf8;
 }
 
@@ -1292,7 +1344,7 @@
 }
 
 .btn-dock-text strong {
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -1450,63 +1502,27 @@ body.light-mode .btn-dock-secondary {
 /* ==========================================================================
    RESPONSIVE BREAKPOINTS
    ========================================================================== */
-@media (max-width: 1024px) {
-  .explorer-grid {
+@media (max-width: 1100px) {
+  .faq-notion-layout {
     grid-template-columns: 240px 1fr;
-    gap: 24px;
+    gap: 28px;
   }
 
   .popular-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .dock-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .dock-buttons {
-    flex-direction: row;
-    flex-wrap: wrap;
-    min-width: unset;
-  }
-
-  .btn-dock-primary,
-  .btn-dock-secondary {
-    flex: 1;
-    min-width: 220px;
-  }
 }
 
-@media (max-width: 768px) {
-  .faq-container {
-    padding: 76px 16px 40px 16px;
-  }
-
-  .hero-title {
-    font-size: 1.85rem;
-  }
-
-  .search-input-pill {
-    height: 50px;
-    padding: 4px 12px 4px 16px;
-  }
-
-  .shortcut-pill {
-    display: none;
-  }
-
-  .popular-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .explorer-grid {
+@media (max-width: 860px) {
+  .faq-notion-layout {
     grid-template-columns: 1fr;
     gap: 28px;
   }
 
   .sidebar-sticky-panel {
     position: static;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .category-menu {
@@ -1527,8 +1543,56 @@ body.light-mode .btn-dock-secondary {
     flex-shrink: 0;
   }
 
+  .cat-chevron {
+    display: none;
+  }
+
   .sidebar-help-box {
     display: none;
+  }
+
+  .popular-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dock-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .dock-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-width: unset;
+  }
+
+  .btn-dock-primary,
+  .btn-dock-secondary {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 640px) {
+  .faq-container {
+    padding: 76px 16px 40px 16px;
+  }
+
+  .hero-title {
+    font-size: 1.85rem;
+  }
+
+  .search-input-pill {
+    height: 50px;
+    padding: 4px 12px 4px 16px;
+  }
+
+  .shortcut-pill {
+    display: none;
+  }
+
+  .popular-grid {
+    grid-template-columns: 1fr;
   }
 
   .qa-answer-container {
