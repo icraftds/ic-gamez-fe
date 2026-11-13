@@ -77,6 +77,11 @@ body:not(.light-mode) .friends-sidebar.from-left {
   transform: translateX(0);
 }
 
+.friends-sidebar.no-transition {
+  transition: none !important;
+  visibility: hidden !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    3. EDGE CAPSULE TAB BUTTON (AssistiveTouch Draggable & Snapping)
    ═══════════════════════════════════════════════════════════════ */

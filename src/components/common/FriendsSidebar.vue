@@ -39,6 +39,7 @@ const DESKTOP_DRAWER_WIDTH = 390
 
 const edgeTabRef = ref(null)
 const isDragging = ref(false)
+const isSnapFlipping = ref(false)
 const dockSide = ref('right') // 'left' | 'right'
 const dockYRatio = ref(0.5)
 const dragX = ref(0)
@@ -199,7 +200,17 @@ function handlePointerUp(e) {
     lastDragEndTime = Date.now()
     const { width, minY, maxY } = btnMetrics.value
     const centerX = dragX.value + width / 2
-    dockSide.value = centerX < viewportW.value / 2 ? 'left' : 'right'
+    const nextSide = centerX < viewportW.value / 2 ? 'left' : 'right'
+
+    if (nextSide !== dockSide.value) {
+      isSnapFlipping.value = true
+      dockSide.value = nextSide
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          isSnapFlipping.value = false
+        })
+      })
+    }
 
     const clampedY = Math.min(maxY, Math.max(minY, dragY.value))
     dockYRatio.value = viewportH.value > 0 ? clampedY / viewportH.value : 0.5
@@ -327,7 +338,8 @@ const handleRemoveFriend = async (userId) => {
     class="friends-sidebar" 
     :class="{ 
       'is-open': isFriendsSidebarOpen,
-      'from-left': dockSide === 'left'
+      'from-left': dockSide === 'left',
+      'no-transition': isSnapFlipping
     }"
   >
     <!-- Header Section -->
