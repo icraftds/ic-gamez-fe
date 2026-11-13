@@ -1,10 +1,19 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useAdBanners } from '../../composables/useAdBanners'
 
 const props = defineProps({
+  placement: {
+    type: String,
+    default: 'all' // 'all' | 'landing' | 'dashboard' | 'learning'
+  },
   customAds: {
     type: Array,
     default: null
+  },
+  apiEndpoint: {
+    type: String,
+    default: ''
   },
   autoRotateInterval: {
     type: Number,
@@ -12,60 +21,29 @@ const props = defineProps({
   }
 })
 
-const DEFAULT_ADS = [
-  {
-    id: 'icraft-ds',
-    typeLabel: 'iCraft Ecosystem',
-    title: 'iCraftDS — Design System & UI Kit Next-Gen',
-    desc: 'Ubah prototipe desain menjadi komponen Vue & React siap produksi dalam hitungan detik.',
-    ctaText: 'Jelajahi iCraftDS',
-    link: 'https://icraft.id',
-    accent: '#38bdf8',
-    icon: 'fa-solid fa-layer-group'
-  },
-  {
-    id: 'icraft-studio',
-    typeLabel: 'iCraft Ecosystem',
-    title: 'Bangun Sistem Digital & AI Bersama iCraft',
-    desc: 'Solusi pengembangan web, aplikasi enterprise, dan integrasi AI custom untuk bisnis Anda.',
-    ctaText: 'Pelajari Layanan',
-    link: 'https://icraft.id',
-    accent: '#a855f7',
-    icon: 'fa-solid fa-rocket'
-  },
-  {
-    id: 'partner-cloud',
-    typeLabel: 'Partner Spotlight',
-    title: 'Orbital Cloud AI — Kredit GPU Gratis $200',
-    desc: 'Latih model Deep Learning & LLM lebih cepat di cluster GPU khusus member Game-Z.',
-    ctaText: 'Klaim Kredit',
-    link: 'https://developer.nvidia.com',
-    accent: '#10b981',
-    icon: 'fa-solid fa-microchip'
-  },
-  {
-    id: 'partner-hackathon',
-    typeLabel: 'Sponsored Event',
-    title: 'Cyber-Zero Hackathon 2026 — Hadiah $50,000',
-    desc: 'Ajang coding 48 jam se-Asia Tenggara dengan jalur rekrutmen ke perusahaan teknologi.',
-    ctaText: 'Daftar Event',
-    link: 'https://devpost.com',
-    accent: '#f59e0b',
-    icon: 'fa-solid fa-trophy'
-  }
-]
+const {
+  isMinimized,
+  fetchBanners,
+  getBannersForPlacement,
+  minimizeBanner: minimizeGlobal,
+  restoreBanner: restoreGlobal
+} = useAdBanners()
 
-const STORAGE_KEY = 'gamez_banner_minimized'
+const placementBanners = getBannersForPlacement(props.placement)
+const ads = computed(() => (props.customAds && props.customAds.length ? props.customAds : placementBanners.value))
 
-const ads = computed(() => (props.customAds && props.customAds.length ? props.customAds : DEFAULT_ADS))
 const currentIndex = ref(0)
 const isHovered = ref(false)
-const isMinimized = ref(false)
 let timer = null
 
-const currentAd = computed(() => ads.value[currentIndex.value] || ads.value[0])
+const currentAd = computed(() => {
+  if (!ads.value.length) return null
+  const safeIdx = currentIndex.value % ads.value.length
+  return ads.value[safeIdx] || ads.value[0]
+})
 
 const nextAd = () => {
+  if (ads.value.length <= 1) return
   currentIndex.value = (currentIndex.value + 1) % ads.value.length
 }
 
@@ -90,24 +68,19 @@ const stopRotation = () => {
 }
 
 const minimizeBanner = () => {
-  isMinimized.value = true
+  minimizeGlobal()
   stopRotation()
-  try {
-    sessionStorage.setItem(STORAGE_KEY, 'true')
-  } catch {
-    // Ignore storage error
-  }
 }
 
 const restoreBanner = () => {
-  isMinimized.value = false
-  try {
-    sessionStorage.removeItem(STORAGE_KEY)
-  } catch {
-    // Ignore storage error
-  }
+  restoreGlobal()
   startRotation()
 }
+
+watch(isMinimized, (minimized) => {
+  if (minimized) stopRotation()
+  else startRotation()
+})
 
 const handleVisibilityChange = () => {
   if (document.hidden) {
@@ -118,12 +91,10 @@ const handleVisibilityChange = () => {
 }
 
 onMounted(() => {
-  try {
-    if (sessionStorage.getItem(STORAGE_KEY) === 'true') {
-      isMinimized.value = true
-    }
-  } catch {
-    // Ignore
+  if (props.apiEndpoint) {
+    fetchBanners(props.apiEndpoint)
+  } else if (import.meta.env.VITE_BANNERS_ENDPOINT) {
+    fetchBanners(import.meta.env.VITE_BANNERS_ENDPOINT)
   }
   if (!isMinimized.value) {
     startRotation()
@@ -138,7 +109,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="gz-ad-wrapper">
+  <div v-if="currentAd" class="gz-ad-wrapper">
     <!-- State 1: Minimized Bar (1-click restore without refresh) -->
     <div v-if="isMinimized" class="gz-ad-minimized">
       <div class="gz-ad-min-info">

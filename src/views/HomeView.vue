@@ -5,7 +5,7 @@
     <div class="container" style="margin-top: 40px">
       <HeroSection />
       <IntroSection />
-      <CyberAdBanner />
+      <CyberAdBanner placement="landing" />
       <LearningPathStack />
     </div>
     <CoffeeModal v-model="showCoffeeModal" />

@@ -2,8 +2,8 @@
   <div class="dash-home-grid">
     <div class="dash-main-col">
       <GreetingCard />
-      <!-- Orbital Sponsored Transmission Banner (Local Preview) -->
-      <CyberAdBanner />
+      <!-- Orbital Sponsored Transmission Banner (Dynamic Placement) -->
+      <CyberAdBanner placement="dashboard" />
       <ContinueLearning />
     </div>
     <div class="dash-side-col">

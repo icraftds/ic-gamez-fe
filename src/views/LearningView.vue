@@ -96,8 +96,8 @@
         </div>
       </div>
 
-      <!-- Space Cyberpunk Partner Transmission / Ad Banner (Local Preview) -->
-      <CyberAdBanner />
+      <!-- Space Cyberpunk Partner Transmission / Ad Banner (Dynamic Placement) -->
+      <CyberAdBanner placement="learning" />
 
       <!-- Loading state if full paths list is being fetched -->
       <div v-if="isLoading && paths.length <= 1" class="paths-loading-state" style="display: flex; justify-content: center; align-items: center; min-height: 320px; width: 100%;">
