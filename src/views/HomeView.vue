@@ -5,6 +5,7 @@
     <div class="container" style="margin-top: 40px">
       <HeroSection />
       <IntroSection />
+      <CyberAdBanner />
       <LearningPathStack />
     </div>
     <CoffeeModal v-model="showCoffeeModal" />
@@ -18,6 +19,7 @@ import CoffeeModal from '../components/common/CoffeeModal.vue'
 import HeroSection from '../components/home/HeroSection.vue'
 import IntroSection from '../components/home/IntroSection.vue'
 import LearningPathStack from '../components/home/LearningPathStack.vue'
+import CyberAdBanner from '../components/ui/CyberAdBanner.vue'
 
 import { useLearningPaths } from '../composables/useLearningPaths'
 
