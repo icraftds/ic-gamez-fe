@@ -200,6 +200,32 @@
 
               <!-- Lessons Section (Interactive List of Lessons) -->
               <div class="chapter-lessons-container">
+                <div
+                  v-if="path?.is_premium && !canAccessPath"
+                  style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; margin-bottom: 16px; border-radius: 12px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(124, 58, 237, 0.12)); border: 1px solid rgba(245, 158, 11, 0.35);"
+                >
+                  <div style="font-size: 0.9rem; color: var(--text-main-hex, #f8fafc); line-height: 1.45;">
+                    <strong><i class="fa-solid fa-lock text-amber"></i> Modul Terkunci</strong>
+                    <div style="font-size: 0.82rem; color: var(--text-sub-hex, #94a3b8);">
+                      <template v-if="currentPlan === 'pro' && (proQuota?.remaining_quota || 0) > 0">
+                        Kamu masih punya <strong>{{ proQuota.remaining_quota }}/{{ proQuota.total_quota || 12 }}</strong> kuota modul Pro bulan ini.
+                      </template>
+                      <template v-else>
+                        Beli modul satuan pakai iCoinZ ({{ Number(path.price_icoinz || 14999).toLocaleString('id-ID') }} c) atau berlangganan Pro/Expert.
+                      </template>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-lesson-open"
+                    style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff; padding: 8px 16px; border-radius: 10px; font-weight: 700; cursor: pointer;"
+                    @click="showPremiumModal = true"
+                  >
+                    <i class="fa-solid fa-unlock-keyhole"></i>
+                    {{ currentPlan === 'pro' && (proQuota?.remaining_quota || 0) > 0 ? 'Klaim dengan Kuota Pro' : 'Buka Akses Modul' }}
+                  </button>
+                </div>
+
                 <div class="lessons-bar-header">
                   <div class="lessons-header-left">
                     <i class="fa-solid fa-list-check"></i>
@@ -217,13 +243,13 @@
                     class="lesson-item-row"
                     :class="{ 
                       'is-completed': isLessonCompleted(lesson),
-                      'is-locked': lesson.is_premium && !isPremiumUser && !(selectedChapterIndex === 0 && lIdx === 0)
+                      'is-locked': lesson.is_premium && !canAccessPath && !(selectedChapterIndex === 0 && lIdx === 0)
                     }"
                     @click="goToLesson(selectedChapter.id, lesson)"
                   >
                     <!-- Status Icon -->
                     <div class="lesson-status-icon">
-                      <i v-if="lesson.is_premium && !isPremiumUser && !(selectedChapterIndex === 0 && lIdx === 0)" class="fa-solid fa-lock text-amber" title="Konten Premium"></i>
+                      <i v-if="lesson.is_premium && !canAccessPath && !(selectedChapterIndex === 0 && lIdx === 0)" class="fa-solid fa-lock text-amber" title="Konten Terkunci"></i>
                       <i v-else-if="isLessonCompleted(lesson)" class="fa-solid fa-circle-check text-green" title="Selesai"></i>
                       <i v-else class="fa-solid fa-circle-play text-cyan" title="Siap dipelajari"></i>
                     </div>
@@ -244,8 +270,8 @@
 
                     <!-- Action Button / Tag -->
                     <div class="lesson-action">
-                      <span v-if="lesson.is_premium && !isPremiumUser && !(selectedChapterIndex === 0 && lIdx === 0)" class="action-tag lock">
-                        PRO
+                      <span v-if="lesson.is_premium && !canAccessPath && !(selectedChapterIndex === 0 && lIdx === 0)" class="action-tag lock">
+                        {{ currentPlan === 'pro' && (proQuota?.remaining_quota || 0) > 0 ? 'KLAIM' : 'TERKUNCI' }}
                       </span>
                       <span v-else-if="isLessonCompleted(lesson)" class="action-tag done">
                         Selesai <i class="fa-solid fa-rotate-right"></i>
@@ -281,7 +307,11 @@
       </div>
     </div>
     
-    <PremiumModal v-model="showPremiumModal" />
+    <PremiumModal
+      v-model="showPremiumModal"
+      :path="path"
+      @unlocked="fetchPathDetails(pathId)"
+    />
   </div>
 </template>
 
@@ -297,10 +327,11 @@ import { getPathThemeColor, getPathIconClass } from '../utils/pathTheme'
 const route = useRoute()
 const router = useRouter()
 const { getPathById, fetchPathDetails, isLoading, isPreparingLesson } = useLearningPaths()
-const { isPremiumUser } = useUserAccount()
+const { hasModuleAccess, currentPlan, proQuota } = useUserAccount()
 
 const pathId = computed(() => route.params.pathId)
 const path = computed(() => getPathById(pathId.value))
+const canAccessPath = computed(() => hasModuleAccess(path.value))
 const showPremiumModal = ref(false)
 
 // Path theme color matching /learning
@@ -553,7 +584,7 @@ const goToLesson = (chapterId, lesson) => {
     (chapterId === firstChapter.id || chapterId === firstChapter.slug) &&
     (lesson.id === firstLesson.id || lesson.slug === firstLesson.slug)
   
-  if (lesson.is_premium && !isPremiumUser.value && !isFirst) {
+  if (lesson.is_premium && !canAccessPath.value && !isFirst) {
     showPremiumModal.value = true
     return
   }

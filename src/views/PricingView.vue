@@ -69,7 +69,7 @@
           </div>
           
           <ul class="plan-benefits">
-            <li v-for="(benefit, index) in getPlanBenefits(plan.slug)" :key="'b-' + index">
+            <li v-for="(benefit, index) in getPlanBenefits(plan)" :key="'b-' + index">
               <i class="fa-solid fa-check"></i> {{ benefit }}
             </li>
             <li v-for="(item, index) in getPlanDisabled(plan.slug)" :key="'d-' + index" class="disabled">
@@ -168,13 +168,14 @@ const PLAN_CONFIG = {
     energyLabel: '20 Energi/minggu',
     energyIcon: 'fa-solid fa-infinity',
     benefits: [
-      'Akses semua modul dasar & premium',
+      'Akses bebas pilih 12 modul alur belajar / bulan (Tidak dapat dibatalkan)',
+      'Akses Global Challenge & Event Arena',
       'Sertifikat kelulusan digital',
-      '200.000 iCoinZ bonus bergabung',
       'Hint premium tak terbatas',
       'Leaderboard eksklusif',
     ],
     disabled: [
+      'Full Access seluruh modul tanpa batas',
       'Kesempatan Magang di ICraft DS',
       '1-on-1 Mentoring bulanan',
     ],
@@ -184,10 +185,10 @@ const PLAN_CONFIG = {
     energyLabel: '25 Energi / minggu',
     energyIcon: 'fa-solid fa-bolt',
     benefits: [
+      'Full Access semua modul alur belajar',
       'Akses 24 Cheatsheets & 300+ Soal Tes Kerja',
       'Semua fitur Pro Plan',
       '25 Energi bonus setiap minggu',
-      '300.000 iCoinZ bonus bergabung',
       'Kesempatan Magang di ICraft DS',
       '1-on-1 Mentoring bulanan',
       'Portofolio review eksklusif',
@@ -197,7 +198,19 @@ const PLAN_CONFIG = {
 }
 
 const getPlanIcon = (slug) => PLAN_CONFIG[slug]?.icon ?? 'fa-solid fa-star'
-const getPlanBenefits = (slug) => PLAN_CONFIG[slug]?.benefits ?? ['Akses fitur premium']
+const getPlanBenefits = (planOrSlug) => {
+  const plan = typeof planOrSlug === 'object' && planOrSlug !== null ? planOrSlug : null
+  const slug = plan ? plan.slug : planOrSlug
+  const base = [...(PLAN_CONFIG[slug]?.benefits ?? ['Akses fitur premium'])]
+  if (slug === 'pro' && plan?.max_selectable_modules) {
+    base[0] = `Akses bebas pilih ${plan.max_selectable_modules} modul alur belajar / bulan (Tidak dapat dibatalkan)`
+  }
+  const reward = Number(plan?.icoinz_reward || 0)
+  if (reward > 0) {
+    base.splice(1, 0, `Bonus ${formatPrice(reward)} iCoinZ bergabung`)
+  }
+  return base
+}
 const getPlanDisabled = (slug) => PLAN_CONFIG[slug]?.disabled ?? []
 const getPlanEnergyLabel  = (slug) => PLAN_CONFIG[slug]?.energyLabel ?? ''
 const getPlanEnergyIcon   = (slug) => PLAN_CONFIG[slug]?.energyIcon ?? 'fa-solid fa-bolt'

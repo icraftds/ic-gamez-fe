@@ -14,7 +14,7 @@
           <i class="fa-solid fa-lock"></i> TAHAP MVP
         </div>
         <div v-else-if="path.isPremium || path.is_premium" class="premium-badge-float">
-          <i class="fa-solid" :class="isPremiumUser ? 'fa-lock-open' : 'fa-lock'"></i> PRO
+          <i class="fa-solid" :class="isPathUnlocked ? 'fa-lock-open' : 'fa-lock'"></i> {{ pathBadgeLabel }}
         </div>
       </div>
       
@@ -57,7 +57,15 @@ const props = defineProps({
 
 const emit = defineEmits(['click'])
 
-const { isPremiumUser } = useUserAccount()
+const { hasModuleAccess } = useUserAccount()
+
+const isPathUnlocked = computed(() => hasModuleAccess(props.path))
+const pathBadgeLabel = computed(() => {
+  if (props.path.access_status === 'owned') return 'DIMILIKI'
+  if (props.path.access_status === 'pro_quota') return 'PRO KUOTA'
+  if (props.path.access_status === 'expert_full') return 'EXPERT'
+  return 'PRO'
+})
 
 const handleClick = () => {
   if (!props.path.isLocked) {

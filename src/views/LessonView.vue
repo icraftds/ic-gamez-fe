@@ -110,6 +110,8 @@
     <!-- Modal Premium -->
     <PremiumModal
       v-model="showPremiumModal"
+      :path="route.query.mode === 'challenge' ? null : path"
+      @unlocked="fetchPathDetails(pathId)"
     />
 
     <!-- XP Toast Notification -->
@@ -165,13 +167,16 @@ const STEP_LABEL = {
 const route = useRoute()
 const router = useRouter()
 const { getPathById, getLessonById, getChapterById, fetchPathDetails, isLoading, isPreparingLesson } = useLearningPaths()
-const { isLoggedIn, isPremiumUser } = useUserAccount()
+const { isLoggedIn, isPremiumUser, hasModuleAccess } = useUserAccount()
 
 const pathId = computed(() => route.params.pathId)
 const chapterId = computed(() => route.params.chapterId)
 const lessonId = computed(() => route.params.lessonId)
 
 const path = computed(() => getPathById(pathId.value))
+const canAccessCurrentPath = computed(() =>
+  route.query.mode === 'challenge' ? isPremiumUser.value : hasModuleAccess(path.value)
+)
 const currentLesson = computed(() => getLessonById(pathId.value, chapterId.value, lessonId.value))
 const currentChapter = computed(() => getChapterById(pathId.value, chapterId.value))
 
@@ -290,7 +295,7 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
     (cId === firstChapter.id || cId === firstChapter.slug) &&
     (lesson.id === firstLesson.id || lesson.slug === firstLesson.slug)
 
-  if (lesson.is_premium && !isPremiumUser.value && !isClickedFirstLesson) {
+  if (lesson.is_premium && !canAccessCurrentPath.value && !isClickedFirstLesson) {
     showPremiumModal.value = true
     return
   }
@@ -488,7 +493,7 @@ const onPracticeFinish = async () => {
   scoring.flushOutboxNow().catch(() => {})
 
   const next = getNextLesson()
-  if (next && next.is_premium && !isPremiumUser.value) {
+  if (next && next.is_premium && !canAccessCurrentPath.value) {
     showPremiumModal.value = true
     return
   }
@@ -508,7 +513,7 @@ const goToRegister = () => {
 
 // Lesson berubah → reset semua state
 watch(currentLesson, (newLesson) => {
-  if (newLesson && newLesson.is_premium && !isPremiumUser.value && !isFirstLesson.value) {
+  if (newLesson && newLesson.is_premium && !canAccessCurrentPath.value && !isFirstLesson.value) {
     showPremiumModal.value = true
     router.replace(`/learning/${pathId.value}`)
     return

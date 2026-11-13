@@ -116,3 +116,73 @@ button {
   color: #7c3aed;
 }
 
+
+.modal-content.modal-wide {
+  max-width: 460px;
+}
+
+.modal-subtitle {
+  margin-bottom: 18px;
+}
+
+.pro-quota-box {
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.quota-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-main-hex);
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.quota-warning {
+  font-size: 0.82rem;
+  color: #fbbf24;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.4;
+}
+
+.modal-error {
+  color: #f43f5e;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
+.modal-actions.stacked-actions {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-buy-single {
+  background: linear-gradient(135deg, #00f0ff, #0284c7);
+  color: #ffffff;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-buy-single:hover {
+  opacity: 0.92;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+}
+
+:global(body.light-mode) .pro-quota-box {
+  background: #f5f3ff;
+  border-color: rgba(124, 58, 237, 0.25);
+}
+
+:global(body.light-mode) .quota-warning {
+  color: #b45309;
+}
