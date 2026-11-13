@@ -96,6 +96,9 @@
         </div>
       </div>
 
+      <!-- Space Cyberpunk Partner Transmission / Ad Banner (Local Preview) -->
+      <CyberAdBanner />
+
       <!-- Loading state if full paths list is being fetched -->
       <div v-if="isLoading && paths.length <= 1" class="paths-loading-state" style="display: flex; justify-content: center; align-items: center; min-height: 320px; width: 100%;">
         <TerminalLoader size="lg" label="seluruh alur belajar" />
@@ -138,6 +141,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import PathCard from '../components/learning/PathCard.vue'
+import CyberAdBanner from '../components/ui/CyberAdBanner.vue'
 import { useLearningPaths } from '../composables/useLearningPaths'
 import { useUserAccount } from '../composables/useUserAccount'
 

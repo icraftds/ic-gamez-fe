@@ -2,6 +2,8 @@
   <div class="dash-home-grid">
     <div class="dash-main-col">
       <GreetingCard />
+      <!-- Orbital Sponsored Transmission Banner (Local Preview) -->
+      <CyberAdBanner />
       <ContinueLearning />
     </div>
     <div class="dash-side-col">
@@ -35,6 +37,7 @@ import GreetingCard from './home/GreetingCard.vue'
 import BadgeCollection from './home/BadgeCollection.vue'
 import ContinueLearning from './home/ContinueLearning.vue'
 import RecentActivity from './home/RecentActivity.vue'
+import CyberAdBanner from '../ui/CyberAdBanner.vue'
 
 const { userProfile } = useUserAccount()
 </script>
