@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFriends } from '../../composables/useFriends'
 import CyberLevel from '../ui/CyberLevel.vue'
@@ -29,8 +29,231 @@ const searchQuery = ref('')
 const activeTab = ref(initialSidebarTab.value === 'permintaan' ? 'permintaan' : 'teman')
 let searchTimeout
 
+/* ═══════════════════════════════════════════════════════════════
+   ASSISTIVETOUCH / DRAGGABLE EDGE SNAPPING LOGIC (iCraftDS style)
+   ═══════════════════════════════════════════════════════════════ */
+const STORAGE_KEY = 'ic_friends_btn_pos_v2'
+const edgeTabRef = ref(null)
+
+const isDragging = ref(false)
+const dockSide = ref('right') // 'left' | 'right'
+const dockYRatio = ref(0.5) // default middle of screen (50%)
+const dragScreenX = ref(0)
+const dragScreenY = ref(0)
+
+const viewportW = ref(typeof window !== 'undefined' ? window.innerWidth : 1200)
+const viewportH = ref(typeof window !== 'undefined' ? window.innerHeight : 800)
+
+let pointerActive = false
+let pointerId = -1
+let startClientX = 0
+let startClientY = 0
+let startScreenX = 0
+let startScreenY = 0
+let hasMoved = false
+let suppressNextClick = false
+
+const getBtnMetrics = () => {
+  const isMobile = viewportW.value <= 768
+  const width = isMobile ? 44 : 52
+  const height = isMobile ? 40 : 48
+  const minY = isMobile ? 65 : 75
+  const maxY = Math.max(minY, viewportH.value - height - (isMobile ? 25 : 30))
+  return { isMobile, width, height, minY, maxY }
+}
+
+const loadSavedPosition = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (parsed.dockSide === 'left' || parsed.dockSide === 'right') {
+        dockSide.value = parsed.dockSide
+      }
+      if (typeof parsed.dockYRatio === 'number' && !isNaN(parsed.dockYRatio)) {
+        dockYRatio.value = Math.min(0.92, Math.max(0.08, parsed.dockYRatio))
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load friends button position', err)
+  }
+}
+
+const savePosition = () => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        dockSide: dockSide.value,
+        dockYRatio: dockYRatio.value
+      })
+    )
+  } catch (err) {
+    // Ignore storage quota/security errors
+  }
+}
+
+const handleResize = () => {
+  viewportW.value = window.innerWidth
+  viewportH.value = window.innerHeight
+}
+
+const buttonStyle = computed(() => {
+  const { isMobile, width, height, minY, maxY } = getBtnMetrics()
+  
+  if (isDragging.value) {
+    return {
+      left: `${dragScreenX.value}px`,
+      top: `${dragScreenY.value}px`,
+      transition: 'none',
+      cursor: 'grabbing'
+    }
+  }
+
+  // Not dragging: Docked state
+  const currentY = Math.min(maxY, Math.max(minY, dockYRatio.value * viewportH.value))
+
+  // When sidebar is open on mobile: hide floating button to avoid UI clash
+  if (isFriendsSidebarOpen.value && isMobile) {
+    return {
+      left: dockSide.value === 'left' ? '0px' : `${viewportW.value - width}px`,
+      top: `${currentY}px`,
+      opacity: '0',
+      pointerEvents: 'none'
+    }
+  }
+
+  // When sidebar is open on desktop (drawer width is 390px):
+  if (isFriendsSidebarOpen.value) {
+    if (dockSide.value === 'left') {
+      return {
+        left: '390px',
+        top: `${currentY}px`
+      }
+    } else {
+      return {
+        left: `${viewportW.value - 390 - width}px`,
+        top: `${currentY}px`
+      }
+    }
+  }
+
+  // When sidebar is closed: docked flush to left or right edge
+  if (dockSide.value === 'left') {
+    return {
+      left: '0px',
+      top: `${currentY}px`
+    }
+  } else {
+    return {
+      left: `${viewportW.value - width}px`,
+      top: `${currentY}px`
+    }
+  }
+})
+
+function handlePointerDown(e) {
+  if (e.pointerType === 'mouse' && e.button !== 0) return
+
+  const { width, minY, maxY } = getBtnMetrics()
+  const btnEl = edgeTabRef.value
+  let currentLeft = 0
+  let currentTop = 0
+
+  if (btnEl) {
+    const rect = btnEl.getBoundingClientRect()
+    currentLeft = rect.left
+    currentTop = rect.top
+  } else {
+    currentLeft = dockSide.value === 'left' ? 0 : viewportW.value - width
+    currentTop = dockYRatio.value * viewportH.value
+  }
+
+  pointerActive = true
+  pointerId = e.pointerId
+  hasMoved = false
+  startClientX = e.clientX
+  startClientY = e.clientY
+  startScreenX = currentLeft
+  startScreenY = currentTop
+
+  dragScreenX.value = currentLeft
+  dragScreenY.value = currentTop
+
+  if (e.currentTarget && e.currentTarget.setPointerCapture) {
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      // ignore capture errors
+    }
+  }
+}
+
+function handlePointerMove(e) {
+  if (!pointerActive || e.pointerId !== pointerId) return
+
+  const dx = e.clientX - startClientX
+  const dy = e.clientY - startClientY
+
+  if (!hasMoved && Math.hypot(dx, dy) > 5) {
+    hasMoved = true
+    isDragging.value = true
+  }
+
+  if (hasMoved) {
+    const { width, minY, maxY } = getBtnMetrics()
+    const clampedX = Math.min(viewportW.value - width, Math.max(0, startScreenX + dx))
+    const clampedY = Math.min(maxY, Math.max(minY, startScreenY + dy))
+
+    dragScreenX.value = clampedX
+    dragScreenY.value = clampedY
+  }
+}
+
+function handlePointerUp(e) {
+  if (!pointerActive || e.pointerId !== pointerId) return
+  pointerActive = false
+
+  if (e.currentTarget && e.currentTarget.releasePointerCapture) {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      // ignore
+    }
+  }
+
+  if (hasMoved) {
+    suppressNextClick = true
+    setTimeout(() => {
+      suppressNextClick = false
+    }, 350)
+
+    const { width, minY, maxY } = getBtnMetrics()
+    const centerX = dragScreenX.value + width / 2
+    dockSide.value = centerX < viewportW.value / 2 ? 'left' : 'right'
+
+    const clampedY = Math.min(maxY, Math.max(minY, dragScreenY.value))
+    dockYRatio.value = viewportH.value > 0 ? clampedY / viewportH.value : 0.5
+    savePosition()
+    isDragging.value = false
+  }
+}
+
+function handleClick() {
+  if (suppressNextClick) return
+  toggleFriendsSidebar('teman')
+}
+
 onMounted(() => {
   fetchFriendRequests()
+  loadSavedPosition()
+  viewportW.value = window.innerWidth
+  viewportH.value = window.innerHeight
+  window.addEventListener('resize', handleResize, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
 })
 
 watch(initialSidebarTab, (newTab) => {
@@ -88,31 +311,53 @@ const handleRemoveFriend = async (userId) => {
 </script>
 
 <template>
-  <!-- Backdrop Blur Overlay -->
+  <!-- 1. Floating AssistiveTouch Friends Edge Tab (Draggable & Snaps to Nearest Edge) -->
+  <button 
+    ref="edgeTabRef"
+    class="fs-edge-tab" 
+    :class="{ 
+      'is-open': isFriendsSidebarOpen,
+      'is-dragging': isDragging,
+      'is-left-side': dockSide === 'left',
+      'is-right-side': dockSide === 'right'
+    }"
+    :style="buttonStyle"
+    @pointerdown="handlePointerDown"
+    @pointermove="handlePointerMove"
+    @pointerup="handlePointerUp"
+    @pointercancel="handlePointerUp"
+    @click="handleClick"
+    :title="isFriendsSidebarOpen ? 'Tutup Daftar Teman' : 'Daftar Teman & Komunitas (Tahan untuk Drag)'"
+    :aria-label="isFriendsSidebarOpen ? 'Tutup Daftar Teman' : 'Daftar Teman & Komunitas'"
+    type="button"
+  >
+    <div class="fs-edge-tab-inner">
+      <i class="fa-solid" :class="isFriendsSidebarOpen ? 'fa-xmark' : 'fa-user-group'"></i>
+      <i 
+        v-if="!isFriendsSidebarOpen" 
+        class="fa-solid fs-edge-chevron"
+        :class="dockSide === 'left' ? 'fa-chevron-right' : 'fa-chevron-left'"
+      ></i>
+    </div>
+    <!-- Notification Dot on edge tab for Friend Requests only -->
+    <span v-if="hasUnreadRequests" class="fs-tab-dot" title="Permintaan pertemanan baru"></span>
+  </button>
+
+  <!-- 2. Backdrop Blur Overlay -->
   <div 
     class="friends-sidebar-overlay" 
     :class="{ 'is-open': isFriendsSidebarOpen }" 
     @click="toggleFriendsSidebar()"
   ></div>
   
-  <aside class="friends-sidebar" :class="{ 'is-open': isFriendsSidebarOpen }">
-    <!-- Sleek Floating Game Friends Capsule Edge Tab -->
-    <button 
-      class="fs-edge-tab" 
-      @click.stop="toggleFriendsSidebar('teman')"
-      :class="{ 'is-open': isFriendsSidebarOpen }"
-      :title="isFriendsSidebarOpen ? 'Tutup Daftar Teman' : 'Daftar Teman & Komunitas'"
-      :aria-label="isFriendsSidebarOpen ? 'Tutup Daftar Teman' : 'Daftar Teman & Komunitas'"
-      type="button"
-    >
-      <div class="fs-edge-tab-inner">
-        <i class="fa-solid" :class="isFriendsSidebarOpen ? 'fa-xmark' : 'fa-user-group'"></i>
-        <i v-if="!isFriendsSidebarOpen" class="fa-solid fa-chevron-left fs-edge-chevron"></i>
-      </div>
-      <!-- Notification Dot on edge tab for Friend Requests only -->
-      <span v-if="hasUnreadRequests" class="fs-tab-dot" title="Permintaan pertemanan baru"></span>
-    </button>
-
+  <!-- 3. Sidebar Drawer (Opens smoothly from Left or Right depending on snap edge) -->
+  <aside 
+    class="friends-sidebar" 
+    :class="{ 
+      'is-open': isFriendsSidebarOpen,
+      'from-left': dockSide === 'left'
+    }"
+  >
     <!-- Header Section -->
     <div class="fs-header">
       <div class="fs-header-branding">

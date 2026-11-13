@@ -57,54 +57,101 @@ body:not(.light-mode) .friends-sidebar {
   transform: translateX(0);
 }
 
+/* When docked to left edge, drawer slides smoothly from the left */
+.friends-sidebar.from-left {
+  left: 0;
+  right: auto;
+  border-left: none;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 16px 0 48px rgba(0, 0, 0, 0.08);
+  transform: translateX(-100%);
+}
+
+body:not(.light-mode) .friends-sidebar.from-left {
+  border-left: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 20px 0 60px rgba(0, 0, 0, 0.65);
+}
+
+.friends-sidebar.from-left.is-open {
+  transform: translateX(0);
+}
+
 /* ═══════════════════════════════════════════════════════════════
-   3. EDGE CAPSULE TAB BUTTON (Game Friends Button)
+   3. EDGE CAPSULE TAB BUTTON (AssistiveTouch Draggable & Snapping)
    ═══════════════════════════════════════════════════════════════ */
 .fs-edge-tab {
-  position: absolute;
-  left: -52px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: fixed;
   height: 48px;
-  padding: 0 14px 0 16px;
+  min-width: 52px;
+  padding: 0 14px;
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-right: none;
-  box-shadow: -4px 6px 20px -2px rgba(0, 0, 0, 0.08), -2px 2px 6px -1px rgba(0, 0, 0, 0.03);
-  border-radius: 9999px 0 0 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: grab;
   z-index: 10001;
   color: #475569;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  outline: none;
+  touch-action: none;
   user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+  box-sizing: border-box;
+  transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.25s ease,
+              color 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.25s ease,
+              transform 0.2s ease,
+              border-radius 0.25s ease;
 }
 
 body:not(.light-mode) .fs-edge-tab {
-  background: rgba(18, 22, 34, 0.88);
+  background: rgba(18, 22, 34, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-right: none;
-  box-shadow: -8px 8px 32px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55), 0 0 15px rgba(56, 189, 248, 0.15);
   color: #cbd5e1;
 }
 
-.fs-edge-tab:hover {
-  transform: translateY(-50%) translateX(-4px);
-  color: #0284c7;
-  background: #ffffff;
-  box-shadow: -8px 10px 28px rgba(0, 0, 0, 0.12);
+/* Docked Right Side */
+.fs-edge-tab.is-right-side:not(.is-dragging) {
+  border-radius: 9999px 0 0 9999px;
+  border-right: none;
 }
 
-body:not(.light-mode) .fs-edge-tab:hover {
+/* Docked Left Side */
+.fs-edge-tab.is-left-side:not(.is-dragging) {
+  border-radius: 0 9999px 9999px 0;
+  border-left: none;
+}
+
+/* Floating AssistiveTouch Dragging Mode */
+.fs-edge-tab.is-dragging {
+  cursor: grabbing !important;
+  border-radius: 9999px !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 24px rgba(56, 189, 248, 0.45) !important;
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  background: rgba(22, 28, 44, 0.98) !important;
+  color: #38bdf8 !important;
+}
+
+.fs-edge-tab:hover:not(.is-dragging) {
+  color: #0284c7;
+  background: #ffffff;
+  box-shadow: 0 6px 24px rgba(2, 132, 199, 0.25);
+}
+
+body:not(.light-mode) .fs-edge-tab:hover:not(.is-dragging) {
   color: #38bdf8;
-  background: rgba(26, 32, 50, 0.95);
-  border-color: rgba(56, 189, 248, 0.3);
-  box-shadow: -10px 10px 36px rgba(0, 0, 0, 0.65);
+  background: rgba(26, 32, 50, 0.96);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.3);
 }
 
 .fs-edge-tab.is-open {
@@ -113,9 +160,9 @@ body:not(.light-mode) .fs-edge-tab:hover {
 }
 
 body:not(.light-mode) .fs-edge-tab.is-open {
-  background: rgba(22, 28, 44, 0.95);
+  background: rgba(22, 28, 44, 0.98);
   color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.25);
+  border-color: rgba(56, 189, 248, 0.4);
 }
 
 .fs-edge-tab-inner {
@@ -127,12 +174,17 @@ body:not(.light-mode) .fs-edge-tab.is-open {
 
 .fs-edge-chevron {
   font-size: 0.75rem;
-  opacity: 0.55;
+  opacity: 0.6;
   transition: transform 0.25s ease, opacity 0.25s ease;
 }
 
-.fs-edge-tab:hover .fs-edge-chevron {
-  transform: translateX(-3px);
+.fs-edge-tab.is-right-side:hover .fs-edge-chevron {
+  transform: translateX(-2px);
+  opacity: 1;
+}
+
+.fs-edge-tab.is-left-side:hover .fs-edge-chevron {
+  transform: translateX(2px);
   opacity: 1;
 }
 
@@ -870,19 +922,10 @@ body:not(.light-mode) .fs-autocomplete-dropdown::-webkit-scrollbar-thumb {
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .fs-edge-tab {
-    top: auto;
-    bottom: 85px;
-    transform: none;
-    height: 38px;
-    padding: 0 10px 0 12px;
-    left: -40px;
-    font-size: 0.85rem;
-    border-radius: 9999px 0 0 9999px;
-    box-shadow: -4px 6px 16px rgba(0, 0, 0, 0.35);
-  }
-
-  .fs-edge-tab:hover {
-    transform: translateX(-3px);
+    height: 40px;
+    min-width: 44px;
+    padding: 0 10px;
+    font-size: 0.9rem;
   }
 
   .friends-sidebar {
