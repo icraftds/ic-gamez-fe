@@ -67,18 +67,29 @@
       <!-- MODULE TAB -->
       <div v-if="activeTab === 'module'" class="tab-content module-tab">
         <div class="module-promo-banner">
-          <div class="promo-left">
-            <span class="promo-pill">
-              <i class="fa-solid fa-tags"></i> Diskon Multi-Beli {{ moduleMeta.discount_percent }}%
-            </span>
-            <p class="promo-text">
-              Beli satuan <strong>{{ formatPrice(moduleMeta.module_default_price) }} iCoinZ</strong> (akses {{ moduleMeta.module_default_duration_days }} hari), atau pilih
-              <strong>&ge; 2 modul sekaligus</strong> untuk langsung dapat <strong>diskon {{ moduleMeta.discount_percent }}%</strong>!
-            </p>
+          <div class="promo-badge-icon">
+            <i class="fa-solid fa-layer-group"></i>
           </div>
-          <div class="promo-note">
-            <i class="fa-solid fa-circle-info"></i>
-            Pembelian modul satuan hanya membuka materi modul terpilih (tidak termasuk akses Global Challenge).
+          <div class="promo-body">
+            <div class="promo-header-row">
+              <h3>Akses Alur Belajar Satuan</h3>
+              <div class="promo-pills-group">
+                <span class="promo-chip price">
+                  <img src="/images/icoinz.svg" alt="c" class="icoinz-icon-xs" />
+                  {{ formatPrice(moduleMeta.module_default_price) }} / Modul
+                </span>
+                <span class="promo-chip discount">
+                  <i class="fa-solid fa-tags"></i> Diskon {{ moduleMeta.discount_percent }}% (&ge; 2 Modul)
+                </span>
+                <span class="promo-chip duration">
+                  <i class="fa-regular fa-clock"></i> {{ moduleMeta.module_default_duration_days }} Hari
+                </span>
+              </div>
+            </div>
+            <p class="promo-note">
+              <i class="fa-solid fa-circle-info"></i>
+              Pembelian modul satuan hanya menggunakan iCoinZ &amp; membuka materi modul terpilih (tidak termasuk akses Global Challenge).
+            </p>
           </div>
         </div>
 
@@ -92,45 +103,80 @@
           <p>Silakan cek kembali nanti atau pilih paket berlangganan.</p>
         </div>
 
-        <div v-else class="shop-item-grid">
+        <div v-else class="module-cards-grid">
           <div
-            v-for="mod in sortedModules"
+            v-for="(mod, idx) in sortedModules"
             :key="mod.id"
-            class="border-shop-card module-shop-card"
+            class="module-shop-card"
+            :style="{ '--mod-color': getPathThemeColor(mod, idx) }"
             :class="{
               'is-owned': mod.is_unlocked,
-              'is-selected': isModuleSelected(mod.id)
+              'is-selected': isModuleSelected(mod.id),
+              'is-shaking': shakeKey === `mod-${mod.id}`,
+              'is-buying': activeBuyingKey === `mod-${mod.id}`
             }"
           >
-            <div class="border-preview-box module-preview-box">
-              <span class="module-duration-pill">
-                <i class="fa-regular fa-clock"></i> {{ mod.duration_days }} Hari
-              </span>
-              <div class="module-icon-circle">
-                <i :class="mod.icon || 'fa-solid fa-book-open'"></i>
+            <div class="module-card-glow"></div>
+
+            <div class="module-card-header">
+              <div class="module-brand-icon">
+                <i :class="getPathIconClass(mod)"></i>
               </div>
-              <div class="module-meta-chips">
-                <span><i class="fa-solid fa-book"></i> {{ mod.chapters_count || 0 }} Bab</span>
-                <span><i class="fa-solid fa-code"></i> {{ mod.lessons_count || 0 }} Materi</span>
+              <div class="module-header-badges">
+                <span class="module-duration-pill">
+                  <i class="fa-regular fa-clock"></i> {{ mod.duration_days }} Hari
+                </span>
+                <span v-if="mod.is_unlocked" class="module-owned-pill">
+                  <i class="fa-solid fa-circle-check"></i> {{ formatModuleAccessBadge(mod) }}
+                </span>
               </div>
             </div>
 
-            <div class="border-info-box">
-              <h4>{{ mod.title }}</h4>
-              <p class="border-desc">{{ mod.description || 'Akses penuh seluruh bab dan materi pada alur belajar ini.' }}</p>
+            <div class="module-card-body">
+              <h4 class="module-title">{{ mod.title }}</h4>
+              <div class="module-meta-chips">
+                <span><i class="fa-solid fa-book-open"></i> {{ mod.chapters_count || 0 }} Bab</span>
+                <span><i class="fa-solid fa-code"></i> {{ mod.lessons_count || 0 }} Materi</span>
+              </div>
+              <p class="module-desc">{{ mod.description || 'Akses penuh seluruh bab dan materi pada alur belajar ini.' }}</p>
+            </div>
 
-              <div class="border-price-row">
-                <span class="price-label">Status / Harga</span>
-                <span v-if="mod.is_unlocked" class="module-status-tag">
-                  {{ formatModuleAccessBadge(mod) }}
+            <div class="module-card-footer">
+              <div class="module-price-strip">
+                <span class="price-label">
+                  {{ mod.is_unlocked ? 'Status Akses' : 'Harga Modul' }}
                 </span>
-                <span v-else class="price-val-group">
-                  <img src="/images/icoinz.svg" alt="C" class="mini-coin-svg" /> {{ formatPrice(mod.price_icoinz) }}
-                </span>
+                <div v-if="mod.is_unlocked" class="price-unlocked-label">
+                  <i class="fa-solid fa-unlock-keyhole"></i> Terbuka
+                </div>
+                <div v-else class="module-price-values">
+                  <span
+                    v-if="isModuleSelected(mod.id) && selectedModuleIds.length >= 2"
+                    class="price-original-strike"
+                  >
+                    {{ formatPrice(mod.price_icoinz) }}
+                  </span>
+                  <span class="price-value">
+                    <img src="/images/icoinz.svg" alt="C" class="icoinz-icon-xs" />
+                    {{
+                      formatPrice(
+                        isModuleSelected(mod.id) && selectedModuleIds.length >= 2
+                          ? getDiscountedModulePrice(mod.price_icoinz)
+                          : mod.price_icoinz
+                      )
+                    }}
+                  </span>
+                  <span
+                    v-if="isModuleSelected(mod.id) && selectedModuleIds.length >= 2"
+                    class="discount-tag-inline"
+                  >
+                    -{{ moduleMeta.discount_percent }}%
+                  </span>
+                </div>
               </div>
 
               <div v-if="mod.is_unlocked" class="module-card-actions">
-                <router-link :to="`/learn/path/${mod.slug || mod.id}`" class="btn-buy-shop btn-open-module">
+                <router-link :to="`/learning/${mod.slug || mod.id}`" class="btn-open-module">
                   <i class="fa-solid fa-play"></i> Buka Modul
                 </router-link>
               </div>
@@ -139,17 +185,26 @@
                   type="button"
                   class="btn-select-module"
                   :class="{ active: isModuleSelected(mod.id) }"
+                  :disabled="isTransitioningCheckout"
                   @click="toggleModuleSelect(mod.id)"
                 >
-                  <i :class="isModuleSelected(mod.id) ? 'fa-solid fa-square-check' : 'fa-regular fa-square'"></i>
-                  {{ isModuleSelected(mod.id) ? 'Dipilih' : 'Pilih' }}
+                  <i :class="isModuleSelected(mod.id) ? 'fa-solid fa-circle-check' : 'fa-solid fa-plus'"></i>
+                  <span>{{ isModuleSelected(mod.id) ? 'Dipilih' : 'Pilih' }}</span>
                 </button>
                 <button
                   type="button"
-                  class="btn-buy-shop"
+                  class="btn-buy-module"
+                  :disabled="isTransitioningCheckout"
                   @click="checkoutSingleModule(mod)"
                 >
-                  Beli
+                  <template v-if="activeBuyingKey === `mod-${mod.id}`">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span>Memproses...</span>
+                  </template>
+                  <template v-else>
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Beli</span>
+                  </template>
                 </button>
               </div>
             </div>
@@ -157,36 +212,56 @@
         </div>
 
         <!-- Sticky Multi-Buy Checkout Bar -->
-        <div v-if="selectedModuleIds.length > 0" class="module-checkout-bar">
-          <div class="checkout-bar-summary">
-            <div class="selected-count-pill">
-              {{ selectedModuleIds.length }} Modul Dipilih
-              <span v-if="selectedModuleIds.length >= 2" class="discount-applied-badge">
-                DISKON {{ moduleMeta.discount_percent }}% AKTIF!
-              </span>
-              <span v-else class="discount-hint-badge">
-                Tambah 1 modul lagi untuk diskon {{ moduleMeta.discount_percent }}%
-              </span>
+        <Transition name="dock-slide">
+          <div v-if="selectedModuleIds.length > 0" class="module-checkout-bar">
+            <div class="checkout-bar-summary">
+              <div class="selected-count-pill">
+                <span class="count-dot">{{ selectedModuleIds.length }}</span>
+                <span>Modul Dipilih</span>
+                <span v-if="selectedModuleIds.length >= 2" class="discount-applied-badge">
+                  <i class="fa-solid fa-sparkles"></i> DISKON {{ moduleMeta.discount_percent }}% AKTIF!
+                </span>
+                <span v-else class="discount-hint-badge">
+                  + Pilih 1 modul lagi untuk diskon {{ moduleMeta.discount_percent }}%
+                </span>
+              </div>
+              <div class="selected-price-breakdown">
+                <span v-if="selectedModuleIds.length >= 2" class="subtotal-strike">
+                  {{ formatPrice(moduleSubtotal) }} c
+                </span>
+                <span class="final-total-coinz">
+                  <img src="/images/icoinz.svg" alt="C" class="icoinz-icon-xs" />
+                  {{ formatPrice(moduleFinalTotal) }} iCoinZ
+                </span>
+              </div>
             </div>
-            <div class="selected-price-breakdown">
-              <span v-if="selectedModuleIds.length >= 2" class="subtotal-strike">
-                {{ formatPrice(moduleSubtotal) }} c
-              </span>
-              <span class="final-total-coinz">
-                <img src="/images/icoinz.svg" alt="C" class="mini-coin-svg" />
-                {{ formatPrice(moduleFinalTotal) }} iCoinZ
-              </span>
+            <div class="checkout-bar-actions">
+              <button
+                type="button"
+                class="btn-clear-modules"
+                :disabled="isTransitioningCheckout"
+                @click="selectedModuleIds = []"
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                class="btn-checkout-modules"
+                :disabled="isTransitioningCheckout"
+                @click="checkoutSelectedModules"
+              >
+                <template v-if="activeBuyingKey === 'mod-bundle'">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i>
+                  <span>Menyiapkan Checkout...</span>
+                </template>
+                <template v-else>
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>Bayar Sekarang</span>
+                </template>
+              </button>
             </div>
           </div>
-          <div class="checkout-bar-actions">
-            <button type="button" class="btn-clear-modules" @click="selectedModuleIds = []">
-              Reset
-            </button>
-            <button type="button" class="btn-checkout-modules" @click="checkoutSelectedModules">
-              <i class="fa-solid fa-bolt"></i> Bayar Sekarang
-            </button>
-          </div>
-        </div>
+        </Transition>
       </div>
 
       <!-- ENERGY TAB -->
@@ -222,8 +297,16 @@
                 <span class="price-value"><img src="/images/icoinz.svg" class="icoinz-icon-xs"/> {{ formatPrice(pkg.price_icoinz) }}</span>
               </div>
               
-              <button class="btn-buy coinz-buy" :class="{ 'disabled-buy': isProcessing || walletStatus !== 'fresh' || coinz < pkg.price_icoinz }" @click="purchaseEnergy(pkg)">
-                Beli Energi
+              <button
+                class="btn-buy coinz-buy"
+                :class="{ 'disabled-buy': isProcessing || isTransitioningCheckout || walletStatus !== 'fresh' || coinz < pkg.price_icoinz }"
+                :disabled="isTransitioningCheckout"
+                @click="purchaseEnergy(pkg)"
+              >
+                <template v-if="activeBuyingKey === `energy-${pkg.id}`">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i> Menyiapkan...
+                </template>
+                <template v-else>Beli Energi</template>
               </button>
             </div>
           </div>
@@ -249,8 +332,17 @@
               <button v-if="isBought(border.id)" class="btn-buy btn-bought" disabled>
                 <i class="fa-solid fa-check"></i> Dimiliki
               </button>
-              <button v-else class="btn-buy coinz-buy" :class="{ 'disabled-buy': coinz < getBorderPrice(border.id) || walletStatus !== 'fresh' }" @click="buyBorder(border.id)">
-                Beli Border
+              <button
+                v-else
+                class="btn-buy coinz-buy"
+                :class="{ 'disabled-buy': isTransitioningCheckout || coinz < getBorderPrice(border.id) || walletStatus !== 'fresh' }"
+                :disabled="isTransitioningCheckout"
+                @click="buyBorder(border.id)"
+              >
+                <template v-if="activeBuyingKey === `border-${border.id}`">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i> Menyiapkan...
+                </template>
+                <template v-else>Beli Border</template>
               </button>
             </div>
           </div>
@@ -283,8 +375,16 @@
                 <span class="price-value"><img src="/images/icoinz.svg" class="icoinz-icon-xs"/> {{ formatPrice(item.price) }}</span>
               </div>
               
-              <button class="btn-buy coinz-buy" :class="{ 'disabled-buy': isProcessing || walletStatus !== 'fresh' || coinz < item.price }" @click="buyItem(item)">
-                Beli Item
+              <button
+                class="btn-buy coinz-buy"
+                :class="{ 'disabled-buy': isProcessing || isTransitioningCheckout || walletStatus !== 'fresh' || coinz < item.price }"
+                :disabled="isTransitioningCheckout"
+                @click="buyItem(item)"
+              >
+                <template v-if="activeBuyingKey === `item-${item.id}`">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i> Menyiapkan...
+                </template>
+                <template v-else>Beli Item</template>
               </button>
             </div>
           </div>
@@ -301,6 +401,23 @@
         <p class="energy-gained">{{ successMsg }}</p>
       </div>
     </div>
+
+    <!-- Checkout Navigation Transition Overlay -->
+    <Transition name="fade-overlay">
+      <div v-if="isTransitioningCheckout" class="checkout-transition-backdrop" role="status" aria-live="polite">
+        <div class="checkout-transition-card">
+          <div class="transition-spinner-ring">
+            <img src="/images/icoinz.svg" alt="iCoinZ" class="transition-coin-pulse" />
+          </div>
+          <h3>Menyiapkan Pembayaran</h3>
+          <p class="transition-item-name">{{ transitionItemLabel }}</p>
+          <div class="transition-progress-track">
+            <div class="transition-progress-fill"></div>
+          </div>
+          <span class="transition-hint">Mengunci transaksi &amp; mengamankan saldo iCoinZ...</span>
+        </div>
+      </div>
+    </Transition>
 
     <InsufficientBalanceModal
       v-model="showInsufficientModal"
@@ -320,6 +437,7 @@ import api from '../services/api'
 import { useUserAccount } from '../composables/useUserAccount'
 import confetti from 'canvas-confetti'
 import { TIERS } from '../utils/tiers.js'
+import { getPathThemeColor, getPathIconClass } from '../utils/pathTheme.js'
 import CyberBorder from '../components/ui/CyberBorder.vue'
 import CyberEnergy from '../components/ui/CyberEnergy.vue'
 import InsufficientBalanceModal from '../components/shop/InsufficientBalanceModal.vue'
@@ -362,6 +480,10 @@ const moduleMeta = ref({
 })
 const isLoading = ref(false)
 const isProcessing = ref(false)
+const isTransitioningCheckout = ref(false)
+const activeBuyingKey = ref(null)
+const transitionItemLabel = ref('')
+const shakeKey = ref(null)
 
 const showSuccessAnim = ref(false)
 const successMsg = ref('')
@@ -546,15 +668,44 @@ const playSuccessAnimation = (msg) => {
   }, 2500)
 }
 
-const checkoutModulesList = (modsList) => {
-  if (!modsList.length) return
+const getDiscountedModulePrice = (price) => {
+  const pct = Number(moduleMeta.value.discount_percent ?? 25)
+  return Math.max(0, Math.round((Number(price || 0) * (100 - pct)) / 100))
+}
+
+const triggerShake = (key) => {
+  shakeKey.value = key
+  setTimeout(() => {
+    if (shakeKey.value === key) shakeKey.value = null
+  }, 450)
+}
+
+const navigateWithCheckoutDelay = async (targetRoute, key, itemLabel) => {
+  if (isTransitioningCheckout.value) return
+  isTransitioningCheckout.value = true
+  activeBuyingKey.value = key
+  transitionItemLabel.value = itemLabel
+
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 900))
+    await router.push(targetRoute)
+  } finally {
+    isTransitioningCheckout.value = false
+    activeBuyingKey.value = null
+  }
+}
+
+const checkoutModulesList = (modsList, triggerKey = 'mod-bundle') => {
+  if (!modsList.length || isTransitioningCheckout.value) return
   const subtotal = modsList.reduce((sum, m) => sum + Number(m.price_icoinz || 0), 0)
   const discountPercent = modsList.length >= 2 ? Number(moduleMeta.value.discount_percent ?? 25) : 0
   const discountAmount = Math.round((subtotal * discountPercent) / 100)
   const total = Math.max(0, subtotal - discountAmount)
   const names = modsList.map(m => m.title).join(', ')
+  const displayName = modsList.length > 1 ? `${modsList.length} Modul Belajar` : modsList[0].title
 
   if (Number(coinz.value || 0) < total) {
+    triggerShake(triggerKey)
     openInsufficientBalance(
       modsList.length > 1 ? `${modsList.length} Modul (${names})` : names,
       total
@@ -562,12 +713,12 @@ const checkoutModulesList = (modsList) => {
     return
   }
 
-  router.push({
+  navigateWithCheckoutDelay({
     path: '/shop/checkout',
     query: {
       type: 'module',
       pathIds: modsList.map(m => m.id).join(','),
-      name: modsList.length > 1 ? `${modsList.length} Modul Belajar` : modsList[0].title,
+      name: displayName,
       names,
       durationDays: modsList[0]?.duration_days || moduleMeta.value.module_default_duration_days,
       subtotal,
@@ -576,24 +727,26 @@ const checkoutModulesList = (modsList) => {
       method: 'coinz',
       price: total
     }
-  })
+  }, triggerKey, displayName)
 }
 
 const checkoutSingleModule = (mod) => {
-  checkoutModulesList([mod])
+  checkoutModulesList([mod], `mod-${mod.id}`)
 }
 
 const checkoutSelectedModules = () => {
-  checkoutModulesList(selectedModuleObjects.value)
+  checkoutModulesList(selectedModuleObjects.value, 'mod-bundle')
 }
 
 const purchaseEnergy = (pkg) => {
+  if (isTransitioningCheckout.value) return
   if (Number(coinz.value || 0) < pkg.price_icoinz) {
+    triggerShake(`energy-${pkg.id}`)
     openInsufficientBalance(pkg.name, pkg.price_icoinz)
     return
   }
-  
-  router.push({
+
+  navigateWithCheckoutDelay({
     path: '/shop/checkout',
     query: {
       pkgId: pkg.id,
@@ -602,37 +755,42 @@ const purchaseEnergy = (pkg) => {
       method: 'coinz',
       price: pkg.price_icoinz
     }
-  })
+  }, `energy-${pkg.id}`, `${pkg.name} (+${pkg.energy_amount} Energi)`)
 }
 
 const buyBorder = (id) => {
+  if (isTransitioningCheckout.value) return
   const price = getBorderPrice(id)
   const b = TIERS.find(t => t.id === id)
+  const borderName = b ? parseName(b.name) : `Border ${id}`
   if (Number(coinz.value || 0) < price) {
-    openInsufficientBalance(b ? parseName(b.name) : `Border ${id}`, price)
+    triggerShake(`border-${id}`)
+    openInsufficientBalance(borderName, price)
     return
   }
-  
-  router.push({
+
+  navigateWithCheckoutDelay({
     path: '/shop/checkout',
     query: {
       pkgId: id,
-      name: parseName(b.name),
+      name: borderName,
       energy: 0,
       type: 'border',
       method: 'coinz',
       price: price
     }
-  })
+  }, `border-${id}`, borderName)
 }
 
 const buyItem = (item) => {
+  if (isTransitioningCheckout.value) return
   if (Number(coinz.value || 0) < item.price) {
+    triggerShake(`item-${item.id}`)
     openInsufficientBalance(item.name, item.price)
     return
   }
-  
-  router.push({
+
+  navigateWithCheckoutDelay({
     path: '/shop/checkout',
     query: {
       pkgId: item.id,
@@ -642,7 +800,7 @@ const buyItem = (item) => {
       method: 'coinz',
       price: item.price
     }
-  })
+  }, `item-${item.id}`, item.name)
 }
 </script>
 <style scoped src="../assets/css/views/ShopView.css"></style>
