@@ -5,7 +5,7 @@
     <div class="checkout-wrapper">
       <!-- Top Navigation: Back to Pricing -->
       <div class="checkout-top-bar">
-        <button class="btn-back-pricing" @click="goBackToPricing">
+        <button class="btn-back-pricing" :disabled="isProcessingCheckout" :style="{ opacity: isProcessingCheckout ? 0.5 : 1, pointerEvents: isProcessingCheckout ? 'none' : 'auto' }" @click="goBackToPricing">
           <i class="fa-solid fa-arrow-left"></i>
           <span>Kembali ke Paket Langganan</span>
         </button>
@@ -30,7 +30,14 @@
       </div>
 
       <!-- Main Card -->
-      <div class="checkout-card">
+      <div class="checkout-card" :style="{ position: 'relative' }">
+        <div
+          v-if="isProcessingCheckout"
+          style="position: absolute; inset: 0; background: rgba(2, 6, 23, 0.58); backdrop-filter: blur(3px); z-index: 30; border-radius: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; pointer-events: all;"
+        >
+          <TerminalLoader size="lg" label="menyiapkan pembayaran" />
+          <p style="color: #e2e8f0; font-size: 0.92rem; margin: 0;">Mohon tunggu, seluruh kontrol dikunci sementara...</p>
+        </div>
         <Transition name="fade-slide" mode="out-in">
           <CheckoutStepSelection
             v-if="currentStep === 1"
@@ -74,7 +81,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import api from '../services/api'
 import { createPaymentPoll } from '../utils/paymentPoll'
@@ -108,9 +115,18 @@ const currentStep = ref(1)
 const paymentDetails = ref({})
 const selectedMethod = ref('')
 const discountedPrice = ref(null)
+const isProcessingCheckout = ref(false)
+
+onBeforeRouteLeave((_to, _from, next) => {
+  if (isProcessingCheckout.value) {
+    next(false)
+    return
+  }
+  next()
+})
 
 const onProcessing = (isProcessing) => {
-  // Can be used if parent needs to know processing state (e.g. block navigation)
+  isProcessingCheckout.value = Boolean(isProcessing)
 }
 
 const onInstruction = (data) => {

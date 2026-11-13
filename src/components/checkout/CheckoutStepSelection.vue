@@ -212,9 +212,10 @@ const PLAN_PERKS = {
     duration: '30 Hari',
     energy: '+20 Energi / minggu',
     features: [
-      'Akses semua modul dasar & premium',
+      'Akses bebas pilih 12 modul alur belajar / bulan (Tidak dapat dibatalkan)',
+      'Akses penuh Global Challenge & Event Arena',
       'Sertifikat kelulusan digital resmi',
-      '200.000 iCoinZ bonus langsung masuk',
+      'Bonus iCoinZ sesuai konfigurasi paket aktif',
       'Hint premium tak terbatas di workspace',
       'Leaderboard eksklusif coder Game-Z',
     ]
@@ -224,13 +225,12 @@ const PLAN_PERKS = {
     duration: '180 Hari',
     energy: '+25 Energi / minggu',
     features: [
+      'Full Access seluruh modul & alur belajar',
       'Akses 24 Cheatsheets & 300+ Soal Tes Kerja',
-      'Semua fitur Pro Plan',
+      'Semua fitur Pro Plan tanpa batas pilihan modul',
       '25 Energi bonus setiap minggu',
-      '300.000 iCoinZ bonus langsung masuk',
-      'Kesempatan Magang di iCraft DS',
-      '1-on-1 Mentoring bulanan',
-      'Review portofolio eksklusif',
+      'Bonus iCoinZ VIP langsung masuk',
+      'Kesempatan Magang di iCraft DS & 1-on-1 Mentoring',
     ]
   }
 }
@@ -292,17 +292,21 @@ const validateCoupon = async () => {
 }
 
 const goToInstruction = async () => {
+  if (isProcessingPayment.value) return
   paymentError.value = ''
   isProcessingPayment.value = true
   emit('processing', true)
   
   try {
-    const res = await api.post('/payments/create', {
-      item_type: 'premium_plan',
-      payment_method: selectedMethod.value,
-      plan_slug: props.planSlug,
-      coupon_code: couponCode.value
-    })
+    const [res] = await Promise.all([
+      api.post('/payments/create', {
+        item_type: 'premium_plan',
+        payment_method: selectedMethod.value,
+        plan_slug: props.planSlug,
+        coupon_code: couponCode.value
+      }),
+      new Promise((resolve) => setTimeout(resolve, 1500))
+    ])
     
     const tx = res.data?.data
     if (!tx) throw new Error('Data transaksi tidak ditemukan dari server.')
