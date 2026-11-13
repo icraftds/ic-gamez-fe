@@ -231,4 +231,52 @@ h2 {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
 }
+
+@media (max-width: 480px) {
+  .insufficient-backdrop {
+    padding: 14px;
+  }
+
+  .insufficient-card {
+    padding: 24px 18px;
+    border-radius: 16px;
+  }
+
+  .insufficient-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 1.5rem;
+    margin-bottom: 14px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  .insufficient-desc {
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+
+  .balance-breakdown {
+    padding: 12px 14px;
+    margin-bottom: 18px;
+  }
+
+  .breakdown-row {
+    font-size: 0.85rem;
+  }
+
+  .insufficient-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .btn-modal-cancel,
+  .btn-modal-market {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+  }
+}
 </style>

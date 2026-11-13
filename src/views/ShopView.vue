@@ -34,29 +34,32 @@
         <!-- TABS -->
         <div class="shop-tabs">
           <button class="shop-tab" :class="{ active: activeTab === 'module' }" @click="activeTab = 'module'">
-            <i class="fa-solid fa-layer-group" style="font-size: 20px; margin-right: 8px;"></i> Modul Belajar
+            <i class="fa-solid fa-layer-group tab-icon"></i>
+            <span>Modul Belajar</span>
           </button>
           <button class="shop-tab" :class="{ active: activeTab === 'energy' }" @click="activeTab = 'energy'">
-            <CyberEnergy :pkgId="1" :isAnimated="false" style="width: 32px; height: 32px; margin-right: 8px;" /> Energi
+            <CyberEnergy :pkgId="1" :isAnimated="false" class="tab-icon-energy" />
+            <span>Energi</span>
           </button>
           <button class="shop-tab" :class="{ active: activeTab === 'border' }" @click="activeTab = 'border'">
-            <div style="width: 32px; height: 32px; margin-right: 6px; display: inline-flex; align-items: center; justify-content: center;">
+            <div class="tab-icon-border-wrap">
               <CyberBorder tierId="BB1" style="width: 100%; height: 100%;" />
             </div>
-            Border Premium
+            <span>Border Premium</span>
           </button>
           <button class="shop-tab" :class="{ active: activeTab === 'item' }" @click="activeTab = 'item'">
-            <i class="fa-solid fa-gift" style="font-size: 24px; margin-right: 8px;"></i> Items
+            <i class="fa-solid fa-gift tab-icon"></i>
+            <span>Items</span>
           </button>
         </div>
 
         <div class="shop-sort">
-          <select v-if="activeTab === 'border' || activeTab === 'module'" v-model="filterOwnership" class="sort-select" style="margin-right: 10px;">
-            <option value="all">Semua</option>
+          <select v-if="activeTab === 'border' || activeTab === 'module'" v-model="filterOwnership" class="sort-select filter-select">
+            <option value="all">Semua Status</option>
             <option value="not_owned">Belum Dimiliki</option>
             <option value="owned">Dimiliki</option>
           </select>
-          <select v-model="sortOrder" class="sort-select">
+          <select v-model="sortOrder" class="sort-select order-select">
             <option value="default">Urutan Default</option>
             <option value="asc">Paling Murah</option>
             <option value="desc">Paling Mahal</option>
@@ -282,8 +285,8 @@
             :key="pkg.id" 
             class="border-shop-card energy-card"
           >
-            <div class="border-preview-box" style="flex-direction: column; margin: 5px 0;">
-               <div class="energy-giant-icon" style="width: 120px; height: 120px;">
+            <div class="border-preview-box energy-preview-box">
+               <div class="energy-giant-icon">
                  <CyberEnergy :pkgId="pkg.id" :isAnimated="true" style="width: 100%; height: 100%;" />
                </div>
                <div class="energy-float-badge">+{{ pkg.energy_amount }} Energi</div>
@@ -361,10 +364,10 @@
         </div>
         <div v-else class="shop-item-grid">
           <div v-for="item in items" :key="item.id" class="border-shop-card">
-            <div class="border-preview-box" style="margin: 5px 0;">
-               <img v-if="item.image_url" :src="getImageUrl(item.image_url)" alt="Icon" style="width: 200px; height: 200px; object-fit: contain;" />
-               <img v-else-if="item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" style="width: 100px; height: 100px; object-fit: contain;" />
-               <i v-else class="fa-solid fa-gift" style="font-size: 5rem; color: #fbbf24;"></i>
+            <div class="border-preview-box item-preview-box">
+               <img v-if="item.image_url" :src="getImageUrl(item.image_url)" alt="Icon" class="item-shop-img" />
+               <img v-else-if="item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" class="item-shop-img sm" />
+               <i v-else class="fa-solid fa-gift item-gift-icon"></i>
             </div>
             <div class="border-info-box">
               <h4>{{ item.name }}</h4>
