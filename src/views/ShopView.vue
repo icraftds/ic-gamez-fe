@@ -5,67 +5,71 @@
       <button class="btn-retry" @click="async () => { await initializeWallet(true); await fetchWallet() }">Coba lagi</button>
     </p>
 
-    <!-- Compact Header -->
-    <div class="shop-compact-header container">
-      <div class="header-content-left">
-        <div class="title-with-icon">
-          <div class="header-icon-box">
-            <i class="fa-solid fa-store"></i>
-          </div>
-          <div class="header-text-group">
-            <h1>GameZ Black Market</h1>
-            <p>Dapatkan tambahan energi dan perlengkapan profil eksklusif.</p>
-          </div>
-        </div>
-      </div>
-      <div class="header-content-right">
-        <div class="wallet-compact-badge" title="Saldo iCoinZ">
-          <img src="/images/icoinz.svg" alt="iCoinZ" class="icoinz-icon" />
-          <span class="coin-amount">{{ coinz === null ? '—' : formatPrice(coinz) }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Shop Content -->
-    <div class="shop-content-section container">
-
-      <!-- Shop Controls -->
-      <div class="shop-controls">
-        <!-- TABS -->
-        <div class="shop-tabs">
-          <button class="shop-tab" :class="{ active: activeTab === 'module' }" @click="activeTab = 'module'">
-            <i class="fa-solid fa-layer-group tab-icon"></i>
-            <span>Modul Belajar</span>
-          </button>
-          <button class="shop-tab" :class="{ active: activeTab === 'energy' }" @click="activeTab = 'energy'">
-            <CyberEnergy :pkgId="1" :isAnimated="false" class="tab-icon-energy" />
-            <span>Energi</span>
-          </button>
-          <button class="shop-tab" :class="{ active: activeTab === 'border' }" @click="activeTab = 'border'">
-            <div class="tab-icon-border-wrap">
-              <CyberBorder tierId="BB1" style="width: 100%; height: 100%;" />
+    <div class="shop-container">
+      <!-- Compact Header -->
+      <header class="shop-compact-header">
+        <div class="header-main-row">
+          <div class="title-with-icon">
+            <div class="header-icon-box">
+              <i class="fa-solid fa-store"></i>
             </div>
-            <span>Border Premium</span>
-          </button>
-          <button class="shop-tab" :class="{ active: activeTab === 'item' }" @click="activeTab = 'item'">
-            <i class="fa-solid fa-gift tab-icon"></i>
-            <span>Items</span>
-          </button>
+            <div class="header-text-group">
+              <h1>GameZ Black Market</h1>
+              <p class="header-desc-desktop">Dapatkan tambahan energi dan perlengkapan profil eksklusif.</p>
+            </div>
+          </div>
+          <div class="wallet-compact-badge" title="Saldo iCoinZ">
+            <img src="/images/icoinz.svg" alt="iCoinZ" class="icoinz-icon" />
+            <span class="coin-amount">{{ coinz === null ? '—' : formatPrice(coinz) }}</span>
+          </div>
         </div>
+        <p class="header-desc-mobile">Tukarkan iCoinZ untuk Modul Belajar, Energi &amp; Item Eksklusif.</p>
+      </header>
 
-        <div class="shop-sort">
-          <select v-if="activeTab === 'border' || activeTab === 'module'" v-model="filterOwnership" class="sort-select filter-select">
-            <option value="all">Semua Status</option>
-            <option value="not_owned">Belum Dimiliki</option>
-            <option value="owned">Dimiliki</option>
-          </select>
-          <select v-model="sortOrder" class="sort-select order-select">
-            <option value="default">Urutan Default</option>
-            <option value="asc">Paling Murah</option>
-            <option value="desc">Paling Mahal</option>
-          </select>
+      <!-- Shop Content -->
+      <main class="shop-content-section">
+
+        <!-- Shop Controls -->
+        <div class="shop-controls">
+          <!-- TABS -->
+          <div class="shop-tabs">
+            <button class="shop-tab" :class="{ active: activeTab === 'module' }" @click="activeTab = 'module'">
+              <i class="fa-solid fa-layer-group tab-icon"></i>
+              <span class="tab-label-desktop">Modul Belajar</span>
+              <span class="tab-label-mobile">Modul</span>
+            </button>
+            <button class="shop-tab" :class="{ active: activeTab === 'energy' }" @click="activeTab = 'energy'">
+              <CyberEnergy :pkgId="1" :isAnimated="false" class="tab-icon-energy" />
+              <span class="tab-label-desktop">Energi</span>
+              <span class="tab-label-mobile">Energi</span>
+            </button>
+            <button class="shop-tab" :class="{ active: activeTab === 'border' }" @click="activeTab = 'border'">
+              <div class="tab-icon-border-wrap">
+                <CyberBorder tierId="BB1" style="width: 100%; height: 100%;" />
+              </div>
+              <span class="tab-label-desktop">Border Premium</span>
+              <span class="tab-label-mobile">Border</span>
+            </button>
+            <button class="shop-tab" :class="{ active: activeTab === 'item' }" @click="activeTab = 'item'">
+              <i class="fa-solid fa-gift tab-icon"></i>
+              <span class="tab-label-desktop">Items</span>
+              <span class="tab-label-mobile">Item</span>
+            </button>
+          </div>
+
+          <div class="shop-sort">
+            <select v-if="activeTab === 'border' || activeTab === 'module'" v-model="filterOwnership" class="sort-select filter-select">
+              <option value="all">Semua Status</option>
+              <option value="not_owned">Belum Dimiliki</option>
+              <option value="owned">Dimiliki</option>
+            </select>
+            <select v-model="sortOrder" class="sort-select order-select">
+              <option value="default">Urutan Default</option>
+              <option value="asc">Paling Murah</option>
+              <option value="desc">Paling Mahal</option>
+            </select>
+          </div>
         </div>
-      </div>
 
       <!-- MODULE TAB -->
       <div v-if="activeTab === 'module'" class="tab-content module-tab">
@@ -394,6 +398,7 @@
         </div>
       </div>
 
+      </main>
     </div>
 
     <!-- Success Animation Overlay -->

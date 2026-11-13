@@ -864,3 +864,29 @@ body:not(.light-mode) .fs-autocomplete-dropdown::-webkit-scrollbar-thumb {
   opacity: 0;
   transform: translateY(-6px);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE MOBILE RULES
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .fs-edge-tab {
+    top: auto;
+    bottom: 85px;
+    transform: none;
+    height: 38px;
+    padding: 0 10px 0 12px;
+    left: -40px;
+    font-size: 0.85rem;
+    border-radius: 9999px 0 0 9999px;
+    box-shadow: -4px 6px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .fs-edge-tab:hover {
+    transform: translateX(-3px);
+  }
+
+  .friends-sidebar {
+    width: 100vw;
+    max-width: 100vw;
+  }
+}

@@ -29,18 +29,41 @@
   cursor: pointer;
 }
 
+.shop-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  box-sizing: border-box;
+}
+
 .shop-compact-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 50px;
-  margin-bottom: 40px;
-  padding: 20px 30px;
+  flex-direction: column;
+  margin-top: 36px;
+  margin-bottom: 30px;
+  padding: 22px 30px;
   background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
+}
+
+.header-main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-desc-desktop {
+  margin: 0;
+  color: #94A3B8;
+  font-size: 0.95rem;
+}
+
+.header-desc-mobile {
+  display: none;
 }
 
 .header-content-left {
@@ -195,6 +218,14 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.tab-label-desktop {
+  display: inline;
+}
+
+.tab-label-mobile {
+  display: none;
 }
 
 /* Section wrapper (container utility handles max-width/padding) */
@@ -1413,107 +1444,135 @@ body.light-mode .transition-progress-track {
     padding-bottom: 120px;
   }
 
-  /* Compact Header */
-  .shop-compact-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    padding: 16px;
-    margin: 18px 0 22px 0;
-    border-radius: 16px;
-    text-align: left;
+  .shop-container {
+    padding: 0 12px 100px;
   }
 
-  .header-content-left {
+  /* Compact Hero Header */
+  .shop-compact-header {
+    margin: 12px 0 16px 0;
+    padding: 12px 14px;
+    border-radius: 14px;
+    gap: 6px;
+  }
+
+  .header-main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
     width: 100%;
   }
 
   .title-with-icon {
-    flex-direction: row;
+    display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
   }
 
   .header-icon-box {
-    width: 46px;
-    height: 46px;
-    font-size: 1.3rem;
-    border-radius: 12px;
+    width: 34px;
+    height: 34px;
+    font-size: 1.05rem;
+    border-radius: 10px;
     flex-shrink: 0;
   }
 
+  .header-text-group {
+    min-width: 0;
+  }
+
   .header-text-group h1 {
-    font-size: 1.22rem;
-    margin-bottom: 2px;
+    font-size: 0.98rem;
+    margin: 0;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .header-text-group p {
-    font-size: 0.82rem;
-    line-height: 1.35;
-  }
-
-  .header-content-right {
-    width: 100%;
-  }
-
-  .wallet-compact-badge {
-    width: 100%;
-    justify-content: space-between;
-    padding: 10px 16px;
-    border-radius: 12px;
-    box-sizing: border-box;
-  }
-
-  .icoinz-icon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .coin-amount {
-    font-size: 1.25rem;
-  }
-
-  /* Controls: Tabs & Sort */
-  .shop-controls {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .shop-tabs {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding: 2px 2px 8px 2px;
-    margin: 0 -2px;
-  }
-
-  .shop-tabs::-webkit-scrollbar {
+  .header-desc-desktop {
     display: none;
   }
 
+  .header-desc-mobile {
+    display: block;
+    margin: 2px 0 0;
+    font-size: 0.74rem;
+    color: #94a3b8;
+    line-height: 1.3;
+  }
+
+  .wallet-compact-badge {
+    padding: 5px 10px;
+    border-radius: 999px;
+    gap: 6px;
+    flex-shrink: 0;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.15);
+  }
+
+  .icoinz-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .coin-amount {
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  /* Controls: Segmented Tabs & Sort */
+  .shop-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .tab-label-desktop {
+    display: none;
+  }
+
+  .tab-label-mobile {
+    display: inline;
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+
+  .shop-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: visible;
+  }
+
   .shop-tab {
-    flex: 0 0 auto;
-    padding: 9px 16px;
-    font-size: 0.88rem;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 3px;
     border-radius: 10px;
-    gap: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     white-space: nowrap;
   }
 
   .tab-icon {
-    font-size: 1.05rem;
+    font-size: 0.88rem;
   }
 
   .tab-icon-energy,
   .tab-icon-border-wrap {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
   }
 
   .shop-sort {
@@ -1525,114 +1584,116 @@ body.light-mode .transition-progress-track {
   .shop-sort .sort-select {
     flex: 1;
     min-width: 0;
-    padding: 9px 12px;
-    font-size: 0.84rem;
+    padding: 8px 10px;
+    font-size: 0.8rem;
     border-radius: 10px;
+    height: 38px;
   }
 
   /* Module Promo Banner */
   .module-promo-banner {
     flex-direction: column;
     align-items: stretch;
-    padding: 14px 16px;
-    gap: 12px;
+    padding: 12px 14px;
+    gap: 10px;
     border-radius: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
 
   .promo-badge-icon {
-    width: 42px;
-    height: 42px;
-    font-size: 1.15rem;
-    border-radius: 12px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.05rem;
+    border-radius: 10px;
   }
 
   .promo-header-row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-  }
-
-  .promo-header-row h3 {
-    font-size: 1rem;
-  }
-
-  .promo-pills-group {
     gap: 6px;
   }
 
+  .promo-header-row h3 {
+    font-size: 0.95rem;
+  }
+
+  .promo-pills-group {
+    gap: 5px;
+  }
+
   .promo-chip {
-    font-size: 0.74rem;
-    padding: 4px 10px;
+    font-size: 0.72rem;
+    padding: 3px 8px;
   }
 
   .promo-note {
-    font-size: 0.8rem;
-    line-height: 1.4;
+    font-size: 0.78rem;
+    line-height: 1.35;
   }
 
   /* Module Grid & Cards */
   .module-cards-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   .module-shop-card {
-    padding: 16px;
+    padding: 14px;
     border-radius: 16px;
-    gap: 12px;
+    gap: 10px;
   }
 
   .module-card-header {
-    gap: 12px;
+    gap: 10px;
   }
 
   .mod-icon-shell {
-    width: 44px;
-    height: 44px;
-    font-size: 1.25rem;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.15rem;
+    border-radius: 10px;
   }
 
   .mod-title {
-    font-size: 1.05rem;
-    line-height: 1.3;
+    font-size: 1rem;
+    line-height: 1.25;
   }
 
   .mod-description {
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     min-height: auto;
     margin-bottom: 2px;
   }
 
   .mod-chips-row {
-    gap: 6px;
+    gap: 5px;
   }
 
   .mod-chip {
-    font-size: 0.72rem;
-    padding: 3px 8px;
+    font-size: 0.7rem;
+    padding: 2px 7px;
   }
 
   .mod-pricing-strip {
-    padding: 10px 12px;
-    border-radius: 12px;
+    padding: 8px 10px;
+    border-radius: 10px;
   }
 
   .mod-coin-value {
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 
   .mod-actions-row {
-    gap: 8px;
+    gap: 6px;
   }
 
   .btn-buy-single,
   .btn-select-module,
   .btn-enter-module {
-    height: 42px;
-    font-size: 0.88rem;
-    padding: 0 14px;
+    height: 40px;
+    font-size: 0.86rem;
+    padding: 0 12px;
+    border-radius: 10px;
   }
 
   /* Sticky Multi-Buy Checkout Dock */
@@ -1644,7 +1705,7 @@ body.light-mode .transition-progress-track {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 16px;
   }
 
   .checkout-bar-summary {
@@ -1656,16 +1717,16 @@ body.light-mode .transition-progress-track {
   }
 
   .selected-count-pill {
-    font-size: 0.78rem;
-    padding: 4px 10px;
+    font-size: 0.76rem;
+    padding: 3px 8px;
   }
 
   .checkout-total-price {
-    font-size: 0.88rem;
+    font-size: 0.85rem;
   }
 
   .checkout-total-price strong {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
   }
 
   .checkout-bar-actions {
@@ -1676,104 +1737,173 @@ body.light-mode .transition-progress-track {
 
   .btn-clear-modules {
     flex: 0 0 auto;
-    padding: 10px 12px;
-    font-size: 0.84rem;
+    padding: 8px 12px;
+    font-size: 0.82rem;
   }
 
   .btn-checkout-multi {
     flex: 1;
     justify-content: center;
-    padding: 10px 14px;
-    font-size: 0.88rem;
+    padding: 8px 14px;
+    font-size: 0.86rem;
   }
 
   /* Grids for Energy, Borders, Items */
   .shop-item-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   .border-shop-card {
-    border-radius: 18px;
+    border-radius: 16px;
   }
 
   .border-preview-box {
-    height: 150px;
+    height: 130px;
+    padding: 8px;
   }
 
-  .energy-giant-icon {
-    width: 90px;
-    height: 90px;
-    font-size: 4rem;
-  }
-
-  .item-shop-img {
-    width: 140px;
-    height: 140px;
-  }
-
-  .item-shop-img.sm {
-    width: 80px;
-    height: 80px;
-  }
-
-  .item-gift-icon {
-    font-size: 3.5rem;
+  .shop-border-svg {
+    width: 96px;
+    height: 96px;
   }
 
   .border-info-box {
-    padding: 16px;
+    padding: 12px 14px;
   }
 
-  .border-action-box {
-    padding: 0 16px 16px;
+  .border-info-box h4 {
+    font-size: 1.05rem;
+    margin: 0 0 3px 0;
   }
 
-  .btn-buy-border {
-    padding: 12px;
+  .border-desc {
+    font-size: 0.78rem;
+    line-height: 1.35;
+    margin: 0 0 8px 0;
+    color: #94a3b8;
+  }
+
+  .border-price-row {
+    margin: 4px 0 10px 0;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .border-price-row .price-label {
+    font-size: 0.78rem;
+    color: #94a3b8;
+  }
+
+  .border-price-row .price-value {
     font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  .btn-buy {
+    height: 40px;
+    font-size: 0.88rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* Energy Shop Specific */
+  .energy-preview-box {
+    height: 130px;
+  }
+
+  .energy-giant-icon {
+    width: 76px;
+    height: 76px;
+    font-size: 3.2rem;
+    margin-bottom: 4px;
+  }
+
+  .energy-float-badge {
+    font-size: 0.82rem;
+    padding: 3px 12px;
+  }
+
+  /* Item Shop Specific */
+  .item-preview-box {
+    height: 130px;
+  }
+
+  .item-shop-img {
+    width: 90px;
+    height: 90px;
+  }
+
+  .item-shop-img.sm {
+    width: 65px;
+    height: 65px;
+  }
+
+  .item-gift-icon {
+    font-size: 3rem;
   }
 
   /* Checkout Transition Overlay Card */
   .checkout-transition-card {
     max-width: 92%;
-    padding: 24px 18px;
-    border-radius: 18px;
+    padding: 22px 16px;
+    border-radius: 16px;
   }
 
   .checkout-transition-card h3 {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
 
   .checkout-transition-card p {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
   }
 }
 
 /* ─── Ultra-Compact Phones (<= 480px) ─── */
 @media (max-width: 480px) {
+  .shop-container {
+    padding: 0 10px 100px;
+  }
+
   .shop-compact-header {
-    padding: 14px;
-    gap: 14px;
+    padding: 10px 12px;
   }
 
   .header-icon-box {
-    width: 42px;
-    height: 42px;
-    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
   }
 
   .header-text-group h1 {
-    font-size: 1.1rem;
+    font-size: 0.92rem;
   }
 
   .coin-amount {
-    font-size: 1.15rem;
+    font-size: 0.88rem;
   }
 
   .shop-tab {
-    padding: 8px 13px;
+    padding: 7px 2px;
+    font-size: 0.74rem;
+    gap: 3px;
+  }
+
+  .tab-icon {
     font-size: 0.82rem;
+  }
+
+  .tab-icon-energy,
+  .tab-icon-border-wrap {
+    width: 16px;
+    height: 16px;
   }
 
   .mod-pricing-strip {
@@ -1792,4 +1922,21 @@ body.light-mode .transition-progress-track {
     align-items: flex-start;
     gap: 4px;
   }
+}
+
+/* Light Mode Overrides for Mobile Shop */
+body.light-mode .header-desc-mobile {
+  color: #64748b;
+}
+
+body.light-mode .border-price-row {
+  background: rgba(241, 245, 249, 0.9);
+}
+
+body.light-mode .border-price-row .price-label {
+  color: #64748b;
+}
+
+body.light-mode .border-desc {
+  color: #64748b;
 }
