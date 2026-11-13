@@ -35,6 +35,7 @@ const maxCredits = computed(() => {
 const currentPlan = ref('free')
 const proQuota = ref({ total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] })
 const unlockedPathIds = ref([])
+const ownedPathIds = ref([])
 const systemConfig = ref({
   market_topup_url: 'https://market.icraftds.id/topup',
   market_redirect_enabled: true,
@@ -138,6 +139,7 @@ export function clearUserAccount() {
   currentPlan.value = 'free'; isPremiumUser.value = false; credits.value = 10; initializedToken = null
   proQuota.value = { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
   unlockedPathIds.value = []
+  ownedPathIds.value = []
   activeBorderId.value = null
 }
 
@@ -188,6 +190,7 @@ export function useUserAccount() {
         : (data.current_plan || 'free')
       proQuota.value = data.pro_quota || { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
       unlockedPathIds.value = Array.isArray(data.unlocked_path_ids) ? data.unlocked_path_ids.map(Number) : []
+      ownedPathIds.value = Array.isArray(data.owned_path_ids) ? data.owned_path_ids.map(Number) : []
 
       if (data.active_border_id) activeBorderId.value = data.active_border_id;
 
@@ -590,6 +593,7 @@ export function useUserAccount() {
     currentPlan,
     proQuota,
     unlockedPathIds,
+    ownedPathIds,
     systemConfig,
     fetchPublicConfig,
     hasModuleAccess,

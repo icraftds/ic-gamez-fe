@@ -54,14 +54,15 @@
               :class="{ 
                 active: selectedTier === tier.id,
                 'tier-free': tier.id === 'free',
-                'tier-pro': tier.id === 'premium'
+                'tier-pro': tier.id === 'premium',
+                'tier-owned': tier.id === 'owned'
               }"
               @click="selectedTier = tier.id"
               type="button"
             >
               <i v-if="tier.icon" :class="tier.icon"></i>
               <span>{{ tier.label }}</span>
-              <span class="count-badge">{{ tierCounts[tier.id] }}</span>
+              <span class="count-badge">{{ tierCounts[tier.id] || 0 }}</span>
             </button>
           </div>
         </div>
@@ -110,11 +111,19 @@
         />
         
         <div v-if="filteredPaths.length === 0" class="no-results">
-          <i class="fa-solid fa-ghost"></i>
-          <p>Tidak ada alur belajar yang sesuai dengan filter Anda.</p>
-          <button v-if="hasActiveFilter" class="empty-reset-btn" @click="resetFilters" type="button">
-            <i class="fa-solid fa-rotate-left"></i> Tampilkan Semua Alur Belajar
-          </button>
+          <i class="fa-solid" :class="selectedTier === 'owned' ? 'fa-cart-shopping' : 'fa-ghost'"></i>
+          <p v-if="selectedTier === 'owned'">
+            Kamu belum memiliki modul belajar yang dibeli satuan. Tukarkan iCoinZ milikmu di Black Market untuk membuka modul belajar pilihan!
+          </p>
+          <p v-else>Tidak ada alur belajar yang sesuai dengan filter Anda.</p>
+          <div class="no-results-actions" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button v-if="selectedTier === 'owned'" class="empty-reset-btn" style="background: linear-gradient(135deg, #0ea5e9, #7c3aed); border-color: transparent;" @click="$router.push('/shop')" type="button">
+              <i class="fa-solid fa-store"></i> Buka Black Market Shop
+            </button>
+            <button v-if="hasActiveFilter" class="empty-reset-btn" @click="resetFilters" type="button">
+              <i class="fa-solid fa-rotate-left"></i> Tampilkan Semua Alur Belajar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -130,9 +139,11 @@ import { useRouter } from 'vue-router'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import PathCard from '../components/learning/PathCard.vue'
 import { useLearningPaths } from '../composables/useLearningPaths'
+import { useUserAccount } from '../composables/useUserAccount'
 
 const router = useRouter()
 const { paths, fetchPaths, fetchPathDetails, isLoading, isPreparingLesson, hasFetchedAllPaths } = useLearningPaths()
+const { ownedPathIds, loadUser, isLoggedIn } = useUserAccount()
 
 const searchQuery = ref('')
 const selectedCategory = ref('all')
@@ -148,7 +159,8 @@ const categories = [
 const accessFilters = [
   { id: 'all', label: 'Semua Akses' },
   { id: 'free', label: 'Gratis', icon: 'fa-solid fa-gift' },
-  { id: 'premium', label: 'Pro', icon: 'fa-solid fa-crown' }
+  { id: 'premium', label: 'Pro', icon: 'fa-solid fa-crown' },
+  { id: 'owned', label: 'Milikmu', icon: 'fa-solid fa-circle-check' }
 ]
 
 // Accurate mapping for curriculum tracks
@@ -228,6 +240,17 @@ const isPathPremium = (path) => {
   return Boolean(path.is_premium || path.isPremium)
 }
 
+const isPathOwned = (path) => {
+  if (!path) return false
+  if (path.access_status === 'owned' || path.is_owned) return true
+  const idStr = String(path.id)
+  const idNum = Number(path.id)
+  if (ownedPathIds.value && (ownedPathIds.value.includes(idStr) || ownedPathIds.value.includes(idNum))) {
+    return true
+  }
+  return false
+}
+
 const categoryCounts = computed(() => {
   const counts = { all: paths.value?.length || 0, fondasi: 0, web: 0, data: 0 }
   if (paths.value) {
@@ -242,13 +265,16 @@ const categoryCounts = computed(() => {
 })
 
 const tierCounts = computed(() => {
-  const counts = { all: paths.value?.length || 0, free: 0, premium: 0 }
+  const counts = { all: paths.value?.length || 0, free: 0, premium: 0, owned: 0 }
   if (paths.value) {
     paths.value.forEach(p => {
       if (isPathPremium(p)) {
         counts.premium++
       } else {
         counts.free++
+      }
+      if (isPathOwned(p)) {
+        counts.owned++
       }
     })
   }
@@ -266,6 +292,9 @@ const resetFilters = () => {
 }
 
 onMounted(async () => {
+  if (isLoggedIn.value && (!ownedPathIds.value || ownedPathIds.value.length === 0)) {
+    loadUser(true)
+  }
   await fetchPaths(true)
   isPreparingLesson.value = false
 })
@@ -295,6 +324,8 @@ const filteredPaths = computed(() => {
       result = result.filter(p => !isPathPremium(p))
     } else if (selectedTier.value === 'premium') {
       result = result.filter(p => isPathPremium(p))
+    } else if (selectedTier.value === 'owned') {
+      result = result.filter(p => isPathOwned(p))
     }
   }
   
