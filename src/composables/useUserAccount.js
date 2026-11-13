@@ -33,6 +33,17 @@ const maxCredits = computed(() => {
   return 10
 })
 const currentPlan = ref('free')
+const proQuota = ref({ total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] })
+const unlockedPathIds = ref([])
+const systemConfig = ref({
+  market_topup_url: 'https://market.icraftds.id/topup',
+  market_redirect_enabled: true,
+  module_default_price: 14999,
+  module_multibuy_discount_percent: 25,
+  module_default_duration_days: 30,
+  pro_max_selectable_modules: 12
+})
+let configRequest = null
 const isLoggedIn = ref(!!authIdentity())
 const isLoading = ref(false)
 const isBootstrapping = ref(true)
@@ -122,9 +133,11 @@ const userProfile = ref({
 
 export function clearUserAccount() {
   isLoggedIn.value = false
-  userProfile.value = { id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '', level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, showcase_medals: null, joinDate: '' }
+  userProfile.value = { id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '', level: 1, xp: 0, monthlyXp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, showcase_medals: null, joinDate: '' }
   coinz.value = null; walletStatus.value = 'unavailable'; walletInitializationPending.value = false
   currentPlan.value = 'free'; isPremiumUser.value = false; credits.value = 10; initializedToken = null
+  proQuota.value = { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
+  unlockedPathIds.value = []
   activeBorderId.value = null
 }
 
@@ -158,6 +171,7 @@ export function useUserAccount() {
         avatar: sanitizeAvatarUrl(data.avatar_url, data.name),
         level: Number(data.level) || 1,
         xp: Number(data.xp) || 0,
+        monthlyXp: Number(data.monthly_xp) || 0,
         totalXp: Number(data.total_xp ?? data.xp) || 0,
         nextLevelXp: Number(data.next_level_xp) || 100,
         streak: data.current_streak,
@@ -172,6 +186,8 @@ export function useUserAccount() {
       currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
         ? data.current_plan.slug 
         : (data.current_plan || 'free')
+      proQuota.value = data.pro_quota || { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
+      unlockedPathIds.value = Array.isArray(data.unlocked_path_ids) ? data.unlocked_path_ids.map(Number) : []
 
       if (data.active_border_id) activeBorderId.value = data.active_border_id;
 
@@ -225,9 +241,29 @@ export function useUserAccount() {
     return initializeRequest
   }
 
+  const fetchPublicConfig = (force = false) => {
+    if (configRequest && !force) return configRequest
+    configRequest = api.get('/system/public-config').then(res => {
+      if (res.data?.success && res.data?.data) {
+        systemConfig.value = { ...systemConfig.value, ...res.data.data }
+      }
+      return systemConfig.value
+    }).catch(() => systemConfig.value)
+    return configRequest
+  }
+
+  const hasModuleAccess = (path) => {
+    if (!path) return false
+    if (path.is_unlocked) return true
+    if (currentPlan.value === 'expert') return true
+    if (path.id && unlockedPathIds.value.includes(Number(path.id))) return true
+    return path.is_premium === false
+  }
+
   const bootstrapSession = async (silent = false) => {
     if (!silent) isBootstrapping.value = true
     try {
+      fetchPublicConfig()
       if (ssoEnabled) {
         try { if (!await loadSsoSession()) return false } catch { return false }
       }
@@ -552,6 +588,11 @@ export function useUserAccount() {
     maxCredits,
     isPremiumUser,
     currentPlan,
+    proQuota,
+    unlockedPathIds,
+    systemConfig,
+    fetchPublicConfig,
+    hasModuleAccess,
     isAuthLoading,
     isRedirectingToSso,
     authLoadingLabel,
