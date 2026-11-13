@@ -33,6 +33,9 @@
       <div class="shop-controls">
         <!-- TABS -->
         <div class="shop-tabs">
+          <button class="shop-tab" :class="{ active: activeTab === 'module' }" @click="activeTab = 'module'">
+            <i class="fa-solid fa-layer-group" style="font-size: 20px; margin-right: 8px;"></i> Modul Belajar
+          </button>
           <button class="shop-tab" :class="{ active: activeTab === 'energy' }" @click="activeTab = 'energy'">
             <CyberEnergy :pkgId="1" :isAnimated="false" style="width: 32px; height: 32px; margin-right: 8px;" /> Energi
           </button>
@@ -48,7 +51,7 @@
         </div>
 
         <div class="shop-sort">
-          <select v-if="activeTab === 'border'" v-model="filterOwnership" class="sort-select" style="margin-right: 10px;">
+          <select v-if="activeTab === 'border' || activeTab === 'module'" v-model="filterOwnership" class="sort-select" style="margin-right: 10px;">
             <option value="all">Semua</option>
             <option value="not_owned">Belum Dimiliki</option>
             <option value="owned">Dimiliki</option>
@@ -58,6 +61,131 @@
             <option value="asc">Paling Murah</option>
             <option value="desc">Paling Mahal</option>
           </select>
+        </div>
+      </div>
+
+      <!-- MODULE TAB -->
+      <div v-if="activeTab === 'module'" class="tab-content module-tab">
+        <div class="module-promo-banner">
+          <div class="promo-left">
+            <span class="promo-pill">
+              <i class="fa-solid fa-tags"></i> Diskon Multi-Beli {{ moduleMeta.discount_percent }}%
+            </span>
+            <p class="promo-text">
+              Beli satuan <strong>{{ formatPrice(moduleMeta.module_default_price) }} iCoinZ</strong> (akses {{ moduleMeta.module_default_duration_days }} hari), atau pilih
+              <strong>&ge; 2 modul sekaligus</strong> untuk langsung dapat <strong>diskon {{ moduleMeta.discount_percent }}%</strong>!
+            </p>
+          </div>
+          <div class="promo-note">
+            <i class="fa-solid fa-circle-info"></i>
+            Pembelian modul satuan hanya membuka materi modul terpilih (tidak termasuk akses Global Challenge).
+          </div>
+        </div>
+
+        <TerminalLoader v-if="isLoading" label="etalase modul" />
+
+        <div v-else-if="sortedModules.length === 0" class="empty-state">
+          <div class="empty-icon-wrapper">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <h3>Belum Ada Modul di Toko</h3>
+          <p>Silakan cek kembali nanti atau pilih paket berlangganan.</p>
+        </div>
+
+        <div v-else class="shop-item-grid">
+          <div
+            v-for="mod in sortedModules"
+            :key="mod.id"
+            class="border-shop-card module-shop-card"
+            :class="{
+              'is-owned': mod.is_unlocked,
+              'is-selected': isModuleSelected(mod.id)
+            }"
+          >
+            <div class="border-preview-box module-preview-box">
+              <span class="module-duration-pill">
+                <i class="fa-regular fa-clock"></i> {{ mod.duration_days }} Hari
+              </span>
+              <div class="module-icon-circle">
+                <i :class="mod.icon || 'fa-solid fa-book-open'"></i>
+              </div>
+              <div class="module-meta-chips">
+                <span><i class="fa-solid fa-book"></i> {{ mod.chapters_count || 0 }} Bab</span>
+                <span><i class="fa-solid fa-code"></i> {{ mod.lessons_count || 0 }} Materi</span>
+              </div>
+            </div>
+
+            <div class="border-info-box">
+              <h4>{{ mod.title }}</h4>
+              <p class="border-desc">{{ mod.description || 'Akses penuh seluruh bab dan materi pada alur belajar ini.' }}</p>
+
+              <div class="border-price-row">
+                <span class="price-label">Status / Harga</span>
+                <span v-if="mod.is_unlocked" class="module-status-tag">
+                  {{ formatModuleAccessBadge(mod) }}
+                </span>
+                <span v-else class="price-val-group">
+                  <img src="/images/icoinz.svg" alt="C" class="mini-coin-svg" /> {{ formatPrice(mod.price_icoinz) }}
+                </span>
+              </div>
+
+              <div v-if="mod.is_unlocked" class="module-card-actions">
+                <router-link :to="`/learn/path/${mod.slug || mod.id}`" class="btn-buy-shop btn-open-module">
+                  <i class="fa-solid fa-play"></i> Buka Modul
+                </router-link>
+              </div>
+              <div v-else class="module-card-actions dual">
+                <button
+                  type="button"
+                  class="btn-select-module"
+                  :class="{ active: isModuleSelected(mod.id) }"
+                  @click="toggleModuleSelect(mod.id)"
+                >
+                  <i :class="isModuleSelected(mod.id) ? 'fa-solid fa-square-check' : 'fa-regular fa-square'"></i>
+                  {{ isModuleSelected(mod.id) ? 'Dipilih' : 'Pilih' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-buy-shop"
+                  @click="checkoutSingleModule(mod)"
+                >
+                  Beli
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Multi-Buy Checkout Bar -->
+        <div v-if="selectedModuleIds.length > 0" class="module-checkout-bar">
+          <div class="checkout-bar-summary">
+            <div class="selected-count-pill">
+              {{ selectedModuleIds.length }} Modul Dipilih
+              <span v-if="selectedModuleIds.length >= 2" class="discount-applied-badge">
+                DISKON {{ moduleMeta.discount_percent }}% AKTIF!
+              </span>
+              <span v-else class="discount-hint-badge">
+                Tambah 1 modul lagi untuk diskon {{ moduleMeta.discount_percent }}%
+              </span>
+            </div>
+            <div class="selected-price-breakdown">
+              <span v-if="selectedModuleIds.length >= 2" class="subtotal-strike">
+                {{ formatPrice(moduleSubtotal) }} c
+              </span>
+              <span class="final-total-coinz">
+                <img src="/images/icoinz.svg" alt="C" class="mini-coin-svg" />
+                {{ formatPrice(moduleFinalTotal) }} iCoinZ
+              </span>
+            </div>
+          </div>
+          <div class="checkout-bar-actions">
+            <button type="button" class="btn-clear-modules" @click="selectedModuleIds = []">
+              Reset
+            </button>
+            <button type="button" class="btn-checkout-modules" @click="checkoutSelectedModules">
+              <i class="fa-solid fa-bolt"></i> Bayar Sekarang
+            </button>
+          </div>
         </div>
       </div>
 
@@ -173,18 +301,28 @@
         <p class="energy-gained">{{ successMsg }}</p>
       </div>
     </div>
+
+    <InsufficientBalanceModal
+      v-model="showInsufficientModal"
+      :itemName="insufficientPayload.itemName"
+      :requiredAmount="insufficientPayload.requiredAmount"
+      :currentBalance="Number(coinz || 0)"
+      :marketUrl="moduleMeta.market_topup_url || systemConfig.market_topup_url"
+      :marketRedirectEnabled="systemConfig.market_redirect_enabled"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import api from '../services/api'
 import { useUserAccount } from '../composables/useUserAccount'
 import confetti from 'canvas-confetti'
 import { TIERS } from '../utils/tiers.js'
 import CyberBorder from '../components/ui/CyberBorder.vue'
 import CyberEnergy from '../components/ui/CyberEnergy.vue'
+import InsufficientBalanceModal from '../components/shop/InsufficientBalanceModal.vue'
 import { useToast } from '../composables/useToast'
 
 const { showToast } = useToast()
@@ -197,18 +335,41 @@ const getImageUrl = (url) => {
 }
 
 const router = useRouter()
-const { coinz, fetchWallet, walletStatus, walletInitializationPending, initializeWallet } = useUserAccount()
+const route = useRoute()
+const {
+  coinz,
+  fetchWallet,
+  walletStatus,
+  walletInitializationPending,
+  initializeWallet,
+  systemConfig,
+  fetchPublicConfig
+} = useUserAccount()
 
 const activeTab = ref('energy')
 const sortOrder = ref('default')
 const filterOwnership = ref('all')
 const packages = ref([])
 const items = ref([])
+const modules = ref([])
+const selectedModuleIds = ref([])
+const moduleMeta = ref({
+  module_default_price: 14999,
+  discount_percent: 25,
+  module_default_duration_days: 30,
+  market_topup_url: 'https://market.icraftds.id/topup',
+  user_plan: 'free'
+})
 const isLoading = ref(false)
 const isProcessing = ref(false)
 
 const showSuccessAnim = ref(false)
 const successMsg = ref('')
+const showInsufficientModal = ref(false)
+const insufficientPayload = ref({
+  itemName: '',
+  requiredAmount: 0
+})
 
 const boughtBorders = ref([])
 
@@ -227,6 +388,68 @@ const sortedPackages = computed(() => {
   }
   return pkgs
 })
+
+const sortedModules = computed(() => {
+  let list = [...modules.value]
+  if (filterOwnership.value === 'owned') {
+    list = list.filter(m => m.is_unlocked)
+  } else if (filterOwnership.value === 'not_owned') {
+    list = list.filter(m => !m.is_unlocked)
+  }
+
+  if (sortOrder.value === 'asc') {
+    list.sort((a, b) => (a.price_icoinz || 0) - (b.price_icoinz || 0))
+  } else if (sortOrder.value === 'desc') {
+    list.sort((a, b) => (b.price_icoinz || 0) - (a.price_icoinz || 0))
+  }
+  return list
+})
+
+const selectedModuleObjects = computed(() =>
+  modules.value.filter(m => selectedModuleIds.value.includes(m.id) && !m.is_unlocked)
+)
+
+const moduleSubtotal = computed(() =>
+  selectedModuleObjects.value.reduce((sum, m) => sum + Number(m.price_icoinz || 0), 0)
+)
+
+const moduleDiscountAmount = computed(() => {
+  if (selectedModuleObjects.value.length < 2) return 0
+  const pct = Number(moduleMeta.value.discount_percent ?? 25)
+  return Math.round((moduleSubtotal.value * pct) / 100)
+})
+
+const moduleFinalTotal = computed(() => Math.max(0, moduleSubtotal.value - moduleDiscountAmount.value))
+
+const isModuleSelected = (id) => selectedModuleIds.value.includes(id)
+
+const toggleModuleSelect = (id) => {
+  const idx = selectedModuleIds.value.indexOf(id)
+  if (idx >= 0) {
+    selectedModuleIds.value.splice(idx, 1)
+  } else {
+    selectedModuleIds.value.push(id)
+  }
+}
+
+const formatModuleAccessBadge = (mod) => {
+  if (mod.access_status === 'expert_full') return 'Full Access (Expert)'
+  if (mod.access_status === 'pro_quota') {
+    return mod.remaining_days ? `Kuota Pro (${mod.remaining_days}h)` : 'Aktif via Kuota Pro'
+  }
+  if (mod.access_status === 'owned') {
+    return mod.remaining_days ? `Aktif (${mod.remaining_days} hari)` : 'Sudah Dimiliki'
+  }
+  return 'Gratis'
+}
+
+const openInsufficientBalance = (itemName, requiredAmount) => {
+  insufficientPayload.value = {
+    itemName,
+    requiredAmount: Number(requiredAmount || 0)
+  }
+  showInsufficientModal.value = true
+}
 
 const sortedBorders = computed(() => {
   let b = TIERS.filter(t => typeof t.id === 'string' && t.id.startsWith('BB'))
@@ -257,12 +480,23 @@ const isBought = (id) => boughtBorders.value.includes(id)
 const fetchPackages = async () => {
   try {
     isLoading.value = true
-    const [resPackages, resItems] = await Promise.all([
+    const [resPackages, resItems, resModules] = await Promise.all([
       api.get('/shop/packages'),
-      api.get('/shop/items')
+      api.get('/shop/items'),
+      api.get('/shop/modules').catch(() => ({ data: { data: [], meta: null } }))
     ])
-    packages.value = resPackages.data.data
-    items.value = resItems.data.data
+    packages.value = resPackages.data.data || []
+    items.value = resItems.data.data || []
+    modules.value = resModules.data?.data || []
+    if (resModules.data?.meta) {
+      moduleMeta.value = { ...moduleMeta.value, ...resModules.data.meta }
+    }
+
+    const preselectId = Number(route.query.select)
+    if (preselectId && !selectedModuleIds.value.includes(preselectId)) {
+      const target = modules.value.find(m => Number(m.id) === preselectId && !m.is_unlocked)
+      if (target) selectedModuleIds.value.push(target.id)
+    }
   } catch (error) {
     console.error('Failed to fetch packages:', error.response?.status || 'request_failed')
   } finally {
@@ -282,6 +516,10 @@ const loadBoughtBorders = async () => {
 }
 
 onMounted(() => {
+  if (route.query.tab === 'module') {
+    activeTab.value = 'module'
+  }
+  fetchPublicConfig()
   fetchPackages()
   fetchWallet()
   loadBoughtBorders()
@@ -308,9 +546,50 @@ const playSuccessAnimation = (msg) => {
   }, 2500)
 }
 
+const checkoutModulesList = (modsList) => {
+  if (!modsList.length) return
+  const subtotal = modsList.reduce((sum, m) => sum + Number(m.price_icoinz || 0), 0)
+  const discountPercent = modsList.length >= 2 ? Number(moduleMeta.value.discount_percent ?? 25) : 0
+  const discountAmount = Math.round((subtotal * discountPercent) / 100)
+  const total = Math.max(0, subtotal - discountAmount)
+  const names = modsList.map(m => m.title).join(', ')
+
+  if (Number(coinz.value || 0) < total) {
+    openInsufficientBalance(
+      modsList.length > 1 ? `${modsList.length} Modul (${names})` : names,
+      total
+    )
+    return
+  }
+
+  router.push({
+    path: '/shop/checkout',
+    query: {
+      type: 'module',
+      pathIds: modsList.map(m => m.id).join(','),
+      name: modsList.length > 1 ? `${modsList.length} Modul Belajar` : modsList[0].title,
+      names,
+      durationDays: modsList[0]?.duration_days || moduleMeta.value.module_default_duration_days,
+      subtotal,
+      discountPercent,
+      discountAmount,
+      method: 'coinz',
+      price: total
+    }
+  })
+}
+
+const checkoutSingleModule = (mod) => {
+  checkoutModulesList([mod])
+}
+
+const checkoutSelectedModules = () => {
+  checkoutModulesList(selectedModuleObjects.value)
+}
+
 const purchaseEnergy = (pkg) => {
-  if (coinz.value < pkg.price_icoinz) {
-    showToast('Saldo iCoinZ kamu tidak cukup.', 'warning')
+  if (Number(coinz.value || 0) < pkg.price_icoinz) {
+    openInsufficientBalance(pkg.name, pkg.price_icoinz)
     return
   }
   
@@ -328,12 +607,11 @@ const purchaseEnergy = (pkg) => {
 
 const buyBorder = (id) => {
   const price = getBorderPrice(id)
-  if (coinz.value < price) {
-    showToast('Saldo iCoinZ tidak cukup untuk membeli border ini.', 'warning')
+  const b = TIERS.find(t => t.id === id)
+  if (Number(coinz.value || 0) < price) {
+    openInsufficientBalance(b ? parseName(b.name) : `Border ${id}`, price)
     return
   }
-  
-  const b = TIERS.find(t => t.id === id)
   
   router.push({
     path: '/shop/checkout',
@@ -349,8 +627,8 @@ const buyBorder = (id) => {
 }
 
 const buyItem = (item) => {
-  if (coinz.value < item.price) {
-    showToast('Saldo iCoinZ tidak cukup untuk membeli item ini.', 'warning')
+  if (Number(coinz.value || 0) < item.price) {
+    openInsufficientBalance(item.name, item.price)
     return
   }
   
