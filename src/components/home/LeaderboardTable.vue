@@ -56,7 +56,7 @@
                 <h4>{{ topUsers[1].username ? topUsers[1].username + '#' + topUsers[1].tag_id : topUsers[1].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch" style="margin: 0;">{{ topUsers[1].xp.toLocaleString() }} XP</div>
-                  <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[1])">Lvl {{ topUsers[1].level }}</span>
+                  <span v-if="!topUsers[1].isPlaceholder && topUsers[1].level" class="ct-badge-level" :class="getLevelBadgeClass(topUsers[1])">Lvl {{ topUsers[1].level }}</span>
                 </div>
                 <button v-if="topUsers[1].slug" @click="$router.push('/coderz/' + topUsers[1].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
@@ -80,7 +80,7 @@
                 <h4>{{ topUsers[0].username ? topUsers[0].username + '#' + topUsers[0].tag_id : topUsers[0].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch gold-text" style="margin: 0;">{{ topUsers[0].xp.toLocaleString() }} XP</div>
-                  <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[0])">Lvl {{ topUsers[0].level }}</span>
+                  <span v-if="!topUsers[0].isPlaceholder && topUsers[0].level" class="ct-badge-level" :class="getLevelBadgeClass(topUsers[0])">Lvl {{ topUsers[0].level }}</span>
                 </div>
                 <button v-if="topUsers[0].slug" @click="$router.push('/coderz/' + topUsers[0].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
@@ -104,7 +104,7 @@
                 <h4>{{ topUsers[2].username ? topUsers[2].username + '#' + topUsers[2].tag_id : topUsers[2].name }}</h4>
                 <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 8px;">
                   <div class="xp-glitch" style="margin: 0;">{{ topUsers[2].xp.toLocaleString() }} XP</div>
-                  <span class="ct-badge-level" :class="getLevelBadgeClass(topUsers[2])">Lvl {{ topUsers[2].level }}</span>
+                  <span v-if="!topUsers[2].isPlaceholder && topUsers[2].level" class="ct-badge-level" :class="getLevelBadgeClass(topUsers[2])">Lvl {{ topUsers[2].level }}</span>
                 </div>
                 <button v-if="topUsers[2].slug" @click="$router.push('/coderz/' + topUsers[2].slug)" class="visit-btn" style="display: block; width: fit-content; margin: 0 auto;">Visit</button>
               </div>
@@ -115,8 +115,8 @@
         <!-- Your Rank HUD -->
         <div class="your-rank-hud" v-if="isFullView && isLoggedIn">
           <div class="hud-side">
-            <span class="hud-label">TARGET XP ANDA</span>
-            <span class="hud-value"><CyberEnergy :pkgId="1" :isAnimated="false" /> {{ activeTab === 'monthly' ? myRankMonthly : myRankGlobal }}</span>
+            <span class="hud-label">XP ANDA SAAT INI</span>
+            <span class="hud-value"><CyberEnergy :pkgId="1" :isAnimated="false" /> {{ Number(activeTab === 'monthly' ? myXpMonthly : myXpGlobal).toLocaleString('id-ID') }} XP</span>
           </div>
           <div class="hud-center">
             STATUS PERINGKAT <br />
@@ -213,6 +213,8 @@ const monthlyRanking = ref([]);
 const allTimeRanking = ref([]);
 const myRankMonthly = ref("—");
 const myRankGlobal = ref("—");
+const myXpMonthly = ref(0);
+const myXpGlobal = ref(0);
 const isLoading = ref(true);
 const activeTab = ref('monthly');
 
@@ -221,11 +223,11 @@ const currentRanking = computed(() => {
 });
 
 const topUsers = computed(() => {
-  const users = [...currentRanking.value];
+  const users = currentRanking.value.filter(u => Number(u.xp) > 0).slice(0, 3);
   while (users.length < 3) {
-    users.push({ name: "-", xp: 0, avatar_url: null });
+    users.push({ name: "Belum Ada Progress", xp: 0, avatar_url: null, level: 0, isPlaceholder: true });
   }
-  return users.slice(0, 3);
+  return users;
 });
 
 const tableUsers = computed(() => {
@@ -252,15 +254,22 @@ const fetchLeaderboard = async () => {
 
     monthlyRanking.value = (
       Array.isArray(monthlyRes.data.data) ? monthlyRes.data.data : []
-    ).map((u) => ({ ...u, xp: Number(u.monthly_xp || u.xp || 0) }));
+    )
+      .map((u) => ({ ...u, xp: Number(u.monthly_xp ?? u.xp ?? 0) }))
+      .filter((u) => u.xp > 0);
     allTimeRanking.value = (
       Array.isArray(allTimeRes.data.data) ? allTimeRes.data.data : []
-    ).map((u) => ({ ...u, xp: Number(u.xp || 0) }));
+    )
+      .map((u) => ({ ...u, xp: Number(u.xp || 0) }))
+      .filter((u) => u.xp > 0);
 
     if (isLoggedIn.value) {
       const myRankRes = await api.get("/leaderboard/my-rank");
-      myRankMonthly.value = myRankRes.data.data.monthly_rank || "—";
-      myRankGlobal.value = myRankRes.data.data.all_time_rank || "—";
+      const rankData = myRankRes.data?.data || {};
+      myRankMonthly.value = rankData.monthly_rank || "—";
+      myRankGlobal.value = rankData.all_time_rank || "—";
+      myXpMonthly.value = Number(rankData.monthly_xp ?? 0);
+      myXpGlobal.value = Number(rankData.all_time_xp ?? rankData.xp ?? 0);
     }
   } catch (error) {
     console.error("Failed to load leaderboard", error);
