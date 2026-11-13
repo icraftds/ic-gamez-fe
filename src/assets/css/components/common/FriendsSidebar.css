@@ -82,6 +82,8 @@ body:not(.light-mode) .friends-sidebar.from-left {
    ═══════════════════════════════════════════════════════════════ */
 .fs-edge-tab {
   position: fixed;
+  top: 0;
+  left: 0;
   height: 48px;
   min-width: 52px;
   padding: 0 14px;
@@ -99,14 +101,14 @@ body:not(.light-mode) .friends-sidebar.from-left {
   -webkit-user-select: none;
   outline: none;
   box-sizing: border-box;
-  transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+  will-change: transform;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               background 0.25s ease,
               color 0.25s ease,
               border-color 0.25s ease,
               box-shadow 0.25s ease,
-              transform 0.2s ease,
-              border-radius 0.25s ease;
+              border-radius 0.25s ease,
+              opacity 0.2s ease;
 }
 
 body:not(.light-mode) .fs-edge-tab {
@@ -134,11 +136,15 @@ body:not(.light-mode) .fs-edge-tab {
 .fs-edge-tab.is-dragging {
   cursor: grabbing !important;
   border-radius: 9999px !important;
-  transform: scale(1.1) !important;
+  transition: none !important;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 24px rgba(56, 189, 248, 0.45) !important;
   border-color: rgba(56, 189, 248, 0.6) !important;
   background: rgba(22, 28, 44, 0.98) !important;
   color: #38bdf8 !important;
+}
+
+.fs-edge-tab.is-dragging .fs-edge-tab-inner {
+  transform: scale(1.1);
 }
 
 .fs-edge-tab:hover:not(.is-dragging) {
@@ -170,6 +176,7 @@ body:not(.light-mode) .fs-edge-tab.is-open {
   align-items: center;
   gap: 8px;
   font-size: 1.05rem;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .fs-edge-chevron {

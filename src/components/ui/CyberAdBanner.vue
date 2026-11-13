@@ -101,10 +101,19 @@ const stopRotation = () => {
 
 const dismissBanner = () => {
   isDismissed.value = true
+  stopRotation()
   try {
     sessionStorage.setItem('gamez_banner_dismissed', 'true')
   } catch {
     // ignore storage error
+  }
+}
+
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    stopRotation()
+  } else if (!isDismissed.value) {
+    startRotation()
   }
 }
 
@@ -118,10 +127,12 @@ onMounted(() => {
     // ignore
   }
   startRotation()
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
 onUnmounted(() => {
   stopRotation()
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
 
@@ -227,6 +238,7 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.32);
   overflow: hidden;
+  contain: layout style;
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
   transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.25s ease;

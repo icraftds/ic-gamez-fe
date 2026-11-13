@@ -30,52 +30,54 @@ const activeTab = ref(initialSidebarTab.value === 'permintaan' ? 'permintaan' : 
 let searchTimeout
 
 /* ═══════════════════════════════════════════════════════════════
-   ASSISTIVETOUCH / DRAGGABLE EDGE SNAPPING LOGIC (iCraftDS style)
+   ASSISTIVETOUCH / DRAGGABLE EDGE SNAPPING LOGIC (GPU Composited)
    ═══════════════════════════════════════════════════════════════ */
 const STORAGE_KEY = 'ic_friends_btn_pos_v2'
-const edgeTabRef = ref(null)
+const DRAG_THRESHOLD_PX = 6
+const CLICK_SUPPRESS_MS = 450
+const DESKTOP_DRAWER_WIDTH = 390
 
+const edgeTabRef = ref(null)
 const isDragging = ref(false)
 const dockSide = ref('right') // 'left' | 'right'
-const dockYRatio = ref(0.5) // default middle of screen (50%)
-const dragScreenX = ref(0)
-const dragScreenY = ref(0)
+const dockYRatio = ref(0.5)
+const dragX = ref(0)
+const dragY = ref(0)
 
 const viewportW = ref(typeof window !== 'undefined' ? window.innerWidth : 1200)
 const viewportH = ref(typeof window !== 'undefined' ? window.innerHeight : 800)
 
 let pointerActive = false
-let pointerId = -1
+let activePointerId = -1
 let startClientX = 0
 let startClientY = 0
-let startScreenX = 0
-let startScreenY = 0
+let startPosX = 0
+let startPosY = 0
 let hasMoved = false
-let suppressNextClick = false
+let lastDragEndTime = 0
 
-const getBtnMetrics = () => {
+const btnMetrics = computed(() => {
   const isMobile = viewportW.value <= 768
   const width = isMobile ? 44 : 52
   const height = isMobile ? 40 : 48
   const minY = isMobile ? 65 : 75
   const maxY = Math.max(minY, viewportH.value - height - (isMobile ? 25 : 30))
   return { isMobile, width, height, minY, maxY }
-}
+})
 
 const loadSavedPosition = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw)
-      if (parsed.dockSide === 'left' || parsed.dockSide === 'right') {
-        dockSide.value = parsed.dockSide
-      }
-      if (typeof parsed.dockYRatio === 'number' && !isNaN(parsed.dockYRatio)) {
-        dockYRatio.value = Math.min(0.92, Math.max(0.08, parsed.dockYRatio))
-      }
+    if (!raw) return
+    const parsed = JSON.parse(raw)
+    if (parsed.dockSide === 'left' || parsed.dockSide === 'right') {
+      dockSide.value = parsed.dockSide
     }
-  } catch (err) {
-    console.warn('Failed to load friends button position', err)
+    if (typeof parsed.dockYRatio === 'number' && !Number.isNaN(parsed.dockYRatio)) {
+      dockYRatio.value = Math.min(0.92, Math.max(0.08, parsed.dockYRatio))
+    }
+  } catch {
+    // Ignore storage read errors
   }
 }
 
@@ -88,7 +90,7 @@ const savePosition = () => {
         dockYRatio: dockYRatio.value
       })
     )
-  } catch (err) {
+  } catch {
     // Ignore storage quota/security errors
   }
 }
@@ -98,149 +100,119 @@ const handleResize = () => {
   viewportH.value = window.innerHeight
 }
 
+const dockedCoords = computed(() => {
+  const { isMobile, width, minY, maxY } = btnMetrics.value
+  const y = Math.min(maxY, Math.max(minY, dockYRatio.value * viewportH.value))
+
+  if (isFriendsSidebarOpen.value && !isMobile) {
+    const x = dockSide.value === 'left'
+      ? DESKTOP_DRAWER_WIDTH
+      : Math.max(0, viewportW.value - DESKTOP_DRAWER_WIDTH - width)
+    return { x, y }
+  }
+
+  const x = dockSide.value === 'left' ? 0 : Math.max(0, viewportW.value - width)
+  return { x, y }
+})
+
 const buttonStyle = computed(() => {
-  const { isMobile, width, height, minY, maxY } = getBtnMetrics()
-  
+  const { isMobile } = btnMetrics.value
+
   if (isDragging.value) {
     return {
-      left: `${dragScreenX.value}px`,
-      top: `${dragScreenY.value}px`,
+      transform: `translate3d(${dragX.value}px, ${dragY.value}px, 0)`,
       transition: 'none',
       cursor: 'grabbing'
     }
   }
 
-  // Not dragging: Docked state
-  const currentY = Math.min(maxY, Math.max(minY, dockYRatio.value * viewportH.value))
+  const { x, y } = dockedCoords.value
+  const style = {
+    transform: `translate3d(${x}px, ${y}px, 0)`
+  }
 
-  // When sidebar is open on mobile: hide floating button to avoid UI clash
   if (isFriendsSidebarOpen.value && isMobile) {
-    return {
-      left: dockSide.value === 'left' ? '0px' : `${viewportW.value - width}px`,
-      top: `${currentY}px`,
-      opacity: '0',
-      pointerEvents: 'none'
-    }
+    style.opacity = '0'
+    style.pointerEvents = 'none'
   }
 
-  // When sidebar is open on desktop (drawer width is 390px):
-  if (isFriendsSidebarOpen.value) {
-    if (dockSide.value === 'left') {
-      return {
-        left: '390px',
-        top: `${currentY}px`
-      }
-    } else {
-      return {
-        left: `${viewportW.value - 390 - width}px`,
-        top: `${currentY}px`
-      }
-    }
-  }
-
-  // When sidebar is closed: docked flush to left or right edge
-  if (dockSide.value === 'left') {
-    return {
-      left: '0px',
-      top: `${currentY}px`
-    }
-  } else {
-    return {
-      left: `${viewportW.value - width}px`,
-      top: `${currentY}px`
-    }
-  }
+  return style
 })
+
+function attachWindowDragListeners() {
+  window.addEventListener('pointermove', handlePointerMove, { passive: true })
+  window.addEventListener('pointerup', handlePointerUp)
+  window.addEventListener('pointercancel', handlePointerUp)
+}
+
+function detachWindowDragListeners() {
+  window.removeEventListener('pointermove', handlePointerMove)
+  window.removeEventListener('pointerup', handlePointerUp)
+  window.removeEventListener('pointercancel', handlePointerUp)
+}
 
 function handlePointerDown(e) {
   if (e.pointerType === 'mouse' && e.button !== 0) return
+  // Do not drag while sidebar drawer is open; clicking closes it cleanly
+  if (isFriendsSidebarOpen.value) return
 
-  const { width, minY, maxY } = getBtnMetrics()
-  const btnEl = edgeTabRef.value
-  let currentLeft = 0
-  let currentTop = 0
-
-  if (btnEl) {
-    const rect = btnEl.getBoundingClientRect()
-    currentLeft = rect.left
-    currentTop = rect.top
-  } else {
-    currentLeft = dockSide.value === 'left' ? 0 : viewportW.value - width
-    currentTop = dockYRatio.value * viewportH.value
-  }
-
+  const { x, y } = dockedCoords.value
   pointerActive = true
-  pointerId = e.pointerId
+  activePointerId = e.pointerId
   hasMoved = false
   startClientX = e.clientX
   startClientY = e.clientY
-  startScreenX = currentLeft
-  startScreenY = currentTop
+  startPosX = x
+  startPosY = y
+  dragX.value = x
+  dragY.value = y
 
-  dragScreenX.value = currentLeft
-  dragScreenY.value = currentTop
-
-  if (e.currentTarget && e.currentTarget.setPointerCapture) {
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId)
-    } catch {
-      // ignore capture errors
-    }
-  }
+  attachWindowDragListeners()
 }
 
 function handlePointerMove(e) {
-  if (!pointerActive || e.pointerId !== pointerId) return
+  if (!pointerActive || e.pointerId !== activePointerId) return
 
   const dx = e.clientX - startClientX
   const dy = e.clientY - startClientY
 
-  if (!hasMoved && Math.hypot(dx, dy) > 5) {
+  if (!hasMoved && Math.hypot(dx, dy) > DRAG_THRESHOLD_PX) {
     hasMoved = true
     isDragging.value = true
   }
 
   if (hasMoved) {
-    const { width, minY, maxY } = getBtnMetrics()
-    const clampedX = Math.min(viewportW.value - width, Math.max(0, startScreenX + dx))
-    const clampedY = Math.min(maxY, Math.max(minY, startScreenY + dy))
-
-    dragScreenX.value = clampedX
-    dragScreenY.value = clampedY
+    const { width, minY, maxY } = btnMetrics.value
+    dragX.value = Math.min(viewportW.value - width, Math.max(0, startPosX + dx))
+    dragY.value = Math.min(maxY, Math.max(minY, startPosY + dy))
   }
 }
 
 function handlePointerUp(e) {
-  if (!pointerActive || e.pointerId !== pointerId) return
-  pointerActive = false
+  if (!pointerActive || e.pointerId !== activePointerId) return
 
-  if (e.currentTarget && e.currentTarget.releasePointerCapture) {
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId)
-    } catch {
-      // ignore
-    }
-  }
+  pointerActive = false
+  activePointerId = -1
+  detachWindowDragListeners()
 
   if (hasMoved) {
-    suppressNextClick = true
-    setTimeout(() => {
-      suppressNextClick = false
-    }, 350)
-
-    const { width, minY, maxY } = getBtnMetrics()
-    const centerX = dragScreenX.value + width / 2
+    lastDragEndTime = Date.now()
+    const { width, minY, maxY } = btnMetrics.value
+    const centerX = dragX.value + width / 2
     dockSide.value = centerX < viewportW.value / 2 ? 'left' : 'right'
 
-    const clampedY = Math.min(maxY, Math.max(minY, dragScreenY.value))
+    const clampedY = Math.min(maxY, Math.max(minY, dragY.value))
     dockYRatio.value = viewportH.value > 0 ? clampedY / viewportH.value : 0.5
     savePosition()
     isDragging.value = false
+    hasMoved = false
   }
 }
 
 function handleClick() {
-  if (suppressNextClick) return
+  if (isDragging.value || hasMoved || Date.now() - lastDragEndTime < CLICK_SUPPRESS_MS) {
+    return
+  }
   toggleFriendsSidebar('teman')
 }
 
@@ -253,6 +225,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  detachWindowDragListeners()
   window.removeEventListener('resize', handleResize)
 })
 
@@ -322,11 +295,10 @@ const handleRemoveFriend = async (userId) => {
       'is-right-side': dockSide === 'right'
     }"
     :style="buttonStyle"
+    draggable="false"
+    @dragstart.prevent
     @pointerdown="handlePointerDown"
-    @pointermove="handlePointerMove"
-    @pointerup="handlePointerUp"
-    @pointercancel="handlePointerUp"
-    @click="handleClick"
+    @click.stop.prevent="handleClick"
     :title="isFriendsSidebarOpen ? 'Tutup Daftar Teman' : 'Daftar Teman & Komunitas (Tahan untuk Drag)'"
     :aria-label="isFriendsSidebarOpen ? 'Tutup Daftar Teman' : 'Daftar Teman & Komunitas'"
     type="button"
