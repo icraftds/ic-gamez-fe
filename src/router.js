@@ -67,6 +67,14 @@ const router = createRouter({
       component: () => import('./views/PathDetailView.vue')
     },
     {
+      path: '/learn',
+      redirect: '/learning'
+    },
+    {
+      path: '/learn/path/:pathId',
+      redirect: to => `/learning/${to.params.pathId}`
+    },
+    {
       path: '/learning/:pathId/lesson/:chapterId/:lessonId',
       name: 'lesson',
       component: () => import('./views/LessonView.vue')

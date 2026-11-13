@@ -97,7 +97,7 @@
             </p>
             
             <div class="success-actions">
-              <button v-if="type === 'module'" class="btn-primary" @click="$router.push('/learn')">
+              <button v-if="type === 'module'" class="btn-primary" @click="$router.push(pathIds.length === 1 ? `/learning/${pathIds[0]}` : '/learning')">
                 Mulai Belajar
               </button>
               <button v-else class="btn-primary" @click="$router.push('/dashboard')">
@@ -263,7 +263,10 @@ const processPayment = async () => {
     if (type === 'module') {
       const response = await api.post('/shop/purchase/modules', { path_ids: pathIds })
       if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian modul gagal')
-      try { localStorage.removeItem('ic_learning_paths_cache_v3') } catch {}
+      try {
+        sessionStorage.removeItem('ic_learning_paths_cache_v3')
+        localStorage.removeItem('ic_learning_paths_cache_v3')
+      } catch {}
     } else if (type === 'border') {
       const response = await api.post('/shop/purchase/border', { border_id: pkgId, price: price })
       if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian border gagal')

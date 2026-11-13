@@ -149,7 +149,10 @@ const claimProModule = async () => {
       throw new Error(res.data?.message || 'Gagal mengklaim kuota modul Pro')
     }
 
-    try { localStorage.removeItem('ic_learning_paths_cache_v3') } catch {}
+    try {
+      sessionStorage.removeItem('ic_learning_paths_cache_v3')
+      localStorage.removeItem('ic_learning_paths_cache_v3')
+    } catch {}
     await Promise.all([fetchUser(true), fetchPaths(true)])
     showToast(`Modul "${props.path.title}" berhasil diaktifkan!`, 'success')
     emit('unlocked', props.path.id)
