@@ -576,8 +576,12 @@ const goToInstruction = async () => {
     })
   } catch (err) {
     console.error('Failed to create payment', err)
-    const errMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Coba lagi.'
-    paymentError.value = 'Gagal memuat metode pembayaran: ' + errMessage
+    const rawMsg = err.response?.data?.message || err.response?.data?.error || err.message || 'Coba lagi.'
+    if (err.response?.status === 503 && String(rawMsg).toLowerCase() === 'service unavailable') {
+      paymentError.value = 'Server sedang melakukan pemeliharaan singkat. Silakan tunggu beberapa detik lalu coba lagi.'
+    } else {
+      paymentError.value = 'Gagal memproses pembayaran: ' + rawMsg
+    }
   } finally {
     isProcessingPayment.value = false
     emit('processing', false)
