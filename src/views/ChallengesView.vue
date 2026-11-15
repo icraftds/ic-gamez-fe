@@ -59,7 +59,7 @@ const router = useRouter();
 
 const showModal = ref(false);
 const showAuthModal = ref(false);
-const { paths, fetchAllPathsDetails } = useLearningPaths();
+const { paths, fetchPaths } = useLearningPaths();
 
 const tabs = [
   { id: 'modul', label: 'Modul', icon: 'fa-solid fa-book' },
@@ -92,7 +92,9 @@ const currentTabComponent = computed(() => {
 });
 
 onMounted(() => {
-  fetchAllPathsDetails();
+  if (paths.value.length === 0) {
+    fetchPaths();
+  }
 });
 </script>
 

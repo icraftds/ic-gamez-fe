@@ -53,7 +53,7 @@
         </svg>
       </div>
       <p class="progress-text">
-        {{ completedCount }} / {{ allChallenges.length }} selesai
+        {{ completedCount }} / {{ totalChallengesCount }} selesai
       </p>
 
       <div class="progress-stats">
@@ -116,7 +116,7 @@ import { useLearningPaths } from "../../composables/useLearningPaths.js";
 
 const { isPremiumUser, subscriptionStatus, upgradeToPremium, userStats, fetchUserStats } = useUserAccount();
 const {
-  allChallenges,
+  totalChallengesCount,
   completedCount,
   completionPercentage,
   totalMudah,
@@ -124,10 +124,11 @@ const {
   totalSedang,
   completedSedang,
   totalSulit,
-  completedSulit
+  completedSulit,
+  fetchChallengeStats
 } = useChallengesStats();
 
-const { paths, fetchAllPathsDetails } = useLearningPaths();
+const { paths, fetchPaths } = useLearningPaths();
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
@@ -145,7 +146,10 @@ const filterByCategory = (category) => {
 
 onMounted(async () => {
   fetchUserStats();
-  await fetchAllPathsDetails();
+  fetchChallengeStats(true);
+  if (paths.value.length === 0) {
+    await fetchPaths();
+  }
 });
 </script>
 

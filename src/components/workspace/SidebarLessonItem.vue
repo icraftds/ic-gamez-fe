@@ -37,15 +37,15 @@
           class="sub-item" 
           :class="{
             'is-active': isActive && activeStep === 2,
-            'is-disabled': !lesson.isCompleted
+            'is-disabled': !lesson.isCompleted && !(isActive && activeStep >= 2)
           }" 
-          @click="lesson.isCompleted ? $emit('step-click', 'quiz') : null"
-          :title="!lesson.isCompleted ? 'Selesaikan Materi terlebih dahulu' : ''"
+          @click="lesson.isCompleted || (isActive && activeStep >= 2) ? $emit('step-click', 'quiz') : null"
+          :title="!lesson.isCompleted && !(isActive && activeStep >= 2) ? 'Selesaikan Materi terlebih dahulu' : ''"
         >
           <i class="fa-solid fa-circle-question sub-icon quiz-icon"></i>
           <span class="sub-label">Tes</span>
           <i v-if="lesson.quizPassed" class="fa-solid fa-check sub-status-icon completed"></i>
-          <i v-else-if="!lesson.isCompleted" class="fa-solid fa-lock sub-status-icon locked" style="color: #6b7280; font-size: 0.7rem; opacity: 0.5;"></i>
+          <i v-else-if="!lesson.isCompleted && !(isActive && activeStep >= 2)" class="fa-solid fa-lock sub-status-icon locked" style="color: #6b7280; font-size: 0.7rem; opacity: 0.5;"></i>
         </button>
 
         <!-- Praktik -->
@@ -53,15 +53,15 @@
           class="sub-item" 
           :class="{
             'is-active': isActive && activeStep === 3,
-            'is-disabled': !lesson.quizPassed
+            'is-disabled': !lesson.quizPassed && !(isActive && activeStep >= 3)
           }" 
-          @click="lesson.quizPassed ? $emit('step-click', 'practice') : null"
-          :title="!lesson.quizPassed ? 'Selesaikan Tes terlebih dahulu' : ''"
+          @click="lesson.quizPassed || (isActive && activeStep >= 3) ? $emit('step-click', 'practice') : null"
+          :title="!lesson.quizPassed && !(isActive && activeStep >= 3) ? 'Selesaikan Tes terlebih dahulu' : ''"
         >
           <i class="fa-solid fa-code sub-icon practice-icon"></i>
           <span class="sub-label">Praktik</span>
           <i v-if="lesson.practiceDone" class="fa-solid fa-check sub-status-icon completed"></i>
-          <i v-else-if="!lesson.quizPassed" class="fa-solid fa-lock sub-status-icon locked" style="color: #6b7280; font-size: 0.7rem; opacity: 0.5;"></i>
+          <i v-else-if="!lesson.quizPassed && !(isActive && activeStep >= 3)" class="fa-solid fa-lock sub-status-icon locked" style="color: #6b7280; font-size: 0.7rem; opacity: 0.5;"></i>
         </button>
       </div>
     </Transition>

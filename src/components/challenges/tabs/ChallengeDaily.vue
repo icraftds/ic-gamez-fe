@@ -158,6 +158,15 @@ const isAlreadyPlayedToday = computed(() => {
 
 const userStatus = ref(null);
 
+const setUnavailableDailyFallback = () => {
+  currentEvent.value = {
+    id: 1,
+    title: 'Tantangan Belum Tersedia',
+    difficulty: 'Sedang',
+    description_html: '<p>Tantangan harian belum diatur oleh admin.</p>'
+  };
+};
+
 const fetchActiveChallenge = async () => {
   isLoadingEvent.value = true;
   try {
@@ -165,16 +174,14 @@ const fetchActiveChallenge = async () => {
     if (res.data && res.data.event) {
       currentEvent.value = res.data.event;
       userStatus.value = res.data.user_status;
+    } else {
+      setUnavailableDailyFallback();
     }
   } catch (error) {
-    console.error('Failed to load active challenge', error);
-    // Fallback if API fails
-    currentEvent.value = {
-      id: 1,
-      title: 'Tantangan Belum Tersedia',
-      difficulty: 'Sedang',
-      description_html: '<p>Tantangan harian belum diatur oleh admin.</p>'
-    };
+    if (error?.response?.status !== 404) {
+      console.error('Failed to load active challenge', error);
+    }
+    setUnavailableDailyFallback();
   } finally {
     isLoadingEvent.value = false;
   }

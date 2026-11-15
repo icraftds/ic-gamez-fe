@@ -359,3 +359,80 @@ test('P0-4 & P0-3: JS runner supports top-level await, custom input const, and m
     false
   )
 })
+
+test('GreetingCard separates cumulative totalXp from levelXp bar and useLearningPaths preserves quizzes while syncing progress', async () => {
+  const card = load('../src/components/dashboard/home/GreetingCard.vue', 'totalXp, levelXp, levelXpMax, xpPercentage, displayLevel', {
+    useRouter: () => ({ push: () => {} }),
+    useUserAccount: () => ({
+      userProfile: ref({ id: 7, level: 5, xp: 373, next_level_xp: 746 }),
+      currentPlan: ref('pro'),
+      isPremiumUser: ref(true),
+      activeBorderId: ref('border_default'),
+      isPro: ref(true),
+      isExpert: ref(false),
+    }),
+    useLearningPaths: () => ({ paths: ref([]) }),
+    useDashboardStats: () => ({
+      statsData: ref({ xp: { total: 3600, level: 5, next_level_xp: 746 }, completed_exercises: { total: 52 } }),
+      fetchStats: async () => {},
+    }),
+  })
+  assert.equal(card.totalXp.value, 3600)
+  assert.equal(card.levelXp.value, 373)
+  assert.equal(card.levelXpMax.value, 746)
+  assert.equal(card.xpPercentage.value, 50)
+
+  const { mergeFreshPathsWithCache } = load('../src/composables/useLearningPaths.js', 'mergeFreshPathsWithCache', {
+    api: { get: async () => ({ data: { data: [] } }) },
+    useUserAccount: () => ({ isLoggedIn: ref(true) }),
+  })
+  const cachedPaths = [{
+    id: 1,
+    slug: 'alur-1',
+    chapters: [{
+      id: 10,
+      lessons: [{ id: 100, title: 'L1', quizzes: [{ id: 9, question: 'Q' }], is_completed: false, quiz_passed: false, saved_code: 'print(1)', isCompleted: false }],
+    }],
+  }]
+  const freshPaths = [{
+    id: 1,
+    slug: 'alur-1',
+    total_lessons: 1,
+    chapters: [{
+      id: 10,
+      lessons: [{ id: 100, title: 'L1', is_completed: true, quiz_passed: true, saved_code: 'print(2)', progress: { is_completed: true } }],
+    }],
+  }]
+  const mergedPaths = mergeFreshPathsWithCache(freshPaths, cachedPaths, () => false)
+  const mergedLesson = mergedPaths[0].chapters[0].lessons[0]
+  assert.equal(mergedLesson.quizzes.length, 1)
+  assert.equal(mergedLesson.isCompleted, true)
+  assert.equal(mergedLesson.saved_code, 'print(2)')
+
+  // useChallengesStats fetches /challenges/stats & computes completion percentage
+  const { useChallengesStats } = load('../src/composables/useChallengesStats.js', 'useChallengesStats', {
+    api: {
+      get: async (url) => {
+        assert.equal(url, '/challenges/stats')
+        return {
+          data: {
+            data: {
+              total: 100,
+              completed: 25,
+              mudah: { total: 40, completed: 15 },
+              sedang: { total: 40, completed: 10 },
+              sulit: { total: 20, completed: 0 },
+            },
+          },
+        }
+      },
+    },
+  })
+  const cStats = useChallengesStats()
+  await cStats.fetchChallengeStats(true)
+  assert.equal(cStats.totalChallengesCount.value, 100)
+  assert.equal(cStats.completedCount.value, 25)
+  assert.equal(cStats.completionPercentage.value, 25)
+  assert.equal(cStats.totalMudah.value, 40)
+  assert.equal(cStats.completedMudah.value, 15)
+})

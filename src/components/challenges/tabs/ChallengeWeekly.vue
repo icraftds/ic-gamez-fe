@@ -211,7 +211,9 @@ const fetchWeeklyData = async () => {
       challenges.value = [];
     }
   } catch (error) {
-    console.error('Failed to load active weekly event', error);
+    if (error?.response?.status !== 404) {
+      console.error('Failed to load active weekly event', error);
+    }
     currentEvent.value = null;
     challenges.value = [];
   } finally {
