@@ -23,12 +23,16 @@
         </div>
 
         <!-- State: Pembayaran Sukses -->
-        <div v-else-if="isSuccess" class="status-content success">
+        <div v-else-if="isSuccess" class="status-content success success-animate">
           <div class="icon-circle success">
             <i class="fa-solid fa-check"></i>
           </div>
           <h2>Akses paket sudah aktif!</h2>
           <p>Pembayaran Anda telah berhasil diverifikasi. Selamat menikmati semua materi dan fitur premium iCraft!</p>
+          <div v-if="coinzAmount > 0" class="bonus-coinz-pill">
+            <i class="fa-solid fa-coins"></i>
+            <span>Bonus Pembelian Pertama: <strong>+{{ coinzAmount.toLocaleString('id-ID') }} iCoinZ</strong></span>
+          </div>
           <button class="btn-primary" @click="goToDashboard">
             <i class="fa-solid fa-gauge"></i> Masuk ke Dashboard
           </button>
@@ -123,8 +127,10 @@ const poll = createPaymentPoll(async (isCurrent) => {
   const saved = JSON.parse(localStorage.getItem('ic_pending_checkout') || 'null')
   if (saved) savedCheckout.value = saved
 
+  let verifyData = null
   if (saved?.paymentDetails?.order_id) {
-    await api.post('/payments/verify-status', { order_id: saved.paymentDetails.order_id }).catch(() => {})
+    const verifyRes = await api.post('/payments/verify-status', { order_id: saved.paymentDetails.order_id }).catch(() => null)
+    verifyData = verifyRes?.data?.data || null
     if (!isCurrent()) return false
   }
 
@@ -144,6 +150,14 @@ const poll = createPaymentPoll(async (isCurrent) => {
     isLoading.value = false
     isSuccess.value = true
     fireConfetti()
+    const awarded = Number(verifyData?.coinz_awarded || 0)
+    if (awarded > 0) {
+      coinzAmount.value = awarded
+      coinzPlan.value = expectedPlan || 'pro'
+      setTimeout(() => {
+        if (!disposed) showCoinzModal.value = true
+      }, 450)
+    }
     return true
   }
   return false
@@ -255,7 +269,36 @@ onUnmounted(() => {
 .icon-circle.success {
   background: rgba(16, 185, 129, 0.15);
   color: #10b981;
-  box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+  animation: successIconPop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275), successPulseRing 2s ease-out infinite 0.55s;
+}
+.success-animate {
+  animation: successFadeUp 0.45s ease-out;
+}
+.bonus-coinz-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+  font-size: 0.88rem;
+}
+@keyframes successIconPop {
+  0% { transform: scale(0.4); opacity: 0; }
+  65% { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes successFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes successPulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+  70% { box-shadow: 0 0 0 18px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 .icon-circle.pending {
   background: rgba(245, 158, 11, 0.15);
