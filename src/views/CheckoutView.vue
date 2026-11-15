@@ -103,10 +103,11 @@ const route = useRoute()
 const { userProfile, isPremiumUser, currentPlan, bootstrapSession, fetchUser, fetchWallet, isLoggedIn } = useUserAccount()
 const { plansLoaded, fetchPlans, findPlanBySlug } = usePlans()
 
-const planName = ref(route.query.plan || 'Pro')
-const planPrice = ref(Number(route.query.price) || 49000)
 const planSlug = ref(route.query.slug || 'pro')
-const planId = ref(Number(route.query.id) || 2)
+const isExpertSlug = computed(() => String(planSlug.value).toLowerCase() === 'expert')
+const planName = ref(route.query.plan || (isExpertSlug.value ? 'Expert Plan' : 'Pro'))
+const planPrice = ref(Number(route.query.price) || (isExpertSlug.value ? 99000 : 49000))
+const planId = ref(Number(route.query.id) || (isExpertSlug.value ? 2 : 1))
 const durationMonths = ref(Math.max(1, Number(route.query.months) || 1))
 const activePlanConfig = computed(() => findPlanBySlug(planSlug.value))
 const expiryTime = ref(null)
@@ -116,12 +117,15 @@ const applyPlanMetadata = (matched) => {
   if (!route.query.price) {
     planPrice.value = Number(matched.price) || planPrice.value
   }
-  if (matched.name) {
+  if (!route.query.plan && matched.name) {
     planName.value = matched.name
+  }
+  if (!route.query.id && matched.id) {
+    planId.value = Number(matched.id) || planId.value
   }
 }
 
-applyPlanMetadata(activePlanConfig.value)
+watch(activePlanConfig, applyPlanMetadata, { immediate: true })
 
 const onUpdateDuration = ({ months, totalPrice }) => {
   durationMonths.value = months
