@@ -150,6 +150,29 @@
           </p>
         </div>
 
+        <div
+          v-else-if="showDurationSkeleton"
+          class="checkout-duration-box checkout-duration-skeleton"
+          aria-hidden="true"
+        >
+          <div class="duration-header-row">
+            <span class="skel-bar skel-title"></span>
+            <span class="skel-bar skel-chip"></span>
+          </div>
+          <div class="duration-pills-grid">
+            <div v-for="n in 4" :key="n" class="duration-pill skel-pill">
+              <span class="skel-bar skel-badge"></span>
+              <span class="skel-bar skel-heading"></span>
+              <span class="skel-bar skel-sub"></span>
+              <span class="skel-bar skel-price"></span>
+            </div>
+          </div>
+          <div class="custom-stepper-row">
+            <span class="skel-bar skel-stepper-label"></span>
+            <span class="skel-bar skel-stepper-controls"></span>
+          </div>
+        </div>
+
         <!-- Target Account Info -->
         <div v-if="userProfile" class="target-account-box">
           <div class="account-icon">
@@ -310,6 +333,7 @@
 import { ref, computed } from 'vue'
 import api from '../../services/api'
 import { useUserAccount } from '../../composables/useUserAccount'
+import { resolvePlanPresentation } from '../../composables/usePlans'
 
 const props = defineProps({
   planName: String,
@@ -325,6 +349,10 @@ const props = defineProps({
   planConfig: {
     type: Object,
     default: null
+  },
+  isPlanConfigLoading: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -334,6 +362,9 @@ const { userProfile } = useUserAccount()
 const selectedMonths = ref(Math.max(1, Number(props.durationMonths) || 1))
 
 const isMultiMonthEnabled = computed(() => Boolean(props.planConfig?.allow_multi_month))
+const showDurationSkeleton = computed(() =>
+  props.isPlanConfigLoading && (props.planSlug || 'pro').toLowerCase() === 'pro'
+)
 
 const multiMonthPricing = computed(() => {
   const months = selectedMonths.value
@@ -407,47 +438,18 @@ const displayPlanName = computed(() => {
   return name.toLowerCase().endsWith('plan') ? name : `${name} Plan`
 })
 
-const PLAN_PERKS = {
-  pro: {
-    badge: 'Paling Populer',
-    duration: '30 Hari',
-    energy: '+20 Energi / minggu',
-    features: [
-      'Akses bebas pilih 12 modul alur belajar / bulan (Tidak dapat dibatalkan)',
-      'Akses penuh Global Challenge & Event Arena',
-      'Sertifikat kelulusan digital resmi',
-      'Bonus iCoinZ sesuai konfigurasi paket aktif',
-      'Hint premium tak terbatas di workspace',
-      'Leaderboard eksklusif coder Game-Z',
-    ]
-  },
-  expert: {
-    badge: 'Paket Tertinggi',
-    duration: '180 Hari',
-    energy: '+25 Energi / minggu',
-    features: [
-      'Full Access seluruh modul & alur belajar',
-      'Akses 24 Cheatsheets & 300+ Soal Tes Kerja',
-      'Semua fitur Pro Plan tanpa batas pilihan modul',
-      '25 Energi bonus setiap minggu',
-      'Bonus iCoinZ VIP langsung masuk',
-      'Kesempatan Magang di iCraft DS & 1-on-1 Mentoring',
-    ]
-  }
-}
-
 const currentPlanPerks = computed(() => {
-  const slug = (props.planSlug || 'pro').toLowerCase()
-  const base = PLAN_PERKS[slug] || PLAN_PERKS.pro
+  const presentation = resolvePlanPresentation(
+    props.planConfig || props.planSlug || 'pro',
+    selectedMonths.value
+  )
   const months = selectedMonths.value
-  const daysPerPeriod = Number(props.planConfig?.duration_in_days) || (slug === 'expert' ? 180 : 30)
-  if (months > 1) {
-    return {
-      ...base,
-      duration: `${months * daysPerPeriod} Hari (${months} Bulan)`
-    }
+  return {
+    badge: presentation.checkoutBadge,
+    duration: months > 1 ? `${presentation.durationLabel} (${months} Bulan)` : presentation.durationLabel,
+    energy: presentation.energyLabel,
+    features: presentation.features,
   }
-  return base
 })
 
 const selectedMethod = ref('doku')
@@ -845,6 +847,78 @@ const goToInstruction = async () => {
 
 .tier-marketing-note i {
   color: #38bdf8;
+}
+
+.checkout-duration-skeleton .skel-bar {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    rgba(51, 65, 85, 0.45) 25%,
+    rgba(100, 116, 139, 0.5) 50%,
+    rgba(51, 65, 85, 0.45) 75%
+  );
+  background-size: 200% 100%;
+  animation: dur-skel-shimmer 1.35s ease-in-out infinite;
+}
+
+.checkout-duration-skeleton .skel-title {
+  width: 62%;
+  height: 16px;
+}
+
+.checkout-duration-skeleton .skel-chip {
+  width: 82px;
+  height: 22px;
+  border-radius: 999px;
+}
+
+.checkout-duration-skeleton .skel-pill {
+  cursor: default;
+  gap: 8px;
+  min-height: 108px;
+}
+
+.checkout-duration-skeleton .skel-badge {
+  width: 58px;
+  height: 16px;
+  border-radius: 999px;
+  align-self: flex-end;
+}
+
+.checkout-duration-skeleton .skel-heading {
+  width: 48%;
+  height: 16px;
+}
+
+.checkout-duration-skeleton .skel-sub {
+  width: 66%;
+  height: 12px;
+}
+
+.checkout-duration-skeleton .skel-price {
+  width: 78%;
+  height: 20px;
+  margin-top: auto;
+}
+
+.checkout-duration-skeleton .skel-stepper-label {
+  width: 44%;
+  height: 14px;
+}
+
+.checkout-duration-skeleton .skel-stepper-controls {
+  width: 148px;
+  height: 30px;
+}
+
+@keyframes dur-skel-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @media (max-width: 640px) {

@@ -49,6 +49,7 @@
             :rawPrice="planPrice"
             :durationMonths="durationMonths"
             :planConfig="activePlanConfig"
+            :isPlanConfigLoading="!activePlanConfig && !plansLoaded"
             @update-duration="onUpdateDuration"
             @instruction="onInstruction"
             @success="handlePaymentSuccess"
@@ -65,6 +66,8 @@
             :planPrice="planPrice"
             :formattedPrice="formattedPrice"
             :discountedPrice="discountedPrice"
+            :durationMonths="durationMonths"
+            :planConfig="activePlanConfig"
             :expiryTime="expiryTime"
             @back="goBackToSelection"
             @check-status="startPolling"
@@ -86,6 +89,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
+import { usePlans } from '../composables/usePlans'
 import api from '../services/api'
 import { createPaymentPoll } from '../utils/paymentPoll'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
@@ -97,14 +101,27 @@ import CheckoutStepSuccess from '../components/checkout/CheckoutStepSuccess.vue'
 const router = useRouter()
 const route = useRoute()
 const { userProfile, isPremiumUser, currentPlan, bootstrapSession, fetchUser, fetchWallet, isLoggedIn } = useUserAccount()
+const { plansLoaded, fetchPlans, findPlanBySlug } = usePlans()
 
 const planName = ref(route.query.plan || 'Pro')
 const planPrice = ref(Number(route.query.price) || 49000)
 const planSlug = ref(route.query.slug || 'pro')
 const planId = ref(Number(route.query.id) || 2)
 const durationMonths = ref(Math.max(1, Number(route.query.months) || 1))
-const activePlanConfig = ref(null)
+const activePlanConfig = computed(() => findPlanBySlug(planSlug.value))
 const expiryTime = ref(null)
+
+const applyPlanMetadata = (matched) => {
+  if (!matched) return
+  if (!route.query.price) {
+    planPrice.value = Number(matched.price) || planPrice.value
+  }
+  if (matched.name) {
+    planName.value = matched.name
+  }
+}
+
+applyPlanMetadata(activePlanConfig.value)
 
 const onUpdateDuration = ({ months, totalPrice }) => {
   durationMonths.value = months
@@ -215,23 +232,14 @@ const startPolling = () => { pollingMessage.value = ''; poll.start() }
 const stopPolling = () => poll.stop()
 
 onMounted(async () => {
+  // Fetch plans immediately in parallel so duration tiers never wait for session/wallet requests.
+  const plansPromise = fetchPlans()
+    .then(() => applyPlanMetadata(activePlanConfig.value))
+    .catch(() => {})
+
   await bootstrapSession(true)
   localStorage.removeItem('ic_returning_from_payment')
-
-  try {
-    const plansRes = await api.get('/plans')
-    const list = plansRes.data?.data || plansRes.data || []
-    const matched = list.find((p) => p.slug === planSlug.value)
-    if (matched) {
-      activePlanConfig.value = matched
-      if (!route.query.price) {
-        planPrice.value = Number(matched.price) || planPrice.value
-      }
-      if (matched.name) {
-        planName.value = matched.name
-      }
-    }
-  } catch (e) {}
+  await plansPromise
 
   // Selalu coba restore dari localStorage jika ada pending checkout (agar transaksi tetap muncul saat kembali / refresh)
   const saved = localStorage.getItem('ic_pending_checkout')
@@ -242,6 +250,9 @@ onMounted(async () => {
         planName.value = data.planName || planName.value
         planPrice.value = data.planPrice || planPrice.value
         planSlug.value = data.planSlug || planSlug.value
+        if (data.durationMonths) {
+          durationMonths.value = Math.max(1, Number(data.durationMonths) || 1)
+        }
         discountedPrice.value = data.discountedPrice || null
         paymentDetails.value = data.paymentDetails || {}
         selectedMethod.value = data.selectedMethod || 'doku'

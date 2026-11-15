@@ -210,6 +210,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import QrcodeVue from 'qrcode.vue'
 import TerminalLoader from '../common/TerminalLoader.vue'
 import { useUserAccount } from '../../composables/useUserAccount'
+import { resolvePlanPresentation } from '../../composables/usePlans'
 
 const props = defineProps({
   paymentDetails: {
@@ -226,6 +227,14 @@ const props = defineProps({
   planPrice: Number,
   formattedPrice: String,
   discountedPrice: Number,
+  durationMonths: {
+    type: Number,
+    default: 1
+  },
+  planConfig: {
+    type: Object,
+    default: null
+  },
   expiryTime: Number
 })
 
@@ -243,38 +252,18 @@ const displayPlanName = computed(() => {
   return name.toLowerCase().endsWith('plan') ? name : `${name} Plan`
 })
 
-const PLAN_PERKS = {
-  pro: {
-    badge: 'Paling Populer',
-    duration: '30 Hari',
-    energy: '+20 Energi / minggu',
-    features: [
-      'Akses semua modul dasar & premium',
-      'Sertifikat kelulusan digital resmi',
-      '200.000 iCoinZ bonus langsung masuk',
-      'Hint premium tak terbatas di workspace',
-      'Leaderboard eksklusif coder Game-Z',
-    ]
-  },
-  expert: {
-    badge: 'Paket Tertinggi',
-    duration: '180 Hari',
-    energy: '+25 Energi / minggu',
-    features: [
-      'Akses 24 Cheatsheets & 300+ Soal Tes Kerja',
-      'Semua fitur Pro Plan',
-      '25 Energi bonus setiap minggu',
-      '300.000 iCoinZ bonus langsung masuk',
-      'Kesempatan Magang di iCraft DS',
-      '1-on-1 Mentoring bulanan',
-      'Review portofolio eksklusif',
-    ]
-  }
-}
-
 const currentPlanPerks = computed(() => {
-  const slug = (props.planSlug || 'pro').toLowerCase()
-  return PLAN_PERKS[slug] || PLAN_PERKS.pro
+  const presentation = resolvePlanPresentation(
+    props.planConfig || props.planSlug || 'pro',
+    props.durationMonths
+  )
+  const months = Math.max(1, Number(props.durationMonths) || 1)
+  return {
+    badge: presentation.checkoutBadge,
+    duration: months > 1 ? `${presentation.durationLabel} (${months} Bulan)` : presentation.durationLabel,
+    energy: presentation.energyLabel,
+    features: presentation.features,
+  }
 })
 
 const finalPrice = computed(() => {

@@ -52,9 +52,12 @@ test('Energy retry after timeout and reload generates fresh UUID and blocks doub
   } }
   const globals = {
     api, localStorage, crypto: webcrypto,
+    setTimeout: fn => { if (typeof fn === 'function') fn(); return 1 },
+    onBeforeRouteLeave: () => {},
+    useLearningPaths: () => ({ fetchPaths: async () => {} }),
     useRouter: () => ({ push: () => {} }),
     useRoute: () => ({ query: { pkgId: '2', method: 'coinz' } }),
-    useUserAccount: () => ({ userProfile: ref({ id: 7 }), fetchUser: async () => {}, fetchWallet: async () => {} })
+    useUserAccount: () => ({ userProfile: ref({ id: 7 }), coinz: ref(0), systemConfig: ref({}), fetchPublicConfig: async () => {}, fetchUser: async () => {}, fetchWallet: async () => {} })
   }
   let checkout = load('../src/views/ShopCheckoutView.vue', 'processPayment, state', globals)
   const pending = checkout.processPayment(); await checkout.processPayment(); assert.equal(keys.length, 1)
@@ -69,9 +72,12 @@ test('Unauthenticated user cannot process coinz payment', async () => {
   let called = false
   const checkout = load('../src/views/ShopCheckoutView.vue', 'processPayment, errorMsg', {
     api: { post: async () => { called = true } }, localStorage, crypto: webcrypto,
+    setTimeout: fn => { if (typeof fn === 'function') fn(); return 1 },
+    onBeforeRouteLeave: () => {},
+    useLearningPaths: () => ({ fetchPaths: async () => {} }),
     useRouter: () => ({ push: () => {} }),
     useRoute: () => ({ query: { pkgId: '2', method: 'coinz' } }),
-    useUserAccount: () => ({ userProfile: ref(null) })
+    useUserAccount: () => ({ userProfile: ref(null), coinz: ref(0), systemConfig: ref({}), fetchPublicConfig: async () => {} })
   })
   await checkout.processPayment(); assert.equal(called, false); assert.match(checkout.errorMsg.value, /masuk kembali/)
 })
@@ -97,13 +103,59 @@ test('Paid Pro uses product invoice contract and leaves subscription activation 
     post: async (url, body) => { calls.push({ url, body }); return { data: { data: { order_id: 'ORDER', payment_details: { qr_string: 'QR' } } } } }
   }
   const checkout = load('../src/components/checkout/CheckoutStepSelection.vue', 'goToInstruction', {
-    api, localStorage, useUserAccount: () => ({ userProfile: ref({ id: 7 }) }), defineProps: () => props, defineEmits: () => (...args) => emitted.push(args)
+    api, localStorage,
+    setTimeout: fn => { if (typeof fn === 'function') fn(); return 1 },
+    resolvePlanPresentation: () => ({ checkoutBadge: 'Paling Populer', durationLabel: '30 Hari', energyLabel: '20 Energi/minggu', features: [] }),
+    useUserAccount: () => ({ userProfile: ref({ id: 7 }) }), defineProps: () => props, defineEmits: () => (...args) => emitted.push(args)
   })
   await checkout.goToInstruction()
   assert.equal(calls.length, 1); assert.equal(calls[0].url, '/payments/create')
-  assert.deepEqual(Object.keys(calls[0].body).sort(), ['coupon_code', 'item_type', 'payment_method', 'plan_slug'])
+  assert.deepEqual(Object.keys(calls[0].body).sort(), ['coupon_code', 'duration_months', 'item_type', 'payment_method', 'plan_slug'])
   assert.equal(emitted.some(([event]) => event === 'success'), false)
   assert.equal(emitted.find(([event]) => event === 'instruction')[1].paymentDetails.order_id, 'ORDER')
+})
+
+test('resolvePlanPresentation resolves dynamic benefits, badge, energy label, and sessionStorage cache', async () => {
+  const sessionStorage = storage()
+  const api = {
+    get: async () => ({
+      data: {
+        data: [
+          {
+            slug: 'pro',
+            duration_in_days: 30,
+            badge_label: 'Best Seller',
+            energy_label: '30 Energi/minggu',
+            benefits: [
+              { text: 'Pilih 15 modul', included: true },
+              { text: 'Mentoring 1-on-1', included: false }
+            ]
+          }
+        ]
+      }
+    })
+  }
+  const { usePlans, resolvePlanPresentation } = load('../src/composables/usePlans.js', 'usePlans, resolvePlanPresentation', {
+    api, sessionStorage
+  })
+  const { fetchPlans, findPlanBySlug } = usePlans()
+  await fetchPlans()
+  const proPlan = findPlanBySlug('pro')
+  assert.ok(proPlan)
+  assert.ok(sessionStorage.getItem('ic_plans_cache_v1'))
+
+  const dynamic = resolvePlanPresentation(proPlan, 3)
+  assert.equal(dynamic.badgeLabel, 'Best Seller')
+  assert.equal(dynamic.energyLabel, '30 Energi/minggu')
+  assert.equal(dynamic.durationLabel, '90 Hari')
+  assert.deepEqual(dynamic.features, ['Pilih 15 modul'])
+  assert.deepEqual(dynamic.disabledFeatures, ['Mentoring 1-on-1'])
+
+  const fallback = resolvePlanPresentation({ slug: 'pro', max_selectable_modules: 14, icoinz_reward: 50000 }, 1)
+  assert.equal(fallback.badgeLabel, 'Paling Populer')
+  assert.equal(fallback.energyLabel, '20 Energi/minggu')
+  assert.match(fallback.features[0], /14 modul/)
+  assert.match(fallback.features[1], /50\.000 iCoinZ/)
 })
 
 test.skip('Invoice timeout cannot create another invoice after retry or reload', async () => {

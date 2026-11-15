@@ -24,23 +24,25 @@
       </div>
 
       <!-- Loading State -->
-      <TerminalLoader v-if="isLoadingPlans" label="paket langganan" />
+      <TerminalLoader v-if="isLoadingPlans && plans.length === 0" label="paket langganan" />
 
       <!-- Plan Selection -->
       <div v-else class="plans-container">
         <!-- Free Plan -->
         <div class="plan-card free">
           <div class="plan-header">
-            <div class="plan-icon"><i class="fa-solid fa-paper-plane"></i></div>
-            <h3>Free Plan</h3>
-            <p class="price">Rp 0<span>/bulan</span></p>
+            <div class="plan-icon"><i :class="freePlanDisplay.icon"></i></div>
+            <h3>{{ freePlan?.name || 'Free Plan' }}</h3>
+            <p class="price">Rp {{ formatPrice(freePlan?.price ?? 0) }}<span>{{ freePlan?.duration_in_days ? `/${freePlan.duration_in_days} hari` : '/bulan' }}</span></p>
+          </div>
+          <div v-if="freePlanDisplay.energyLabel" class="plan-energy-badge energy-free">
+            <i :class="freePlanDisplay.energyIcon"></i>
+            {{ freePlanDisplay.energyLabel }}
           </div>
           <ul class="plan-benefits">
-            <li><i class="fa-solid fa-check"></i> Akses modul dasar</li>
-            <li><i class="fa-solid fa-check"></i> 10 Energy / hari</li>
-            <li class="disabled"><i class="fa-solid fa-xmark"></i> Akses konten premium</li>
-            <li class="disabled"><i class="fa-solid fa-xmark"></i> Sertifikat kelulusan</li>
-            <li class="disabled"><i class="fa-solid fa-xmark"></i> 1-on-1 Mentoring</li>
+            <li v-for="(item, index) in freePlanDisplay.orderedBenefits" :key="'free-' + index" :class="{ disabled: !item.included }">
+              <i :class="item.included ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i> {{ item.text }}
+            </li>
           </ul>
           <div class="plan-action">
             <div v-if="(currentPlan === 'free' || !currentPlan) && !isPremiumUser" class="active-badge"><i class="fa-solid fa-check-circle"></i> Paket Saat Ini</div>
@@ -49,10 +51,14 @@
         </div>
 
         <!-- Dynamic Plans from API -->
-        <div v-for="plan in plans" :key="plan.id" class="plan-card" :class="[plan.slug, { active: isPlanOwned(plan.slug) }]">
-          <!-- Optional Badges based on slug -->
-          <div v-if="plan.slug === 'pro'" class="badge-popular">Paling Populer</div>
-          <div v-else-if="plan.slug === 'expert'" class="badge-premium">Premium</div>
+        <div v-for="plan in paidPlans" :key="plan.id" class="plan-card" :class="[plan.slug, { active: isPlanOwned(plan.slug) }]">
+          <!-- Optional Badges from Admin or slug default -->
+          <div
+            v-if="getPlanBadge(plan)"
+            :class="plan.slug === 'expert' ? 'badge-premium' : 'badge-popular'"
+          >
+            {{ getPlanBadge(plan) }}
+          </div>
           
           <div class="plan-header">
             <div class="plan-icon" :class="plan.slug + '-icon'">
@@ -63,17 +69,18 @@
           </div>
           
           <!-- Energy badge -->
-          <div class="plan-energy-badge" :class="'energy-' + plan.slug">
+          <div v-if="getPlanEnergyLabel(plan)" class="plan-energy-badge" :class="'energy-' + plan.slug">
             <i :class="getPlanEnergyIcon(plan.slug)"></i>
-            {{ getPlanEnergyLabel(plan.slug) }}
+            {{ getPlanEnergyLabel(plan) }}
           </div>
           
           <ul class="plan-benefits">
-            <li v-for="(benefit, index) in getPlanBenefits(plan)" :key="'b-' + index">
-              <i class="fa-solid fa-check"></i> {{ benefit }}
-            </li>
-            <li v-for="(item, index) in getPlanDisabled(plan.slug)" :key="'d-' + index" class="disabled">
-              <i class="fa-solid fa-xmark"></i> {{ item }}
+            <li
+              v-for="(item, index) in getPlanBenefitItems(plan)"
+              :key="'b-' + index"
+              :class="{ disabled: !item.included }"
+            >
+              <i :class="item.included ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i> {{ item.text }}
             </li>
           </ul>
           
@@ -119,12 +126,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '../services/api'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import AuthRequiredModal from '../components/common/AuthRequiredModal.vue'
 import { useUserAccount } from '../composables/useUserAccount'
+import { usePlans, resolvePlanPresentation } from '../composables/usePlans'
 import { useToast } from '../composables/useToast'
 
 const props = defineProps({
@@ -136,10 +143,11 @@ const props = defineProps({
 
 const router = useRouter()
 const { isLoggedIn, isPremiumUser, currentPlan, subscriptionInfo } = useUserAccount()
+const { plans, isLoadingPlans, fetchPlans, findPlanBySlug } = usePlans()
+const freePlan = computed(() => findPlanBySlug('free'))
+const freePlanDisplay = computed(() => resolvePlanPresentation(freePlan.value || 'free'))
+const paidPlans = computed(() => plans.value.filter((p) => String(p?.slug || '').toLowerCase() !== 'free'))
 const { showToast } = useToast()
-
-const plans = ref([])
-const isLoadingPlans = ref(false)
 
 const isPlanOwned = (slug) => {
   return currentPlan.value === slug || (isPremiumUser.value && (currentPlan.value === 'free' || !currentPlan.value) && slug === 'pro')
@@ -166,13 +174,9 @@ onMounted(async () => {
   }
 
   try {
-    isLoadingPlans.value = true
-    const response = await api.get('/plans')
-    plans.value = response.data.data || response.data
+    await fetchPlans()
   } catch (error) {
     console.error('Failed to fetch plans', error)
-  } finally {
-    isLoadingPlans.value = false
   }
 })
 
@@ -185,58 +189,11 @@ const cancelPendingCheckout = () => {
   pendingCheckout.value = null
 }
 
-const PLAN_CONFIG = {
-  pro: {
-    icon: 'fa-solid fa-rocket',
-    energyLabel: '20 Energi/minggu',
-    energyIcon: 'fa-solid fa-infinity',
-    benefits: [
-      'Akses bebas pilih 12 modul alur belajar / bulan (Tidak dapat dibatalkan)',
-      'Akses Global Challenge & Event Arena',
-      'Sertifikat kelulusan digital',
-      'Hint premium tak terbatas',
-      'Leaderboard eksklusif',
-    ],
-    disabled: [
-      'Full Access seluruh modul tanpa batas',
-      'Kesempatan Magang di ICraft DS',
-      '1-on-1 Mentoring bulanan',
-    ],
-  },
-  expert: {
-    icon: 'fa-solid fa-crown',
-    energyLabel: '25 Energi / minggu',
-    energyIcon: 'fa-solid fa-bolt',
-    benefits: [
-      'Full Access semua modul alur belajar',
-      'Akses 24 Cheatsheets & 300+ Soal Tes Kerja',
-      'Semua fitur Pro Plan',
-      '25 Energi bonus setiap minggu',
-      'Kesempatan Magang di ICraft DS',
-      '1-on-1 Mentoring bulanan',
-      'Portofolio review eksklusif',
-    ],
-    disabled: [],
-  },
-}
-
-const getPlanIcon = (slug) => PLAN_CONFIG[slug]?.icon ?? 'fa-solid fa-star'
-const getPlanBenefits = (planOrSlug) => {
-  const plan = typeof planOrSlug === 'object' && planOrSlug !== null ? planOrSlug : null
-  const slug = plan ? plan.slug : planOrSlug
-  const base = [...(PLAN_CONFIG[slug]?.benefits ?? ['Akses fitur premium'])]
-  if (slug === 'pro' && plan?.max_selectable_modules) {
-    base[0] = `Akses bebas pilih ${plan.max_selectable_modules} modul alur belajar / bulan (Tidak dapat dibatalkan)`
-  }
-  const reward = Number(plan?.icoinz_reward || 0)
-  if (reward > 0) {
-    base.splice(1, 0, `Bonus ${formatPrice(reward)} iCoinZ bergabung`)
-  }
-  return base
-}
-const getPlanDisabled = (slug) => PLAN_CONFIG[slug]?.disabled ?? []
-const getPlanEnergyLabel  = (slug) => PLAN_CONFIG[slug]?.energyLabel ?? ''
-const getPlanEnergyIcon   = (slug) => PLAN_CONFIG[slug]?.energyIcon ?? 'fa-solid fa-bolt'
+const getPlanIcon = (slug) => resolvePlanPresentation(slug).icon
+const getPlanBadge = (plan) => resolvePlanPresentation(plan).badgeLabel
+const getPlanBenefitItems = (plan) => resolvePlanPresentation(plan).orderedBenefits
+const getPlanEnergyLabel = (planOrSlug) => resolvePlanPresentation(planOrSlug).energyLabel
+const getPlanEnergyIcon = (slug) => resolvePlanPresentation(slug).energyIcon
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
