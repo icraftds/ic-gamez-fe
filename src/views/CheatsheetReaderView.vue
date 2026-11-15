@@ -64,6 +64,7 @@
         </span>
 
         <a 
+          v-if="isExpert"
           :href="`/cheatsheet/${currentModule.file}`" 
           target="_blank" 
           rel="noopener noreferrer" 
@@ -111,7 +112,7 @@
             </div>
             <div class="feature-item">
               <i class="fa-solid fa-circle-check"></i>
-              <span>Hint AI Premium tanpa batas & Akses Seluruh Jalur Belajar</span>
+              <span>25 Energi/minggu, Hint AI Prioritas & Akses Seluruh Jalur Belajar</span>
             </div>
           </div>
 

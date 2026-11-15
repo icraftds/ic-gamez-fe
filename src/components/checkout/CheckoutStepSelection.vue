@@ -217,7 +217,7 @@
           <div class="breakdown-row">
             <span class="breakdown-label">
               Harga Paket
-              <span class="breakdown-plan-tag">({{ displayPlanName }} · {{ selectedMonths }} Bln)</span>
+              <span class="breakdown-plan-tag">({{ displayPlanName }} · {{ isMultiMonthEnabled ? `${selectedMonths} Bln` : currentPlanPerks.duration }})</span>
             </span>
             <span class="breakdown-value">Rp {{ formatNumber(isMultiMonthEnabled ? multiMonthPricing.normalTotal : effectiveRawPrice) }}</span>
           </div>

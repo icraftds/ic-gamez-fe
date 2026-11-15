@@ -5,6 +5,7 @@
     { "source": "/api/session", "destination": "/api/sso?__sso_route=session" },
     { "source": "/api/auth/logout", "destination": "/api/sso?__sso_route=logout" },
     { "source": "/api/bff/:path*", "destination": "/api/sso?__sso_route=bff&__sso_path=:path*" },
+    { "source": "/cheatsheet/index.html", "destination": "/" },
     {
       "source": "/(.*)",
       "destination": "/" }]

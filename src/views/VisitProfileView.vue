@@ -63,7 +63,7 @@
                   <div class="tier-progress">
                     <div class="tier-labels">
                       <span class="current-tier">Lv. {{ userProfile.level }}</span>
-                      <span class="xp-text">{{ userProfile.xp }} / {{ (userProfile.level * 1000) }} XP</span>
+                      <span class="xp-text">{{ userProfile.xp }} / {{ userProfile.next_level_xp || (userProfile.level * 1000) }} XP</span>
                       <span class="next-tier">Lv. {{ userProfile.level + 1 }}</span>
                     </div>
                     <div class="progress-bar-bg">
@@ -78,7 +78,7 @@
                 <div class="stat-card xp-stat">
                   <div class="stat-icon"><CyberXp style="width: 24px; height: 24px;" /></div>
                   <div class="stat-info">
-                    <span class="stat-value">{{ userProfile.xp }}</span>
+                    <span class="stat-value">{{ stats?.xp?.total ?? userProfile.total_xp ?? userProfile.xp ?? 0 }}</span>
                     <span class="stat-label">Total XP</span>
                   </div>
                 </div>
@@ -92,7 +92,7 @@
                 <div class="stat-card lesson-stat">
                   <div class="stat-icon"><i class="fa-solid fa-book-open"></i></div>
                   <div class="stat-info">
-                    <span class="stat-value">{{ stats?.completed_lessons || 0 }}</span>
+                    <span class="stat-value">{{ stats?.completed_exercises?.total ?? stats?.completed_lessons ?? 0 }}</span>
                     <span class="stat-label">Materi Selesai</span>
                   </div>
                 </div>
@@ -354,7 +354,7 @@ const handleAcceptFriend = async () => {
 const xpPercentage = computed(() => {
   if (!userProfile.value) return 0
   const current = userProfile.value.xp || 0
-  const max = (userProfile.value.level || 1) * 1000
+  const max = userProfile.value.next_level_xp || ((userProfile.value.level || 1) * 1000)
   return Math.min(100, Math.max(0, (current / max) * 100))
 })
 

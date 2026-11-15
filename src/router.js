@@ -117,6 +117,10 @@ const router = createRouter({
       component: () => import('./views/VisitProfileView.vue')
     },
     {
+      path: '/profile',
+      redirect: '/profile/edit'
+    },
+    {
       path: '/profile/edit',
       name: 'profile-edit',
       component: () => import('./views/ProfileEditView.vue'),
