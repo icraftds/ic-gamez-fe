@@ -251,11 +251,20 @@
 
 @media (max-width: 768px) {
   .annual-banner {
-    padding: 25px;
+    padding: 22px 16px;
   }
   
   .banner-content h2 {
-    font-size: 1.6rem;
+    font-size: 1.55rem;
+  }
+
+  .annual-content {
+    padding: 16px;
+    gap: 18px;
+  }
+
+  .req-card, .submit-card {
+    padding: 18px 14px;
   }
 }
 

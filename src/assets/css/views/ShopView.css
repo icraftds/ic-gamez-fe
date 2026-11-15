@@ -236,7 +236,7 @@
 /* Grids */
 .shop-item-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 30px;
 }
 
@@ -727,7 +727,7 @@ body.light-mode .success-content h3 {
 
 .module-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
   gap: 24px;
 }
 

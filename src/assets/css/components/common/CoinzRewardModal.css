@@ -26,6 +26,26 @@
   overflow: hidden;
 }
 
+@media (max-width: 480px) {
+  .coinz-modal {
+    padding: 30px 20px 24px;
+    border-radius: 22px;
+  }
+  .coin-img {
+    width: 110px;
+    height: 110px;
+  }
+  .coinz-number {
+    font-size: 2.3rem;
+  }
+  .plus-sign {
+    font-size: 1.6rem;
+  }
+  .reward-title {
+    font-size: 1.25rem;
+  }
+}
+
 .glow-ring {
   position: absolute;
   top: 10px;

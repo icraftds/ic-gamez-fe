@@ -10,8 +10,9 @@
 }
 .market-modal-content {
   background: var(--glass-bg-modal-0_95);
-  padding: 40px;
+  padding: 32px 24px;
   border-radius: 20px;
+  width: calc(100% - 32px);
   max-width: 400px;
   text-align: center;
   border: 1px solid rgba(245, 158, 11, 0.5);
@@ -73,8 +74,9 @@
 }
 .promo-modal-content {
   background: linear-gradient(145deg, #1f2937, #111827);
-  padding: 40px 30px;
+  padding: 34px 24px;
   border-radius: 20px;
+  width: calc(100% - 32px);
   max-width: 450px;
   text-align: center;
   border: 2px solid #ef4444;

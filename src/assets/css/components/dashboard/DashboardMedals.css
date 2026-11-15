@@ -186,12 +186,12 @@
 
 .badges-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
   gap: 20px;
 }
 
 .badges-grid.trophy-grid {
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 28px;
 }
 
@@ -500,6 +500,22 @@
   }
 }
 @media (max-width: 600px) {
+  .dash-medals h2 {
+    font-size: 1.4rem;
+  }
+  .page-tabs {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .page-tabs button {
+    font-size: 0.95rem;
+    padding: 8px 12px;
+  }
+  .border-status-toggle {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px;
+  }
   .category-sidebar {
     display: none;
   }
@@ -507,8 +523,9 @@
     display: block;
     margin-bottom: 15px;
   }
-  .badges-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .badges-grid,
+  .badges-grid.trophy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
   .badges-area {

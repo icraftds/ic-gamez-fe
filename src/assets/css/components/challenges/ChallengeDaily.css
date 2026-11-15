@@ -308,6 +308,23 @@
   }
 }
 
+@media (max-width: 640px) {
+  .challenge-daily {
+    padding: 12px 4px;
+  }
+  .daily-header h2 {
+    font-size: 1.5rem;
+  }
+  .timer {
+    gap: 10px;
+  }
+  .time-box {
+    width: 60px;
+    height: 60px;
+    font-size: 1.4rem;
+  }
+}
+
 .btn-submit-speedrun {
   background: linear-gradient(135deg, #10b981, #0ea5e9);
   color: white;

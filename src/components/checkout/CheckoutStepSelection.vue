@@ -53,8 +53,17 @@
               :class="{ selected: selectedMonths === 1 }"
               @click="selectMonths(1)"
             >
-              <span class="dur-months">1 Bulan</span>
-              <span class="dur-sub">Rp {{ formatNumber(multiMonthPricing.baseMonthlyPrice) }}/bln</span>
+              <div class="dur-card-top">
+                <span class="dur-months">1 Bulan</span>
+                <span class="dur-discount-pill neutral">Reguler</span>
+              </div>
+              <span class="dur-subtitle">Coba 1 bulan</span>
+              <div class="dur-price-block">
+                <div class="dur-price-main">
+                  <span class="dur-amount">Rp {{ formatNumber(multiMonthPricing.baseMonthlyPrice) }}</span>
+                  <span class="dur-unit">/bln</span>
+                </div>
+              </div>
             </button>
 
             <button
@@ -68,9 +77,29 @@
               }"
               @click="selectMonths(tier.months)"
             >
-              <span v-if="tier.badge_text" class="dur-badge">{{ tier.badge_text }}</span>
-              <span class="dur-months">{{ tier.months }} Bulan</span>
-              <span class="dur-sub">Rp {{ formatNumber(tier.monthly_price) }}/bln</span>
+              <div class="dur-card-top">
+                <span class="dur-months">{{ tier.months }} Bulan</span>
+                <span
+                  v-if="getTierDiscountPercent(tier) > 0"
+                  class="dur-discount-pill"
+                  :class="{ hot: tier.is_popular }"
+                >
+                  Diskon {{ getTierDiscountPercent(tier) }}%
+                </span>
+              </div>
+              <span v-if="tier.badge_text" class="dur-subtitle">{{ tier.badge_text }}</span>
+              <div class="dur-price-block">
+                <span
+                  v-if="getTierDiscountPercent(tier) > 0"
+                  class="dur-price-strike"
+                >
+                  Rp {{ formatNumber(multiMonthPricing.baseMonthlyPrice) }}
+                </span>
+                <div class="dur-price-main">
+                  <span class="dur-amount">Rp {{ formatNumber(tier.monthly_price) }}</span>
+                  <span class="dur-unit">/bln</span>
+                </div>
+              </div>
             </button>
           </div>
 
@@ -321,6 +350,13 @@ const multiMonthPricing = computed(() => {
   }
 })
 
+const getTierDiscountPercent = (tier) => {
+  const base = multiMonthPricing.value.baseMonthlyPrice
+  const price = Math.round(Number(tier?.monthly_price) || 0)
+  if (!base || base <= price) return 0
+  return Math.round(((base - price) / base) * 100)
+}
+
 const selectMonths = (months) => {
   selectedMonths.value = Math.max(1, Number(months) || 1)
   emit('update-duration', {
@@ -525,6 +561,8 @@ const goToInstruction = async () => {
 
 <style scoped>
 .checkout-duration-box {
+  font-family: 'Plus Jakarta Sans', 'Poppins', system-ui, -apple-system, sans-serif;
+  font-variant-numeric: tabular-nums;
   margin: 14px 0 18px;
   padding: 14px;
   border-radius: 14px;
@@ -537,17 +575,18 @@ const goToInstruction = async () => {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
 .duration-title {
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.84rem;
+  font-weight: 600;
   color: #f1f5f9;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  letter-spacing: -0.01em;
 }
 
 .duration-title i {
@@ -556,7 +595,7 @@ const goToInstruction = async () => {
 
 .tier-highlight-tag {
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.14);
   border: 1px solid rgba(56, 189, 248, 0.35);
@@ -567,54 +606,116 @@ const goToInstruction = async () => {
 .duration-pills-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
 }
 
 .duration-pill {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 10px 8px;
-  border-radius: 10px;
-  background: rgba(30, 41, 59, 0.72);
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: left;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.18);
   color: #e2e8f0;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .duration-pill:hover {
-  border-color: rgba(56, 189, 248, 0.55);
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(30, 41, 59, 0.8);
 }
 
 .duration-pill.selected {
-  background: rgba(14, 165, 233, 0.18);
+  background: rgba(14, 165, 233, 0.14);
   border-color: #38bdf8;
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.22);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35), 0 8px 18px -8px rgba(56, 189, 248, 0.4);
 }
 
 .duration-pill.popular:not(.selected) {
-  border-color: rgba(245, 158, 11, 0.45);
+  border-color: rgba(244, 63, 94, 0.38);
 }
 
-.dur-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #fbbf24;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+.dur-card-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 .dur-months {
-  font-size: 0.9rem;
-  font-weight: 800;
+  font-size: 0.94rem;
+  font-weight: 700;
   color: #f8fafc;
+  letter-spacing: -0.01em;
 }
 
-.dur-sub {
-  font-size: 0.73rem;
+.dur-discount-pill {
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(244, 63, 94, 0.18);
+  color: #fda4af;
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  white-space: nowrap;
+}
+
+.dur-discount-pill.hot {
+  background: #e11d48;
+  color: #ffffff;
+  border-color: #e11d48;
+}
+
+.dur-discount-pill.neutral {
+  background: rgba(148, 163, 184, 0.14);
+  color: #94a3b8;
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.dur-subtitle {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #94a3b8;
+  line-height: 1.3;
+}
+
+.dur-price-block {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dur-price-strike {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #64748b;
+  text-decoration: line-through;
+}
+
+.dur-price-main {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.dur-amount {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.dur-unit {
+  font-size: 0.72rem;
+  font-weight: 500;
   color: #94a3b8;
 }
 
@@ -691,13 +792,30 @@ const goToInstruction = async () => {
     padding: 12px;
   }
   .duration-pills-grid {
-    gap: 6px;
+    gap: 8px;
   }
   .duration-pill {
-    padding: 8px 6px;
+    padding: 10px 9px;
+  }
+  .dur-card-top {
+    flex-wrap: wrap;
+    gap: 4px;
   }
   .dur-months {
-    font-size: 0.84rem;
+    font-size: 0.86rem;
+  }
+  .dur-amount {
+    font-size: 0.94rem;
+  }
+  .dur-discount-pill {
+    font-size: 0.62rem;
+    padding: 1px 6px;
+  }
+}
+
+@media (max-width: 360px) {
+  .duration-pills-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

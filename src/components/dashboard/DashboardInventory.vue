@@ -156,7 +156,7 @@ onMounted(async () => {
 }
 .inventory-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
   gap: 20px;
 }
 .inventory-item {
@@ -211,5 +211,54 @@ onMounted(async () => {
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .dashboard-inventory {
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+  .header {
+    margin-bottom: 20px;
+  }
+  .header h2 {
+    font-size: 1.4rem;
+  }
+  .inventory-tabs {
+    gap: 14px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    white-space: nowrap;
+    font-size: 0.95rem;
+    padding: 12px 4px;
+    gap: 6px;
+  }
+  .border-tab-wrapper {
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .inventory-item {
+    padding: 14px 10px;
+    border-radius: 12px;
+  }
+  .item-icon img {
+    width: 96px;
+    height: 96px;
+  }
+  .item-details h3 {
+    font-size: 1rem;
+  }
+  .item-details p {
+    font-size: 0.8rem;
+  }
 }
 </style>

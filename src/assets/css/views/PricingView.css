@@ -55,7 +55,7 @@
 
 .plans-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 30px;
   margin-bottom: 40px;
   justify-items: center;
@@ -225,6 +225,22 @@
 }
 
 @media (max-width: 768px) {
+  .pricing-content {
+    padding: 84px 16px 40px;
+  }
+  .gradient-text {
+    font-size: 1.9rem;
+  }
+  .subtitle {
+    font-size: 0.95rem;
+  }
+  .plans-container {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .plan-card {
+    padding: 24px 18px;
+  }
   .plan-card.pro {
     transform: none;
   }

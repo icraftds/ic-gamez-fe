@@ -96,11 +96,17 @@
   color: #fbbf24;
 }
 @media (max-width: 768px) {
+  .mega-prize-pool {
+    padding: 22px 14px;
+  }
   .prize-amount {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
+  }
+  .prize-amount .plus {
+    font-size: 1.8rem;
   }
   .prize-icon {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   .prize-subtext-container {
     flex-direction: column;
