@@ -84,17 +84,19 @@
                   class="dur-discount-pill"
                   :class="{ hot: tier.is_popular }"
                 >
-                  Diskon {{ getTierDiscountPercent(tier) }}%
+                  {{ tier.is_popular ? `Spesial • ${getTierDiscountPercent(tier)}% OFF` : `${getTierDiscountPercent(tier)}% OFF` }}
                 </span>
               </div>
               <span v-if="tier.badge_text" class="dur-subtitle">{{ tier.badge_text }}</span>
               <div class="dur-price-block">
-                <span
-                  v-if="getTierDiscountPercent(tier) > 0"
-                  class="dur-price-strike"
-                >
-                  Rp {{ formatNumber(multiMonthPricing.baseMonthlyPrice) }}
-                </span>
+                <div v-if="getTierDiscountPercent(tier) > 0" class="dur-compare-row">
+                  <span class="dur-price-strike">
+                    Rp {{ formatNumber(multiMonthPricing.baseMonthlyPrice) }}
+                  </span>
+                  <span class="dur-savings-note">
+                    Hemat Rp {{ formatNumber(getTierSavingsPerMonth(tier)) }}/bln
+                  </span>
+                </div>
                 <div class="dur-price-main">
                   <span class="dur-amount">Rp {{ formatNumber(tier.monthly_price) }}</span>
                   <span class="dur-unit">/bln</span>
@@ -355,6 +357,12 @@ const getTierDiscountPercent = (tier) => {
   const price = Math.round(Number(tier?.monthly_price) || 0)
   if (!base || base <= price) return 0
   return Math.round(((base - price) / base) * 100)
+}
+
+const getTierSavingsPerMonth = (tier) => {
+  const base = multiMonthPricing.value.baseMonthlyPrice
+  const price = Math.round(Number(tier?.monthly_price) || 0)
+  return Math.max(0, base - price)
 }
 
 const selectMonths = (months) => {
@@ -693,11 +701,24 @@ const goToInstruction = async () => {
   gap: 1px;
 }
 
+.dur-compare-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .dur-price-strike {
   font-size: 0.72rem;
   font-weight: 500;
   color: #64748b;
   text-decoration: line-through;
+}
+
+.dur-savings-note {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #34d399;
 }
 
 .dur-price-main {
