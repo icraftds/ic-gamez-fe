@@ -53,12 +53,22 @@
               :class="{ selected: selectedMonths === 1 }"
               @click="selectMonths(1)"
             >
-              <div class="dur-card-top">
-                <span class="dur-months">1 Bulan</span>
+              <div class="dur-badge-row">
                 <span class="dur-discount-pill neutral">Reguler</span>
               </div>
-              <span class="dur-subtitle">Coba 1 bulan</span>
+              <div class="dur-head">
+                <span class="dur-months">1 Bulan</span>
+                <span class="dur-subtitle">Coba 1 bulan</span>
+              </div>
               <div class="dur-price-block">
+                <div
+                  v-if="anchorMonthlyPrice > multiMonthPricing.baseMonthlyPrice"
+                  class="dur-compare-row"
+                >
+                  <span class="dur-price-strike">
+                    Rp {{ formatNumber(anchorMonthlyPrice) }}
+                  </span>
+                </div>
                 <div class="dur-price-main">
                   <span class="dur-amount">Rp {{ formatNumber(multiMonthPricing.baseMonthlyPrice) }}</span>
                   <span class="dur-unit">/bln</span>
@@ -77,21 +87,26 @@
               }"
               @click="selectMonths(tier.months)"
             >
-              <div class="dur-card-top">
-                <span class="dur-months">{{ tier.months }} Bulan</span>
+              <div class="dur-badge-row">
                 <span
                   v-if="getTierDiscountPercent(tier) > 0"
                   class="dur-discount-pill"
                   :class="{ hot: tier.is_popular }"
                 >
-                  {{ tier.is_popular ? `Spesial • ${getTierDiscountPercent(tier)}% OFF` : `${getTierDiscountPercent(tier)}% OFF` }}
+                  {{ tier.is_popular ? `Penawaran spesial • ${getTierDiscountPercent(tier)}% off` : `${getTierDiscountPercent(tier)}% off` }}
                 </span>
               </div>
-              <span v-if="tier.badge_text" class="dur-subtitle">{{ tier.badge_text }}</span>
+              <div class="dur-head">
+                <span class="dur-months">
+                  <i v-if="tier.is_popular" class="fas fa-sparkles dur-sparkle"></i>
+                  {{ tier.months }} Bulan
+                </span>
+                <span v-if="tier.badge_text" class="dur-subtitle">{{ tier.badge_text }}</span>
+              </div>
               <div class="dur-price-block">
                 <div v-if="getTierDiscountPercent(tier) > 0" class="dur-compare-row">
                   <span class="dur-price-strike">
-                    Rp {{ formatNumber(multiMonthPricing.baseMonthlyPrice) }}
+                    Rp {{ formatNumber(anchorMonthlyPrice) }}
                   </span>
                   <span class="dur-savings-note">
                     Hemat Rp {{ formatNumber(getTierSavingsPerMonth(tier)) }}/bln
@@ -352,15 +367,20 @@ const multiMonthPricing = computed(() => {
   }
 })
 
+const anchorMonthlyPrice = computed(() => {
+  const cmp = Math.round(Number(props.planConfig?.compare_price) || 0)
+  return cmp > 0 ? cmp : multiMonthPricing.value.baseMonthlyPrice
+})
+
 const getTierDiscountPercent = (tier) => {
-  const base = multiMonthPricing.value.baseMonthlyPrice
+  const base = anchorMonthlyPrice.value
   const price = Math.round(Number(tier?.monthly_price) || 0)
   if (!base || base <= price) return 0
   return Math.round(((base - price) / base) * 100)
 }
 
 const getTierSavingsPerMonth = (tier) => {
-  const base = multiMonthPricing.value.baseMonthlyPrice
+  const base = anchorMonthlyPrice.value
   const price = Math.round(Number(tier?.monthly_price) || 0)
   return Math.max(0, base - price)
 }
@@ -649,36 +669,51 @@ const goToInstruction = async () => {
   border-color: rgba(244, 63, 94, 0.38);
 }
 
-.dur-card-top {
+.dur-badge-row {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  justify-content: flex-end;
+  min-height: 20px;
+}
+
+.dur-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .dur-months {
-  font-size: 0.94rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.96rem;
   font-weight: 700;
   color: #f8fafc;
   letter-spacing: -0.01em;
 }
 
+.dur-sparkle {
+  font-size: 0.78rem;
+  color: #a78bfa;
+}
+
 .dur-discount-pill {
   font-size: 0.66rem;
-  font-weight: 600;
-  padding: 2px 7px;
+  font-weight: 700;
+  padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(244, 63, 94, 0.18);
-  color: #fda4af;
-  border: 1px solid rgba(244, 63, 94, 0.35);
+  background: #f43f5e;
+  color: #ffffff;
+  border: 1px solid #f43f5e;
   white-space: nowrap;
 }
 
 .dur-discount-pill.hot {
-  background: #e11d48;
+  background: #f43f5e;
   color: #ffffff;
-  border-color: #e11d48;
+  border-color: #f43f5e;
+  box-shadow: 0 2px 10px rgba(244, 63, 94, 0.35);
 }
 
 .dur-discount-pill.neutral {
