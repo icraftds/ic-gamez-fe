@@ -35,6 +35,75 @@
           </ul>
         </div>
 
+        <!-- Multi-Month Marketing Sale Selector (Halaman Pembayaran - Kelipatan 3 Tak Terbatas) -->
+        <div v-if="isMultiMonthEnabled" class="checkout-duration-box">
+          <div class="duration-header-row">
+            <span class="duration-title">
+              <i class="fa-solid fa-fire"></i> Pilih Durasi Langganan (Kelipatan 3 Bln)
+            </span>
+            <span v-if="multiMonthPricing.appliedTier?.badge_text" class="tier-highlight-tag">
+              {{ multiMonthPricing.appliedTier.badge_text }}
+            </span>
+          </div>
+
+          <div class="duration-pills-grid">
+            <button
+              type="button"
+              class="duration-pill"
+              :class="{ selected: selectedMonths === 1 }"
+              @click="selectMonths(1)"
+            >
+              <span class="dur-months">1 Bulan</span>
+              <span class="dur-sub">Rp {{ formatNumber(multiMonthPricing.baseMonthlyPrice) }}/bln</span>
+            </button>
+
+            <button
+              v-for="tier in planConfig?.marketing_tiers || []"
+              :key="tier.months"
+              type="button"
+              class="duration-pill"
+              :class="{
+                selected: selectedMonths === tier.months,
+                popular: tier.is_popular
+              }"
+              @click="selectMonths(tier.months)"
+            >
+              <span v-if="tier.badge_text" class="dur-badge">{{ tier.badge_text }}</span>
+              <span class="dur-months">{{ tier.months }} Bulan</span>
+              <span class="dur-sub">Rp {{ formatNumber(tier.monthly_price) }}/bln</span>
+            </button>
+          </div>
+
+          <div class="custom-stepper-row">
+            <span class="stepper-label">Atau atur kelipatan 3 bulan:</span>
+            <div class="stepper-controls">
+              <button
+                type="button"
+                class="stepper-btn"
+                :disabled="selectedMonths <= 1"
+                @click="stepMonths(-1)"
+                aria-label="Kurangi durasi"
+              >
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <span class="stepper-value">{{ selectedMonths }} Bulan</span>
+              <button
+                type="button"
+                class="stepper-btn"
+                @click="stepMonths(1)"
+                aria-label="Tambah 3 bulan"
+              >
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <p v-if="multiMonthPricing.appliedTier?.highlight_text" class="tier-marketing-note">
+            <i class="fa-solid fa-sparkles"></i>
+            <span>{{ multiMonthPricing.appliedTier.highlight_text }}</span>
+          </p>
+        </div>
+
         <!-- Target Account Info -->
         <div v-if="userProfile" class="target-account-box">
           <div class="account-icon">
@@ -77,8 +146,15 @@
         <!-- Price Breakdown -->
         <div class="price-breakdown-card">
           <div class="breakdown-row">
-            <span class="breakdown-label">Harga Paket <span class="breakdown-plan-tag">({{ displayPlanName }})</span></span>
-            <span class="breakdown-value">Rp {{ formattedPrice }}</span>
+            <span class="breakdown-label">
+              Harga Paket
+              <span class="breakdown-plan-tag">({{ displayPlanName }} · {{ selectedMonths }} Bln)</span>
+            </span>
+            <span class="breakdown-value">Rp {{ formatNumber(isMultiMonthEnabled ? multiMonthPricing.normalTotal : effectiveRawPrice) }}</span>
+          </div>
+          <div v-if="isMultiMonthEnabled && multiMonthPricing.savingsAmount > 0" class="breakdown-row discount">
+            <span class="breakdown-label">Diskon Paket {{ selectedMonths }} Bln ({{ multiMonthPricing.discountPercent }}%)</span>
+            <span class="breakdown-value">-Rp {{ formatNumber(multiMonthPricing.savingsAmount) }}</span>
           </div>
           <div v-if="discountAmount > 0" class="breakdown-row discount">
             <span class="breakdown-label">Potongan Promo</span>
@@ -199,11 +275,68 @@ const props = defineProps({
   durationMonths: {
     type: Number,
     default: 1
+  },
+  planConfig: {
+    type: Object,
+    default: null
   }
 })
 
-const emit = defineEmits(['instruction', 'success', 'processing'])
+const emit = defineEmits(['instruction', 'success', 'processing', 'update-duration'])
 const { userProfile } = useUserAccount()
+
+const selectedMonths = ref(Math.max(1, Number(props.durationMonths) || 1))
+
+const isMultiMonthEnabled = computed(() => Boolean(props.planConfig?.allow_multi_month))
+
+const multiMonthPricing = computed(() => {
+  const months = selectedMonths.value
+  const baseMonthlyPrice = Math.round(Number(props.planConfig?.price ?? props.rawPrice) || 0)
+  const tiers = Array.isArray(props.planConfig?.marketing_tiers)
+    ? [...props.planConfig.marketing_tiers].sort((a, b) => Number(a.months) - Number(b.months))
+    : []
+
+  let appliedTier = null
+  for (const tier of tiers) {
+    if (months >= Number(tier.months)) {
+      appliedTier = tier
+    }
+  }
+
+  const effectiveMonthlyPrice = appliedTier ? Math.round(Number(appliedTier.monthly_price)) : baseMonthlyPrice
+  const normalTotal = baseMonthlyPrice * months
+  const totalPrice = effectiveMonthlyPrice * months
+  const savingsAmount = Math.max(0, normalTotal - totalPrice)
+  const discountPercent = normalTotal > 0 ? Math.round(((normalTotal - totalPrice) / normalTotal) * 100) : 0
+
+  return {
+    months,
+    baseMonthlyPrice,
+    effectiveMonthlyPrice,
+    normalTotal,
+    totalPrice,
+    savingsAmount,
+    discountPercent,
+    appliedTier
+  }
+})
+
+const selectMonths = (months) => {
+  selectedMonths.value = Math.max(1, Number(months) || 1)
+  emit('update-duration', {
+    months: selectedMonths.value,
+    totalPrice: multiMonthPricing.value.totalPrice
+  })
+  if (couponStatus.value === 'success' && couponCode.value) {
+    validateCoupon()
+  }
+}
+
+const stepMonths = (delta) => {
+  const cur = selectedMonths.value
+  const next = delta > 0 ? (cur === 1 ? 3 : cur + 3) : (cur <= 3 ? 1 : cur - 3)
+  selectMonths(next)
+}
 
 const displayPlanName = computed(() => {
   const name = props.planName || 'Pro'
@@ -242,11 +375,12 @@ const PLAN_PERKS = {
 const currentPlanPerks = computed(() => {
   const slug = (props.planSlug || 'pro').toLowerCase()
   const base = PLAN_PERKS[slug] || PLAN_PERKS.pro
-  const months = Math.max(1, Number(props.durationMonths) || 1)
-  if (slug === 'pro' && months > 1) {
+  const months = selectedMonths.value
+  const daysPerPeriod = Number(props.planConfig?.duration_in_days) || (slug === 'expert' ? 180 : 30)
+  if (months > 1) {
     return {
       ...base,
-      duration: `${months * 30} Hari (${months} Bulan)`
+      duration: `${months * daysPerPeriod} Hari (${months} Bulan)`
     }
   }
   return base
@@ -266,14 +400,21 @@ const formatNumber = (num) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
-const finalPrice = computed(() => {
-  if (discountedPrice.value !== null) return discountedPrice.value
+const effectiveRawPrice = computed(() => {
+  if (isMultiMonthEnabled.value) {
+    return multiMonthPricing.value.totalPrice
+  }
   return props.rawPrice || 0
 })
 
+const finalPrice = computed(() => {
+  if (discountedPrice.value !== null) return discountedPrice.value
+  return effectiveRawPrice.value
+})
+
 const discountAmount = computed(() => {
-  if (discountedPrice.value !== null && props.rawPrice) {
-    return Math.max(0, props.rawPrice - discountedPrice.value)
+  if (discountedPrice.value !== null && effectiveRawPrice.value) {
+    return Math.max(0, effectiveRawPrice.value - discountedPrice.value)
   }
   return 0
 })
@@ -289,7 +430,7 @@ const validateCoupon = async () => {
     const res = await api.post('/coupons/validate', {
       code: couponCode.value,
       plan_slug: props.planSlug,
-      duration_months: props.durationMonths
+      duration_months: selectedMonths.value
     })
     
     discountedPrice.value = res.data.data.final_price
@@ -316,7 +457,7 @@ const goToInstruction = async () => {
         item_type: 'premium_plan',
         payment_method: selectedMethod.value,
         plan_slug: props.planSlug,
-        duration_months: props.durationMonths,
+        duration_months: selectedMonths.value,
         coupon_code: couponCode.value
       }),
       new Promise((resolve) => setTimeout(resolve, 1500))
@@ -340,8 +481,8 @@ const goToInstruction = async () => {
       planSlug: props.planSlug,
       planName: props.planName,
       planIcon: props.planIcon,
-      planPrice: props.rawPrice,
-      durationMonths: props.durationMonths,
+      planPrice: effectiveRawPrice.value,
+      durationMonths: selectedMonths.value,
       discountedPrice: discountedPrice.value,
       paymentDetails: {
         ...(tx.payment_details || {}),
@@ -381,3 +522,182 @@ const goToInstruction = async () => {
 </script>
 
 <style scoped src="../../assets/css/components/checkout/CheckoutStepSelection.css"></style>
+
+<style scoped>
+.checkout-duration-box {
+  margin: 14px 0 18px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.58);
+  border: 1px solid rgba(56, 189, 248, 0.24);
+}
+
+.duration-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.duration-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.duration-title i {
+  color: #f59e0b;
+}
+
+.tier-highlight-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.duration-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.duration-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.duration-pill:hover {
+  border-color: rgba(56, 189, 248, 0.55);
+}
+
+.duration-pill.selected {
+  background: rgba(14, 165, 233, 0.18);
+  border-color: #38bdf8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.22);
+}
+
+.duration-pill.popular:not(.selected) {
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.dur-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fbbf24;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dur-months {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.dur-sub {
+  font-size: 0.73rem;
+  color: #94a3b8;
+}
+
+.custom-stepper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(148, 163, 184, 0.2);
+  flex-wrap: wrap;
+}
+
+.stepper-label {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.stepper-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepper-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(30, 41, 59, 0.85);
+  color: #e2e8f0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  transition: all 0.2s ease;
+}
+
+.stepper-btn:hover:not(:disabled) {
+  background: rgba(14, 165, 233, 0.25);
+  border-color: #38bdf8;
+}
+
+.stepper-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stepper-value {
+  min-width: 72px;
+  text-align: center;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.tier-marketing-note {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  color: #bae6fd;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tier-marketing-note i {
+  color: #38bdf8;
+}
+
+@media (max-width: 640px) {
+  .checkout-duration-box {
+    padding: 12px;
+  }
+  .duration-pills-grid {
+    gap: 6px;
+  }
+  .duration-pill {
+    padding: 8px 6px;
+  }
+  .dur-months {
+    font-size: 0.84rem;
+  }
+}
+</style>

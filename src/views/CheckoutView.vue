@@ -48,6 +48,8 @@
             :planId="planId"
             :rawPrice="planPrice"
             :durationMonths="durationMonths"
+            :planConfig="activePlanConfig"
+            @update-duration="onUpdateDuration"
             @instruction="onInstruction"
             @success="handlePaymentSuccess"
             @processing="onProcessing"
@@ -101,7 +103,15 @@ const planPrice = ref(Number(route.query.price) || 49000)
 const planSlug = ref(route.query.slug || 'pro')
 const planId = ref(Number(route.query.id) || 2)
 const durationMonths = ref(Math.max(1, Number(route.query.months) || 1))
+const activePlanConfig = ref(null)
 const expiryTime = ref(null)
+
+const onUpdateDuration = ({ months, totalPrice }) => {
+  durationMonths.value = months
+  if (typeof totalPrice === 'number' && !Number.isNaN(totalPrice)) {
+    planPrice.value = totalPrice
+  }
+}
 
 const planIcon = computed(() => {
   if (planSlug.value === 'expert') return 'fa-solid fa-crown'
@@ -207,6 +217,21 @@ const stopPolling = () => poll.stop()
 onMounted(async () => {
   await bootstrapSession(true)
   localStorage.removeItem('ic_returning_from_payment')
+
+  try {
+    const plansRes = await api.get('/plans')
+    const list = plansRes.data?.data || plansRes.data || []
+    const matched = list.find((p) => p.slug === planSlug.value)
+    if (matched) {
+      activePlanConfig.value = matched
+      if (!route.query.price) {
+        planPrice.value = Number(matched.price) || planPrice.value
+      }
+      if (matched.name) {
+        planName.value = matched.name
+      }
+    }
+  } catch (e) {}
 
   // Selalu coba restore dari localStorage jika ada pending checkout (agar transaksi tetap muncul saat kembali / refresh)
   const saved = localStorage.getItem('ic_pending_checkout')

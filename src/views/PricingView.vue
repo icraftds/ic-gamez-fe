@@ -59,97 +59,7 @@
               <i :class="getPlanIcon(plan.slug)"></i>
             </div>
             <h3>{{ plan.name }}</h3>
-
-            <!-- Dynamic Price Display (Multi-month aware) -->
-            <template v-if="plan.allow_multi_month">
-              <div class="price-multi-wrap">
-                <p class="price">
-                  Rp {{ formatPrice(getPlanPricing(plan).effectiveMonthlyPrice) }}<span>/bulan</span>
-                </p>
-                <div v-if="getPlanPricing(plan).discountPercent > 0" class="price-discount-meta">
-                  <span class="price-strike">Rp {{ formatPrice(getPlanPricing(plan).baseMonthlyPrice) }}/bln</span>
-                  <span class="discount-pill">Hemat {{ getPlanPricing(plan).discountPercent }}%</span>
-                </div>
-                <p class="total-billing-note">
-                  Total {{ getPlanPricing(plan).months }} bulan:
-                  <strong>Rp {{ formatPrice(getPlanPricing(plan).totalPrice) }}</strong>
-                  <span v-if="getPlanPricing(plan).savingsAmount > 0" class="savings-text">
-                    (Hemat Rp {{ formatPrice(getPlanPricing(plan).savingsAmount) }})
-                  </span>
-                </p>
-              </div>
-            </template>
-            <template v-else>
-              <p class="price">Rp {{ formatPrice(plan.price) }}<span>/{{ plan.duration_in_days }} hari</span></p>
-            </template>
-          </div>
-
-          <!-- Multi-Month Marketing Sale Selector (Kelipatan 3 Tak Terbatas) -->
-          <div v-if="plan.allow_multi_month" class="duration-selector-box">
-            <div class="duration-header-row">
-              <span class="duration-title"><i class="fa-solid fa-fire"></i> Pilih Durasi (Kelipatan 3 Bln)</span>
-              <span v-if="getPlanPricing(plan).appliedTier?.badge_text" class="tier-highlight-tag">
-                {{ getPlanPricing(plan).appliedTier.badge_text }}
-              </span>
-            </div>
-
-            <div class="duration-pills-grid">
-              <button
-                type="button"
-                class="duration-pill"
-                :class="{ selected: getSelectedMonths(plan) === 1 }"
-                @click="setSelectedMonths(plan, 1)"
-              >
-                <span class="dur-months">1 Bln</span>
-                <span class="dur-sub">Normal</span>
-              </button>
-
-              <button
-                v-for="tier in plan.marketing_tiers || []"
-                :key="tier.months"
-                type="button"
-                class="duration-pill"
-                :class="{
-                  selected: getSelectedMonths(plan) === tier.months,
-                  popular: tier.is_popular
-                }"
-                @click="setSelectedMonths(plan, tier.months)"
-              >
-                <span v-if="tier.badge_text" class="dur-badge">{{ tier.badge_text }}</span>
-                <span class="dur-months">{{ tier.months }} Bln</span>
-                <span class="dur-sub">Rp {{ formatPrice(tier.monthly_price) }}/bln</span>
-              </button>
-            </div>
-
-            <!-- Unlimited Multiple-of-3 Stepper -->
-            <div class="custom-stepper-row">
-              <span class="stepper-label">Atau atur kelipatan 3:</span>
-              <div class="stepper-controls">
-                <button
-                  type="button"
-                  class="stepper-btn"
-                  :disabled="getSelectedMonths(plan) <= 1"
-                  @click="stepMonths(plan, -1)"
-                  aria-label="Kurangi durasi"
-                >
-                  <i class="fa-solid fa-minus"></i>
-                </button>
-                <span class="stepper-value">{{ getSelectedMonths(plan) }} Bulan</span>
-                <button
-                  type="button"
-                  class="stepper-btn"
-                  @click="stepMonths(plan, 1)"
-                  aria-label="Tambah 3 bulan"
-                >
-                  <i class="fa-solid fa-plus"></i>
-                </button>
-              </div>
-            </div>
-
-            <p v-if="getPlanPricing(plan).appliedTier?.highlight_text" class="tier-marketing-note">
-              <i class="fa-solid fa-sparkles"></i>
-              {{ getPlanPricing(plan).appliedTier.highlight_text }}
-            </p>
+            <p class="price">Rp {{ formatPrice(plan.price) }}<span>/{{ plan.duration_in_days }} hari</span></p>
           </div>
           
           <!-- Energy badge -->
@@ -230,64 +140,9 @@ const { showToast } = useToast()
 
 const plans = ref([])
 const isLoadingPlans = ref(false)
-const selectedMonthsByPlan = ref({})
 
 const isPlanOwned = (slug) => {
   return currentPlan.value === slug || (isPremiumUser.value && (currentPlan.value === 'free' || !currentPlan.value) && slug === 'pro')
-}
-
-const getSelectedMonths = (plan) => {
-  if (!plan?.allow_multi_month) return 1
-  return selectedMonthsByPlan.value[plan.slug] || 1
-}
-
-const setSelectedMonths = (plan, months) => {
-  const m = Math.max(1, Number(months) || 1)
-  selectedMonthsByPlan.value = {
-    ...selectedMonthsByPlan.value,
-    [plan.slug]: m
-  }
-}
-
-const stepMonths = (plan, delta) => {
-  const cur = getSelectedMonths(plan)
-  let next
-  if (delta > 0) {
-    next = cur === 1 ? 3 : cur + 3
-  } else {
-    next = cur <= 3 ? 1 : cur - 3
-  }
-  setSelectedMonths(plan, next)
-}
-
-const getPlanPricing = (plan) => {
-  const months = getSelectedMonths(plan)
-  const baseMonthlyPrice = Math.round(Number(plan?.price) || 0)
-  const tiers = Array.isArray(plan?.marketing_tiers) ? [...plan.marketing_tiers].sort((a, b) => a.months - b.months) : []
-
-  let appliedTier = null
-  for (const tier of tiers) {
-    if (months >= Number(tier.months)) {
-      appliedTier = tier
-    }
-  }
-
-  const effectiveMonthlyPrice = appliedTier ? Math.round(Number(appliedTier.monthly_price)) : baseMonthlyPrice
-  const normalTotal = baseMonthlyPrice * months
-  const totalPrice = effectiveMonthlyPrice * months
-  const savingsAmount = Math.max(0, normalTotal - totalPrice)
-  const discountPercent = normalTotal > 0 ? Math.round(((normalTotal - totalPrice) / normalTotal) * 100) : 0
-
-  return {
-    months,
-    baseMonthlyPrice,
-    effectiveMonthlyPrice,
-    normalTotal,
-    totalPrice,
-    savingsAmount,
-    discountPercent,
-    appliedTier
-  }
 }
 
 const showAuthModal = ref(false)
@@ -408,7 +263,6 @@ const handlePlanClick = async (slug, plan = null, isRenewal = false) => {
     } else {
       isNavigating.value = true
       navTargetSlug.value = slug
-      const pricing = plan ? getPlanPricing(plan) : { months: 1, totalPrice: 0 }
       // Arahkan ke halaman checkout dengan query params
       try {
         await router.push({
@@ -416,9 +270,8 @@ const handlePlanClick = async (slug, plan = null, isRenewal = false) => {
           query: {
             id: plan ? plan.id : undefined,
             plan: plan ? plan.name : slug,
-            price: plan ? pricing.totalPrice : 0,
+            price: plan ? plan.price : 0,
             slug: plan ? plan.slug : slug,
-            months: pricing.months,
             renew: isRenewal ? '1' : undefined
           }
         })
@@ -528,213 +381,6 @@ const handlePlanClick = async (slug, plan = null, isRenewal = false) => {
   }
 }
 
-/* Multi-Month Marketing Sale & Renewal UI */
-.price-multi-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.price-discount-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.price-strike {
-  font-size: 0.85rem;
-  color: #64748b;
-  text-decoration: line-through;
-}
-
-.discount-pill {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.14);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-.total-billing-note {
-  margin: 0;
-  font-size: 0.82rem;
-  color: #cbd5e1;
-}
-
-.total-billing-note strong {
-  color: #f8fafc;
-}
-
-.savings-text {
-  color: #34d399;
-  font-weight: 600;
-  margin-left: 4px;
-}
-
-.duration-selector-box {
-  margin: 14px 0 16px;
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(15, 23, 42, 0.55);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-}
-
-.duration-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.duration-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #e2e8f0;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.duration-title i {
-  color: #f59e0b;
-}
-
-.tier-highlight-tag {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.14);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-.duration-pills-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.duration-pill {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 10px 8px;
-  border-radius: 10px;
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  color: #e2e8f0;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.duration-pill:hover {
-  border-color: rgba(56, 189, 248, 0.55);
-}
-
-.duration-pill.selected {
-  background: rgba(14, 165, 233, 0.18);
-  border-color: #38bdf8;
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.22);
-}
-
-.duration-pill.popular:not(.selected) {
-  border-color: rgba(245, 158, 11, 0.45);
-}
-
-.dur-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #fbbf24;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.dur-months {
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #f8fafc;
-}
-
-.dur-sub {
-  font-size: 0.72rem;
-  color: #94a3b8;
-}
-
-.custom-stepper-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed rgba(148, 163, 184, 0.2);
-}
-
-.stepper-label {
-  font-size: 0.76rem;
-  color: #94a3b8;
-}
-
-.stepper-controls {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.stepper-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  background: rgba(30, 41, 59, 0.85);
-  color: #e2e8f0;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  transition: all 0.2s ease;
-}
-
-.stepper-btn:hover:not(:disabled) {
-  background: rgba(14, 165, 233, 0.25);
-  border-color: #38bdf8;
-}
-
-.stepper-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.stepper-value {
-  min-width: 68px;
-  text-align: center;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #f8fafc;
-}
-
-.tier-marketing-note {
-  margin: 8px 0 0;
-  font-size: 0.76rem;
-  color: #bae6fd;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tier-marketing-note i {
-  color: #38bdf8;
-}
-
 .plan-action {
   display: flex;
   flex-direction: column;
@@ -746,22 +392,5 @@ const handlePlanClick = async (slug, plan = null, isRenewal = false) => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-}
-
-@media (max-width: 640px) {
-  .duration-header-row,
-  .custom-stepper-row {
-    flex-wrap: wrap;
-  }
-  .duration-pills-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-  }
-  .duration-pill {
-    padding: 8px 6px;
-  }
-  .dur-months {
-    font-size: 0.84rem;
-  }
 }
 </style>
