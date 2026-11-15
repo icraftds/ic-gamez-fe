@@ -33,6 +33,7 @@ const maxCredits = computed(() => {
   return 10
 })
 const currentPlan = ref('free')
+const subscriptionInfo = ref(null)
 const proQuota = ref({ total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] })
 const unlockedPathIds = ref([])
 const ownedPathIds = ref([])
@@ -136,7 +137,7 @@ export function clearUserAccount() {
   isLoggedIn.value = false
   userProfile.value = { id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '', level: 1, xp: 0, monthlyXp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, showcase_medals: null, joinDate: '' }
   coinz.value = null; walletStatus.value = 'unavailable'; walletInitializationPending.value = false
-  currentPlan.value = 'free'; isPremiumUser.value = false; credits.value = 10; initializedToken = null
+  currentPlan.value = 'free'; isPremiumUser.value = false; subscriptionInfo.value = null; credits.value = 10; initializedToken = null
   proQuota.value = { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
   unlockedPathIds.value = []
   ownedPathIds.value = []
@@ -188,6 +189,7 @@ export function useUserAccount() {
       currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
         ? data.current_plan.slug 
         : (data.current_plan || 'free')
+      subscriptionInfo.value = data.subscription_status || null
       proQuota.value = data.pro_quota || { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
       unlockedPathIds.value = Array.isArray(data.unlocked_path_ids) ? data.unlocked_path_ids.map(Number) : []
       ownedPathIds.value = Array.isArray(data.owned_path_ids) ? data.owned_path_ids.map(Number) : []
@@ -591,6 +593,7 @@ export function useUserAccount() {
     maxCredits,
     isPremiumUser,
     currentPlan,
+    subscriptionInfo,
     proQuota,
     unlockedPathIds,
     ownedPathIds,

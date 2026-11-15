@@ -123,6 +123,11 @@ const poll = createPaymentPoll(async (isCurrent) => {
   const saved = JSON.parse(localStorage.getItem('ic_pending_checkout') || 'null')
   if (saved) savedCheckout.value = saved
 
+  if (saved?.paymentDetails?.order_id) {
+    await api.post('/payments/verify-status', { order_id: saved.paymentDetails.order_id }).catch(() => {})
+    if (!isCurrent()) return false
+  }
+
   await fetchUser(true)
   const isMatchUser = !saved?.userId || String(saved.userId) === String(userProfile.value?.id)
   const expectedPlan = isMatchUser ? (saved?.planSlug || currentPlan.value) : null
@@ -201,10 +206,11 @@ onUnmounted(() => {
 
 <style scoped>
 .payment-success-view {
-  min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .success-container {
@@ -212,7 +218,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 100px 20px 40px 20px;
+  padding: 40px 20px;
   position: relative;
   z-index: 2;
 }
@@ -298,6 +304,8 @@ p {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
   font-size: 0.9rem;
 }
 .summary-row .label {
@@ -306,6 +314,7 @@ p {
 .summary-row .value {
   color: var(--text-light, #e2e8f0);
   font-weight: 600;
+  text-align: right;
 }
 .summary-row .value.highlight {
   color: var(--primary, #00f0ff);
@@ -314,6 +323,7 @@ p {
 .summary-row .value.monospace {
   font-family: 'Fira Code', monospace;
   font-size: 0.85rem;
+  word-break: break-all;
 }
 .summary-row .value.price {
   color: #10b981;
@@ -457,20 +467,41 @@ p {
 }
 
 @media (max-width: 480px) {
+  .success-container {
+    padding: 24px 14px;
+  }
   .success-card {
-    padding: 30px 18px;
+    padding: 26px 16px;
     border-radius: 16px;
   }
-  .success-container {
-    padding-top: 80px;
-  }
   h2 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+  }
+  p,
+  .loading-subtitle {
+    font-size: 0.88rem;
   }
   .icon-circle {
-    width: 64px;
-    height: 64px;
-    font-size: 2rem;
+    width: 60px;
+    height: 60px;
+    font-size: 1.85rem;
+  }
+  .order-summary-box {
+    padding: 12px 14px;
+  }
+  .summary-row {
+    font-size: 0.84rem;
+  }
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline-danger,
+  .btn-secondary-action {
+    min-height: 44px;
+    padding: 11px 14px;
+    font-size: 0.88rem;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.35;
   }
 }
 </style>

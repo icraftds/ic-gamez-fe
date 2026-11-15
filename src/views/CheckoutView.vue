@@ -47,6 +47,7 @@
             :planSlug="planSlug"
             :planId="planId"
             :rawPrice="planPrice"
+            :durationMonths="durationMonths"
             @instruction="onInstruction"
             @success="handlePaymentSuccess"
             @processing="onProcessing"
@@ -99,6 +100,7 @@ const planName = ref(route.query.plan || 'Pro')
 const planPrice = ref(Number(route.query.price) || 49000)
 const planSlug = ref(route.query.slug || 'pro')
 const planId = ref(Number(route.query.id) || 2)
+const durationMonths = ref(Math.max(1, Number(route.query.months) || 1))
 const expiryTime = ref(null)
 
 const planIcon = computed(() => {

@@ -42,6 +42,9 @@
     <!-- Friends Sidebar -->
     <FriendsSidebar v-if="showFriendsSidebar" />
 
+    <!-- Expired Subscription Renewal Prompt -->
+    <SubscriptionExpiredModal />
+
   </div>
 </template>
 
@@ -54,6 +57,7 @@ import AppFooter from './components/common/AppFooter.vue'
 import AppToast from './components/common/AppToast.vue'
 import CoffeeModal from './components/common/CoffeeModal.vue'
 import FriendsSidebar from './components/common/FriendsSidebar.vue'
+import SubscriptionExpiredModal from './components/common/SubscriptionExpiredModal.vue'
 import { useUserAccount, clearUserAccount } from './composables/useUserAccount'
 import { ssoEnabled, ssoState, loadSsoSession } from './services/sso'
 import { useLearningPaths } from './composables/useLearningPaths'

@@ -195,7 +195,11 @@ const props = defineProps({
   formattedPrice: String,
   planSlug: String,
   planId: Number,
-  rawPrice: Number
+  rawPrice: Number,
+  durationMonths: {
+    type: Number,
+    default: 1
+  }
 })
 
 const emit = defineEmits(['instruction', 'success', 'processing'])
@@ -237,7 +241,15 @@ const PLAN_PERKS = {
 
 const currentPlanPerks = computed(() => {
   const slug = (props.planSlug || 'pro').toLowerCase()
-  return PLAN_PERKS[slug] || PLAN_PERKS.pro
+  const base = PLAN_PERKS[slug] || PLAN_PERKS.pro
+  const months = Math.max(1, Number(props.durationMonths) || 1)
+  if (slug === 'pro' && months > 1) {
+    return {
+      ...base,
+      duration: `${months * 30} Hari (${months} Bulan)`
+    }
+  }
+  return base
 })
 
 const selectedMethod = ref('doku')
@@ -276,7 +288,8 @@ const validateCoupon = async () => {
   try {
     const res = await api.post('/coupons/validate', {
       code: couponCode.value,
-      plan_slug: props.planSlug
+      plan_slug: props.planSlug,
+      duration_months: props.durationMonths
     })
     
     discountedPrice.value = res.data.data.final_price
@@ -303,6 +316,7 @@ const goToInstruction = async () => {
         item_type: 'premium_plan',
         payment_method: selectedMethod.value,
         plan_slug: props.planSlug,
+        duration_months: props.durationMonths,
         coupon_code: couponCode.value
       }),
       new Promise((resolve) => setTimeout(resolve, 1500))
@@ -327,6 +341,7 @@ const goToInstruction = async () => {
       planName: props.planName,
       planIcon: props.planIcon,
       planPrice: props.rawPrice,
+      durationMonths: props.durationMonths,
       discountedPrice: discountedPrice.value,
       paymentDetails: {
         ...(tx.payment_details || {}),
