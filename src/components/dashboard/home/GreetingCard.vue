@@ -27,7 +27,7 @@
           <div class="tier-progress">
             <div class="tier-labels">
               <span class="current-tier">Lv. {{ displayLevel }}</span>
-              <span class="xp-text">{{ totalXp }} / {{ levelXpMax }} XP</span>
+              <span class="xp-text">{{ levelXp }} / {{ levelXpMax }} XP</span>
               <span class="next-tier">Lv. {{ displayLevel + 1 }}</span>
             </div>
             <div class="progress-bar-bg">
@@ -96,6 +96,10 @@ const totalXp = computed(() => {
   return Number(statsData.value?.xp?.total ?? userProfile.value.total_xp ?? userProfile.value.xp ?? 0)
 })
 
+const levelXp = computed(() => {
+  return Number(userProfile.value.xp ?? 0)
+})
+
 const levelXpMax = computed(() => {
   return Number(statsData.value?.xp?.next_level_xp ?? userProfile.value.next_level_xp ?? (displayLevel.value * 1000))
 })
@@ -109,7 +113,7 @@ const completedLessons = computed(() => {
 
 const xpPercentage = computed(() => {
   const max = levelXpMax.value || 1000
-  return Math.min(100, Math.max(0, (totalXp.value / max) * 100))
+  return Math.min(100, Math.max(0, (levelXp.value / max) * 100))
 })
 
 const currentBadgeStatus = computed(() => {

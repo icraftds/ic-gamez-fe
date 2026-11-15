@@ -77,6 +77,49 @@ const globalIsPreparingLesson = ref(false)
 const globalHasFetchedAllPaths = ref(false)
 let inFlightPathsRequest = null
 
+/**
+ * Menggabungkan daftar path terbaru dari API dengan chapter/quiz detail yang sudah di-cache
+ * sambil tetap meremajakan status progres lesson (`progress`, `saved_code`).
+ */
+export function mergeFreshPathsWithCache(freshPaths, cachedPaths, hasBeenScoredFn = null) {
+  const detailedMap = new Map()
+  ;(cachedPaths || []).forEach(p => {
+    if (Array.isArray(p.chapters) && p.chapters.some(c => c.lessons?.some(l => l.quizzes !== undefined))) {
+      detailedMap.set(p.slug || String(p.id), p.chapters)
+    }
+  })
+
+  return freshPaths.map(newPath => {
+    const key = newPath.slug || String(newPath.id)
+    const existingChapters = detailedMap.get(key)
+    if (!existingChapters) {
+      return normalizePathProgress(newPath, hasBeenScoredFn)
+    }
+
+    const freshLessonMap = new Map()
+    newPath.chapters?.forEach(ch => {
+      ch.lessons?.forEach(l => freshLessonMap.set(l.id, l))
+    })
+
+    const syncedChapters = existingChapters.map(ch => ({
+      ...ch,
+      lessons: ch.lessons?.map(l => {
+        const fresh = freshLessonMap.get(l.id)
+        if (!fresh) return l
+        return {
+          ...l,
+          is_completed: fresh.is_completed ?? l.is_completed,
+          quiz_passed: fresh.quiz_passed ?? l.quiz_passed,
+          saved_code: fresh.saved_code ?? l.saved_code,
+          progress: fresh.progress ?? l.progress,
+        }
+      })
+    }))
+
+    return normalizePathProgress({ ...newPath, chapters: syncedChapters }, hasBeenScoredFn)
+  })
+}
+
 export function useLearningPaths() {
   const paths = globalPaths
   const isLoading = globalIsLoading
@@ -97,22 +140,7 @@ export function useLearningPaths() {
           const { loadProgress, hasBeenScored } = (await import('./useScoring')).useScoring()
           await loadProgress().catch(() => {})
 
-          // Pertahankan chapter detail yang sudah pernah dimuat (misal quizzes) sembari meremajakan progress terbaru
-          const detailedMap = new Map()
-          paths.value.forEach(p => {
-            if (Array.isArray(p.chapters) && p.chapters.some(c => c.lessons?.some(l => l.quizzes !== undefined))) {
-              detailedMap.set(p.slug || String(p.id), p.chapters)
-            }
-          })
-
-          paths.value = freshPaths.map(newPath => {
-            const key = newPath.slug || String(newPath.id)
-            const existingChapters = detailedMap.get(key)
-            const mergedPath = existingChapters
-              ? { ...newPath, chapters: existingChapters }
-              : newPath
-            return normalizePathProgress(mergedPath, hasBeenScored)
-          })
+          paths.value = mergeFreshPathsWithCache(freshPaths, paths.value, hasBeenScored)
 
           try {
             sessionStorage.setItem(CACHE_KEY, JSON.stringify(freshPaths))
