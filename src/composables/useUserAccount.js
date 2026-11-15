@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import api, { initCsrf } from '../services/api'
+import { useDashboardStats } from './useDashboardStats'
 import { ssoEnabled, ssoState, loadSsoSession, logoutSso } from '../services/sso'
 
 export function sanitizeAvatarUrl(url, name = 'User') {
@@ -533,18 +534,29 @@ export function useUserAccount() {
     return isPremiumUser.value ? 'Premium' : 'Gratis'
   })
 
-  const userStats = ref({
+  const DEFAULT_USER_STATS = {
     events: { daily: 0, weekly: 0, annual: 0 }
-  })
+  }
+  const sharedStatsStore = typeof useDashboardStats === 'function' ? useDashboardStats() : null
+  const fallbackUserStats = ref(DEFAULT_USER_STATS)
 
-  const fetchUserStats = async () => {
+  const userStats = sharedStatsStore
+    ? computed(() => sharedStatsStore.statsData.value || DEFAULT_USER_STATS)
+    : fallbackUserStats
+
+  const fetchUserStats = async (force = false) => {
+    if (sharedStatsStore) {
+      return await sharedStatsStore.fetchStats(force)
+    }
     try {
       const response = await api.get('/user/statistics')
       if (response.data && response.data.data) {
-        userStats.value = response.data.data
+        fallbackUserStats.value = response.data.data
       }
+      return fallbackUserStats.value
     } catch (error) {
       console.error('Failed to fetch user stats', error.response?.status || 'request_failed')
+      return fallbackUserStats.value
     }
   }
 

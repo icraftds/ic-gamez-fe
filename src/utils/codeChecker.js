@@ -1,4 +1,5 @@
 import { runValidation } from './validators/index.js';
+import { stripCommentsByLanguage } from './runners/testInputHelper.js';
 
 /**
  * Memeriksa apakah output dari code runner sesuai dengan harapan dari soal praktik.
@@ -51,14 +52,9 @@ export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOut
     return false;
   }
 
-  // Pengecekan Universal: Jika masih ada "___" di bagian kode utama (abaikan komentar), berarti belum diisi!
+  // Pengecekan Universal: Jika masih ada "___" di bagian kode utama (abaikan komentar sesuai bahasa), berarti belum diisi!
   if (currentCode) {
-    const codeWithoutComments = currentCode
-      .replace(/\/\/.*$/gm, '')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/<!--[\s\S]*?-->/g, '')
-      .replace(/--.*$/gm, '')
-      .replace(/#.*$/gm, '');
+    const codeWithoutComments = stripCommentsByLanguage(currentCode, lessonLanguage);
     if (codeWithoutComments.includes('___')) return false;
   }
 
@@ -104,6 +100,7 @@ export const checkOutputMatch = async (lessonLanguage, lessonPractice, runnerOut
   if (!expectedOutput) return true; 
   
   const actualOutput = runnerOutputArray.map(o => o.text).join(' ').trim();
+  const looseActual = actualOutput.toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');
   const looseExpected = expectedOutput.toLowerCase().replace(/\s+/g, ' ').replace(/["']/g, '');
   if (looseActual === looseExpected) return true;
   const escaped = looseExpected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

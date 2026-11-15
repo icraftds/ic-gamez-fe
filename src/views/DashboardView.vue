@@ -11,6 +11,7 @@ import CoinzRewardModal from '../components/common/CoinzRewardModal.vue'
 import UserProfileDropdown from '../components/common/UserProfileDropdown.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useLearningPaths } from '../composables/useLearningPaths'
+import { useDashboardStats } from '../composables/useDashboardStats'
 import { useTheme } from '../composables/useTheme'
 import { useWipModal } from '../composables/useWipModal'
 import LeaderboardTable from '../components/home/LeaderboardTable.vue'
@@ -27,7 +28,8 @@ const setThemeMode = (light) => {
 }
 
 import { onUnmounted } from 'vue'
-const { hasFetchedAllPaths, fetchAllPathsDetails, isLoading: isPathsLoading } = useLearningPaths()
+const { fetchPaths, isLoading: isPathsLoading } = useLearningPaths()
+const { fetchStats } = useDashboardStats()
 const isDataFetching = computed(() => isPathsLoading.value || isUserLoading.value)
 const route = useRoute()
 const router = useRouter()
@@ -49,9 +51,7 @@ const showCoinzModal = ref(false)
 const showPromoModal = ref(false)
 
 onMounted(() => {
-  if (!hasFetchedAllPaths.value) {
-    fetchAllPathsDetails()
-  }
+  Promise.all([fetchPaths(), fetchStats()])
 
 
   if (sessionStorage.getItem('just_logged_in') === 'true') {

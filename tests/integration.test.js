@@ -188,3 +188,174 @@ test('Provider return and previous Pro grant do not prove the new payment fulfil
   // Cancelled page must not report fulfillment even if the request just succeeded.
   assert.equal(await check(() => false), false); assert.equal(walletRefreshes, 0)
 })
+
+test('P0-1: useDashboardStats deduplicates in-flight/TTL requests and path badges match access status', async () => {
+  let statsCalls = 0
+  let nowMs = 1000
+  const api = {
+    get: async (url) => {
+      if (url === '/user/statistics') {
+        statsCalls++
+        return { data: { data: { xp: { total: 643, level: 2, next_level_xp: 2000 }, completed_exercises: { total: 42 } } } }
+      }
+      return { data: { data: [] } }
+    }
+  }
+  const FakeDate = { now: () => nowMs }
+  const { useDashboardStats, invalidateStatsCache } = load(
+    '../src/composables/useDashboardStats.js',
+    'useDashboardStats, invalidateStatsCache',
+    { api, Date: FakeDate }
+  )
+
+  const storeA = useDashboardStats()
+  const storeB = useDashboardStats()
+  await Promise.all([storeA.fetchStats(), storeB.fetchStats()])
+  assert.equal(statsCalls, 1)
+  assert.equal(storeA.statsData.value.xp.total, 643)
+
+  // Subsequent mount within 30s TTL reuses cached stats without hitting network.
+  nowMs += 5000
+  await storeA.fetchStats()
+  assert.equal(statsCalls, 1)
+
+  // Invalidation (e.g. after completing a lesson) forces fresh reload.
+  invalidateStatsCache()
+  await storeA.fetchStats()
+  assert.equal(statsCalls, 2)
+
+  const { getPathAccessBadge } = await import('../src/utils/pathTheme.js')
+  assert.equal(getPathAccessBadge({ is_premium: true, access_status: 'owned' }), 'DIMILIKI')
+  assert.equal(getPathAccessBadge({ is_premium: true, access_status: 'pro_quota' }), 'PRO KUOTA')
+  assert.equal(getPathAccessBadge({ is_premium: true, access_status: 'expert_full' }), 'EXPERT')
+  assert.equal(getPathAccessBadge({ is_premium: true, access_status: 'locked' }), 'PRO')
+})
+
+test('P0-4 & P0-3: JS runner supports top-level await, custom input const, and multi-case hidden validation', async () => {
+  const { runJavascript } = await import('../src/utils/runners/javascriptRunner.js')
+  const { validateStdout } = await import('../src/utils/validators/StdoutValidator.js')
+  const { validateDom } = await import('../src/utils/validators/DomValidator.js')
+  const { extractTestCases, extractTestInput, parsePracticeData, serializeTestInput, stripCommentsByLanguage } = await import('../src/utils/runners/testInputHelper.js')
+
+  // Top-level async/await (e.g. Alur 13 3.1)
+  const asyncOut = await runJavascript(`
+    function fetchUser() { return new Promise(resolve => resolve("Budi")); }
+    const user = await fetchUser();
+    console.log(user);
+  `)
+  assert.equal(asyncOut.some(e => e.type === 'error'), false)
+  assert.equal(asyncOut[0].text, 'Budi')
+
+  // User declaring const input must not trigger SyntaxError
+  const customInputOut = await runJavascript(`
+    const input = [10, 20];
+    console.log(input.reduce((a, b) => a + b, 0));
+  `, { test_cases: [{ input: '["ignored"]', expected_output: '30' }] })
+  assert.equal(customInputOut.some(e => e.type === 'error'), false)
+  assert.equal(customInputOut[0].text, '30')
+
+  // JSON-quoted string expected output must accept plain printed string (P0-2)
+  assert.equal(validateStdout([{ type: 'log', text: 'Mobil Toyota siap digunakan' }], '"Mobil Toyota siap digunakan"'), true)
+
+  // Hidden test case validator rejects hardcoded solutions without leaking hidden expected output (P0-3)
+  const { runValidation } = load('../src/utils/validators/index.js', 'runValidation', {
+    validateStdout,
+    validateSqlResult: async () => true,
+    validateDom,
+    extractTestCases,
+    stripCommentsByLanguage,
+    executeCode: async (lang, code, ctx) => runJavascript(code, ctx),
+  })
+  const cases = [
+    { input: '[7, 2, 9, 4, 1]', expected_output: '[1, 2, 4, 7, 9]', is_hidden: false },
+    { input: '[5, 3, 8]', expected_output: '[3, 5, 8]', is_hidden: true },
+  ]
+  const hardcodedCode = 'console.log([1, 2, 4, 7, 9]);'
+  const firstRunOutput = await runJavascript(hardcodedCode, { test_cases: [cases[0]] })
+  const hardcodedPassed = await runValidation('stdout', cases, firstRunOutput, hardcodedCode, { language: 'javascript' })
+  assert.equal(hardcodedPassed, false)
+  assert.equal(firstRunOutput.some(e => e.type === 'error' && /hidden test case/i.test(e.text) && !e.text.includes('[3, 5, 8]')), true)
+
+  const dynamicCode = 'function bubbleSort(arr) { return [...arr].sort((a, b) => a - b); }\nconsole.log(JSON.stringify(bubbleSort(input)));'
+  const dynamicFirstOutput = await runJavascript(dynamicCode, { test_cases: [cases[0]] })
+  const dynamicPassed = await runValidation('stdout', cases, dynamicFirstOutput, dynamicCode, { language: 'javascript' })
+  assert.equal(dynamicPassed, true)
+
+  // Python runner auto-invokes solve/function_name & avoids clobbering input() calls
+  const executedScripts = []
+  let stdoutHandler = null
+  const mockPyodide = {
+    setStdout: ({ batched }) => { stdoutHandler = batched },
+    setStderr: () => {},
+    runPythonAsync: async (script) => {
+      executedScripts.push(script)
+      if (script.includes('__ic_fn = globals().get') && stdoutHandler) {
+        stdoutHandler('Mobil Toyota siap digunakan')
+      }
+    }
+  }
+  const { runPython } = load('../src/utils/runners/pythonRunner.js', 'runPython', {
+    extractTestInput,
+    parsePracticeData,
+    serializeTestInput,
+    stripCommentsByLanguage,
+    window: { loadPyodide: async () => mockPyodide }
+  })
+  const pyOut = await runPython(
+    'def solve(x):\n    return "Mobil Toyota siap digunakan"',
+    { function_name: 'solve', test_cases: [{ input: 'Toyota', expected_output: '"Mobil Toyota siap digunakan"' }] }
+  )
+  assert.equal(executedScripts.some(s => s.includes('__ic_fn = globals().get("solve")')), true)
+  assert.equal(executedScripts.some(s => s.includes('print("null")')), true)
+  assert.equal(pyOut[0].text, 'Mobil Toyota siap digunakan')
+
+  // When code uses built-in input(...), runner must not rebind `input = __ic_test_input`
+  const executedStdinScripts = []
+  mockPyodide.runPythonAsync = async (script) => { executedStdinScripts.push(script) }
+  await runPython(
+    'val = input()\nprint(val)',
+    { test_cases: [{ input: 'Halo', expected_output: 'Halo' }] }
+  )
+  const setupScript = executedStdinScripts[0]
+  assert.equal(/\ninput = __ic_test_input/.test(setupScript), false)
+
+  // Decrement `--` & URLs containing `//` must survive language-aware comment stripping
+  const incDecCode = 'let poin=9; poin++; poin--; poin++; console.log(poin);'
+  const incDecOut = await runJavascript(incDecCode, {})
+  const incDecPassed = await runValidation(
+    'stdout',
+    [{ input: '', expected_output: '10', is_hidden: false }],
+    incDecOut,
+    incDecCode,
+    { language: 'javascript', practice: { required_keywords: ['++', '--'] } }
+  )
+  assert.equal(incDecPassed, true)
+
+  const urlKeywordCode = 'const q = new URL("http://x?a=1").searchParams; console.log(q.get("a"));'
+  const urlKeywordOut = await runJavascript(urlKeywordCode, {})
+  const urlKeywordPassed = await runValidation(
+    'stdout',
+    [{ input: '', expected_output: '1', is_hidden: false }],
+    urlKeywordOut,
+    urlKeywordCode,
+    { language: 'javascript', practice: { required_keywords: ['searchParams'] } }
+  )
+  assert.equal(urlKeywordPassed, true)
+
+  // DomValidator supports whitespace-separated rule blocks & source-order:last CSS cascade
+  assert.equal(
+    validateDom(
+      '<style>.kartu{background-color:#f5f5f5;color:#222;font-size:16px}.kartu .nama{font-weight:700}</style><article class="kartu"><h2 class="nama">Rina</h2></article>',
+      '.kartu{background-color:#f5f5f5;color:#222;font-size:16px} .kartu .nama{font-weight:700}'
+    ),
+    true
+  )
+  assert.equal(
+    validateDom('<style>.pesan{color:red}.pesan{color:blue}</style><p class="pesan">P</p>', '.pesan{color:blue;source-order:last}'),
+    true
+  )
+  assert.equal(
+    validateDom('<style>.pesan{color:blue}.pesan{color:red}</style><p class="pesan">P</p>', '.pesan{color:blue;source-order:last}'),
+    false
+  )
+})

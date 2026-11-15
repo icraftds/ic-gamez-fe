@@ -228,26 +228,30 @@ function evaluateSingleRule(userCode, virtualDoc, rule, cssRules) {
     }
 
     // 4d. Cek Properti CSS
-    let allPropsMatched = true;
-    for (const [prop, expVal] of Object.entries(decls)) {
+    const requireLastOrder = decls['source-order'] === 'last';
+    const cssPropEntries = Object.entries(decls).filter(([prop]) => prop !== 'source-order');
+    let allPropsMatched = cssPropEntries.length > 0;
+    for (const [prop, expVal] of cssPropEntries) {
+      const matchingRules = cssRules.filter(
+        r => (r.selector === sel || r.selector.endsWith(sel) || sel.endsWith(r.selector) || sel.includes(r.selector)) && r.declarations[prop]
+      );
       let matchedThisProp = false;
-      for (const r of cssRules) {
-        if (r.selector === sel || r.selector.endsWith(sel) || sel.endsWith(r.selector) || sel.includes(r.selector)) {
-          if (r.declarations[prop]) {
-            const actVal = r.declarations[prop];
-            if (actVal === expVal || actVal.includes(expVal) || expVal.includes(actVal)) {
-              matchedThisProp = true;
-              break;
-            }
-          }
-        }
+      if (requireLastOrder) {
+        const lastRule = matchingRules[matchingRules.length - 1];
+        const actVal = lastRule?.declarations[prop] || '';
+        matchedThisProp = !!lastRule && (actVal === expVal || actVal.includes(expVal) || expVal.includes(actVal));
+      } else {
+        matchedThisProp = matchingRules.some(r => {
+          const actVal = r.declarations[prop];
+          return actVal === expVal || actVal.includes(expVal) || expVal.includes(actVal);
+        });
       }
       if (!matchedThisProp) {
         allPropsMatched = false;
         break;
       }
     }
-    if (allPropsMatched && Object.keys(decls).length > 0) return true;
+    if (allPropsMatched) return true;
     return false;
   }
 
@@ -306,10 +310,34 @@ function evaluateSingleRule(userCode, virtualDoc, rule, cssRules) {
   });
 }
 
+function splitAdjacentBraceBlocks(rule) {
+  const blocks = [];
+  let current = '';
+  let inBrace = 0;
+  for (let i = 0; i < rule.length; i++) {
+    const ch = rule[i];
+    current += ch;
+    if (ch === '{') inBrace++;
+    else if (ch === '}') {
+      inBrace = Math.max(0, inBrace - 1);
+      if (inBrace === 0) {
+        const rest = rule.slice(i + 1).trimStart();
+        if (rest.length > 0) {
+          blocks.push(current.trim());
+          current = '';
+        }
+      }
+    }
+  }
+  if (current.trim()) blocks.push(current.trim());
+  return blocks;
+}
+
 function evaluateDsl(userCode, virtualDoc, expectedCondition) {
   const cssRules = parseCssRules(userCode);
   let andParts = splitTopLevel(expectedCondition, '&&');
   andParts = andParts.flatMap(p => splitTopLevel(p, ';'));
+  andParts = andParts.flatMap(p => splitAdjacentBraceBlocks(p));
 
   return andParts.every(part => {
     part = part.trim();

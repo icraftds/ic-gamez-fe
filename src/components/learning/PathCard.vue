@@ -42,7 +42,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useUserAccount } from '../../composables/useUserAccount'
-import { getPathThemeColor, getPathIconClass } from '../../utils/pathTheme'
+import { getPathThemeColor, getPathIconClass, getPathAccessBadge } from '../../utils/pathTheme'
 
 const props = defineProps({
   path: {
@@ -60,12 +60,7 @@ const emit = defineEmits(['click'])
 const { hasModuleAccess } = useUserAccount()
 
 const isPathUnlocked = computed(() => hasModuleAccess(props.path))
-const pathBadgeLabel = computed(() => {
-  if (props.path.access_status === 'owned') return 'DIMILIKI'
-  if (props.path.access_status === 'pro_quota') return 'PRO KUOTA'
-  if (props.path.access_status === 'expert_full') return 'EXPERT'
-  return 'PRO'
-})
+const pathBadgeLabel = computed(() => getPathAccessBadge(props.path))
 
 const handleClick = () => {
   if (!props.path.isLocked) {

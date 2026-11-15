@@ -33,19 +33,25 @@ export function validateStdout(actualOutputArray, expectedOutputText) {
   const actualJoined = rawTexts.join('\n').trim();
   if (!actualJoined) return false;
 
-  // 1. Coba perbandingan objek JSON mendalam jika kedua output valid JSON
+  // 1. Coba perbandingan objek/string JSON mendalam jika kedua output valid JSON
+  let parsedExpectedJsonString = null;
   try {
-    const parsedActual = JSON.parse(actualJoined);
     const parsedExpected = JSON.parse(expStr);
+    if (typeof parsedExpected === 'string') {
+      parsedExpectedJsonString = parsedExpected;
+    }
+    const parsedActual = JSON.parse(actualJoined);
     if (deepEqual(parsedActual, parsedExpected)) {
       return true;
     }
   } catch (e) {
-    // Bukan JSON, lanjut ke pencocokan teks
+    // Bukan JSON, lanjut ke pencocokan teks (bila expected berupa JSON string ter-quote, bandingkan juga versi unquoted-nya)
   }
 
+  const effectiveExpectedText = parsedExpectedJsonString !== null ? parsedExpectedJsonString.trim() : expStr;
+
   // 2. Normalisasi baris demi baris (CRLF -> LF, trim setiap baris)
-  const normExpectedLines = expStr.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const normExpectedLines = effectiveExpectedText.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(l => l.length > 0);
   const normActualLines = actualJoined.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
   // Jika jumlah baris sama dan semua baris cocok persis

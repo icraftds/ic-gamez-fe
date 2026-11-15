@@ -3,13 +3,67 @@ import api from '../services/api'
 
 const CACHE_KEY = 'ic_learning_paths_cache_v3'
 
+function readLocalFlag(key) {
+  if (typeof localStorage === 'undefined') return null
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Normalisasi progres lesson dari payload backend (`progress`) dan state lokal,
+ * digunakan konsisten di fetchPaths, fetchPathDetails, maupun cache sessionStorage.
+ */
+function normalizePathProgress(path, hasBeenScoredFn = null) {
+  if (!path || !Array.isArray(path.chapters)) return path
+
+  for (const chapter of path.chapters) {
+    if (!Array.isArray(chapter.lessons)) continue
+    for (const lesson of chapter.lessons) {
+      let prog = lesson.progress
+      if (Array.isArray(prog)) {
+        prog = prog.length > 0 ? prog[0] : null
+      }
+
+      const lsQuizStr = readLocalFlag(`quiz_state_${lesson.id}`)
+      let localQuizPassed = false
+      if (lsQuizStr) {
+        try { localQuizPassed = Boolean(JSON.parse(lsQuizStr).isCorrect) } catch {}
+      }
+
+      const lsPracticeStr = readLocalFlag(`practice_state_${lesson.id}`)
+      let localPracticeDone = false
+      if (lsPracticeStr) {
+        try { localPracticeDone = JSON.parse(lsPracticeStr).status === 'success' } catch {}
+      }
+
+      const localTheoryDone = readLocalFlag(`theory_completed_${lesson.id}`) === 'true'
+      const scoredFn = typeof hasBeenScoredFn === 'function' ? hasBeenScoredFn : () => false
+
+      if (prog && Object.keys(prog).length > 0) {
+        lesson.isCompleted = Boolean(prog.is_completed || localTheoryDone)
+        lesson.quizPassed = Boolean(prog.quiz_passed || localQuizPassed)
+        lesson.practiceDone = Boolean(prog.saved_code || localPracticeDone)
+      } else {
+        lesson.isCompleted = Boolean(lesson.isCompleted || scoredFn('theory', lesson.id) || localTheoryDone)
+        lesson.quizPassed = Boolean(lesson.quizPassed || scoredFn('quiz', lesson.id) || localQuizPassed)
+        lesson.practiceDone = Boolean(lesson.practiceDone || scoredFn('practice', lesson.id) || localPracticeDone)
+      }
+    }
+  }
+
+  return path
+}
+
 function loadCachedPaths() {
   try {
     const raw = sessionStorage.getItem(CACHE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed) && parsed.length > 1) {
-        return parsed
+        return parsed.map((p) => normalizePathProgress(p))
       }
     }
   } catch (e) {}
@@ -20,7 +74,8 @@ const initialCached = loadCachedPaths()
 const globalPaths = ref(initialCached)
 const globalIsLoading = ref(false)
 const globalIsPreparingLesson = ref(false)
-const globalHasFetchedAllPaths = ref(initialCached.length > 1)
+const globalHasFetchedAllPaths = ref(false)
+let inFlightPathsRequest = null
 
 export function useLearningPaths() {
   const paths = globalPaths
@@ -29,43 +84,52 @@ export function useLearningPaths() {
   const hasFetchedAllPaths = globalHasFetchedAllPaths
 
   const fetchPaths = async (force = false) => {
-    if (isLoading.value && !force) return
-    try {
-      isLoading.value = true
-      const response = await api.get('/paths')
-      if (response.data && Array.isArray(response.data.data)) {
-        const freshPaths = response.data.data
-
-        // Map existing detailed chapters to retain loaded lessons/quizzes
-        const detailedMap = new Map()
-        paths.value.forEach(p => {
-          if (p.chapters && p.chapters.length > 0) {
-            detailedMap.set(p.slug || String(p.id), p.chapters)
-          }
-        })
-
-        paths.value = freshPaths.map(newPath => {
-          const key = newPath.slug || String(newPath.id)
-          const existingChapters = detailedMap.get(key)
-          if (existingChapters) {
-            return {
-              ...newPath,
-              chapters: existingChapters
-            }
-          }
-          return newPath
-        })
-
-        hasFetchedAllPaths.value = true
-        try {
-          sessionStorage.setItem(CACHE_KEY, JSON.stringify(freshPaths))
-        } catch (e) {}
-      }
-    } catch (error) {
-      console.error('Failed to fetch learning paths', error)
-    } finally {
-      isLoading.value = false
+    if (inFlightPathsRequest && !force) {
+      return inFlightPathsRequest
     }
+
+    const request = (async () => {
+      try {
+        isLoading.value = true
+        const response = await api.get('/paths')
+        if (response.data && Array.isArray(response.data.data)) {
+          const freshPaths = response.data.data
+          const { loadProgress, hasBeenScored } = (await import('./useScoring')).useScoring()
+          await loadProgress().catch(() => {})
+
+          // Pertahankan chapter detail yang sudah pernah dimuat (misal quizzes) sembari meremajakan progress terbaru
+          const detailedMap = new Map()
+          paths.value.forEach(p => {
+            if (Array.isArray(p.chapters) && p.chapters.some(c => c.lessons?.some(l => l.quizzes !== undefined))) {
+              detailedMap.set(p.slug || String(p.id), p.chapters)
+            }
+          })
+
+          paths.value = freshPaths.map(newPath => {
+            const key = newPath.slug || String(newPath.id)
+            const existingChapters = detailedMap.get(key)
+            const mergedPath = existingChapters
+              ? { ...newPath, chapters: existingChapters }
+              : newPath
+            return normalizePathProgress(mergedPath, hasBeenScored)
+          })
+
+          try {
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify(freshPaths))
+          } catch (e) {}
+        }
+      } catch (error) {
+        console.error('Failed to fetch learning paths', error)
+      } finally {
+        if (inFlightPathsRequest === request) {
+          inFlightPathsRequest = null
+        }
+        isLoading.value = false
+      }
+    })()
+
+    inFlightPathsRequest = request
+    return request
   }
 
   // To get detailed info including chapters and lessons for a specific path
@@ -74,56 +138,19 @@ export function useLearningPaths() {
     try {
       if (!skipLoadingState) isLoading.value = true
       const response = await api.get(`/paths/${slug}`)
-      // Update or insert the detailed path into our state
       const detailedPath = response.data.data
 
-      // Try loading global progress first to fill in missing progress
-      const { loadProgress, hasBeenScored } = (await import('./useScoring')).useScoring();
-      await loadProgress();
+      const { loadProgress, hasBeenScored } = (await import('./useScoring')).useScoring()
+      await loadProgress()
 
-      // Normalize progress fields for frontend reactivity
-      if (detailedPath.chapters) {
-        detailedPath.chapters.forEach(chapter => {
-          if (chapter.lessons) {
-            chapter.lessons.forEach(lesson => {
-              let prog = lesson.progress;
-              if (Array.isArray(prog)) {
-                prog = prog.length > 0 ? prog[0] : null;
-              }
-              
-              const lsQuizStr = localStorage.getItem(`quiz_state_${lesson.id}`);
-              let localQuizPassed = false;
-              if (lsQuizStr) {
-                try { localQuizPassed = JSON.parse(lsQuizStr).isCorrect; } catch(e){}
-              }
-              const lsPracticeStr = localStorage.getItem(`practice_state_${lesson.id}`);
-              let localPracticeDone = false;
-              if (lsPracticeStr) {
-                try { localPracticeDone = JSON.parse(lsPracticeStr).status === 'success'; } catch(e){}
-              }
-              const localTheoryDone = localStorage.getItem(`theory_completed_${lesson.id}`) === 'true';
-
-              if (prog && Object.keys(prog).length > 0) {
-                lesson.isCompleted = prog.is_completed || localTheoryDone;
-                lesson.quizPassed = prog.quiz_passed || localQuizPassed;
-                lesson.practiceDone = !!prog.saved_code || localPracticeDone;
-              } else {
-                lesson.isCompleted = hasBeenScored('theory', lesson.id) || localTheoryDone;
-                lesson.quizPassed = hasBeenScored('quiz', lesson.id) || localQuizPassed;
-                lesson.practiceDone = hasBeenScored('practice', lesson.id) || localPracticeDone;
-              }
-            });
-          }
-        });
-      }
+      normalizePathProgress(detailedPath, hasBeenScored)
 
       const index = paths.value.findIndex(p => p.slug === slug || String(p.id) === String(slug))
       if (index !== -1) {
         paths.value[index] = detailedPath
       } else {
         paths.value.push(detailedPath)
-        // If paths list is incomplete, fetch full list in background
-        if (!hasFetchedAllPaths.value || paths.value.length <= 1) {
+        if (paths.value.length <= 1) {
           fetchPaths()
         }
       }
@@ -138,14 +165,20 @@ export function useLearningPaths() {
 
   const fetchAllPathsDetails = async () => {
     if (paths.value.length === 0) {
-      await fetchPaths();
+      await fetchPaths()
     }
-    isLoading.value = true;
+    const needsDetailFetch = paths.value.some(p => !Array.isArray(p.chapters) || p.chapters.length === 0)
+    if (!needsDetailFetch) {
+      globalHasFetchedAllPaths.value = true
+      return
+    }
+    isLoading.value = true
     try {
-      const promises = paths.value.map(p => fetchPathDetails(p.slug || p.id, true));
-      await Promise.all(promises);
+      const promises = paths.value.map(p => fetchPathDetails(p.slug || p.id, true))
+      await Promise.all(promises)
+      globalHasFetchedAllPaths.value = true
     } finally {
-      isLoading.value = false;
+      isLoading.value = false
     }
   }
 

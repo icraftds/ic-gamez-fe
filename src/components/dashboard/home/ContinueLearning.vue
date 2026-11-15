@@ -52,8 +52,8 @@
           <div class="cl-top-line">
             <div class="cl-title-group">
               <h4 class="cl-title">{{ path.title }}</h4>
-              <span v-if="path.is_premium || path.isPremium" class="cc-pro-badge sm">
-                <i class="fa-solid fa-crown"></i> PRO
+              <span v-if="path.is_premium || path.isPremium || path.access_status === 'owned'" class="cc-pro-badge sm">
+                <i class="fa-solid fa-crown"></i> {{ getPathAccessBadge(path) }}
               </span>
             </div>
             <span class="cl-percent" :style="{ color: getTheme(path, index) }">
@@ -119,8 +119,8 @@
           </div>
           
           <div class="cc-badges">
-            <span v-if="path.is_premium || path.isPremium" class="cc-pro-badge">
-              <i class="fa-solid fa-crown"></i> PRO
+            <span v-if="path.is_premium || path.isPremium || path.access_status === 'owned'" class="cc-pro-badge">
+              <i class="fa-solid fa-crown"></i> {{ getPathAccessBadge(path) }}
             </span>
             <span 
               class="cc-progress-pill" 
@@ -182,11 +182,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useLearningPaths } from '../../../composables/useLearningPaths'
-import { getPathThemeColor, getPathIconClass } from '../../../utils/pathTheme'
+import { useDashboardStats } from '../../../composables/useDashboardStats'
+import { getPathThemeColor, getPathIconClass, getPathAccessBadge } from '../../../utils/pathTheme'
 
 const { paths } = useLearningPaths()
+const { statsData, fetchStats } = useDashboardStats()
+
+onMounted(() => {
+  fetchStats()
+})
 
 const VIEW_KEY = 'continue_learning_view'
 const viewMode = ref(localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'grid')
@@ -210,9 +216,12 @@ const getPathProgress = (path) => {
 }
 
 const getCompletedLessonsForPath = (path) => {
-  let count = 0
-  path?.chapters?.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) count++ }))
-  return count
+  const total = getTotalLessonsForPath(path)
+  let localCount = 0
+  path?.chapters?.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) localCount++ }))
+  const statsBreakdownCount = Number(statsData.value?.completed_exercises?.breakdown?.[path?.slug] ?? 0)
+  const merged = Math.max(localCount, Number.isFinite(statsBreakdownCount) ? statsBreakdownCount : 0)
+  return total > 0 ? Math.min(total, merged) : merged
 }
 
 const getTotalLessonsForPath = (path) => {

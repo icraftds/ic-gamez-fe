@@ -27,7 +27,7 @@ const DEFAULT_PLAN_FALLBACKS = {
       { text: 'Akses bebas pilih 12 modul alur belajar / bulan (Tidak dapat dibatalkan)', included: true },
       { text: 'Akses Global Challenge & Event Arena', included: true },
       { text: 'Sertifikat kelulusan digital', included: true },
-      { text: 'Hint premium tak terbatas', included: true },
+      { text: '20 Energi bonus setiap minggu', included: true },
       { text: 'Leaderboard eksklusif', included: true },
       { text: 'Full Access seluruh modul tanpa batas', included: false },
       { text: 'Kesempatan Magang di ICraft DS', included: false },

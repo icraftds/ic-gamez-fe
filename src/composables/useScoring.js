@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { useUserAccount } from './useUserAccount'
+import { invalidateStatsCache } from './useDashboardStats'
 import api from '../services/api'
 
 // ── XP Constants (dipakai untuk Optimistic UI, tanpa menunggu API) ─────────
@@ -116,6 +117,9 @@ async function sendSyncEntry(entry) {
 
   try {
     await api.post(endpoint, payload)
+    if (typeof invalidateStatsCache === 'function') {
+      invalidateStatsCache()
+    }
     return true
   } catch (error) {
     // 400: sudah pernah dapat XP → anggap sukses (tidak perlu retry)

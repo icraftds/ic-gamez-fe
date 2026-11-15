@@ -26,9 +26,9 @@
           
           <div class="tier-progress">
             <div class="tier-labels">
-              <span class="current-tier">Lv. {{ userProfile.level }}</span>
-              <span class="xp-text">{{ userProfile.xp }} / {{ (userProfile.level * 1000) }} XP</span>
-              <span class="next-tier">Lv. {{ userProfile.level + 1 }}</span>
+              <span class="current-tier">Lv. {{ displayLevel }}</span>
+              <span class="xp-text">{{ totalXp }} / {{ levelXpMax }} XP</span>
+              <span class="next-tier">Lv. {{ displayLevel + 1 }}</span>
             </div>
             <div class="progress-bar-bg">
               <div class="progress-bar-fill" :style="{ width: xpPercentage + '%' }"></div>
@@ -41,7 +41,7 @@
         <div class="stat-card xp-stat">
           <div class="stat-icon"><CyberXp style="width: 24px; height: 24px;" /></div>
           <div class="stat-info">
-            <span class="stat-value">{{ userProfile.xp }}</span>
+            <span class="stat-value">{{ totalXp }}</span>
             <span class="stat-label">Total XP</span>
           </div>
         </div>
@@ -72,26 +72,44 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../../../composables/useUserAccount'
 import { useLearningPaths } from '../../../composables/useLearningPaths'
+import { useDashboardStats } from '../../../composables/useDashboardStats'
 
 const { userProfile, isPremiumUser, currentPlan, activeBorderId } = useUserAccount()
 const { paths } = useLearningPaths()
+const { statsData, fetchStats } = useDashboardStats()
 const router = useRouter()
 import CyberBorder from '../../ui/CyberBorder.vue'
 
+onMounted(() => {
+  fetchStats()
+})
+
+const displayLevel = computed(() => {
+  return Number(statsData.value?.xp?.level ?? userProfile.value.level ?? 1)
+})
+
+const totalXp = computed(() => {
+  return Number(statsData.value?.xp?.total ?? userProfile.value.total_xp ?? userProfile.value.xp ?? 0)
+})
+
+const levelXpMax = computed(() => {
+  return Number(statsData.value?.xp?.next_level_xp ?? userProfile.value.next_level_xp ?? (displayLevel.value * 1000))
+})
+
 const completedLessons = computed(() => {
-  let count = 0
-  paths.value?.forEach(p => p.chapters?.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) count++ })))
-  return count
+  let localCount = 0
+  paths.value?.forEach(p => p.chapters?.forEach(c => c.lessons?.forEach(l => { if (l.isCompleted) localCount++ })))
+  const statsTotal = Number(statsData.value?.completed_exercises?.total ?? 0)
+  return Math.max(localCount, Number.isFinite(statsTotal) ? statsTotal : 0)
 })
 
 const xpPercentage = computed(() => {
-  const current = userProfile.value.xp || 0
-  const max = (userProfile.value.level || 1) * 1000
-  return Math.min(100, Math.max(0, (current / max) * 100))
+  const max = levelXpMax.value || 1000
+  return Math.min(100, Math.max(0, (totalXp.value / max) * 100))
 })
 
 const currentBadgeStatus = computed(() => {

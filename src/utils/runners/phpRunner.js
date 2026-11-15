@@ -1,24 +1,5 @@
 import api from '../../services/api'
-
-/**
- * Helper untuk mengekstrak input pertama dari context latihan
- */
-function extractTestInput(context) {
-  if (!context) return null
-  let practiceObj = context.practice
-  if (typeof practiceObj === 'string') {
-    try { practiceObj = JSON.parse(practiceObj) } catch {}
-  }
-  const testCases = context.test_cases || practiceObj?.test_cases
-  if (testCases && testCases[0] && testCases[0].input) {
-    try {
-      return JSON.parse(testCases[0].input)
-    } catch {
-      return testCases[0].input
-    }
-  }
-  return null
-}
+import { extractTestInput } from './testInputHelper.js'
 
 /**
  * Runner untuk PHP menggunakan isolated backend execution service

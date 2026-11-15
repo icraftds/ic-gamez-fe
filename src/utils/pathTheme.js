@@ -167,3 +167,11 @@ export function getPathIconClass(path) {
 
   return 'fa-solid fa-code'
 }
+
+export function getPathAccessBadge(path) {
+  const status = path?.access_status
+  if (status === 'owned') return 'DIMILIKI'
+  if (status === 'pro_quota') return 'PRO KUOTA'
+  if (status === 'expert_full') return 'EXPERT'
+  return 'PRO'
+}
