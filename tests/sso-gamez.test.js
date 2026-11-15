@@ -286,3 +286,70 @@ test('BFF preserves multipart bytes and permitted attachment downloads', async (
         assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [1, 2, 3])
     } finally { globalThis.fetch = previous }
 })
+
+test('Browser auth routes render HTML recovery page instead of raw JSON on expired callback or session', async () => {
+    const { handleSso } = await import('../server/sso/handler.js')
+    const { SsoError } = await import('../server/sso/security.js')
+    const expiredState = 'expired-tx-0000000000000000000000'
+    const deadSessionState = 'dead-session-00000000000000000000'
+    const runtime = {
+        configuration: GAMEZ_CONTRACT,
+        sessions: {
+            callback: async (params) => {
+                if (params.get('state') === expiredState) throw new SsoError(400, 'Authorization transaction expired or was already used.', 'invalid_callback')
+                throw new SsoError(401, 'Please authorize again.', 'reauthorization_required')
+            },
+            verify: async () => { throw new SsoError(401, 'Local session expired.', 'session_expired') },
+        },
+        oauth: {
+            begin: async () => { throw new SsoError(503, 'SSO service is unavailable.') },
+        },
+    }
+
+    const expiredCallback = await handleSso(
+        new Request(`${GAMEZ_CONTRACT.appOrigin}/auth/callback?state=${expiredState}&code=opaque`, { headers: { accept: 'text/html,application/xhtml+xml' } }),
+        runtime,
+    )
+    assert.equal(expiredCallback.status, 400)
+    assert.match(expiredCallback.headers.get('content-type'), /^text\/html/)
+    assert.match(expiredCallback.headers.get('set-cookie'), /__Host-gamez_tx_expired-tx-0000000000000000000000=; Path=\/; Secure; HttpOnly; SameSite=Lax; Max-Age=0/)
+    const expiredBody = await expiredCallback.text()
+    assert.match(expiredBody, /Tautan Autentikasi Sudah Kadaluarsa/)
+    assert.match(expiredBody, /\/auth\/start\?return_to=%2Fdashboard/)
+
+    const expiredSessionCallback = await handleSso(
+        new Request(`${GAMEZ_CONTRACT.appOrigin}/auth/callback?state=${deadSessionState}&code=opaque`, { headers: { cookie: `${GAMEZ_CONTRACT.cookieName}=old`, accept: 'text/html' } }),
+        runtime,
+    )
+    assert.equal(expiredSessionCallback.status, 401)
+    assert.match(expiredSessionCallback.headers.get('content-type'), /^text\/html/)
+    assert.match(expiredSessionCallback.headers.get('set-cookie'), /__Host-gamez_session=; Path=\/; Secure; HttpOnly; SameSite=Lax; Max-Age=0/)
+    assert.match(await expiredSessionCallback.text(), /Sesi Login Anda Telah Habis/)
+
+    const apiSession = await handleSso(new Request(`${GAMEZ_CONTRACT.appOrigin}/api/session`, { headers: { accept: 'application/json' } }), runtime)
+    assert.equal(apiSession.status, 401)
+    assert.match(apiSession.headers.get('content-type'), /^application\/json/)
+
+    const browserSession = await handleSso(
+        new Request(`${GAMEZ_CONTRACT.appOrigin}/api/session`, { headers: { accept: 'text/html', 'sec-fetch-mode': 'navigate' } }),
+        runtime,
+    )
+    assert.equal(browserSession.status, 401)
+    assert.match(browserSession.headers.get('content-type'), /^text\/html/)
+
+    const jsonCallback = await handleSso(
+        new Request(`${GAMEZ_CONTRACT.appOrigin}/auth/callback?state=${expiredState}&code=opaque`, { headers: { accept: 'application/json' } }),
+        runtime,
+    )
+    assert.equal(jsonCallback.status, 400)
+    assert.match(jsonCallback.headers.get('content-type'), /^application\/json/)
+
+    const expiredStartOutage = await handleSso(
+        new Request(`${GAMEZ_CONTRACT.appOrigin}/auth/start?return_to=%2Fdashboard`, { headers: { cookie: `${GAMEZ_CONTRACT.cookieName}=old`, accept: 'text/html' } }),
+        runtime,
+    )
+    assert.equal(expiredStartOutage.status, 503)
+    assert.match(expiredStartOutage.headers.get('content-type'), /^text\/html/)
+    assert.match(expiredStartOutage.headers.get('set-cookie'), /__Host-gamez_session=; Path=\/; Secure; HttpOnly; SameSite=Lax; Max-Age=0/)
+    assert.match(await expiredStartOutage.text(), /Layanan Autentikasi Sedang Tidak Tersedia/)
+})

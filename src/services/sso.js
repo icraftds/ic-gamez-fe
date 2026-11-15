@@ -5,17 +5,17 @@ export const globalLogoutEnabled = ssoEnabled && __SSO_GLOBAL_LOGOUT_ENABLED__
 export const ssoState = { user: ref(null), csrf: ref(null), status: ref('idle'), walletPending: ref(false), generation: 0 }
 let inFlight = null
 
-export function clearSsoSession() {
+export function clearSsoSession(reason = 'expired') {
     ssoState.user.value = null; ssoState.csrf.value = null
     ssoState.walletPending.value = false; ssoState.status.value = 'guest'; ssoState.generation++
-    window.dispatchEvent(new CustomEvent('gamez-session-cleared'))
+    window.dispatchEvent(new CustomEvent('gamez-session-cleared', { detail: { reason } }))
 }
 
 export async function sessionRequest(path, options = {}) {
     let response
     try { response = await fetch(path, { ...options, credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(15000) }) }
     catch { throw { response: { status: 503, data: { message: 'Layanan sesi belum tersedia.' } } } }
-    const data = await response.json()
+    const data = await response.json().catch(() => ({}))
     if (!response.ok) throw { response: { status: response.status, data } }
     return data
 }
@@ -31,7 +31,7 @@ export function loadSsoSession(force = false) {
         ssoState.status.value = 'authenticated'
         return data.user
     }).catch(error => {
-        if ([401, 403].includes(error.response?.status)) { clearSsoSession(); return null }
+        if ([401, 403].includes(error.response?.status)) { clearSsoSession('expired'); return null }
         ssoState.status.value = 'unavailable'
         throw error
     }).finally(() => { inFlight = null })
@@ -45,6 +45,6 @@ export async function logoutSso() {
         if (error.response?.status !== 401) throw error
         result = { revoked: false, alreadySignedOut: true }
     }
-    clearSsoSession()
+    clearSsoSession('logout')
     return result
 }

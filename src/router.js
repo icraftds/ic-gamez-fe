@@ -1,5 +1,5 @@
 import { ssoEnabled, loadSsoSession } from './services/sso'
-import { startAuthLoading, stopAuthLoading, redirectToSso } from './composables/useUserAccount'
+import { startAuthLoading, stopAuthLoading, redirectToSso, isRedirectingToSso } from './composables/useUserAccount'
 import { useNotifications } from './composables/useNotifications'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
@@ -191,11 +191,30 @@ const router = createRouter({
   ]
 })
 
+const AUTO_SSO_COOLDOWN_MS = 10000
+const AUTO_SSO_STORAGE_KEY = 'gamez_auto_sso_ts'
+
+function canAutoRedirectToSso(from) {
+  if (isRedirectingToSso.value) return false
+  if (from.matched.length > 0 || typeof window === 'undefined') return true
+  try {
+    const lastTs = Number(sessionStorage.getItem(AUTO_SSO_STORAGE_KEY) || 0)
+    if (lastTs && Date.now() - lastTs < AUTO_SSO_COOLDOWN_MS) {
+      sessionStorage.removeItem(AUTO_SSO_STORAGE_KEY)
+      return false
+    }
+    sessionStorage.setItem(AUTO_SSO_STORAGE_KEY, String(Date.now()))
+  } catch { /* Ignore storage restrictions. */ }
+  return true
+}
+
 router.beforeEach(async (to, from, next) => {
   if (['login', 'register', 'auto-login'].includes(to.name)) {
     if (ssoEnabled) {
-      const target = typeof to.query.redirect === 'string' ? to.query.redirect : '/dashboard'
-      redirectToSso(target, to.name === 'register' ? 'daftar' : 'masuk')
+      if (!isRedirectingToSso.value) {
+        const target = typeof to.query.redirect === 'string' ? to.query.redirect : '/dashboard'
+        redirectToSso(target, to.name === 'register' ? 'daftar' : 'masuk')
+      }
       return next(false)
     }
     if (to.name === 'register') {
@@ -209,10 +228,17 @@ router.beforeEach(async (to, from, next) => {
     if (to.meta.requiresAuth) {
       try {
         if (!await loadSsoSession()) {
-          redirectToSso(to.fullPath, 'masuk')
-          return next(false)
+          if (canAutoRedirectToSso(from)) {
+            redirectToSso(to.fullPath, 'masuk')
+            return next(false)
+          }
+          return next()
         }
-      } catch { return next(false) }
+        try { sessionStorage.removeItem(AUTO_SSO_STORAGE_KEY) } catch { /* Ignore storage restrictions. */ }
+      } catch {
+        if (from.matched.length === 0) return next()
+        return next(false)
+      }
     }
     return next()
   }

@@ -2,6 +2,7 @@ import { gamezRuntime } from './runtime.js'
 import { GAMEZ_CONTRACT } from './config.js'
 import { handleSso } from './handler.js'
 import { SsoError, noStoreHeaders, singleParameter, productUrl } from './security.js'
+import { buildSsoErrorResponse, shouldRenderHtmlError } from './errorPage.js'
 
 export function functionRequestUrl(requestUrl, query = {}) {
     const url = new URL(requestUrl, GAMEZ_CONTRACT.appOrigin)
@@ -51,7 +52,19 @@ export default async function handler(req, res) {
         response = await handleSso(request, gamezRuntime(configuration))
     } catch (error) {
         const safe = error instanceof SsoError ? error : new SsoError(503, 'SSO service is unavailable.')
-        response = new Response(JSON.stringify({ message: safe.message, code: safe.code }), { status: safe.status, headers: { ...noStoreHeaders, 'content-type': 'application/json' } })
+        const rawRoute = Array.isArray(req.query?.__sso_route) ? req.query.__sso_route[0] : req.query?.__sso_route
+        let pathname = ''
+        try { pathname = new URL(req.url || '/', GAMEZ_CONTRACT.appOrigin).pathname } catch { /* Ignore malformed request URLs. */ }
+        const html = shouldRenderHtmlError({
+            pathname,
+            routeHint: typeof rawRoute === 'string' ? rawRoute : '',
+            method: req.method,
+            accept: Array.isArray(req.headers?.accept) ? req.headers.accept.join(',') : req.headers?.accept,
+            secFetchMode: Array.isArray(req.headers?.['sec-fetch-mode']) ? req.headers['sec-fetch-mode'][0] : req.headers?.['sec-fetch-mode'],
+        })
+        const errorHeaders = new Headers(noStoreHeaders)
+        if (safe.retryAfter) errorHeaders.set('retry-after', String(safe.retryAfter))
+        response = buildSsoErrorResponse({ status: safe.status, code: safe.code, message: safe.message, headers: errorHeaders, html, method: req.method })
     }
     res.statusCode = response.status
     for (const [name, value] of response.headers) if (name !== 'set-cookie') res.setHeader(name, value)

@@ -1,5 +1,6 @@
 import { generateRandomState } from 'oauth4webapi'
 import { SsoError, noStoreHeaders, returnPath, singleParameter, callbackParameters, assertMutation, productUrl, assertSafeJson } from './security.js'
+import { buildSsoErrorResponse, shouldRenderHtmlError } from './errorPage.js'
 
 const cookie = (name, value, age) => `${name}=${value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${age}`
 function cookies(request) {
@@ -33,7 +34,10 @@ export async function handleSso(request, runtime) {
             const target = returnPath(singleParameter(url.searchParams, 'return_to', false) || '/', configuration.appOrigin)
             if (id) {
                 try { await sessions.verify(id); return redirect(target) }
-                catch (error) { if (error.status !== 401) throw error }
+                catch (error) {
+                    if (error.status !== 401) throw error
+                    headers.append('set-cookie', cookie(configuration.cookieName, '', 0))
+                }
             }
             const prompt = singleParameter(url.searchParams, 'prompt', false)
             if (prompt && prompt !== 'none') throw new SsoError(400, 'Invalid authorization prompt.', 'invalid_prompt')
@@ -101,11 +105,22 @@ export async function handleSso(request, runtime) {
             if (!/^attachment(?:;|$)/i.test(response.headers.get('content-disposition') || '')) throw new SsoError(502, 'Unexpected non-JSON product response.', 'unsafe_upstream_response')
             return new Response(response.body, { status: response.status, headers })
         }
+        if (shouldRenderHtmlError({ pathname: url.pathname, method: request.method, accept: request.headers.get('accept'), secFetchMode: request.headers.get('sec-fetch-mode') })) {
+            return buildSsoErrorResponse({ status: 404, code: 'route_missing', message: 'Route not found.', headers, html: true, method: request.method })
+        }
         return json({ message: 'Route not found.' }, 404)
     } catch (error) {
         const safe = error instanceof SsoError ? error : new SsoError(503, 'SSO service is unavailable.')
         if (safe.status === 401 && configuration) headers.append('set-cookie', cookie(configuration.cookieName, '', 0))
         if (safe.retryAfter) headers.set('retry-after', String(safe.retryAfter))
-        return json({ message: safe.message, code: safe.code }, safe.status)
+        let pathname = ''
+        try { pathname = new URL(request.url).pathname } catch { /* Invalid URL falls back to request header inspection. */ }
+        const html = shouldRenderHtmlError({
+            pathname,
+            method: request.method,
+            accept: request.headers.get('accept'),
+            secFetchMode: request.headers.get('sec-fetch-mode'),
+        })
+        return buildSsoErrorResponse({ status: safe.status, code: safe.code, message: safe.message, headers, html, method: request.method })
     }
 }

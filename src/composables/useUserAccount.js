@@ -51,7 +51,7 @@ const isLoggedIn = ref(!!authIdentity())
 const isLoading = ref(false)
 const isBootstrapping = ref(true)
 const isAuthLoading = ref(false)
-const isRedirectingToSso = ref(false)
+export const isRedirectingToSso = ref(false)
 const authLoadingLabel = ref('autentikasi')
 const authLoadingText = ref('')
 const activeBorderId = ref(null)
@@ -84,12 +84,21 @@ export function startAuthLoading(options = {}) {
 }
 
 export function redirectToSso(target = '/dashboard', type = 'masuk') {
+  const safeTarget =
+    typeof target === 'string' &&
+    target.startsWith('/') &&
+    !target.startsWith('//') &&
+    !target.startsWith('/auth/') &&
+    !['/login', '/register', '/auto-login'].some(p => target === p || target.startsWith(p + '?'))
+      ? target
+      : '/dashboard'
+
   isRedirectingToSso.value = true
   startAuthLoading({
     text: type === 'daftar' ? 'Memuat pendaftaran akun' : 'Memuat autentikasi masuk'
   })
 
-  const returnTo = encodeURIComponent(target)
+  const returnTo = encodeURIComponent(safeTarget)
   const ssoUrl = `/auth/start?return_to=${returnTo}`
 
   // Direct immediately to SSO endpoint; loader remains permanently on-screen until page unloads

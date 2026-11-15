@@ -129,7 +129,7 @@ api.interceptors.response.use(
 
     // Tangani error 401 Unauthorized secara global
     if (error.response && error.response.status === 401 && !['/auth/login', '/auth/register', '/auth/verify-otp', '/auth/resend-otp'].includes(error.config?.url)) {
-      if (ssoEnabled) clearSsoSession();
+      if (ssoEnabled) clearSsoSession('expired');
       // Jika error 401 berasal dari '/auth/me', abaikan redirect karena wajar saat init App.vue
       if (error.config && error.config.url === '/auth/me') {
         return Promise.reject(error);
@@ -138,9 +138,10 @@ api.interceptors.response.use(
       // Bersihkan token yang tidak valid
       localStorage.removeItem('auth_token');
       
-      // Hanya redirect ke login jika halaman saat ini memang wajib login
-      if (router.currentRoute.value.meta && router.currentRoute.value.meta.requiresAuth) {
-        router.push('/login');
+      // Hanya redirect ke form login non-SSO; mode SSO ditangani panel pemulihan sesi tanpa auto-redirect loop
+      if (!ssoEnabled && router.currentRoute.value.meta && router.currentRoute.value.meta.requiresAuth) {
+        const redirect = router.currentRoute.value.fullPath || '/dashboard';
+        router.push({ path: '/login', query: { redirect } });
       }
     }
     return Promise.reject(error);

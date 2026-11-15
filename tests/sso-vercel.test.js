@@ -22,9 +22,15 @@ test('Vercel Node adapter returns sanitized guest/errors and preserves host-only
         }
     })
     const origin = `http://127.0.0.1:${server.address().port}`
-    for (const [path, status] of [['/api/session', 401], ['/auth/start?return_to=%2F%2Fevil.test', 400], ['/auth/callback?state=invalid&code=opaque', 400]]) {
+    for (const [path, status, expectedType] of [
+        ['/api/session', 401, /^application\/json/],
+        ['/auth/start?return_to=%2F%2Fevil.test', 400, /^text\/html/],
+        ['/auth/callback?state=invalid&code=opaque', 400, /^text\/html/],
+        ['/api/sso?__sso_route=callback&state=dup&state=dup', 400, /^text\/html/],
+    ]) {
         const response = await fetch(origin + path)
         assert.equal(response.status, status)
+        assert.match(response.headers.get('content-type'), expectedType)
         assert.match(response.headers.get('cache-control'), /no-store/)
         assert.equal(response.headers.get('referrer-policy'), 'no-referrer')
         assert.doesNotMatch(await response.text(), /TEST_ONLY_NODE|stack|accessToken|refreshToken/)
@@ -35,4 +41,5 @@ test('Vercel Node adapter returns sanitized guest/errors and preserves host-only
     }
     const rewritten = await fetch(origin + '/api/sso?__sso_route=session')
     assert.equal(rewritten.status, 401)
+    assert.match(rewritten.headers.get('content-type'), /^application\/json/)
 })

@@ -14,6 +14,21 @@
           </transition>
         </router-view>
       </div>
+      <div v-else class="app-content session-recovery-shell">
+        <div class="session-recovery-card" role="status" aria-live="polite">
+          <span class="session-recovery-badge">Sesi Berakhir</span>
+          <h2>Sesi Login Anda Telah Habis</h2>
+          <p>Untuk melindungi akun Anda, sesi masuk berakhir. Silakan masuk kembali untuk melanjutkan.</p>
+          <div class="session-recovery-actions">
+            <button type="button" class="session-recovery-btn primary" @click="redirectToSso(route.fullPath || '/dashboard', 'masuk')">
+              Masuk Kembali
+            </button>
+            <button type="button" class="session-recovery-btn secondary" @click="router.push('/')">
+              Kembali ke Beranda
+            </button>
+          </div>
+        </div>
+      </div>
       <AppFooter v-if="!isWorkspacePage && !isAuthPage && !isCheckoutPage && route.name !== 'materials' && route.name !== 'notifications'" />
     </template>
     
@@ -51,15 +66,16 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { rateLimitUntil } from './services/api'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import HomeNavbar from './components/home/HomeNavbar.vue'
 import AppFooter from './components/common/AppFooter.vue'
 import AppToast from './components/common/AppToast.vue'
 import CoffeeModal from './components/common/CoffeeModal.vue'
 import FriendsSidebar from './components/common/FriendsSidebar.vue'
 import SubscriptionExpiredModal from './components/common/SubscriptionExpiredModal.vue'
-import { useUserAccount, clearUserAccount } from './composables/useUserAccount'
+import { useUserAccount, clearUserAccount, redirectToSso } from './composables/useUserAccount'
 import { ssoEnabled, ssoState, loadSsoSession } from './services/sso'
+import { useToast } from './composables/useToast'
 import { useLearningPaths } from './composables/useLearningPaths'
 import { useWipModal } from './composables/useWipModal'
 import { useTheme } from './composables/useTheme'
@@ -71,6 +87,8 @@ let cooldownTimer
 onMounted(() => { cooldownTimer = setInterval(() => { now.value = Date.now() }, 1000) })
 onUnmounted(() => clearInterval(cooldownTimer))
 const route = useRoute()
+const router = useRouter()
+const { showToast } = useToast()
 const isWorkspacePage = computed(() => ['lesson', 'cheatsheet-reader'].includes(route.name))
 const isAuthPage = computed(() => ['login', 'register', 'developer', 'auto-login'].includes(route.name))
 const isCheckoutPage = computed(() => ['checkout', 'payment-success'].includes(route.name))
@@ -130,7 +148,14 @@ onMounted(() => {
 })
 
 let sessionTimer
-const clearAccount = () => clearUserAccount()
+const clearAccount = (event) => {
+  const wasLoggedIn = isLoggedIn.value
+  const reason = event?.detail?.reason || 'expired'
+  clearUserAccount()
+  if (reason === 'expired' && wasLoggedIn) {
+    showToast('Sesi login Anda telah habis. Silakan masuk kembali.', 'warning')
+  }
+}
 const checkSession = async () => {
   if (!ssoEnabled || !isLoggedIn.value || document.visibilityState !== 'visible') return
   try { if (await loadSsoSession()) await fetchUser(true) } catch { /* Retain unavailable state. */ }
@@ -212,5 +237,80 @@ onUnmounted(() => {
   min-height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.session-recovery-shell {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.session-recovery-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-card, #131824);
+  border: 1px solid var(--border, rgba(148, 163, 184, 0.16));
+  border-radius: 18px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.session-recovery-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  margin-bottom: 12px;
+}
+
+.session-recovery-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+  color: var(--text-light, #f8fafc);
+}
+
+.session-recovery-card p {
+  margin: 0 0 20px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text-muted, #94a3b8);
+}
+
+.session-recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.session-recovery-btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.session-recovery-btn:hover {
+  transform: translateY(-1px);
+}
+
+.session-recovery-btn.primary {
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  color: #fff;
+}
+
+.session-recovery-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-light, #f8fafc);
+  border-color: var(--border, rgba(148, 163, 184, 0.2));
 }
 </style>
