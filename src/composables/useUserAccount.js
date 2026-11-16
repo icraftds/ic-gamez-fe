@@ -29,7 +29,7 @@ let initializeRequest = null
 let initializedToken = null
 const isPremiumUser = ref(false)
 const maxCredits = computed(() => {
-  if (currentPlan.value === 'expert') return 25
+  if (currentPlan.value === 'expert' || currentPlan.value === 'lifetime') return 25
   if (currentPlan.value === 'pro') return 20
   return 10
 })
@@ -43,7 +43,7 @@ const systemConfig = ref({
   market_redirect_enabled: true,
   module_default_price: 14999,
   module_multibuy_discount_percent: 25,
-  module_default_duration_days: 30,
+  module_default_duration_days: 0,
   pro_max_selectable_modules: 12
 })
 let configRequest = null
@@ -272,7 +272,7 @@ export function useUserAccount() {
   const hasModuleAccess = (path) => {
     if (!path) return false
     if (path.is_unlocked) return true
-    if (currentPlan.value === 'expert') return true
+    if (currentPlan.value === 'expert' || currentPlan.value === 'lifetime') return true
     if (path.id && unlockedPathIds.value.includes(Number(path.id))) return true
     return path.is_premium === false
   }

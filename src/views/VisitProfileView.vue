@@ -363,6 +363,7 @@ const currentPlan = computed(() => {
 })
 
 const currentBadgeStatus = computed(() => {
+  if (currentPlan.value === 'lifetime') return 'LIFETIME';
   if (currentPlan.value === 'expert') return 'EXPERT';
   if (currentPlan.value === 'pro' || userProfile.value?.is_premium) return 'PRO';
   return 'FREE';
@@ -370,7 +371,7 @@ const currentBadgeStatus = computed(() => {
 
 const borderId = computed(() => {
   if (userProfile.value?.active_border_id) return userProfile.value.active_border_id;
-  if (currentPlan.value === 'expert') return 'D_EXPERT';
+  if (currentPlan.value === 'expert' || currentPlan.value === 'lifetime') return 'D_EXPERT';
   if (currentPlan.value === 'pro' || userProfile.value?.is_premium) return 'D_PRO';
   return 'D_FREE';
 });

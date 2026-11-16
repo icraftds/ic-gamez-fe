@@ -142,7 +142,12 @@ const poll = createPaymentPoll(async (isCurrent) => {
   if (!isCurrent()) return false
   const active = response.data?.data
   const baseline = saved?.paymentDetails?.baselineSubscription
-  const newGrant = !baseline || (active && (active.id !== baseline.id || active.expires_at !== baseline.expires_at))
+  const newGrant = !baseline || (active && (
+    active.id !== baseline.id ||
+    active.expires_at !== baseline.expires_at ||
+    active.starts_at !== baseline.starts_at ||
+    active.updated_at !== baseline.updated_at
+  ))
   
   if ((newGrant || !baseline) && user && isPremiumUser.value && (!expectedPlan || currentPlan.value === expectedPlan) && active?.status === 'active') {
     await fetchWallet()

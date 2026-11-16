@@ -89,7 +89,8 @@
                   <i class="fa-solid fa-tags"></i> Diskon {{ moduleMeta.discount_percent }}% (&ge; 2 Modul)
                 </span>
                 <span class="promo-chip duration">
-                  <i class="fa-regular fa-clock"></i> {{ moduleMeta.module_default_duration_days }} Hari
+                  <i :class="Number(moduleMeta.module_default_duration_days) > 0 ? 'fa-regular fa-clock' : 'fa-solid fa-infinity'"></i>
+                  {{ Number(moduleMeta.module_default_duration_days) > 0 ? `${moduleMeta.module_default_duration_days} Hari` : 'Akses Lifetime (Selamanya)' }}
                 </span>
               </div>
             </div>
@@ -131,7 +132,8 @@
               </div>
               <div class="module-header-badges">
                 <span class="module-duration-pill">
-                  <i class="fa-regular fa-clock"></i> {{ mod.duration_days }} Hari
+                  <i :class="Number(mod.duration_days) > 0 ? 'fa-regular fa-clock' : 'fa-solid fa-infinity'"></i>
+                  {{ Number(mod.duration_days) > 0 ? `${mod.duration_days} Hari` : 'Lifetime' }}
                 </span>
                 <span v-if="mod.is_unlocked" class="module-owned-pill">
                   <i class="fa-solid fa-circle-check"></i> {{ formatModuleAccessBadge(mod) }}
@@ -482,7 +484,7 @@ const selectedModuleIds = ref([])
 const moduleMeta = ref({
   module_default_price: 14999,
   discount_percent: 25,
-  module_default_duration_days: 30,
+  module_default_duration_days: 0,
   market_topup_url: 'https://market.icraftds.id/topup',
   user_plan: 'free'
 })
@@ -563,12 +565,12 @@ const toggleModuleSelect = (id) => {
 }
 
 const formatModuleAccessBadge = (mod) => {
-  if (mod.access_status === 'expert_full') return 'Full Access (Expert)'
+  if (mod.access_status === 'expert_full') return 'Full Access'
   if (mod.access_status === 'pro_quota') {
     return mod.remaining_days ? `Kuota Pro (${mod.remaining_days}h)` : 'Aktif via Kuota Pro'
   }
   if (mod.access_status === 'owned') {
-    return mod.remaining_days ? `Aktif (${mod.remaining_days} hari)` : 'Sudah Dimiliki'
+    return mod.remaining_days ? `Aktif (${mod.remaining_days} hari)` : 'Lifetime (Aktif Selamanya)'
   }
   return 'Gratis'
 }
@@ -728,7 +730,7 @@ const checkoutModulesList = (modsList, triggerKey = 'mod-bundle') => {
       pathIds: modsList.map(m => m.id).join(','),
       name: displayName,
       names,
-      durationDays: modsList[0]?.duration_days || moduleMeta.value.module_default_duration_days,
+      durationDays: modsList[0]?.duration_days ?? moduleMeta.value.module_default_duration_days ?? 0,
       subtotal,
       discountPercent,
       discountAmount,

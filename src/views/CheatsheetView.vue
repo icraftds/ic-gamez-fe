@@ -214,7 +214,7 @@ const { isLoggedIn, currentPlan } = useUserAccount()
 
 // Cek apakah akun adalah Expert
 const isExpert = computed(() => {
-  return isLoggedIn.value && currentPlan.value === 'expert'
+  return isLoggedIn.value && (currentPlan.value === 'expert' || currentPlan.value === 'lifetime')
 })
 
 const searchQuery = ref('')

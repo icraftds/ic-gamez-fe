@@ -37,13 +37,14 @@ const router = useRouter()
 // Determine coinz amount based on current plan
 const coinzBonusAmount = computed(() => {
   const plan = currentPlan.value
+  if (plan === 'lifetime') return 500000
   if (plan === 'expert') return 300000
   if (plan === 'pro')    return 200000
   return 0
 })
 const coinzBonusPlan = computed(() => {
   const plan = currentPlan.value
-  if (plan === 'expert') return 'expert'
+  if (plan === 'lifetime' || plan === 'expert') return plan
   return 'pro'
 })
 

@@ -160,7 +160,7 @@ const toggleIframeSidebar = () => {
 }
 
 const isExpert = computed(() => {
-  return isLoggedIn.value && currentPlan.value === 'expert'
+  return isLoggedIn.value && (currentPlan.value === 'expert' || currentPlan.value === 'lifetime')
 })
 
 const currentSlug = computed(() => route.params.slug)

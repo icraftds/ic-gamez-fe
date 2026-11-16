@@ -105,8 +105,9 @@ const { plansLoaded, fetchPlans, findPlanBySlug } = usePlans()
 
 const planSlug = ref(route.query.slug || 'pro')
 const isExpertSlug = computed(() => String(planSlug.value).toLowerCase() === 'expert')
-const planName = ref(route.query.plan || (isExpertSlug.value ? 'Expert Plan' : 'Pro'))
-const planPrice = ref(Number(route.query.price) || (isExpertSlug.value ? 99000 : 49000))
+const isLifetimeSlug = computed(() => String(planSlug.value).toLowerCase() === 'lifetime')
+const planName = ref(route.query.plan || (isLifetimeSlug.value ? 'Lifetime Plan' : (isExpertSlug.value ? 'Expert Plan' : 'Pro')))
+const planPrice = ref(Number(route.query.price) || (isLifetimeSlug.value ? 499000 : (isExpertSlug.value ? 99000 : 49000)))
 const planId = ref(Number(route.query.id) || (isExpertSlug.value ? 2 : 1))
 const durationMonths = ref(Math.max(1, Number(route.query.months) || 1))
 const activePlanConfig = computed(() => findPlanBySlug(planSlug.value))
@@ -135,6 +136,7 @@ const onUpdateDuration = ({ months, totalPrice }) => {
 }
 
 const planIcon = computed(() => {
+  if (planSlug.value === 'lifetime') return 'fa-solid fa-infinity'
   if (planSlug.value === 'expert') return 'fa-solid fa-crown'
   if (planSlug.value === 'pro') return 'fa-solid fa-rocket'
   return 'fa-solid fa-star'
@@ -224,7 +226,12 @@ const poll = createPaymentPoll(async (isCurrent) => {
   if (!isCurrent()) return false
   const active = subscription.data?.data
   const baseline = paymentDetails.value?.baselineSubscription
-  const newGrant = !baseline || (active && (active.id !== baseline.id || active.expires_at !== baseline.expires_at))
+  const newGrant = !baseline || (active && (
+    active.id !== baseline.id ||
+    active.expires_at !== baseline.expires_at ||
+    active.starts_at !== baseline.starts_at ||
+    active.updated_at !== baseline.updated_at
+  ))
   if ((newGrant || !baseline) && user && isPremiumUser.value && currentPlan.value === planSlug.value && active?.status === 'active') {
     await fetchWallet()
     await handlePaymentSuccess()

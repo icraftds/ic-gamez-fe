@@ -31,7 +31,7 @@
                 <div>
                   <span>{{ pkgName }} <span v-if="type === 'energy'">(+{{ pkgEnergy }} Energi)</span></span>
                   <div v-if="type === 'module' && moduleNames" style="font-size: 0.8rem; opacity: 0.78; margin-top: 4px;">
-                    {{ moduleNames }} • Durasi akses {{ durationDays }} hari
+                    {{ moduleNames }} • {{ isLifetimeModule ? 'Akses Lifetime (Selamanya)' : `Durasi akses ${durationDays} hari` }}
                   </div>
                 </div>
               </div>
@@ -90,7 +90,9 @@
             </div>
             <h2 class="success-title">Pembayaran Berhasil!</h2>
             <p class="success-desc">Anda telah berhasil membeli <strong>{{ pkgName }}</strong>.<br>
-            <span v-if="type === 'module'">Akses modul telah aktif selama {{ durationDays }} hari. Selamat belajar!</span>
+            <span v-if="type === 'module'">
+              {{ isLifetimeModule ? 'Akses modul telah aktif selamanya (Lifetime). Selamat belajar!' : `Akses modul telah aktif selama ${durationDays} hari. Selamat belajar!` }}
+            </span>
             <span v-else-if="type === 'border'">Border telah ditambahkan ke koleksi Anda.</span>
             <span v-else-if="type === 'item'">Item telah ditambahkan ke inventory Anda.</span>
             <span v-else>Energi Anda telah ditambahkan.</span>
@@ -204,7 +206,11 @@ const pathIds = String(route.query.pathIds || '')
   .map((id) => Number(id.trim()))
   .filter(Boolean)
 const moduleNames = route.query.names || ''
-const durationDays = Number(route.query.durationDays || 30)
+const rawDurationQuery = route.query.durationDays
+const durationDays = rawDurationQuery !== undefined && rawDurationQuery !== null && rawDurationQuery !== ''
+  ? Number(rawDurationQuery)
+  : 0
+const isLifetimeModule = computed(() => !Number.isFinite(durationDays) || durationDays <= 0)
 const discountPercent = Number(route.query.discountPercent || 0)
 
 const state = ref('confirm')

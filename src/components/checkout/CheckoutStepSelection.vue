@@ -446,7 +446,9 @@ const currentPlanPerks = computed(() => {
   const months = selectedMonths.value
   return {
     badge: presentation.checkoutBadge,
-    duration: months > 1 ? `${presentation.durationLabel} (${months} Bulan)` : presentation.durationLabel,
+    duration: presentation.isLifetime
+      ? 'Selamanya (Lifetime)'
+      : (months > 1 ? `${presentation.durationLabel} (${months} Bulan)` : presentation.durationLabel),
     energy: presentation.energyLabel,
     features: presentation.features,
   }
