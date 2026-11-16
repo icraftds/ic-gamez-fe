@@ -451,6 +451,7 @@ body:not(.light-mode) .sidebar-tooltip::before {
 /* Main Content Area */
 .dash-main-wrapper {
   flex: 1;
+  min-width: 0;
   padding: 24px 32px;
   margin-left: 96px;
   max-width: calc(100% - 96px);

@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import api from '../services/api'
 
 const STORAGE_KEY = 'gamez_banner_minimized'
+const DEFAULT_BANNERS_ENDPOINT = '/banners'
 
 const DEFAULT_BANNERS = [
   {
@@ -61,6 +62,16 @@ const DEFAULT_BANNERS = [
 const banners = ref([...DEFAULT_BANNERS])
 const isLoading = ref(false)
 const hasFetched = ref(false)
+let inFlightFetch = null
+
+function safeBannerLink(raw) {
+  if (typeof raw !== 'string') return '#'
+  const trimmed = raw.trim()
+  if (/^https?:\/\//i.test(trimmed) || (trimmed.startsWith('/') && !trimmed.startsWith('//'))) {
+    return trimmed
+  }
+  return '#'
+}
 
 function readInitialMinimized() {
   try {
@@ -79,7 +90,7 @@ function normalizeBanner(item, index) {
     title: item.title || '',
     desc: item.desc || item.description || '',
     ctaText: item.ctaText || item.cta_text || 'Selengkapnya',
-    link: item.link || item.url || '#',
+    link: safeBannerLink(item.link || item.url || '#'),
     accent: item.accent || item.accent_color || '#38bdf8',
     icon: item.icon || 'fa-solid fa-bullhorn',
     imageUrl: item.imageUrl || item.image_url || null,
@@ -100,26 +111,34 @@ function isWithinSchedule(banner, nowMs) {
 
 export function useAdBanners() {
   const setBanners = (list) => {
-    if (Array.isArray(list) && list.length > 0) {
+    if (Array.isArray(list)) {
       banners.value = list.map(normalizeBanner)
     }
   }
 
-  const fetchBanners = async (endpoint = import.meta.env.VITE_BANNERS_ENDPOINT) => {
-    if (!endpoint || hasFetched.value || isLoading.value) return
+  const fetchBanners = async (endpoint = import.meta.env.VITE_BANNERS_ENDPOINT || DEFAULT_BANNERS_ENDPOINT, force = false) => {
+    if (!endpoint) return
+    if (hasFetched.value && !force) return
+    if (inFlightFetch && !force) return inFlightFetch
+
     isLoading.value = true
-    try {
-      const response = await api.get(endpoint)
-      const payload = response?.data?.data ?? response?.data
-      if (Array.isArray(payload) && payload.length > 0) {
-        setBanners(payload)
-      }
-      hasFetched.value = true
-    } catch {
-      // Keep default ecosystem & partner banners on failure
-    } finally {
-      isLoading.value = false
-    }
+    inFlightFetch = api.get(endpoint)
+      .then((response) => {
+        const payload = response?.data?.data ?? response?.data
+        if (Array.isArray(payload)) {
+          setBanners(payload)
+        }
+        hasFetched.value = true
+      })
+      .catch(() => {
+        // Keep default ecosystem & partner banners on network failure
+      })
+      .finally(() => {
+        isLoading.value = false
+        inFlightFetch = null
+      })
+
+    return inFlightFetch
   }
 
   const getBannersForPlacement = (placement = 'all') => {

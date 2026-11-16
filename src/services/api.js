@@ -97,7 +97,8 @@ api.interceptors.response.use(
         error.config.url.includes('/challenges') ||
         error.config.url.includes('/materials') ||
         error.config.url.includes('/user/statistics') ||
-        error.config.url.includes('/progress')
+        error.config.url.includes('/progress') ||
+        error.config.url.includes('/banners')
       )) {
         return Promise.reject(error);
       }

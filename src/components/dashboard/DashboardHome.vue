@@ -54,6 +54,7 @@ const { userProfile } = useUserAccount()
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 .dash-vault-card {

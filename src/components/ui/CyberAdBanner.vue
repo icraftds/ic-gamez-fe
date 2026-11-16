@@ -42,6 +42,17 @@ const currentAd = computed(() => {
   return ads.value[safeIdx] || ads.value[0]
 })
 
+const isInternalLink = computed(() => {
+  const link = currentAd.value?.link || ''
+  return link.startsWith('/') && !link.startsWith('//')
+})
+
+watch(() => ads.value.length, (len) => {
+  if (len === 0) currentIndex.value = 0
+  else if (currentIndex.value >= len) currentIndex.value = 0
+  startRotation()
+})
+
 const nextAd = () => {
   if (ads.value.length <= 1) return
   currentIndex.value = (currentIndex.value + 1) % ads.value.length
@@ -91,11 +102,7 @@ const handleVisibilityChange = () => {
 }
 
 onMounted(() => {
-  if (props.apiEndpoint) {
-    fetchBanners(props.apiEndpoint)
-  } else if (import.meta.env.VITE_BANNERS_ENDPOINT) {
-    fetchBanners(import.meta.env.VITE_BANNERS_ENDPOINT)
-  }
+  fetchBanners(props.apiEndpoint || undefined)
   if (!isMinimized.value) {
     startRotation()
   }
@@ -167,7 +174,16 @@ onUnmounted(() => {
 
         <!-- Right CTA & Hide Controls -->
         <div class="gz-ad-actions">
+          <router-link
+            v-if="isInternalLink"
+            :to="currentAd.link"
+            class="gz-ad-cta"
+          >
+            <span>{{ currentAd.ctaText }}</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </router-link>
           <a
+            v-else
             :href="currentAd.link"
             target="_blank"
             rel="noopener noreferrer"
@@ -194,8 +210,11 @@ onUnmounted(() => {
 <style scoped>
 .gz-ad-wrapper {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin: 1.25rem 0 1.5rem 0;
   font-family: 'Poppins', sans-serif;
+  contain: layout inline-size style;
 }
 
 /* 1. Minimized Restore Bar */
@@ -262,13 +281,15 @@ onUnmounted(() => {
 .gz-ad-banner {
   position: relative;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   height: 106px;
   border-radius: 16px;
   background: rgba(15, 23, 42, 0.76);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
   overflow: hidden;
-  contain: layout style;
+  contain: layout style paint;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
@@ -300,12 +321,16 @@ onUnmounted(() => {
 .gz-ad-inner {
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   height: 100%;
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 0 20px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Left Icon Box */
@@ -333,8 +358,9 @@ onUnmounted(() => {
 
 /* Middle Text Content (Strictly Clamped for 100% Consistent Size) */
 .gz-ad-content {
-  flex: 1;
+  flex: 1 1 0%;
   min-width: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -481,8 +507,7 @@ onUnmounted(() => {
 /* Responsive Mobile (Consistent Fixed Height on Mobile Too) */
 @media (max-width: 768px) {
   .gz-ad-banner {
-    height: auto;
-    min-height: 124px;
+    height: 156px;
     padding: 14px 16px;
     box-sizing: border-box;
   }
@@ -490,7 +515,8 @@ onUnmounted(() => {
   .gz-ad-inner {
     padding: 0;
     flex-wrap: wrap;
-    gap: 12px;
+    align-content: space-between;
+    gap: 10px 12px;
   }
 
   .gz-ad-icon-box {
