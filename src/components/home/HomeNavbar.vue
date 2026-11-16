@@ -4,8 +4,8 @@
       <!-- 1. Floating Logo Capsule (Left) -->
       <div class="nav-capsule nav-logo-capsule">
         <router-link to="/" class="logo-link">
-          <img src="/images/Logo iC GameZ Lightmode.png" alt="IC Game Z" class="logo-text-img logo-light" />
-          <img src="/images/Logo iC GameZ darkmode.png" alt="IC Game Z" class="logo-text-img logo-dark" />
+          <img src="/images/logo-gamez-light.webp" alt="IC Game Z" class="logo-text-img logo-light" />
+          <img src="/images/logo-gamez-dark.webp" alt="IC Game Z" class="logo-text-img logo-dark" />
         </router-link>
       </div>
 

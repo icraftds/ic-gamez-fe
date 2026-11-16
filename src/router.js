@@ -1,11 +1,12 @@
 import { ssoEnabled, loadSsoSession } from './services/sso'
 import { startAuthLoading, stopAuthLoading, redirectToSso, isRedirectingToSso } from './composables/useUserAccount'
 import { useNotifications } from './composables/useNotifications'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createMemoryHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  // Build-time prerendering (scripts/prerender.mjs) runs without a browser.
+  history: import.meta.env.SSR ? createMemoryHistory(import.meta.env.BASE_URL) : createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition;
@@ -80,9 +81,11 @@ const router = createRouter({
       component: () => import('./views/LessonView.vue')
     },
     {
-      path: '/encyclopedia',
+      path: '/encyclopedia/:slug?',
       name: 'encyclopedia',
-      component: () => import('./views/EncyclopediaView.vue')
+      component: () => import('./views/EncyclopediaView.vue'),
+      // Keep the view mounted while switching articles (only :slug changes)
+      meta: { stableKey: true }
     },
     {
       path: '/cheatsheet',
@@ -187,6 +190,12 @@ const router = createRouter({
       alias: '/terms',
       name: 'terms',
       component: () => import('./views/TermsView.vue')
+    },
+    {
+      // Must stay last. Prerendered to dist/404.html, which Vercel serves with HTTP 404.
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('./views/NotFoundView.vue')
     }
   ]
 })
@@ -209,6 +218,8 @@ function canAutoRedirectToSso(from) {
 }
 
 router.beforeEach(async (to, from, next) => {
+  // Prerendering only renders public pages as a logged-out visitor; auth guards run in the browser.
+  if (import.meta.env.SSR) return next()
   if (['login', 'register', 'auto-login'].includes(to.name)) {
     if (ssoEnabled) {
       if (!isRedirectingToSso.value) {
@@ -252,6 +263,7 @@ router.beforeEach(async (to, from, next) => {
 })
 
 router.afterEach((to) => {
+  if (import.meta.env.SSR) return
   // Auth views (login / register) dismiss authLoading explicitly via finishAuthLoading()
   // once their component is mounted on screen so the user never gets stuck on the previous page.
   if (!['login', 'register', 'auto-login'].includes(to.name)) {

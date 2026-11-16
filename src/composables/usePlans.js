@@ -167,6 +167,12 @@ const isLoadingPlans = ref(false)
 const plansLoaded = ref(initialPlans.length > 0)
 let inFlightRequest = null
 
+/** Build-time prerendering only: fill the shared state with public plan data. */
+export function seedPlansForPrerender(planList) {
+  plans.value = Array.isArray(planList) ? planList : []
+  plansLoaded.value = plans.value.length > 0
+}
+
 /**
  * Shared subscription plans state with synchronous sessionStorage hydration
  * so Pricing and Checkout render duration tiers and benefits immediately.

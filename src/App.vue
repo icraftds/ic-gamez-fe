@@ -8,7 +8,7 @@
       <div v-if="!ssoEnabled || ssoState.status.value !== 'guest' || !route.meta.requiresAuth" class="app-content">
         <router-view v-slot="{ Component, route }">
           <transition name="page-fade" mode="out-in">
-            <div :key="route.path" class="route-wrapper">
+            <div :key="route.meta.stableKey ? route.name : route.path" class="route-wrapper">
               <component :is="Component" />
             </div>
           </transition>

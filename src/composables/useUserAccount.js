@@ -49,7 +49,9 @@ const systemConfig = ref({
 let configRequest = null
 const isLoggedIn = ref(!!authIdentity())
 const isLoading = ref(false)
-const isBootstrapping = ref(true)
+// Prerendered HTML must show page content, not the session loader
+// (globalThis.__PRERENDER__ is set by server/seo/prerender.mjs before the app loads).
+const isBootstrapping = ref(!globalThis.__PRERENDER__)
 const isAuthLoading = ref(false)
 export const isRedirectingToSso = ref(false)
 const authLoadingLabel = ref('autentikasi')

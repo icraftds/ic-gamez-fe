@@ -1,0 +1,29 @@
+name: Refresh prerendered pages
+
+# Prerendered SEO pages (learning paths, encyclopedia) are built from the API at deploy
+# time. Rebuild daily so content edited in the admin panel reaches search engines.
+# Setup: Vercel > Project > Settings > Git > Deploy Hooks (branch: master), then save
+# the hook URL as the repository secret VERCEL_DEPLOY_HOOK_URL.
+
+on:
+  schedule:
+    - cron: '0 20 * * *' # 03:00 WIB
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Vercel production rebuild
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::notice::VERCEL_DEPLOY_HOOK_URL is not set; skipping."
+            exit 0
+          fi
+          curl --fail --silent --show-error -X POST "$HOOK" > /dev/null
+          echo "Rebuild triggered."

@@ -15,8 +15,8 @@
       <header class="vault-header">
         <div class="vault-brand-header">
           <div class="vault-logo-wrap">
-            <img src="/images/Logo iC GameZ darkmode.png" alt="iC Game-Z" class="brand-logo-img logo-dark" />
-            <img src="/images/Logo iC GameZ Lightmode.png" alt="iC Game-Z" class="brand-logo-img logo-light" />
+            <img src="/images/logo-gamez-dark.webp" alt="iC Game-Z" class="brand-logo-img logo-dark" />
+            <img src="/images/logo-gamez-light.webp" alt="iC Game-Z" class="brand-logo-img logo-light" />
           </div>
           <h1 class="vault-title"><span class="gradient-text">Cheatsheet</span></h1>
         </div>

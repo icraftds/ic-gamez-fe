@@ -11,7 +11,7 @@
       </div>
 
       <div class="reading-logo">
-        <img src="/images/Logo iC GameZ darkmode.png" alt="iC GameZ" height="24" />
+        <img src="/images/logo-gamez-dark.webp" alt="iC GameZ" height="24" />
       </div>
 
       <div class="topbar-right">

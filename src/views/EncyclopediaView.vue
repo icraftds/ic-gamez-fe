@@ -56,14 +56,14 @@
               </h4>
               <ul>
                 <li v-for="topic in section.topics" :key="topic.id || topic.slug">
-                  <a 
-                    href="#" 
+                  <router-link
+                    :to="`/encyclopedia/${topic.slug}`"
+                    replace
                     :class="{ active: selectedTopicId === topic.slug }"
-                    @click.prevent="selectedTopicId = topic.slug"
                   >
                     <i class="fa-regular fa-file-code topic-icon"></i>
                     <span class="topic-title">{{ topic.title }}</span>
-                  </a>
+                  </router-link>
                 </li>
               </ul>
             </div>
@@ -90,11 +90,16 @@ import { ref, computed, onMounted, watch } from 'vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import ArticleReader from '../components/encyclopedia/ArticleReader.vue'
 import api from '../services/api'
+import { useRoute } from 'vue-router'
+import { prerenderData } from '../services/prerenderData'
 
-const encyclopediaData = ref([])
-const selectedTopicId = ref(null)
-const selectedTopic = ref(null)
-const isLoading = ref(true)
+// prerenderData is only filled during build-time prerendering; in the browser it is empty.
+const encyclopediaData = ref(prerenderData.encyclopedia || [])
+const route = useRoute()
+// Each article has its own URL (/encyclopedia/:slug) so it can be shared and indexed.
+const selectedTopicId = ref(typeof route.params.slug === 'string' ? route.params.slug : (prerenderData.topic?.slug || null))
+const selectedTopic = ref(prerenderData.topic || null)
+const isLoading = ref(!prerenderData.encyclopedia)
 const isTopicLoading = ref(false)
 const searchQuery = ref('')
 
@@ -131,7 +136,7 @@ const fetchEncyclopedia = async () => {
     encyclopediaData.value = response.data.data || []
     
     // Set default selected topic if available
-    if (encyclopediaData.value.length > 0 && encyclopediaData.value[0].topics?.length > 0) {
+    if (!selectedTopicId.value && encyclopediaData.value.length > 0 && encyclopediaData.value[0].topics?.length > 0) {
       selectedTopicId.value = encyclopediaData.value[0].topics[0].slug
     }
   } catch (error) {
@@ -158,8 +163,13 @@ watch(selectedTopicId, (newId) => {
   fetchTopicDetails(newId)
 })
 
+watch(() => route.params.slug, (slug) => {
+  if (typeof slug === 'string' && slug) selectedTopicId.value = slug
+})
+
 onMounted(() => {
   fetchEncyclopedia()
+  if (selectedTopicId.value) fetchTopicDetails(selectedTopicId.value)
 })
 </script>
 

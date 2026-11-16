@@ -7,8 +7,8 @@
       <div class="contact-top-nav">
         <div class="top-nav-left">
           <router-link to="/" class="brand-link" title="Beranda iC Game-Z">
-            <img src="/images/Logo iC GameZ Lightmode.png" alt="iC Game-Z" class="brand-logo-img logo-light" />
-            <img src="/images/Logo iC GameZ darkmode.png" alt="iC Game-Z" class="brand-logo-img logo-dark" />
+            <img src="/images/logo-gamez-light.webp" alt="iC Game-Z" class="brand-logo-img logo-light" />
+            <img src="/images/logo-gamez-dark.webp" alt="iC Game-Z" class="brand-logo-img logo-dark" />
           </router-link>
           <span class="nav-sep">/</span>
           <div class="nav-breadcrumbs">
@@ -337,7 +337,7 @@ const handleSubmitForm = async () => {
   await new Promise(resolve => setTimeout(resolve, 350))
 
   try {
-    window.open(waUrl, '_blank')
+    window.open(waUrl, '_blank', 'noopener,noreferrer')
   } catch (err) {
     console.error('Failed to auto open window:', err)
   }

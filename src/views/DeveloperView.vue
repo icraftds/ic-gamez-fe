@@ -19,19 +19,19 @@
         </div>
         
         <div class="social-links">
-          <a href="https://github.com/rzranz" target="_blank" class="social-btn github">
+          <a href="https://github.com/rzranz" target="_blank" rel="noopener noreferrer" class="social-btn github">
             <i class="fa-brands fa-github"></i>
             <span>rzranz</span>
           </a>
-          <a href="https://www.linkedin.com/in/randizakariaputra" target="_blank" class="social-btn linkedin">
+          <a href="https://www.linkedin.com/in/randizakariaputra" target="_blank" rel="noopener noreferrer" class="social-btn linkedin">
             <i class="fa-brands fa-linkedin-in"></i>
             <span>LinkedIn</span>
           </a>
-          <a href="https://instagram.com/rdzaputra_" target="_blank" class="social-btn instagram">
+          <a href="https://instagram.com/rdzaputra_" target="_blank" rel="noopener noreferrer" class="social-btn instagram">
             <i class="fa-brands fa-instagram"></i>
             <span>@rdzaputra_</span>
           </a>
-          <a href="https://randizp.my.id" target="_blank" class="social-btn website">
+          <a href="https://randizp.my.id" target="_blank" rel="noopener noreferrer" class="social-btn website">
             <i class="fa-solid fa-globe"></i>
             <span>randizp.my.id</span>
           </a>

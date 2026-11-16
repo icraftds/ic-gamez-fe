@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --ssrManifest && vite build --ssr src/entry-server.js --outDir dist-ssr && node server/seo/prerender.mjs",
     "preview": "vite preview",
-    "test": "node --test tests/integration.test.js",
-    "typecheck": "vue-tsc --noEmit --allowJs --checkJs false --target ES2022 --module ESNext --moduleResolution bundler src/main.js"
+    "test": "node --test tests/integration.test.js tests/seo-crawlers.test.js tests/seo-prerender.test.js",
+    "typecheck": "vue-tsc --noEmit --allowJs --checkJs false --target ES2022 --module ESNext --moduleResolution bundler src/main.js",
+    "build:spa": "vite build"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.12",

@@ -14,10 +14,10 @@
       <div class="social-support">
         <p class="social-label">Support kami di sosial media:</p>
         <div class="social-buttons">
-          <a href="https://instagram.com/icraft.ds" target="_blank" class="btn-social ig">
+          <a href="https://instagram.com/icraft.ds" target="_blank" rel="noopener noreferrer" class="btn-social ig">
             <i class="fa-brands fa-instagram"></i> icraft.ds
           </a>
-          <a href="https://tiktok.com/@icraftds.id" target="_blank" class="btn-social tiktok">
+          <a href="https://tiktok.com/@icraftds.id" target="_blank" rel="noopener noreferrer" class="btn-social tiktok">
             <i class="fa-brands fa-tiktok"></i> icraft.ds
           </a>
         </div>

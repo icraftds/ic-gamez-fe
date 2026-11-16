@@ -90,7 +90,7 @@ const handleClaimReward = async (notif) => {
 const navigateCta = (url) => {
   if (!url) return
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    window.open(url, '_blank')
+    window.open(url, '_blank', 'noopener,noreferrer')
   } else {
     router.push(url)
   }

@@ -1,12 +1,116 @@
 {
-  "rewrites": [
-    { "source": "/auth/start", "destination": "/api/sso?__sso_route=start" },
-    { "source": "/auth/callback", "destination": "/api/sso?__sso_route=callback" },
-    { "source": "/api/session", "destination": "/api/sso?__sso_route=session" },
-    { "source": "/api/auth/logout", "destination": "/api/sso?__sso_route=logout" },
-    { "source": "/api/bff/:path*", "destination": "/api/sso?__sso_route=bff&__sso_path=:path*" },
-    { "source": "/cheatsheet/index.html", "destination": "/" },
+  "trailingSlash": false,
+  "redirects": [
     {
-      "source": "/(.*)",
-      "destination": "/" }]
+      "source": "/about",
+      "destination": "/tentang-kami",
+      "statusCode": 301
+    },
+    {
+      "source": "/guide",
+      "destination": "/panduan",
+      "statusCode": 301
+    },
+    {
+      "source": "/contact",
+      "destination": "/hubungi-kami",
+      "statusCode": 301
+    },
+    {
+      "source": "/privacy",
+      "destination": "/kebijakan-privasi",
+      "statusCode": 301
+    },
+    {
+      "source": "/terms",
+      "destination": "/syarat-ketentuan",
+      "statusCode": 301
+    },
+    {
+      "source": "/learn",
+      "destination": "/learning",
+      "statusCode": 301
+    },
+    {
+      "source": "/learn/path/:pathId",
+      "destination": "/learning/:pathId",
+      "statusCode": 301
+    },
+    {
+      "source": "/cheatsheet/index.html",
+      "destination": "/cheatsheet",
+      "statusCode": 301
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/auth/start",
+      "destination": "/api/sso?__sso_route=start"
+    },
+    {
+      "source": "/auth/callback",
+      "destination": "/api/sso?__sso_route=callback"
+    },
+    {
+      "source": "/api/session",
+      "destination": "/api/sso?__sso_route=session"
+    },
+    {
+      "source": "/api/auth/logout",
+      "destination": "/api/sso?__sso_route=logout"
+    },
+    {
+      "source": "/api/bff/:path*",
+      "destination": "/api/sso?__sso_route=bff&__sso_path=:path*"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/seo?file=sitemap"
+    },
+    {
+      "source": "/llms.txt",
+      "destination": "/api/seo?file=llms"
+    },
+    {
+      "source": "/llms-full.txt",
+      "destination": "/api/seo?file=llms-full"
+    },
+    {
+      "source": "/(login|auto-login|register|workspace|learning|challenges|dashboard|notifications|encyclopedia|cheatsheet|shop|leaderboard|coderz|profile|pricing|developer|checkout|payment|materials|faq|panduan|hubungi-kami|tentang-kami|kebijakan-privasi|syarat-ketentuan)",
+      "destination": "/spa.html"
+    },
+    {
+      "source": "/(login|auto-login|register|workspace|learning|challenges|dashboard|notifications|encyclopedia|cheatsheet|shop|leaderboard|coderz|profile|pricing|developer|checkout|payment|materials|faq|panduan|hubungi-kami|tentang-kami|kebijakan-privasi|syarat-ketentuan)/(.*)",
+      "destination": "/spa.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/cheatsheet/(.*)\\.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
+    }
+  ]
 }

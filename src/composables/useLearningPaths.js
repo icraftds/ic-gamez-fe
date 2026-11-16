@@ -120,6 +120,12 @@ export function mergeFreshPathsWithCache(freshPaths, cachedPaths, hasBeenScoredF
   })
 }
 
+/** Build-time prerendering only: fill the shared state with public (logged-out) API data. */
+export function seedLearningPathsForPrerender(pathList) {
+  globalPaths.value = Array.isArray(pathList) ? pathList : []
+  globalHasFetchedAllPaths.value = true
+}
+
 export function useLearningPaths() {
   const paths = globalPaths
   const isLoading = globalIsLoading

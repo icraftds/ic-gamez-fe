@@ -42,7 +42,7 @@
 
           <!-- CTA Buttons -->
           <div class="reward-actions">
-            <a href="https://market.icraftds.id/" target="_blank" class="btn-market-cta">
+            <a href="https://market.icraftds.id/" target="_blank" rel="noopener noreferrer" class="btn-market-cta">
               <i class="fa-solid fa-store"></i> Tukarkan di IC Market
             </a>
             <button class="btn-later" @click="handleClose">
