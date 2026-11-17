@@ -757,40 +757,20 @@
    RESPONSIVE BREAKPOINTS
    ══════════════════════════════════════════════════ */
 @media (max-width: 960px) {
+  .explorer-top {
+    margin-bottom: 22px;
+  }
   .explorer-matrix {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 0;
   }
-  .track-rail-scroll {
-    flex-direction: row;
-    max-height: none;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    gap: 8px;
-  }
-  .track-rail-spine,
-  .rail-node-dot,
-  .rail-arrow {
+  .track-rail-column {
     display: none;
-  }
-  .rail-row {
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 210px;
-    padding: 10px 14px;
-    border: 1px solid rgba(148, 163, 184, 0.16);
-  }
-  .rail-row:hover,
-  .rail-row.is-selected {
-    transform: none;
-    border-color: var(--row-accent);
   }
   .track-stage-column {
     position: static;
-    padding-left: 0;
+    padding: 0;
     border-left: none;
-    border-top: 1px solid rgba(148, 163, 184, 0.16);
-    padding-top: 22px;
   }
   .gamification-strip {
     grid-template-columns: 1fr;

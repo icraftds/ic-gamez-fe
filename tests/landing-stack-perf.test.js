@@ -29,6 +29,11 @@ test('HomeView renders LearningPathShowcase, removes extra reference gallery, an
   const homeVue = fs.readFileSync(path.join(rootDir, 'src/views/HomeView.vue'), 'utf8')
   const showcaseVue = fs.readFileSync(path.join(rootDir, 'src/components/home/LearningPathShowcase.vue'), 'utf8')
 
+  const showcaseCss = fs.readFileSync(
+    path.join(rootDir, 'src/assets/css/components/home/LearningPathShowcase.css'),
+    'utf8'
+  )
+
   assert.match(homeVue, /<LearningPathShowcase\s*\/>/)
   assert.match(homeVue, /<!--[\s\S]*<LearningPathStack\s*\/>[\s\S]*-->/)
   assert.doesNotMatch(homeVue, /LearningPathReferences/)
@@ -36,4 +41,6 @@ test('HomeView renders LearningPathShowcase, removes extra reference gallery, an
   assert.equal(fs.existsSync(path.join(rootDir, 'src/components/home/LearningPathStack.vue')), true)
   assert.match(showcaseVue, /mini-sandbox/)
   assert.match(showcaseVue, /runSimulation/)
+  assert.match(showcaseVue, /stage-step-controls/)
+  assert.match(showcaseCss, /@media\s*\(max-width:\s*960px\)[\s\S]*\.track-rail-column\s*\{\s*display:\s*none;/)
 })
