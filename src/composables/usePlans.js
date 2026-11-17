@@ -1,6 +1,8 @@
 import { ref } from 'vue'
 import api from '../services/api'
-export { resolvePlanPresentation } from '../utils/planPresentation.js'
+import { resolvePlanPresentation } from '../utils/planPresentation.js'
+
+export { resolvePlanPresentation }
 
 const PLANS_CACHE_KEY = 'ic_plans_cache_v1'
 const PLANS_CACHE_TTL_MS = 5 * 60 * 1000

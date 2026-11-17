@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
 import { webcrypto } from 'node:crypto'
+import { resolvePlanPresentation } from '../src/utils/planPresentation.js'
 
 const ref = value => ({ value })
 const computed = getter => ({ get value() { return getter() } })
@@ -135,8 +136,8 @@ test('resolvePlanPresentation resolves dynamic benefits, badge, energy label, an
       }
     })
   }
-  const { usePlans, resolvePlanPresentation } = load('../src/composables/usePlans.js', 'usePlans, resolvePlanPresentation', {
-    api, sessionStorage
+  const { usePlans } = load('../src/composables/usePlans.js', 'usePlans', {
+    api, sessionStorage, resolvePlanPresentation
   })
   const { fetchPlans, findPlanBySlug } = usePlans()
   await fetchPlans()

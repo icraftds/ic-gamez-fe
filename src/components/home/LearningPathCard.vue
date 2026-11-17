@@ -1,5 +1,5 @@
 <template>
-  <div class="learning-path-card" :style="cardStyle">
+  <div class="learning-path-card" :class="{ 'is-occluded': isOccluded }" :style="cardStyle">
     <div class="card-ambient-glow" :style="ambientGlowStyle"></div>
     <div class="card-inner">
       <div class="card-content-left">
@@ -138,6 +138,10 @@ const props = defineProps({
   total: {
     type: Number,
     default: 0,
+  },
+  isOccluded: {
+    type: Boolean,
+    default: false,
   },
 });
 
