@@ -3,33 +3,101 @@
     <SimpleBackground v-if="!isEmbedded" />
 
     <div class="pricing-content">
-      <!-- Medium Hero Section -->
+      <!-- Open Asymmetric Editorial Hero (Unboxed, Fluid, Dynamic) -->
       <section class="pricing-hero">
-        <div class="hero-glow" aria-hidden="true"></div>
-        <div class="hero-badge-pill">
-          <i class="fa-solid fa-bolt"></i>
-          <span>INVESTASI SKILL GAME &amp; ENGINEERING</span>
-        </div>
-        <h1 class="gradient-text">Pilih Paket Langganan</h1>
-        <p class="subtitle">
-          Tingkatkan pengalaman belajarmu dengan akses penuh ke seluruh alur belajar interaktif, tantangan arena, dan mentoring eksklusif.
-        </p>
+        <div class="hero-mesh-bg" aria-hidden="true"></div>
+        <div class="hero-ambient hero-ambient-cyan" aria-hidden="true"></div>
+        <div class="hero-ambient hero-ambient-purple" aria-hidden="true"></div>
 
-        <div class="hero-highlights">
-          <span class="hero-chip"><i class="fa-solid fa-layer-group"></i> Kurikulum Terstruktur</span>
-          <span class="hero-chip"><i class="fa-solid fa-coins"></i> Bonus iCoinZ Instan</span>
-          <span class="hero-chip"><i class="fa-solid fa-certificate"></i> Sertifikat &amp; Arena</span>
-        </div>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="hero-badge-pill">
+              <span class="pulse-dot"></span>
+              <span>MEMBERSHIP &amp; AKSES SEUMUR HIDUP</span>
+            </div>
 
-        <div class="hero-actions" v-if="lifetimePlan || carouselPlans.length > 0">
-          <button v-if="lifetimePlan" type="button" class="btn-hero-primary" @click="scrollToSection('lifetime-offer-anchor')">
-            <i class="fa-solid fa-infinity"></i>
-            <span>Lihat Penawaran Lifetime</span>
-          </button>
-          <button type="button" class="btn-hero-secondary" @click="scrollToSection('plans-carousel-anchor')">
-            <i class="fa-solid fa-layer-group"></i>
-            <span>Bandingkan Semua Paket</span>
-          </button>
+            <h1 class="hero-heading">
+              Pilih Paket Belajar
+              <span class="gradient-text">Sesuai Targetmu</span>
+            </h1>
+
+            <p class="subtitle">
+              Mulai gratis dengan materi fundamental, naik ke paket berlangganan fleksibel, atau amankan akses penuh selamanya cukup dengan sekali bayar.
+            </p>
+
+            <div class="hero-actions" v-if="lifetimePlan || carouselPlans.length > 0">
+              <button
+                v-if="lifetimePlan"
+                type="button"
+                class="btn-hero-primary"
+                @click="scrollToSection('lifetime-offer-anchor')"
+              >
+                <i class="fa-solid fa-infinity"></i>
+                <span>Penawaran Lifetime</span>
+                <i class="fa-solid fa-arrow-right cta-arrow"></i>
+              </button>
+              <button
+                type="button"
+                class="btn-hero-secondary"
+                @click="scrollToSection('plans-carousel-anchor')"
+              >
+                <span>Bandingkan Semua Paket</span>
+              </button>
+            </div>
+
+            <div class="hero-metrics">
+              <div class="hero-metric">
+                <i class="fa-solid fa-route"></i>
+                <span><strong>Full</strong> Alur Belajar</span>
+              </div>
+              <span class="metric-divider" aria-hidden="true"></span>
+              <div class="hero-metric">
+                <i class="fa-solid fa-file-code"></i>
+                <span><strong>24+</strong> Cheatsheets Pro</span>
+              </div>
+              <span class="metric-divider" aria-hidden="true"></span>
+              <div class="hero-metric">
+                <i class="fa-solid fa-coins"></i>
+                <span><strong>Bonus</strong> iCoinZ Instan</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Visual Showcase Deck -->
+          <div class="hero-visual" aria-hidden="true">
+            <div class="hero-deck">
+              <div class="deck-card deck-card-back">
+                <div class="deck-icon violet"><i class="fa-solid fa-crown"></i></div>
+                <div>
+                  <span class="deck-kicker">Expert &amp; Lifetime</span>
+                  <strong>24 Cheatsheets &amp; 300+ Soal</strong>
+                </div>
+              </div>
+
+              <div class="deck-card deck-card-main">
+                <div class="deck-top-row">
+                  <span class="deck-pill"><i class="fa-solid fa-infinity"></i> Lifetime Pass</span>
+                  <span class="deck-tag">Sekali Bayar</span>
+                </div>
+                <div class="deck-title">Full Akses Selamanya</div>
+                <div class="deck-progress-bar">
+                  <span class="deck-progress-fill"></span>
+                </div>
+                <div class="deck-stats-row">
+                  <span><i class="fa-solid fa-bolt"></i> 25 Energi/mgg</span>
+                  <span><i class="fa-solid fa-check-double"></i> Tanpa Batas Waktu</span>
+                </div>
+              </div>
+
+              <div class="deck-card deck-card-float">
+                <div class="deck-icon gold"><i class="fa-solid fa-coins"></i></div>
+                <div>
+                  <span class="deck-kicker">Reward Bergabung</span>
+                  <strong>+500.000 iCoinZ</strong>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -52,22 +120,26 @@
       <TerminalLoader v-if="isLoadingPlans && plans.length === 0" label="paket langganan" />
 
       <template v-else>
-        <!-- Featured Lifetime Offer Banner -->
+        <!-- Flagship Lifetime Offer Banner -->
         <section
           v-if="lifetimePlan"
           id="lifetime-offer-anchor"
           class="lifetime-offer-card"
         >
-          <div class="lifetime-offer-orb" aria-hidden="true"></div>
+          <div class="lifetime-border-glow" aria-hidden="true"></div>
+          <div class="lifetime-grid-pattern" aria-hidden="true"></div>
 
           <div class="lifetime-offer-main">
             <div class="lifetime-eyebrow-row">
               <span class="lifetime-pill-badge">
                 <i class="fa-solid fa-infinity"></i>
-                PENAWARAN LIFETIME · {{ getPlanBadge(lifetimePlan) || 'AKSES SELAMANYA' }}
+                PENAWARAN LIFETIME · {{ getPlanBadge(lifetimePlan) || 'BEST VALUE' }}
               </span>
               <span v-if="lifetimeSavingsPercent > 0" class="lifetime-save-pill">
-                Hemat {{ lifetimeSavingsPercent }}%
+                <i class="fa-solid fa-fire"></i> Hemat {{ lifetimeSavingsPercent }}%
+              </span>
+              <span v-if="Number(lifetimePlan.icoinz_reward) > 0" class="lifetime-bonus-pill">
+                <i class="fa-solid fa-coins"></i> +{{ formatPrice(lifetimePlan.icoinz_reward) }} iCoinZ
               </span>
             </div>
 
@@ -82,7 +154,7 @@
                 :key="'lo-' + idx"
                 class="lifetime-perk-chip"
               >
-                <i class="fa-solid fa-circle-check"></i>
+                <span class="perk-check-badge"><i class="fa-solid fa-check"></i></span>
                 <span>{{ item.text }}</span>
               </div>
             </div>
@@ -90,13 +162,15 @@
 
           <div class="lifetime-offer-pricing">
             <div class="lifetime-price-box">
-              <span class="lifetime-price-kicker">Sekali Bayar · Tidak Kedaluwarsa</span>
-              <span v-if="Number(lifetimePlan.compare_price) > Number(lifetimePlan.price)" class="lifetime-compare-price">
-                Rp {{ formatPrice(lifetimePlan.compare_price) }}
-              </span>
-              <div class="lifetime-current-price">
-                Rp {{ formatPrice(lifetimePlan.price) }}
-                <span class="lifetime-duration-unit">/ Selamanya</span>
+              <span class="lifetime-price-kicker">Sekali Bayar · Aktif Seumur Hidup</span>
+              <div class="lifetime-price-stack">
+                <span v-if="Number(lifetimePlan.compare_price) > Number(lifetimePlan.price)" class="lifetime-compare-price">
+                  Rp {{ formatPrice(lifetimePlan.compare_price) }}
+                </span>
+                <div class="lifetime-current-price">
+                  Rp {{ formatPrice(lifetimePlan.price) }}
+                  <span class="lifetime-duration-unit">/ selamanya</span>
+                </div>
               </div>
             </div>
 
@@ -117,6 +191,10 @@
                 <i class="fa-solid fa-arrow-right"></i>
               </template>
             </button>
+
+            <span class="lifetime-guarantee-note">
+              <i class="fa-solid fa-shield-halved"></i> Otomatis membuka semua pembaruan materi baru
+            </span>
           </div>
         </section>
 
@@ -124,150 +202,212 @@
         <section id="plans-carousel-anchor" class="plans-carousel-section">
           <div class="carousel-toolbar">
             <div class="carousel-heading-group">
+              <span class="carousel-section-kicker">PERBANDINGAN PAKET</span>
               <h2 class="carousel-title">Daftar Paket Langganan</h2>
-              <p class="carousel-subtitle">Geser atau gunakan tombol navigasi untuk membandingkan detail setiap paket.</p>
             </div>
 
-            <div class="carousel-nav-controls" v-if="maxIndex > 0">
-              <span class="carousel-counter">{{ activeIndex + 1 }}–{{ Math.min(activeIndex + visibleCards, carouselPlans.length) }} dari {{ carouselPlans.length }}</span>
-              <button
-                type="button"
-                class="carousel-arrow-btn"
-                :disabled="activeIndex <= 0"
-                @click="prevSlide"
-                aria-label="Paket sebelumnya"
-              >
-                <i class="fa-solid fa-chevron-left"></i>
-              </button>
-              <button
-                type="button"
-                class="carousel-arrow-btn"
-                :disabled="activeIndex >= maxIndex"
-                @click="nextSlide"
-                aria-label="Paket berikutnya"
-              >
-                <i class="fa-solid fa-chevron-right"></i>
-              </button>
+            <!-- Interactive Quick-Focus Plan Switcher & Controls -->
+            <div class="carousel-controls-bar">
+              <div class="plan-jump-pills" role="tablist" aria-label="Pilih paket fokus">
+                <button
+                  v-for="(item, idx) in carouselPlans"
+                  :key="'jump-' + item.key"
+                  type="button"
+                  class="plan-jump-pill"
+                  :class="{ active: focusedIndex === idx, ['tier-' + item.slugClass]: true }"
+                  @click="focusPlan(idx)"
+                >
+                  {{ item.displayName.replace(/\s*Plan$/i, '') }}
+                </button>
+              </div>
+
+              <div class="carousel-nav-controls" v-if="maxIndex > 0">
+                <button
+                  type="button"
+                  class="carousel-arrow-btn"
+                  :disabled="activeIndex <= 0"
+                  @click="prevSlide"
+                  aria-label="Paket sebelumnya"
+                >
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span class="carousel-counter">{{ activeIndex + 1 }}–{{ Math.min(activeIndex + visibleCards, carouselPlans.length) }} / {{ carouselPlans.length }}</span>
+                <button
+                  type="button"
+                  class="carousel-arrow-btn"
+                  :disabled="activeIndex >= maxIndex"
+                  @click="nextSlide"
+                  aria-label="Paket berikutnya"
+                >
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div
-            class="plans-carousel-viewport"
-            @touchstart.passive="onTouchStart"
-            @touchend.passive="onTouchEnd"
-          >
+          <div class="carousel-stage">
+            <!-- Floating Side Navigation Arrows -->
+            <button
+              v-if="maxIndex > 0"
+              type="button"
+              class="carousel-side-arrow prev"
+              :disabled="activeIndex <= 0"
+              @click="prevSlide"
+              aria-label="Geser ke paket sebelumnya"
+            >
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
             <div
-              class="plans-carousel-track"
-              :style="carouselTrackStyle"
+              class="plans-carousel-viewport"
+              @touchstart.passive="onTouchStart"
+              @touchend.passive="onTouchEnd"
             >
               <div
-                v-for="item in carouselPlans"
-                :key="item.key"
-                class="plan-slide"
+                class="plans-carousel-track"
+                :style="carouselTrackStyle"
               >
                 <div
-                  class="plan-card"
-                  :class="[
-                    item.slugClass,
-                    {
-                      'is-lifetime-card': item.presentation.isLifetime,
-                      'active': item.slug === 'free'
-                        ? (currentPlan === 'free' || !currentPlan) && !isPremiumUser
-                        : isPlanOwned(item.slug)
-                    }
-                  ]"
+                  v-for="(item, idx) in carouselPlans"
+                  :key="item.key"
+                  class="plan-slide"
                 >
-                  <!-- Floating Badge -->
                   <div
-                    v-if="item.presentation.badgeLabel"
-                    :class="getBadgeClass(item)"
+                    class="plan-card"
+                    :class="[
+                      item.slugClass,
+                      {
+                        'is-lifetime-card': item.presentation.isLifetime,
+                        'is-focused': spotlightIndex === idx,
+                        'active': item.slug === 'free'
+                          ? (currentPlan === 'free' || !currentPlan) && !isPremiumUser
+                          : isPlanOwned(item.slug)
+                      }
+                    ]"
                   >
-                    {{ item.presentation.badgeLabel }}
-                  </div>
+                    <div class="card-top-accent" :class="'accent-' + item.slugClass"></div>
 
-                  <div class="plan-header">
-                    <div class="plan-icon" :class="item.slugClass + '-icon'">
-                      <i :class="item.presentation.icon"></i>
-                    </div>
-                    <h3>{{ item.displayName }}</h3>
-
-                    <div v-if="item.comparePrice > item.price" class="plan-compare-price">
-                      Rp {{ formatPrice(item.comparePrice) }}
-                    </div>
-
-                    <p class="price">
-                      Rp {{ formatPrice(item.price) }}<span>{{ getPricePeriodSuffix(item) }}</span>
-                    </p>
-                  </div>
-
-                  <!-- Energy Badge -->
-                  <div
-                    v-if="item.presentation.energyLabel"
-                    class="plan-energy-badge"
-                    :class="'energy-' + item.slugClass"
-                  >
-                    <i :class="item.presentation.energyIcon"></i>
-                    {{ item.presentation.energyLabel }}
-                  </div>
-
-                  <ul class="plan-benefits">
-                    <li
-                      v-for="(benefit, index) in item.presentation.orderedBenefits"
-                      :key="`${item.key}-b-${index}`"
-                      :class="{ disabled: !benefit.included }"
+                    <!-- Floating Badge -->
+                    <div
+                      v-if="item.presentation.badgeLabel"
+                      :class="getBadgeClass(item)"
                     >
-                      <i :class="benefit.included ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>
-                      <span>{{ benefit.text }}</span>
-                    </li>
-                  </ul>
+                      {{ item.presentation.badgeLabel }}
+                    </div>
 
-                  <div class="plan-action">
-                    <template v-if="item.slug === 'free'">
-                      <div v-if="(currentPlan === 'free' || !currentPlan) && !isPremiumUser" class="active-badge">
-                        <i class="fa-solid fa-check-circle"></i> Paket Saat Ini
+                    <div class="plan-header">
+                      <div class="plan-icon-badge" :class="item.slugClass + '-icon-badge'">
+                        <i :class="item.presentation.icon"></i>
                       </div>
-                      <button v-else class="btn-disabled" @click="handlePlanClick('free')">Klaim Gratis</button>
-                    </template>
 
-                    <template v-else-if="isPlanOwned(item.slug)">
-                      <div class="active-badge">
-                        <i class="fa-solid fa-check-circle"></i>
-                        <span>
-                          Paket Aktif
-                          <template v-if="item.presentation.isLifetime || subscriptionInfo?.is_lifetime">
-                            (Selamanya)
-                          </template>
-                          <template v-else-if="subscriptionInfo?.days_remaining > 0">
-                            (Sisa {{ subscriptionInfo.days_remaining }} hari)
-                          </template>
+                      <h3 class="plan-name">{{ item.displayName }}</h3>
+
+                      <div class="plan-price-wrap">
+                        <span
+                          class="plan-compare-price"
+                          :class="{ 'is-empty': !(item.comparePrice > item.price) }"
+                        >
+                          {{ item.comparePrice > item.price ? `Rp ${formatPrice(item.comparePrice)}` : '\u00A0' }}
                         </span>
+                        <p class="price">
+                          <span class="price-currency">Rp</span>
+                          <span class="price-amount">{{ formatPrice(item.price) }}</span>
+                          <span class="price-period">{{ getPricePeriodSuffix(item) }}</span>
+                        </p>
                       </div>
+
+                      <!-- Fixed slot for energy pill / free note -->
+                      <div class="plan-energy-slot">
+                        <div
+                          v-if="item.presentation.energyLabel"
+                          class="plan-energy-badge"
+                          :class="'energy-' + item.slugClass"
+                        >
+                          <i :class="item.presentation.energyIcon"></i>
+                          <span>{{ item.presentation.energyLabel }}</span>
+                        </div>
+                        <div v-else class="plan-energy-badge energy-free">
+                          <i class="fa-solid fa-seedling"></i>
+                          <span>10 Energi / hari</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <ul class="plan-benefits">
+                      <li
+                        v-for="(benefit, bIdx) in item.presentation.orderedBenefits"
+                        :key="`${item.key}-b-${bIdx}`"
+                        :class="{ disabled: !benefit.included }"
+                      >
+                        <span class="benefit-dot" :class="benefit.included ? 'ok' : 'no'">
+                          <i :class="benefit.included ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"></i>
+                        </span>
+                        <span>{{ benefit.text }}</span>
+                      </li>
+                    </ul>
+
+                    <div class="plan-action">
+                      <template v-if="item.slug === 'free'">
+                        <div v-if="(currentPlan === 'free' || !currentPlan) && !isPremiumUser" class="active-badge">
+                          <i class="fa-solid fa-check-circle"></i> Paket Saat Ini
+                        </div>
+                        <button v-else class="btn-disabled" @click="handlePlanClick('free')">Klaim Gratis</button>
+                      </template>
+
+                      <template v-else-if="isPlanOwned(item.slug)">
+                        <div class="active-badge">
+                          <i class="fa-solid fa-check-circle"></i>
+                          <span>
+                            Paket Aktif
+                            <template v-if="item.presentation.isLifetime">
+                              (Selamanya)
+                            </template>
+                            <template v-else-if="subscriptionInfo?.days_remaining > 0">
+                              (Sisa {{ subscriptionInfo.days_remaining }} hari)
+                            </template>
+                            <template v-else-if="subscriptionInfo?.is_lifetime">
+                              (Tanpa Batas)
+                            </template>
+                          </span>
+                        </div>
+                        <button
+                          v-if="!item.presentation.isLifetime && !subscriptionInfo?.is_lifetime"
+                          class="btn-upgrade btn-renew-plan"
+                          :class="item.slugClass + '-btn'"
+                          @click="handlePlanClick(item.slug, item.rawPlan, true)"
+                          :disabled="isNavigating"
+                        >
+                          <TerminalLoader v-if="isNavigating && navTargetSlug === item.slug" variant="inline" label="perpanjang" />
+                          <span v-else><i class="fa-solid fa-rotate-right"></i> Perpanjang Paket</span>
+                        </button>
+                      </template>
+
                       <button
-                        v-if="!item.presentation.isLifetime && !subscriptionInfo?.is_lifetime"
-                        class="btn-upgrade btn-renew-plan"
+                        v-else
+                        class="btn-upgrade"
                         :class="item.slugClass + '-btn'"
-                        @click="handlePlanClick(item.slug, item.rawPlan, true)"
+                        @click="handlePlanClick(item.slug, item.rawPlan)"
                         :disabled="isNavigating"
                       >
-                        <TerminalLoader v-if="isNavigating && navTargetSlug === item.slug" variant="inline" label="perpanjang" />
-                        <span v-else><i class="fa-solid fa-rotate-right"></i> Perpanjang Paket</span>
+                        <TerminalLoader v-if="isNavigating && navTargetSlug === item.slug" variant="inline" label="paket" />
+                        <span v-else>{{ item.presentation.isLifetime ? 'Dapatkan Lifetime' : `Pilih ${item.displayName}` }}</span>
                       </button>
-                    </template>
-
-                    <button
-                      v-else
-                      class="btn-upgrade"
-                      :class="item.slugClass + '-btn'"
-                      @click="handlePlanClick(item.slug, item.rawPlan)"
-                      :disabled="isNavigating"
-                    >
-                      <TerminalLoader v-if="isNavigating && navTargetSlug === item.slug" variant="inline" label="paket" />
-                      <span v-else>{{ item.presentation.isLifetime ? 'Dapatkan Lifetime' : `Pilih ${item.displayName}` }}</span>
-                    </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            <button
+              v-if="maxIndex > 0"
+              type="button"
+              class="carousel-side-arrow next"
+              :disabled="activeIndex >= maxIndex"
+              @click="nextSlide"
+              aria-label="Geser ke paket berikutnya"
+            >
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
           </div>
 
           <!-- Pagination Dots -->
@@ -379,6 +519,8 @@ const carouselPlans = computed(() => {
 // Responsive carousel state
 const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1280)
 const activeIndex = ref(0)
+const spotlightIndex = ref(-1)
+let spotlightTimer = null
 
 const updateViewportWidth = () => {
   if (typeof window !== 'undefined') {
@@ -406,6 +548,13 @@ watch(maxIndex, (max) => {
   }
 })
 
+const focusedIndex = computed(() => {
+  if (spotlightIndex.value >= 0) return spotlightIndex.value
+  const visibleEnd = activeIndex.value + visibleCards.value - 1
+  // Prefer highlighting Pro or Lifetime if currently visible
+  return Math.min(activeIndex.value + 1, visibleEnd)
+})
+
 const carouselTrackStyle = computed(() => ({
   '--visible-cards': visibleCards.value,
   '--active-index': activeIndex.value,
@@ -413,15 +562,28 @@ const carouselTrackStyle = computed(() => ({
 }))
 
 const prevSlide = () => {
+  spotlightIndex.value = -1
   activeIndex.value = Math.max(0, activeIndex.value - 1)
 }
 
 const nextSlide = () => {
+  spotlightIndex.value = -1
   activeIndex.value = Math.min(maxIndex.value, activeIndex.value + 1)
 }
 
 const goToSlide = (idx) => {
+  spotlightIndex.value = -1
   activeIndex.value = Math.min(maxIndex.value, Math.max(0, idx))
+}
+
+const focusPlan = (idx) => {
+  const targetStart = Math.max(0, Math.min(maxIndex.value, idx - Math.floor(visibleCards.value / 2)))
+  activeIndex.value = targetStart
+  spotlightIndex.value = idx
+  if (spotlightTimer) clearTimeout(spotlightTimer)
+  spotlightTimer = setTimeout(() => {
+    spotlightIndex.value = -1
+  }, 1800)
 }
 
 let touchStartX = 0
@@ -454,7 +616,7 @@ const getBadgeClass = (item) => {
 }
 
 const getPricePeriodSuffix = (item) => {
-  if (item.presentation.isLifetime) return ' / Selamanya'
+  if (item.presentation.isLifetime) return '/selamanya'
   if (item.slug === 'free') return item.durationInDays ? `/${item.durationInDays} hari` : '/bulan'
   return `/${item.durationInDays || 30} hari`
 }
@@ -496,6 +658,7 @@ onUnmounted(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', updateViewportWidth)
   }
+  if (spotlightTimer) clearTimeout(spotlightTimer)
 })
 
 const resumeCheckout = () => {
@@ -554,9 +717,9 @@ const handlePlanClick = async (slug, plan = null, isRenewal = false) => {
 .pending-banner {
   background: rgba(124, 58, 237, 0.1);
   border: 1px solid rgba(124, 58, 237, 0.3);
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 16px 20px;
-  margin-bottom: 28px;
+  margin-bottom: 26px;
   display: flex;
   align-items: center;
   justify-content: space-between;
