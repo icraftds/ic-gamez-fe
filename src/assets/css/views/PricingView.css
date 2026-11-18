@@ -1,5 +1,4 @@
 .pricing-view {
-  min-height: 100vh;
   position: relative;
   overflow-x: clip;
   min-width: 0;
@@ -8,7 +7,7 @@
 .pricing-content {
   position: relative;
   z-index: 10;
-  padding: 92px 24px 68px;
+  padding: 92px 24px 8px;
   max-width: 1240px;
   margin: 0 auto;
   min-width: 0;
@@ -19,7 +18,7 @@
 }
 
 .pricing-view.is-embedded .pricing-content {
-  padding: 6px 4px 28px;
+  padding: 6px 4px 8px;
   max-width: 100%;
 }
 
@@ -675,11 +674,18 @@
 .plan-jump-pills {
   display: inline-flex;
   align-items: center;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
   padding: 4px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.09);
   gap: 4px;
+}
+
+.plan-jump-pills::-webkit-scrollbar {
+  display: none;
 }
 
 .plan-jump-pill {
@@ -690,6 +696,8 @@
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -762,16 +770,20 @@
   min-width: 0;
 }
 
+.carousel-stage.has-side-arrows {
+  padding: 0 52px;
+}
+
 .carousel-side-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 12;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(10, 15, 30, 0.88);
+  background: rgba(10, 15, 30, 0.9);
   color: #f8fafc;
   display: grid;
   place-items: center;
@@ -781,8 +793,8 @@
   transition: all 0.22s ease;
 }
 
-.carousel-side-arrow.prev { left: -16px; }
-.carousel-side-arrow.next { right: -16px; }
+.carousel-side-arrow.prev { left: 2px; }
+.carousel-side-arrow.next { right: 2px; }
 
 .carousel-side-arrow:hover:not(:disabled) {
   background: #0ea5e9;
@@ -791,13 +803,13 @@
 }
 
 .carousel-side-arrow:disabled {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0.28;
+  cursor: not-allowed;
 }
 
 .plans-carousel-viewport {
   overflow: hidden;
-  padding: 20px 4px 16px;
+  padding: 20px 4px 8px;
   margin: -4px -4px 0;
   min-width: 0;
 }
@@ -1121,7 +1133,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .carousel-dot {
@@ -1154,6 +1166,9 @@
   .lifetime-offer-card {
     grid-template-columns: 1fr;
   }
+  .carousel-stage.has-side-arrows {
+    padding: 0;
+  }
   .carousel-side-arrow {
     display: none;
   }
@@ -1161,7 +1176,7 @@
 
 @media (max-width: 768px) {
   .pricing-content {
-    padding: 82px 16px 44px;
+    padding: 82px 16px 8px;
   }
   .lifetime-offer-card {
     padding: 20px 18px;

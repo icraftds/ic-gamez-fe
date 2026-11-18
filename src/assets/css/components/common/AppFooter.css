@@ -8,6 +8,10 @@
   font-family: inherit;
 }
 
+.gamez-footer.footer-compact-top {
+  margin-top: 20px;
+}
+
 .footer-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -126,6 +130,12 @@ body.light-mode .logo-light { display: block; }
   }
   .footer-desc {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .gamez-footer.footer-compact-top {
+    padding-bottom: 76px;
   }
 }
 

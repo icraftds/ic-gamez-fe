@@ -46,6 +46,17 @@ test('PricingView contains hero section, lifetime offer showcase, and carousel c
   assert.match(pricingVue, /lifetime-offer-card/)
   assert.match(pricingVue, /plans-carousel-track/)
   assert.match(pricingVue, /carousel-arrow-btn/)
+  assert.match(pricingVue, /has-side-arrows/)
   assert.match(shopVue, /Akses Lifetime \(Selamanya\)/)
   assert.match(shopCheckoutVue, /isLifetimeModule/)
+
+  const pricingCss = fs.readFileSync(path.join(rootDir, 'src/assets/css/views/PricingView.css'), 'utf8')
+  const footerCss = fs.readFileSync(path.join(rootDir, 'src/assets/css/components/common/AppFooter.css'), 'utf8')
+  const dashboardVue = fs.readFileSync(path.join(rootDir, 'src/views/DashboardView.vue'), 'utf8')
+
+  assert.match(pricingCss, /\.carousel-stage\.has-side-arrows\s*\{\s*padding:\s*0\s+52px;/)
+  assert.match(pricingCss, /\.carousel-side-arrow\.prev\s*\{\s*left:\s*2px;\s*\}/)
+  assert.match(pricingCss, /\.carousel-side-arrow\.next\s*\{\s*right:\s*2px;\s*\}/)
+  assert.match(footerCss, /\.gamez-footer\.footer-compact-top\s*\{\s*margin-top:\s*20px;\s*\}/)
+  assert.match(dashboardVue, /\.dash-content\s*\{\s*padding-bottom:\s*0;\s*\}/)
 })

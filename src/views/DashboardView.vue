@@ -269,7 +269,6 @@ const getTabIcon = (id) => {
    ═══════════════════════════════════════════ */
 .dash-layout {
   display: flex;
-  min-height: calc(100vh - 86px);
   position: relative;
 }
 
@@ -453,11 +452,15 @@ body:not(.light-mode) .sidebar-tooltip::before {
 .dash-main-wrapper {
   flex: 1;
   min-width: 0;
-  padding: 24px 32px;
+  padding: 24px 32px 0;
   margin-left: 96px;
   max-width: calc(100% - 96px);
   box-sizing: border-box;
   transition: margin-left 0.3s ease;
+}
+
+.dash-content {
+  padding-bottom: 0;
 }
 
 /* Mobile Responsiveness (≤768px) */
@@ -491,8 +494,7 @@ body:not(.light-mode) .sidebar-tooltip::before {
   .dash-main-wrapper {
     margin-left: 0;
     max-width: 100%;
-    padding: 16px;
-    padding-bottom: 90px;
+    padding: 16px 16px 0;
   }
 }
 </style>

@@ -245,7 +245,7 @@
             </div>
           </div>
 
-          <div class="carousel-stage">
+          <div class="carousel-stage" :class="{ 'has-side-arrows': maxIndex > 0 }">
             <!-- Floating Side Navigation Arrows -->
             <button
               v-if="maxIndex > 0"

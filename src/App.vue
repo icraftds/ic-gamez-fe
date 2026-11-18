@@ -29,7 +29,10 @@
           </div>
         </div>
       </div>
-      <AppFooter v-if="!isWorkspacePage && !isAuthPage && !isCheckoutPage && route.name !== 'materials' && route.name !== 'notifications'" />
+      <AppFooter
+        v-if="!isWorkspacePage && !isAuthPage && !isCheckoutPage && route.name !== 'materials' && route.name !== 'notifications'"
+        :class="{ 'footer-compact-top': ['pricing', 'dashboard'].includes(route.name) }"
+      />
     </template>
     
     <!-- Global Loading Overlay -->

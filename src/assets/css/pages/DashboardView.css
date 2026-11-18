@@ -1,6 +1,5 @@
 .dashboard-view {
-  min-height: 100vh;
-  padding-bottom: 20px;
+  padding-bottom: 0;
 }
 
 /* Dashboard Navbar */
@@ -231,6 +230,7 @@ body:not(.light-mode) .logo-dark { display: block; }
 /* Content */
 .dash-content {
   margin-top: 20px;
+  padding-bottom: 0;
 }
 
 .not-logged-in {
