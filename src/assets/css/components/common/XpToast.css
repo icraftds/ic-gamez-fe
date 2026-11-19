@@ -14,6 +14,18 @@
     0 0 0 1px var(--white-alpha-0_08) inset;
   overflow: hidden;
   min-width: 240px;
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .xp-toast {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    min-width: 0;
+    padding: 12px 14px;
+  }
 }
 
 .toast-quiz {

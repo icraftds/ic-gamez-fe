@@ -120,7 +120,7 @@
           </div>
 
           <div class="nav-capsule nav-login-capsule" @click="handleAuthClick('masuk')">
-            <a href="/auth/start?return_to=%2Fdashboard" class="nav-login-link" @click.prevent="handleAuthClick('masuk')">
+            <a :href="authHref" class="nav-login-link" @click.prevent.stop="handleAuthClick('masuk')">
               Masuk / Daftar
             </a>
           </div>
@@ -223,7 +223,7 @@
           </template>
           <template v-else>
             <div class="nav-capsule nav-login-capsule" @click="handleMobileAuthClick">
-              <a href="/auth/start?return_to=%2Fdashboard" class="nav-login-link" @click.prevent="handleMobileAuthClick">
+              <a :href="authHref" class="nav-login-link" @click.prevent.stop="handleMobileAuthClick">
                 Masuk / Daftar
               </a>
             </div>
@@ -237,7 +237,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useUserAccount } from "../../composables/useUserAccount";
+import { useUserAccount, getAuthHref } from "../../composables/useUserAccount";
 import { useTheme } from "../../composables/useTheme";
 import UserProfileDropdown from "../common/UserProfileDropdown.vue";
 import { useNotifications } from "../../composables/useNotifications";
@@ -246,6 +246,7 @@ const { isLightMode, toggleTheme } = useTheme();
 
 const { isPremiumUser, isLoggedIn, isLoading, fetchUser, coinz, redirectToSso } = useUserAccount();
 const { hasUnread, hasUnclaimedGifts, fetchUnreadSummary } = useNotifications();
+const authHref = getAuthHref('/dashboard', 'masuk');
 
 const handleAuthClick = (type = 'masuk') => {
   redirectToSso('/dashboard', type);

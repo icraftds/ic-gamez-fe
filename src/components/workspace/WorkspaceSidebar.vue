@@ -52,7 +52,7 @@
               :is-active="isLessonActive(lesson)"
               :active-step="activeStep"
               @toggle="toggleLesson"
-              @step-click="onSubItemClick(chapter.id, lesson, $event)"
+              @step-click="onSubItemClick(chapter.slug || String(chapter.id), lesson, $event)"
             />
           </div>
         </div>

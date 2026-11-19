@@ -24,7 +24,7 @@
             harian
           </li>
         </ul>
-        <button class="btn-upgrade" @click="upgradeToPremium">
+        <button class="btn-upgrade" @click="goToPricing">
           Upgrade Ke Premium
         </button>
       </div>
@@ -114,7 +114,7 @@ import { useUserAccount } from "../../composables/useUserAccount.js";
 import { useChallengesStats } from "../../composables/useChallengesStats.js";
 import { useLearningPaths } from "../../composables/useLearningPaths.js";
 
-const { isPremiumUser, subscriptionStatus, upgradeToPremium, userStats, fetchUserStats } = useUserAccount();
+const { isPremiumUser, subscriptionStatus, userStats, fetchUserStats } = useUserAccount();
 const {
   totalChallengesCount,
   completedCount,
@@ -132,6 +132,10 @@ const { paths, fetchPaths } = useLearningPaths();
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
+
+const goToPricing = () => {
+  router.push('/pricing');
+};
 
 const filterByCategory = (category) => {
   if (route.query.category === category) {

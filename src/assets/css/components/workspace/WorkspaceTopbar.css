@@ -176,12 +176,12 @@
   .step-label { display: none; }
   .step-connector { width: 20px; margin: 0 4px; }
   .breadcrumb-chapter { display: none; }
-  .breadcrumb .separator:nth-child(2) { display: none; }
+  .breadcrumb .separator:nth-of-type(2) { display: none; }
 }
 
 @media (max-width: 768px) {
   .ws-topbar { 
-    padding: 10px 12px; 
+    padding: 8px 10px; 
     flex-wrap: nowrap; 
     gap: 8px; 
     position: fixed;
@@ -191,15 +191,16 @@
     max-width: 100vw;
     box-sizing: border-box;
   }
-  .topbar-left { flex: 1; min-width: 0; }
-  .breadcrumb-path { display: none; }
-  .breadcrumb .separator:first-of-type { display: none; }
-  .breadcrumb-lesson { font-size: 0.75rem; }
-  .user-indicator { gap: 8px; }
+  .topbar-left { flex: 1; min-width: 0; gap: 8px; }
+  .breadcrumb-path,
+  .breadcrumb .separator { display: none; }
+  .breadcrumb-lesson { font-size: 0.78rem; }
+  .user-indicator { gap: 6px; flex-shrink: 0; }
   .user-stats { display: none; }
   .separator-vertical { display: none; }
   .step-dot { width: 18px; height: 18px; font-size: 0.55rem; }
-  .step-connector { width: 14px; }
+  .step-connector { width: 10px; margin: 0 2px; }
+  .nav-energy { margin-right: 4px; padding: 4px 8px; font-size: 0.78rem; }
 }
 
 

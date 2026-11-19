@@ -34,7 +34,7 @@
 
     <!-- Premium / Energy Modal -->
     <PremiumModal v-model="showModal" />
-    <AuthRequiredModal :isOpen="showAuthModal" @close="showAuthModal = false" @login="$router.push('/login')" @register="$router.push('/register')" />
+    <AuthRequiredModal :isOpen="showAuthModal" @close="showAuthModal = false" />
   </div>
 </template>
 

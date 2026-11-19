@@ -517,6 +517,12 @@
 }
 
 @media (max-width: 600px) {
+  .vp-rank-grid {
+    grid-template-columns: 1fr;
+  }
+  .vp-rank-label {
+    white-space: normal;
+  }
   .badges-grid-full {
     grid-template-columns: 1fr;
   }

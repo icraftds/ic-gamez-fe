@@ -216,8 +216,12 @@ const handleVerifyOtp = async () => {
   if (result.success) {
     otpStatus.value = 'success'
     showToast('Registrasi dan verifikasi berhasil!', 'success')
+    const rawRedirect = router.currentRoute.value?.query?.redirect
+    const target = typeof rawRedirect === 'string' && rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
+      ? rawRedirect
+      : '/dashboard'
     setTimeout(() => {
-      router.push('/dashboard')
+      router.push(target)
     }, 1500)
   } else {
     otpStatus.value = 'error'

@@ -85,15 +85,41 @@ export function startAuthLoading(options = {}) {
   }
 }
 
-export function redirectToSso(target = '/dashboard', type = 'masuk') {
-  const safeTarget =
-    typeof target === 'string' &&
+export function sanitizeAuthTarget(target = '/dashboard') {
+  return typeof target === 'string' &&
     target.startsWith('/') &&
     !target.startsWith('//') &&
     !target.startsWith('/auth/') &&
     !['/login', '/register', '/auto-login'].some(p => target === p || target.startsWith(p + '?'))
-      ? target
-      : '/dashboard'
+    ? target
+    : '/dashboard'
+}
+
+export function getAuthHref(target = '/dashboard', type = 'masuk') {
+  const safeTarget = sanitizeAuthTarget(target)
+  if (ssoEnabled) {
+    return `/auth/start?return_to=${encodeURIComponent(safeTarget)}`
+  }
+  const basePath = type === 'daftar' ? '/register' : '/login'
+  return safeTarget !== '/dashboard'
+    ? `${basePath}?redirect=${encodeURIComponent(safeTarget)}`
+    : basePath
+}
+
+export function redirectToSso(target = '/dashboard', type = 'masuk') {
+  const safeTarget = sanitizeAuthTarget(target)
+
+  if (!ssoEnabled) {
+    startAuthLoading({
+      text: type === 'daftar' ? 'Memuat pendaftaran akun' : 'Memuat autentikasi masuk'
+    })
+    import('../router').then(({ default: router }) => {
+      const path = type === 'daftar' ? '/register' : '/login'
+      const query = safeTarget !== '/dashboard' ? { redirect: safeTarget } : undefined
+      router.push({ path, query }).catch(() => {})
+    })
+    return
+  }
 
   isRedirectingToSso.value = true
   startAuthLoading({

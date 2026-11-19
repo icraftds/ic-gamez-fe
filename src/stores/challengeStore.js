@@ -111,6 +111,7 @@ export const useChallengeStore = defineStore('challenge', {
     tokens: 10,
     submissions: [],
     codeContent: '',
+    language: 'javascript',
     isRunning: false,
     isSubmitting: false,
     consoleOutputHtml: 'Run your code to see the test results here.',
@@ -130,14 +131,19 @@ export const useChallengeStore = defineStore('challenge', {
     isSuccess: false
   }),
   actions: {
+    resetCode() {
+      this.codeContent = this.stageData?.template || ''
+      this.consoleOutputHtml = 'Run your code to see the test results here.'
+    },
+
     async initChallenge(query) {
       let stage = parseInt(query.stage) || 1
-      if (stage < 1 || stage > 6) stage = 1
-      this.currentStage = stage
-      
       this.mode = query.mode || null
       this.eventId = query.eventId || null
       this.taskId = query.taskId || null
+
+      if (!this.mode && (stage < 1 || stage > 6)) stage = 1
+      this.currentStage = stage
       
       if (this.mode === 'speedrun') {
         try {
@@ -156,6 +162,7 @@ export const useChallengeStore = defineStore('challenge', {
                             : {};
              this.stageData = {
                id: beEvent.id,
+               lessonId: lesson.id || beEvent.challenges?.[0]?.lesson_id || null,
                title: beEvent.title,
                diff: lesson.difficulty || 'Sedang',
                diffClass: 'diff-' + (lesson.difficulty ? lesson.difficulty.toLowerCase() : 'sedang'),
@@ -170,14 +177,41 @@ export const useChallengeStore = defineStore('challenge', {
              }
           } else {
              // Fallback jika tidak ada event aktif
-             this.stageData = challenges.find(c => c.id === stage)
+             this.stageData = challenges.find(c => c.id === 1)
           }
         } catch (error) {
           console.error('Failed to load dynamic challenge', error)
-          this.stageData = challenges.find(c => c.id === stage)
+          this.stageData = challenges.find(c => c.id === 1)
+        }
+      } else if (this.mode === 'weekly') {
+        try {
+          const { EventService } = await import('../services/eventService')
+          const resWeekly = await EventService.getActiveWeekly()
+          const beEvent = resWeekly.data?.event || null
+          const matchedChallenge = beEvent?.challenges?.find(c => String(c.id) === String(this.taskId)) || beEvent?.challenges?.[0] || null
+          const lesson = matchedChallenge?.lesson || {}
+
+          if (matchedChallenge) {
+            this.stageData = {
+              id: matchedChallenge.id,
+              lessonId: matchedChallenge.lesson_id || lesson.id || null,
+              title: lesson.title || matchedChallenge.custom_task || beEvent?.title || 'Tantangan Mingguan',
+              diff: lesson.difficulty || 'Sedang',
+              diffClass: 'diff-' + (lesson.difficulty ? lesson.difficulty.toLowerCase() : 'sedang'),
+              prose: lesson.explanation || lesson.description_html || matchedChallenge.custom_task || beEvent?.description || 'Selesaikan tantangan mingguan ini.',
+              template: lesson.practice || lesson.template_code || '// Tulis kodemu di sini',
+              funcName: lesson.function_name || 'solution',
+              testCases: lesson.test_cases || []
+            }
+          } else {
+            this.stageData = challenges.find(c => c.id === stage) || challenges[0]
+          }
+        } catch (error) {
+          console.error('Failed to load weekly challenge', error)
+          this.stageData = challenges.find(c => c.id === stage) || challenges[0]
         }
       } else {
-        this.stageData = challenges.find(c => c.id === stage)
+        this.stageData = challenges.find(c => c.id === stage) || challenges[0]
       }
 
       this.codeContent = this.stageData.template
@@ -416,9 +450,22 @@ export const useChallengeStore = defineStore('challenge', {
           }
 
           if (this.mode === 'weekly' && this.eventId) {
+              if (this.stageData?.lessonId) {
+                  try {
+                      const { default: api } = await import('../services/api')
+                      await api.post('/progress/practice-complete', {
+                          lesson_id: this.stageData.lessonId,
+                          code: this.codeContent
+                      })
+                  } catch (e) {
+                      console.warn('Weekly challenge backend completion sync failed', e)
+                  }
+              }
+
               const completedTasks = JSON.parse(localStorage.getItem(`weekly_tasks_${this.eventId}`)) || []
-              if (!completedTasks.includes(this.taskId)) {
-                  completedTasks.push(this.taskId)
+              const normalizedTaskId = String(this.taskId || this.stageData?.id || '')
+              if (normalizedTaskId && !completedTasks.map(String).includes(normalizedTaskId)) {
+                  completedTasks.push(this.taskId || this.stageData?.id)
                   localStorage.setItem(`weekly_tasks_${this.eventId}`, JSON.stringify(completedTasks))
               }
               

@@ -156,13 +156,18 @@ const loginForm = ref({
   password: ''
 })
 
+const getPostAuthTarget = () => {
+  const raw = router.currentRoute.value?.query?.redirect
+  return typeof raw === 'string' && raw.startsWith('/') && !raw.startsWith('//') ? raw : '/dashboard'
+}
+
 const handleLogin = async () => {
   errorMessage.value = ''
   
   const result = await login(loginForm.value.email, loginForm.value.password)
   if (result.success) {
     sessionStorage.setItem('just_logged_in', 'true')
-    router.push('/dashboard')
+    router.push(getPostAuthTarget())
   } else {
     // Check if error is because user is unverified
     if (result.data?.errors?.is_unverified) {
@@ -191,7 +196,7 @@ const handleVerifyOtp = async () => {
     showToast('Verifikasi dan Login berhasil!', 'success')
     setTimeout(() => {
       sessionStorage.setItem('just_logged_in', 'true')
-      router.push('/dashboard')
+      router.push(getPostAuthTarget())
     }, 1500)
   } else {
     otpStatus.value = 'error'

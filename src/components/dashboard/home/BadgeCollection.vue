@@ -244,8 +244,11 @@ const saveSelection = async () => {
   background: var(--bg-card, #1e293b);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 16px;
-  width: 90%;
-  max-width: 500px;
+  width: 100%;
+  max-width: min(500px, calc(100vw - 24px));
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -277,6 +280,7 @@ const saveSelection = async () => {
 .close-btn:hover { color: white; }
 .modal-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 5px;
   background: rgba(0,0,0,0.2);
   padding: 5px;

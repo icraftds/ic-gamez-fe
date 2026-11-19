@@ -273,7 +273,7 @@ import { ref, onMounted } from 'vue'
 import SimpleBackground from '../components/common/SimpleBackground.vue'
 import { useUserAccount } from '../composables/useUserAccount'
 
-const { user, isLoggedIn } = useUserAccount()
+const { userProfile, isLoggedIn } = useUserAccount()
 
 const form = ref({
   name: '',
@@ -300,9 +300,9 @@ const ticketNumber = ref('')
 const lastWaUrl = ref('')
 
 onMounted(() => {
-  if (isLoggedIn.value && user.value) {
-    if (user.value.name) form.value.name = user.value.name
-    if (user.value.email) form.value.email = user.value.email
+  if (isLoggedIn.value && userProfile.value) {
+    if (userProfile.value.name) form.value.name = userProfile.value.name
+    if (userProfile.value.email) form.value.email = userProfile.value.email
   }
 })
 
@@ -348,8 +348,8 @@ const handleSubmitForm = async () => {
 
 const resetForm = () => {
   form.value = {
-    name: (isLoggedIn.value && user.value?.name) || '',
-    email: (isLoggedIn.value && user.value?.email) || '',
+    name: (isLoggedIn.value && userProfile.value?.name) || '',
+    email: (isLoggedIn.value && userProfile.value?.email) || '',
     phone: '',
     category: '',
     subject: '',

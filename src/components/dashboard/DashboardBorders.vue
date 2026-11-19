@@ -210,7 +210,7 @@ const buyBorder = (border) => {
   if (border.tierId === 'D_PRO' || border.tierId === 'D_EXPERT') {
     router.push('/pricing');
   } else {
-    router.push('/shop');
+    router.push('/shop?tab=border');
   }
 }
 

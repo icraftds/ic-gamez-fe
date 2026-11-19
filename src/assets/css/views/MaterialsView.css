@@ -144,9 +144,29 @@
 
 @media (max-width: 768px) {
   .reading-topbar {
-    padding: 0 16px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .topbar-right {
+    gap: 8px;
   }
   .topbar-tier-pill {
+    display: none;
+  }
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .reading-topbar {
+    padding: 0 10px;
+  }
+  .reading-logo {
+    display: none;
+  }
+  .back-btn span {
     display: none;
   }
 }

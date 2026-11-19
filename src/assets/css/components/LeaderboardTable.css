@@ -293,6 +293,7 @@
 }
 
 .hud-center {
+  position: relative;
   text-align: center;
   font-size: 0.85rem;
   color: #94a3b8;
@@ -370,7 +371,7 @@
 }
 
 .ct-rank { width: 60px; flex-shrink: 0; }
-.ct-user { flex: 1; gap: 16px; }
+.ct-user { flex: 1; gap: 16px; min-width: 0; }
 .ct-xp { width: 140px; justify-content: flex-end; flex-shrink: 0; }
 .ct-level { width: 100px; justify-content: flex-end; flex-shrink: 0; }
 
@@ -396,6 +397,10 @@
   font-weight: 700;
   font-size: 1.1rem;
   color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .xp-text {

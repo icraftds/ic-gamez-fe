@@ -32,3 +32,14 @@ html {
   display: flex;
   flex-direction: column;
 }
+
+@media (max-width: 768px) {
+  .app-layout.workspace-mode,
+  .app-layout.workspace-mode .app-content,
+  .app-layout.workspace-mode .route-wrapper {
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+}

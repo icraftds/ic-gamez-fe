@@ -4,12 +4,14 @@
   left: 0;
   width: 100%;
   height: 100%;
+  padding: 12px;
+  box-sizing: border-box;
   background: var(--black-alpha-0_7);
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 10020;
 }
 
 .modal-content {
@@ -17,8 +19,11 @@
   border: 1px solid rgba(245, 158, 11, 0.5);
   border-radius: 16px;
   padding: 40px;
-  max-width: 400px;
-  width: 90%;
+  max-width: min(400px, calc(100vw - 24px));
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
   text-align: center;
   box-shadow: 0 20px 40px var(--black-alpha-0_5), 0 0 20px rgba(245, 158, 11, 0.2);
   animation: slideUp 0.3s ease-out;
@@ -185,4 +190,14 @@ button {
 
 :global(body.light-mode) .quota-warning {
   color: #b45309;
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 24px 18px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
 }

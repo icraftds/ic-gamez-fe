@@ -858,6 +858,19 @@
     gap: 10px;
   }
 
+  .editor-topbar {
+    height: auto;
+    min-height: 42px;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .editor-topbar-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
   .editor-column {
     flex: none;
     min-height: 500px;

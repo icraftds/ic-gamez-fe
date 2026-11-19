@@ -20,7 +20,7 @@ import { onMounted } from 'vue'
 import api from '../services/api'
 
 
-const { isLoggedIn, userProfile, credits, coinz, walletStatus, maxCredits, isPremiumUser, currentPlan, upgradeToPremium, logout, isLoading: isUserLoading } = useUserAccount()
+const { isLoggedIn, userProfile, credits, coinz, walletStatus, maxCredits, isPremiumUser, currentPlan, logout, isLoading: isUserLoading } = useUserAccount()
 const { isLightMode, toggleTheme } = useTheme()
 const { showWipModal } = useWipModal()
 const setThemeMode = (light) => {
@@ -202,6 +202,37 @@ const getTabIcon = (id) => {
       </aside>
 
       <div class="dash-main-wrapper">
+        <div v-if="isLoggedIn" class="mobile-dash-utils">
+          <div class="mobile-util-group">
+            <button
+              type="button"
+              class="mobile-util-btn"
+              @click="toggleTheme"
+              :aria-label="isLightMode ? 'Mode Gelap' : 'Mode Terang'"
+            >
+              <i :class="isLightMode ? 'fa-solid fa-moon' : 'fa-solid fa-sun'"></i>
+              <span>{{ isLightMode ? 'Gelap' : 'Terang' }}</span>
+            </button>
+            <button
+              type="button"
+              class="mobile-util-btn"
+              @click="showWipModal = true"
+              aria-label="Bantuan & Dukungan"
+            >
+              <i class="fa-regular fa-circle-question"></i>
+              <span>Bantuan</span>
+            </button>
+          </div>
+          <button
+            type="button"
+            class="mobile-util-btn danger"
+            @click="handleLogoutClick"
+            aria-label="Keluar dari Akun"
+          >
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Keluar</span>
+          </button>
+        </div>
     <!-- Content -->
     <div class="container dash-content" v-if="isLoggedIn">
       <TerminalLoader v-if="isDataFetching" label="data dashboard" />
@@ -463,14 +494,18 @@ body:not(.light-mode) .sidebar-tooltip::before {
   padding-bottom: 0;
 }
 
+.mobile-dash-utils {
+  display: none;
+}
+
 /* Mobile Responsiveness (≤768px) */
 @media (max-width: 768px) {
   .dash-floating-sidebar {
     position: fixed;
     top: auto;
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
     width: auto;
     height: auto;
     flex-direction: row;
@@ -486,15 +521,51 @@ body:not(.light-mode) .sidebar-tooltip::before {
 
   .capsule-nav {
     flex-direction: row;
-    padding: 6px 14px;
-    gap: 12px;
+    padding: 6px 10px;
+    gap: 8px;
+    max-width: 100%;
+    overflow-x: auto;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
 
   .dash-main-wrapper {
     margin-left: 0;
     max-width: 100%;
-    padding: 16px 16px 0;
+    padding: 16px 16px 96px;
+  }
+
+  .mobile-dash-utils {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .mobile-util-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-util-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border, rgba(148, 163, 184, 0.2));
+    background: var(--glass-bg-card-0_8, rgba(15, 23, 42, 0.7));
+    color: var(--text-main-hex, #f8fafc);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .mobile-util-btn.danger {
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
   }
 }
 </style>

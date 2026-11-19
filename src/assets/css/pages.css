@@ -585,14 +585,27 @@
 
         /* ═══ RESPONSIVE ═══ */
         @media (max-width: 1024px) {
+          .workspace-view {
+            height: auto;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+          }
           .hero { padding: 100px 24px 60px; }
           .hero h1 { font-size: 3.5rem; }
           .section-header h2 { font-size: 2.2rem; }
           .intro-section { grid-template-columns: 1fr; text-align: center; }
           .intro-content h2 { font-size: 2.2rem; }
           .leaderboard-container { padding: 25px; }
-          .workspace { flex-direction: column; }
+          .workspace { flex-direction: column; overflow: visible; }
           .panel-left { max-width: 100%; min-width: unset; }
+          .panel-editor { min-height: 360px; }
+          .panel-console { min-height: 220px; }
+          .action-bar { flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+        }
+
+        @media (max-width: 480px) {
+          .token-badge { width: 100%; justify-content: center; margin-right: 0; }
         }
 
         @media (max-width: 768px) {

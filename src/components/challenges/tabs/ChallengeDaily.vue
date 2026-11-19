@@ -207,12 +207,14 @@ const formatTime = (seconds) => {
   return `${m}:${s}.00`;
 };
 
+const emit = defineEmits(['require-auth']);
+
 const showConfirmModal = ref(false);
 
 const startChallenge = () => {
   if (!isLoggedIn.value) {
       showToast('Silakan Masuk atau Daftar untuk mengikuti Speedrun Harian!', 'warning');
-      router.push('/login');
+      emit('require-auth');
       return;
   }
   if (isAlreadyPlayedToday.value) {

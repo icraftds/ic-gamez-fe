@@ -21,7 +21,11 @@ import ContinueLearning from './dashboard/home/ContinueLearning.vue'
 
 
 const store = useChallengeStore()
-const title = computed(() => store.stageData?.title.split(". ")[1] || 'Loading...')
+const title = computed(() => {
+    const raw = store.stageData?.title
+    if (!raw) return 'Loading...'
+    return raw.includes('. ') ? raw.split('. ').slice(1).join('. ') : raw
+})
 
 const elapsedSeconds = ref(0)
 let timerInterval = null

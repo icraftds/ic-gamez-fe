@@ -189,6 +189,39 @@ const fireConfetti = () => {
   to { opacity: 1; }
 }
 
+@media (max-width: 480px) {
+  .medal-popup-content {
+    padding: 24px 16px;
+    max-width: calc(100vw - 24px);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .popup-title {
+    font-size: 1.65rem;
+    margin-bottom: 24px;
+  }
+
+  .new-medal-showcase {
+    width: 170px;
+    height: 170px;
+  }
+
+  .medal-name {
+    font-size: 1.45rem;
+  }
+
+  .medal-desc {
+    font-size: 0.98rem;
+    margin-bottom: 24px;
+  }
+
+  .btn-claim {
+    padding: 13px 32px;
+    font-size: 1rem;
+  }
+}
+
 @keyframes popIn {
   0% { transform: scale(0.7); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }

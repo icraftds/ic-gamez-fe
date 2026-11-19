@@ -87,25 +87,25 @@
         <p style="color: var(--text-sub-hex); font-size: 1.1rem; margin-bottom: 30px;">Bersiaplah untuk Mega Project: <strong style="color: #38bdf8;">{{ currentEvent.title }}</strong></p>
       </div>
       
-      <div class="countdown-container" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; position: relative; z-index: 2;">
-        <div class="countdown-box" style="background: var(--glass-bg-modal-0_95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 20px; min-width: 90px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-          <div class="countdown-value" style="font-size: 2.5rem; font-weight: 800; color: var(--text-main-hex); font-family: 'Courier New', monospace; line-height: 1;">{{ countdown.days }}</div>
-          <div class="countdown-label" style="font-size: 0.8rem; color: var(--text-sub-hex); text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Hari</div>
+      <div class="countdown-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 40px; position: relative; z-index: 2;">
+        <div class="countdown-box" style="background: var(--glass-bg-modal-0_95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 12px 14px; min-width: 68px; flex: 0 1 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+          <div class="countdown-value" style="font-size: clamp(1.6rem, 5vw, 2.5rem); font-weight: 800; color: var(--text-main-hex); font-family: 'Courier New', monospace; line-height: 1;">{{ countdown.days }}</div>
+          <div class="countdown-label" style="font-size: 0.75rem; color: var(--text-sub-hex); text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Hari</div>
         </div>
-        <div class="countdown-separator" style="font-size: 2.5rem; font-weight: bold; color: var(--text-muted); align-self: center; margin-top: -20px;">:</div>
-        <div class="countdown-box" style="background: var(--glass-bg-modal-0_95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 20px; min-width: 90px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-          <div class="countdown-value" style="font-size: 2.5rem; font-weight: 800; color: var(--text-main-hex); font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.hours).padStart(2, '0') }}</div>
-          <div class="countdown-label" style="font-size: 0.8rem; color: var(--text-sub-hex); text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Jam</div>
+        <div class="countdown-separator" style="font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: bold; color: var(--text-muted); align-self: center; margin-top: -16px;">:</div>
+        <div class="countdown-box" style="background: var(--glass-bg-modal-0_95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 12px 14px; min-width: 68px; flex: 0 1 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+          <div class="countdown-value" style="font-size: clamp(1.6rem, 5vw, 2.5rem); font-weight: 800; color: var(--text-main-hex); font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.hours).padStart(2, '0') }}</div>
+          <div class="countdown-label" style="font-size: 0.75rem; color: var(--text-sub-hex); text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Jam</div>
         </div>
-        <div class="countdown-separator" style="font-size: 2.5rem; font-weight: bold; color: var(--text-muted); align-self: center; margin-top: -20px;">:</div>
-        <div class="countdown-box" style="background: var(--glass-bg-modal-0_95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 20px; min-width: 90px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-          <div class="countdown-value" style="font-size: 2.5rem; font-weight: 800; color: var(--text-main-hex); font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.minutes).padStart(2, '0') }}</div>
-          <div class="countdown-label" style="font-size: 0.8rem; color: var(--text-sub-hex); text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Menit</div>
+        <div class="countdown-separator" style="font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: bold; color: var(--text-muted); align-self: center; margin-top: -16px;">:</div>
+        <div class="countdown-box" style="background: var(--glass-bg-modal-0_95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 12px 14px; min-width: 68px; flex: 0 1 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+          <div class="countdown-value" style="font-size: clamp(1.6rem, 5vw, 2.5rem); font-weight: 800; color: var(--text-main-hex); font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.minutes).padStart(2, '0') }}</div>
+          <div class="countdown-label" style="font-size: 0.75rem; color: var(--text-sub-hex); text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Menit</div>
         </div>
-        <div class="countdown-separator" style="font-size: 2.5rem; font-weight: bold; color: var(--text-muted); align-self: center; margin-top: -20px;">:</div>
-        <div class="countdown-box" style="background: var(--glass-bg-modal-0_95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 20px; min-width: 90px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-          <div class="countdown-value" style="font-size: 2.5rem; font-weight: 800; color: #0284c7; font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.seconds).padStart(2, '0') }}</div>
-          <div class="countdown-label" style="font-size: 0.8rem; color: var(--text-sub-hex); text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Detik</div>
+        <div class="countdown-separator" style="font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: bold; color: var(--text-muted); align-self: center; margin-top: -16px;">:</div>
+        <div class="countdown-box" style="background: var(--glass-bg-modal-0_95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 12px 14px; min-width: 68px; flex: 0 1 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+          <div class="countdown-value" style="font-size: clamp(1.6rem, 5vw, 2.5rem); font-weight: 800; color: #0284c7; font-family: 'Courier New', monospace; line-height: 1;">{{ String(countdown.seconds).padStart(2, '0') }}</div>
+          <div class="countdown-label" style="font-size: 0.75rem; color: var(--text-sub-hex); text-transform: uppercase; margin-top: 5px; font-weight: 600; letter-spacing: 1px;">Detik</div>
         </div>
       </div>
       

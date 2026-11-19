@@ -19,10 +19,11 @@
     </div>
     <div v-else class="inventory-grid">
       <div v-for="userItem in activeInventory" :key="userItem.id" class="inventory-item">
-        
+        <div class="item-icon">
           <img v-if="userItem.item.image_url" :src="getImageUrl(userItem.item.image_url)" alt="Icon" />
           <img v-else-if="userItem.item.slug === 'changename-usn'" src="/favicon.png" alt="Icon" />
           <i v-else class="fa-solid fa-gift"></i>
+        </div>
         
         <div class="item-details">
           <h3>{{ userItem.item.name }}</h3>
@@ -174,19 +175,21 @@ onMounted(async () => {
   transform: translateY(-5px);
   border-color: rgba(255, 255, 255, 0.15);
 }
-/* .item-icon {
-  width: 150px;
-  height: 150px;
-  background: rgba(0, 0, 0, 0.2);
+.item-icon {
+  width: 140px;
+  height: 140px;
+  max-width: 100%;
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 15px;
-} */
+  margin-bottom: 12px;
+}
 .item-icon img {
-  width: 150px;
-  height: 150px;
+  width: 100%;
+  max-width: 140px;
+  height: 100%;
+  max-height: 140px;
   object-fit: contain;
 }
 .item-icon i {

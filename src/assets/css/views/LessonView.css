@@ -75,21 +75,28 @@
 /* Mobile & Tablet Responsiveness */
 @media (max-width: 768px) {
   .lesson-workspace { 
-    height: 100vh; 
-    overflow: hidden;
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
   
   .workspace-body { 
     flex-direction: column; 
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
     padding-top: 56px; /* Offset for fixed topbar */
     width: 100%;
+    height: auto;
   }
   
   .workspace-main { 
     margin-left: 44px; 
     width: calc(100% - 44px);
-    overflow: hidden;
+    max-width: calc(100% - 44px);
+    overflow-x: hidden;
+    overflow-y: visible;
     padding-left: 0;
+    height: auto;
   }
 }

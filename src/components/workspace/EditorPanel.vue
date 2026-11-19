@@ -7,11 +7,10 @@
         </div>
         <div class="editor-container">
             <div class="editor-toolbar">
-                <select class="lang-select">
+                <select class="lang-select" v-model="store.language" aria-label="Bahasa pemrograman">
                     <option value="javascript">JavaScript</option>
-                    <option value="python">Python</option>
                 </select>
-                <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+                <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" @click="store.resetCode()"><i class="fa-solid fa-rotate-right"></i> Reset</button>
             </div>
             <textarea class="code-editor" v-model="store.codeContent" spellcheck="false"></textarea>
         </div>

@@ -275,4 +275,37 @@ const fireConfetti = () => {
   0% { transform: scale(0.75); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+@media (max-width: 480px) {
+  .trophy-popup-content {
+    padding: 28px 18px 24px;
+    max-width: calc(100vw - 24px);
+    width: 100%;
+    border-radius: 20px;
+    box-sizing: border-box;
+  }
+
+  .trophy-ambient-glow {
+    width: 240px;
+    height: 240px;
+  }
+
+  .trophy-popup-title {
+    font-size: 1.55rem;
+  }
+
+  .new-trophy-showcase {
+    width: 190px;
+    height: 190px;
+  }
+
+  .trophy-award-title {
+    font-size: 1.25rem;
+  }
+
+  .btn-claim-trophy {
+    padding: 12px 28px;
+    font-size: 0.95rem;
+  }
+}
 </style>

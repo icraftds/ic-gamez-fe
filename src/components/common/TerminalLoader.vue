@@ -94,6 +94,8 @@ const message = computed(() => props.text || (props.label ? `Memuat ${props.labe
   flex-direction: column;
   gap: 12px;
   padding: 14px 20px 12px;
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--tl-accent) 22%, transparent);
   background: color-mix(in srgb, var(--tl-accent) 5%, transparent);
@@ -106,6 +108,11 @@ const message = computed(() => props.text || (props.label ? `Memuat ${props.labe
 .tl--sm .tl-shell { padding: 10px 14px 9px; gap: 9px; border-radius: 10px; }
 .tl--lg .tl-shell { padding: 18px 26px 14px; gap: 14px; border-radius: 14px; }
 .tl--overlay .tl-shell { padding: 20px 30px 16px; }
+
+@media (max-width: 480px) {
+  .tl--lg { --tl-font-size: 0.95rem; }
+  .tl--overlay .tl-shell { padding: 14px 16px 12px; }
+}
 
 .tl-line {
   display: flex;

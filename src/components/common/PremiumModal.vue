@@ -1,6 +1,7 @@
 <template>
-  <div v-if="modelValue" class="modal-backdrop" @click="close">
-    <div class="modal-content" :class="{ 'modal-wide': Boolean(path) }" @click.stop>
+  <Teleport to="body">
+    <div v-if="modelValue" class="modal-backdrop" @click="close">
+      <div class="modal-content" :class="{ 'modal-wide': Boolean(path) }" @click.stop>
       <div class="modal-icon">
         <i :class="canClaimPro ? 'fa-solid fa-layer-group' : 'fa-solid fa-crown'"></i>
       </div>
@@ -66,16 +67,17 @@
           <button class="btn-cancel" @click="close">Batal</button>
           <button class="btn-subscribe" @click="subscribe">Berlangganan Sekarang</button>
         </div>
-      </template>
+        </template>
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../../services/api'
-import { useUserAccount } from '../../composables/useUserAccount'
+import { useUserAccount, redirectToSso } from '../../composables/useUserAccount'
 import { useLearningPaths } from '../../composables/useLearningPaths'
 import { useToast } from '../../composables/useToast'
 
@@ -118,18 +120,19 @@ const subscribe = () => {
   if (isLoggedIn.value) {
     router.push('/pricing')
   } else {
-    router.push('/?auth=login')
+    redirectToSso('/pricing', 'masuk')
   }
 }
 
 const goToModuleShop = () => {
   if (isClaiming.value) return
   emit('update:modelValue', false)
+  const target = `/shop?tab=module&select=${props.path?.id || ''}`
   if (!isLoggedIn.value) {
-    router.push('/?auth=login')
+    redirectToSso(target, 'masuk')
     return
   }
-  router.push(`/shop?tab=module&select=${props.path?.id || ''}`)
+  router.push(target)
 }
 
 const claimProModule = async () => {

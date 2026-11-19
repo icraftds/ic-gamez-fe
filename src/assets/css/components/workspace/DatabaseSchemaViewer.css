@@ -789,3 +789,32 @@
 .text-green {
   color: #34d399 !important;
 }
+
+@media (max-width: 768px) {
+  .db-schema-viewer.is-modal {
+    padding: 12px;
+  }
+
+  .is-modal .schema-container {
+    width: 100%;
+    max-width: calc(100vw - 24px);
+    padding: 16px;
+  }
+
+  .schema-topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .is-modal .schema-container {
+    padding: 14px 12px;
+    border-radius: 12px;
+  }
+
+  .db-badge {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+}

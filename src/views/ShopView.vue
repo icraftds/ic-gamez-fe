@@ -648,8 +648,8 @@ const loadBoughtBorders = async () => {
 }
 
 onMounted(() => {
-  if (route.query.tab === 'module') {
-    activeTab.value = 'module'
+  if (['module', 'energy', 'border', 'item'].includes(route.query.tab)) {
+    activeTab.value = route.query.tab
   }
   fetchPublicConfig()
   fetchPackages()

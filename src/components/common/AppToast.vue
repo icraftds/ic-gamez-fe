@@ -44,8 +44,19 @@ const iconClass = computed(() => {
   color: white;
   font-weight: 500;
   pointer-events: none;
-  min-width: 300px;
+  min-width: min(300px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
   justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .app-toast {
+    top: 1rem;
+    padding: 10px 16px;
+    border-radius: 16px;
+    font-size: 0.88rem;
+  }
 }
 .toast-error, .toast-danger { border-color: rgba(239, 68, 68, 0.5); }
 .toast-error .toast-icon, .toast-danger .toast-icon { color: #ef4444; }

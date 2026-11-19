@@ -1,7 +1,8 @@
 <template>
-  <Transition name="modal">
-    <div v-if="isOpen" class="modal-backdrop" @click="$emit('close')">
-      <div class="modal-content" @click.stop>
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="isOpen" class="modal-backdrop" @click="$emit('close')">
+        <div class="modal-content" @click.stop>
         <div class="modal-accent"></div>
 
         <div class="modal-icon">
@@ -44,15 +45,17 @@
         <button class="btn-close-text" @click="$emit('close')">
           Lanjut Preview Saja
         </button>
+        </div>
       </div>
-    </div>
-  </Transition>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router'
 import { redirectToSso } from '../../composables/useUserAccount'
 
-defineProps({
+const props = defineProps({
   isOpen: {
     type: Boolean,
     default: false
@@ -60,19 +63,26 @@ defineProps({
   nextStepLabel: {
     type: String,
     default: 'selanjutnya'
+  },
+  returnTo: {
+    type: String,
+    default: ''
   }
 })
 
-const emit = defineEmits(['close', 'login', 'register'])
+const emit = defineEmits(['close'])
+const route = useRoute()
+
+const resolveTarget = () => props.returnTo || route.fullPath || '/dashboard'
 
 const handleRegister = () => {
-  redirectToSso('/dashboard', 'daftar')
-  emit('register')
+  emit('close')
+  redirectToSso(resolveTarget(), 'daftar')
 }
 
 const handleLogin = () => {
-  redirectToSso('/dashboard', 'masuk')
-  emit('login')
+  emit('close')
+  redirectToSso(resolveTarget(), 'masuk')
 }
 </script>
 

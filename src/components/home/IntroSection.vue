@@ -9,7 +9,7 @@
         akan mendampingi Anda di setiap baris kode, memberikan petunjuk, dan
         membantu Anda belajar lebih cepat.
       </p>
-      <router-link to="#" class="btn-learn-more"
+      <router-link to="/panduan" class="btn-learn-more"
         >Pelajari Cara Kerjanya <i class="fa-solid fa-arrow-right"></i
       ></router-link>
     </div>

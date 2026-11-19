@@ -431,8 +431,6 @@
       :isOpen="showAuthModal"
       :nextStepLabel="pendingStepLabel"
       @close="showAuthModal = false"
-      @login="$router.push('/login')"
-      @register="$router.push('/register')"
     />
   </div>
 </template>

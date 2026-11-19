@@ -103,8 +103,6 @@
       :isOpen="showAuthModal"
       :nextStepLabel="pendingStepLabel"
       @close="showAuthModal = false"
-      @login="goToLogin"
-      @register="goToRegister"
     />
 
     <!-- Modal Premium -->
@@ -265,9 +263,28 @@ const pendingStepLabel = ref('Tes Pertanyaan')
 // ── Initialise step from query param (preview navigation) ─────────
 const initStepFromQuery = () => {
   const stepParam = route.query.step
+  const lesson = currentLesson.value
   if (stepParam === 'quiz') {
+    if (!isLoggedIn.value) {
+      activeStep.value = STEP.THEORY
+      requireAuth(STEP.QUIZ)
+      return
+    }
+    if (lesson && !lesson.isCompleted) {
+      activeStep.value = STEP.THEORY
+      return
+    }
     activeStep.value = STEP.QUIZ
   } else if (stepParam === 'practice') {
+    if (!isLoggedIn.value) {
+      activeStep.value = STEP.THEORY
+      requireAuth(STEP.PRACTICE)
+      return
+    }
+    if (lesson && !lesson.quizPassed) {
+      activeStep.value = lesson.isCompleted ? STEP.QUIZ : STEP.THEORY
+      return
+    }
     activeStep.value = STEP.PRACTICE
   } else {
     activeStep.value = STEP.THEORY
@@ -292,16 +309,24 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
   const firstLesson = firstChapter?.lessons?.[0]
   
   const isClickedFirstLesson = firstChapter && firstLesson &&
-    (cId === firstChapter.id || cId === firstChapter.slug) &&
-    (lesson.id === firstLesson.id || lesson.slug === firstLesson.slug)
+    (String(cId) === String(firstChapter.id) || String(cId) === String(firstChapter.slug)) &&
+    (String(lesson.id) === String(firstLesson.id) || String(lesson.slug) === String(firstLesson.slug))
 
   if (lesson.is_premium && !canAccessCurrentPath.value && !isClickedFirstLesson) {
     showPremiumModal.value = true
     return
   }
 
+  const isSameChapter =
+    String(cId) === String(chapterId.value) ||
+    String(cId) === String(currentChapter.value?.id) ||
+    String(cId) === String(currentChapter.value?.slug)
+  const isSameLesson =
+    String(lesson.id) === String(lessonId.value) ||
+    String(lesson.slug) === String(lessonId.value)
+
   // Jika masih di lesson yang sama, cukup ubah step-nya saja
-  if (cId === chapterId.value && lesson.id === lessonId.value) {
+  if (isSameChapter && isSameLesson) {
     if (step === 'quiz') {
       if (!isLoggedIn.value) {
         requireAuth(STEP.QUIZ)
@@ -324,8 +349,10 @@ const onSidebarLessonSelect = ({ chapterId: cId, lesson, step }) => {
     router.replace({ query: { ...route.query, step } })
   } else {
     // Navigasi ke lesson yang berbeda, bawa step-nya
+    const targetPathSlug = path.value.slug || path.value.id
+    const targetLessonSlug = lesson.slug || lesson.id
     router.push({
-      path: `/learning/${path.value.id}/lesson/${cId}/${lesson.id}`,
+      path: `/learning/${targetPathSlug}/lesson/${cId}/${targetLessonSlug}`,
       query: { step: step || 'theory', preview: '1' }
     })
   }
@@ -499,16 +526,6 @@ const onPracticeFinish = async () => {
   }
 
   goToNextLesson()
-}
-
-const goToLogin = () => {
-  showAuthModal.value = false
-  router.push('/login')
-}
-
-const goToRegister = () => {
-  showAuthModal.value = false
-  router.push('/register')
 }
 
 // Lesson berubah → reset semua state
