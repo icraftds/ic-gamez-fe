@@ -2,7 +2,7 @@
   <div class="app-layout" :class="{ 'workspace-mode': isWorkspacePage, 'fullpage-locked': route.name === 'notifications' }">
     <p v-if="cooldownSeconds" role="status" style="position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:999999;background:#222;color:white;padding:12px;border-radius:8px;">Terlalu banyak permintaan. Tunggu {{ cooldownSeconds }} detik.</p>
     
-    <template v-if="!isBootstrapping">
+    <template v-if="!showSessionBootstrapLoader">
       <HomeNavbar v-if="showHomeNavbar" />
       <p v-if="ssoEnabled && ssoState.status.value === 'unavailable'" role="status">Layanan sesi belum tersedia. Coba kembali sebentar lagi.</p>
       <div v-if="!ssoEnabled || ssoState.status.value !== 'guest' || !route.meta.requiresAuth" class="app-content">
@@ -38,13 +38,13 @@
     <!-- Global Loading Overlay -->
     <TerminalLoader v-if="isPreparingLesson" variant="overlay" size="lg" label="materi belajar" />
 
-    <!-- Initial App Loader for Session Bootstrap -->
-    <TerminalLoader v-if="isBootstrapping" variant="overlay" size="lg" label="sesi" />
+    <!-- Initial App Loader for Session Bootstrap (hanya tampil di rute yang butuh autentikasi atau saat sudah login agar halaman publik langsung tampil) -->
+    <TerminalLoader v-if="showSessionBootstrapLoader" variant="overlay" size="lg" label="sesi" />
 
     <!-- Auth Action / Redirect Loader (Micro-interaction for Masuk/Daftar) -->
     <transition name="auth-loader-fade">
       <TerminalLoader
-        v-if="isAuthLoading && !isBootstrapping"
+        v-if="isAuthLoading && !showSessionBootstrapLoader"
         variant="overlay"
         size="lg"
         :label="authLoadingLabel"
@@ -67,15 +67,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 import { rateLimitUntil } from './services/api'
 import { useRoute, useRouter } from 'vue-router'
 import HomeNavbar from './components/home/HomeNavbar.vue'
 import AppFooter from './components/common/AppFooter.vue'
 import AppToast from './components/common/AppToast.vue'
-import CoffeeModal from './components/common/CoffeeModal.vue'
-import FriendsSidebar from './components/common/FriendsSidebar.vue'
-import SubscriptionExpiredModal from './components/common/SubscriptionExpiredModal.vue'
+const CoffeeModal = defineAsyncComponent(() => import('./components/common/CoffeeModal.vue'))
+const FriendsSidebar = defineAsyncComponent(() => import('./components/common/FriendsSidebar.vue'))
+const SubscriptionExpiredModal = defineAsyncComponent(() => import('./components/common/SubscriptionExpiredModal.vue'))
 import { useUserAccount, clearUserAccount, redirectToSso } from './composables/useUserAccount'
 import { ssoEnabled, ssoState, loadSsoSession } from './services/sso'
 import { useToast } from './composables/useToast'
@@ -112,6 +112,7 @@ const showFriendsSidebar = computed(() => {
 })
 
 const { bootstrapSession, fetchUser, isLoggedIn, isBootstrapping, isAuthLoading, authLoadingLabel, authLoadingText } = useUserAccount()
+const showSessionBootstrapLoader = computed(() => isBootstrapping.value && (Boolean(route.meta?.requiresAuth) || isLoggedIn.value))
 const { isPreparingLesson } = useLearningPaths()
 const { showWipModal } = useWipModal()
 const { isLightMode, toggleTheme } = useTheme()

@@ -1,5 +1,5 @@
 <template>
-  <section class="hero reveal">
+  <section class="hero reveal active">
     <template v-if="!isLoggedIn">
       <h1>
         IC Game-Z <br /><span class="gradient-text">Level up your Skill!</span>

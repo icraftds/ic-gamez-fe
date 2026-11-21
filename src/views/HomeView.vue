@@ -16,9 +16,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue'
 import BackgroundEffects from '../components/common/BackgroundEffects.vue'
-import CoffeeModal from '../components/common/CoffeeModal.vue'
+const CoffeeModal = defineAsyncComponent(() => import('../components/common/CoffeeModal.vue'))
 import HeroSection from '../components/home/HeroSection.vue'
 import IntroSection from '../components/home/IntroSection.vue'
 import LearningPathShowcase from '../components/home/LearningPathShowcase.vue'
@@ -32,6 +32,23 @@ const showCoffeeModal = ref(false)
 const { paths, isLoading, fetchPaths } = useLearningPaths()
 
 let revealObserver = null
+let deferredPathsHandle = null
+let deferredPathsUsesIdle = false
+
+function scheduleFetchPaths() {
+  if (paths.value.length > 0 || typeof window === 'undefined') return
+  const run = () => {
+    deferredPathsHandle = null
+    if (paths.value.length === 0) fetchPaths()
+  }
+  if (typeof window.requestIdleCallback === 'function') {
+    deferredPathsUsesIdle = true
+    deferredPathsHandle = window.requestIdleCallback(run, { timeout: 400 })
+  } else {
+    deferredPathsUsesIdle = false
+    deferredPathsHandle = window.setTimeout(run, 80)
+  }
+}
 
 function revealFallback() {
   const reveals = document.querySelectorAll('.reveal:not(.active)')
@@ -44,9 +61,7 @@ function revealFallback() {
 }
 
 onMounted(() => {
-  if (paths.value.length === 0) {
-    fetchPaths()
-  }
+  scheduleFetchPaths()
 
   if (typeof IntersectionObserver !== 'undefined') {
     revealObserver = new IntersectionObserver(
@@ -68,6 +83,14 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  if (deferredPathsHandle !== null && typeof window !== 'undefined') {
+    if (deferredPathsUsesIdle && typeof window.cancelIdleCallback === 'function') {
+      window.cancelIdleCallback(deferredPathsHandle)
+    } else {
+      clearTimeout(deferredPathsHandle)
+    }
+    deferredPathsHandle = null
+  }
   revealObserver?.disconnect()
   revealObserver = null
   window.removeEventListener('scroll', revealFallback)

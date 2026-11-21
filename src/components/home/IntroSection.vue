@@ -27,6 +27,10 @@
               <img
                 src="https://ui-avatars.com/api/?name=AI&background=9333ea&color=fff&bold=true"
                 alt="AI"
+                width="32"
+                height="32"
+                loading="lazy"
+                decoding="async"
               />
               <div>
                 <strong>AI Mentor</strong>
@@ -40,6 +44,10 @@
               <img
                 src="https://ui-avatars.com/api/?name=You&background=ec4899&color=fff&bold=true"
                 alt="You"
+                width="32"
+                height="32"
+                loading="lazy"
+                decoding="async"
               />
               <div>
                 <strong>Anda</strong>
@@ -50,6 +58,10 @@
               <img
                 src="https://ui-avatars.com/api/?name=AI&background=9333ea&color=fff&bold=true"
                 alt="AI"
+                width="32"
+                height="32"
+                loading="lazy"
+                decoding="async"
               />
               <div>
                 <strong>AI Mentor</strong>
