@@ -50,15 +50,32 @@ export function gamezOAuth(configuration, transport = fetch) {
         },
     })
 
+    const METADATA_TTL_MS = 10 * 60 * 1000
+    let cachedMetadata = null
+    let cachedMetadataExpiresAt = 0
+    let inFlightMetadata = null
+
     async function metadata() {
-        try {
-            const response = await oauth.discoveryRequest(issuer, { ...options(), algorithm: 'oauth2' })
-            const server = await oauth.processDiscoveryResponse(issuer, response)
-            if (server.authorization_endpoint !== `${configuration.issuer}/oauth/authorize` || server.token_endpoint !== `${configuration.issuer}/oauth/token`) {
-                throw new SsoError(503, 'Unexpected issuer metadata.', 'sso_configuration')
-            }
-            return server
-        } catch (error) { throw unavailable(error) }
+        if (cachedMetadata && cachedMetadataExpiresAt > Date.now()) {
+            return cachedMetadata
+        }
+        if (inFlightMetadata) {
+            return inFlightMetadata
+        }
+        inFlightMetadata = (async () => {
+            try {
+                const response = await oauth.discoveryRequest(issuer, { ...options(), algorithm: 'oauth2' })
+                const server = await oauth.processDiscoveryResponse(issuer, response)
+                if (server.authorization_endpoint !== `${configuration.issuer}/oauth/authorize` || server.token_endpoint !== `${configuration.issuer}/oauth/token`) {
+                    throw new SsoError(503, 'Unexpected issuer metadata.', 'sso_configuration')
+                }
+                cachedMetadata = server
+                cachedMetadataExpiresAt = Date.now() + METADATA_TTL_MS
+                return server
+            } catch (error) { throw unavailable(error) }
+            finally { inFlightMetadata = null }
+        })()
+        return inFlightMetadata
     }
 
     function tokens(response, now) {
