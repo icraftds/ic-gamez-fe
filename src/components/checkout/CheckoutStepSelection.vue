@@ -518,8 +518,12 @@ const goToInstruction = async () => {
   paymentError.value = ''
   isProcessingPayment.value = true
   emit('processing', true)
+  let isRedirecting = false
   
   try {
+    const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `pay-${Date.now()}-${Math.random().toString(36).slice(2)}`
     const [res] = await Promise.all([
       api.post('/payments/create', {
         item_type: 'premium_plan',
@@ -527,6 +531,8 @@ const goToInstruction = async () => {
         plan_slug: props.planSlug,
         duration_months: selectedMonths.value,
         coupon_code: couponCode.value
+      }, {
+        headers: { 'Idempotency-Key': idempotencyKey }
       }),
       new Promise((resolve) => setTimeout(resolve, 1500))
     ])
@@ -544,6 +550,15 @@ const goToInstruction = async () => {
       ? new Date(tx.payment_details.expires_at).getTime()
       : Date.now() + 30 * 60 * 1000
 
+    const currentSub = userProfile.value?.subscription || null
+    const baselineSubscription = currentSub ? {
+      id: currentSub.id,
+      expires_at: currentSub.expires_at,
+      starts_at: currentSub.starts_at,
+      updated_at: currentSub.updated_at,
+      status: currentSub.status
+    } : null
+
     // Simpan informasi checkout ke localStorage agar persist saat redirect / refresh
     localStorage.setItem('ic_pending_checkout', JSON.stringify({
       planSlug: props.planSlug,
@@ -557,6 +572,7 @@ const goToInstruction = async () => {
         order_id: tx.order_id,
         amount: tx.amount,
         payment_link: paymentLink,
+        baselineSubscription,
       },
       selectedMethod: selectedMethod.value,
       expiryTime: expiryTime,
@@ -565,6 +581,7 @@ const goToInstruction = async () => {
     }))
 
     if (paymentLink) {
+      isRedirecting = true
       window.location.href = paymentLink
       return
     }
@@ -573,7 +590,8 @@ const goToInstruction = async () => {
       paymentDetails: {
         ...(tx.payment_details || {}),
         order_id: tx.order_id,
-        amount: tx.amount
+        amount: tx.amount,
+        baselineSubscription,
       },
       selectedMethod: selectedMethod.value,
       discountedPrice: discountedPrice.value
@@ -587,8 +605,10 @@ const goToInstruction = async () => {
       paymentError.value = 'Gagal memproses pembayaran: ' + rawMsg
     }
   } finally {
-    isProcessingPayment.value = false
-    emit('processing', false)
+    if (!isRedirecting) {
+      isProcessingPayment.value = false
+      emit('processing', false)
+    }
   }
 }
 </script>

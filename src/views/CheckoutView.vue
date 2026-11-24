@@ -177,6 +177,15 @@ const onInstruction = (data) => {
     }
   }
 
+  const currentSub = userProfile.value?.subscription || null
+  const baselineSubscription = currentSub ? {
+    id: currentSub.id,
+    expires_at: currentSub.expires_at,
+    starts_at: currentSub.starts_at,
+    updated_at: currentSub.updated_at,
+    status: currentSub.status
+  } : (paymentDetails.value?.baselineSubscription || null)
+
   // Simpan ke local storage
   localStorage.setItem('ic_pending_checkout', JSON.stringify({
     planSlug: planSlug.value,
@@ -184,7 +193,10 @@ const onInstruction = (data) => {
     planIcon: planIcon.value,
     planPrice: planPrice.value,
     discountedPrice: discountedPrice.value,
-    paymentDetails: paymentDetails.value,
+    paymentDetails: {
+      ...(paymentDetails.value || {}),
+      baselineSubscription
+    },
     selectedMethod: selectedMethod.value,
     expiryTime: expiryTime.value,
     userId: userProfile.value?.id,
@@ -203,6 +215,7 @@ const goBackToPricing = goBackToSelection
 const handlePaymentSuccess = async () => {
   stopPolling()
   localStorage.removeItem('ic_pending_checkout')
+  await Promise.allSettled([fetchUser(true), fetchWallet()])
   currentStep.value = 4
 
   try {
@@ -257,7 +270,11 @@ onMounted(async () => {
   if (saved) {
     try {
       const data = JSON.parse(saved)
-      if (!data.userId || String(data.userId) === String(userProfile.value?.id)) {
+      const isExpired = Number(data.expiryTime || 0) <= Date.now()
+      const isOwnerMatch = !data.userId || String(data.userId) === String(userProfile.value?.id)
+      const isIntentionalResume = route.query.resume === 'true' || !route.query.plan || route.query.plan === data.planSlug
+
+      if (!isExpired && isOwnerMatch && isIntentionalResume) {
         planName.value = data.planName || planName.value
         planPrice.value = data.planPrice || planPrice.value
         planSlug.value = data.planSlug || planSlug.value
@@ -269,7 +286,7 @@ onMounted(async () => {
         selectedMethod.value = data.selectedMethod || 'doku'
         expiryTime.value = data.expiryTime
         currentStep.value = 2
-      } else {
+      } else if (isExpired) {
         localStorage.removeItem('ic_pending_checkout')
       }
     } catch(e) {}

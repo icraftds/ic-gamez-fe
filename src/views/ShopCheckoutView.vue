@@ -266,23 +266,22 @@ const processPayment = async () => {
   state.value = 'processing'
 
   const executePurchase = async () => {
+    const headers = { 'Idempotency-Key': idempotencyKey.value }
     if (type === 'module') {
-      const response = await api.post('/shop/purchase/modules', { path_ids: pathIds })
+      const response = await api.post('/shop/purchase/modules', { path_ids: pathIds }, { headers })
       if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian modul gagal')
       try {
         sessionStorage.removeItem('ic_learning_paths_cache_v3')
         localStorage.removeItem('ic_learning_paths_cache_v3')
       } catch {}
     } else if (type === 'border') {
-      const response = await api.post('/shop/purchase/border', { border_id: pkgId, price: price })
+      const response = await api.post('/shop/purchase/border', { border_id: pkgId }, { headers })
       if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian border gagal')
     } else if (type === 'item') {
-      const response = await api.post('/shop/purchase/item', { item_id: pkgId })
+      const response = await api.post('/shop/purchase/item', { item_id: pkgId }, { headers })
       if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian item gagal')
     } else {
-      const response = await api.post('/shop/purchase/coinz', { package_id: pkgId }, {
-        headers: { 'Idempotency-Key': idempotencyKey.value }
-      })
+      const response = await api.post('/shop/purchase/coinz', { package_id: pkgId }, { headers })
       if (response.data.success !== true) throw new Error(response.data.message || 'Pembelian energi gagal')
     }
   }
@@ -300,7 +299,11 @@ const processPayment = async () => {
     ])
     state.value = 'success'
   } catch (error) {
-    idempotencyKey.value = crypto.randomUUID()
+    const status = error.response?.status
+    // Hanya rotasi idempotency key jika error validasi client (4xx) pasti ditolak
+    if (status && status >= 400 && status < 500 && status !== 408) {
+      idempotencyKey.value = crypto.randomUUID()
+    }
     state.value = 'confirm'
     const data = error.response?.data
     if (data?.code === 'INSUFFICIENT_ICOINZ') {

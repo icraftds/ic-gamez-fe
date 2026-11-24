@@ -637,7 +637,8 @@ onMounted(async () => {
   if (saved) {
     try {
       const data = JSON.parse(saved)
-      if (data.expiryTime > Date.now()) {
+      const isOwnerMatch = !data.userId || !userProfile.value?.id || String(data.userId) === String(userProfile.value.id)
+      if (data.expiryTime > Date.now() && isOwnerMatch) {
         pendingCheckout.value = data
       } else {
         localStorage.removeItem('ic_pending_checkout')
