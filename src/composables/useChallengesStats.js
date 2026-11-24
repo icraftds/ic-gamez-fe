@@ -1,5 +1,6 @@
 import { computed, ref } from "vue";
 import api from "../services/api.js";
+import { useUserAccount } from "./useUserAccount.js";
 
 const defaultStats = () => ({
   total: 0,
@@ -14,6 +15,13 @@ let inFlightStatsRequest = null;
 
 export function useChallengesStats() {
   const fetchChallengeStats = async (force = false) => {
+    if (typeof useUserAccount === 'function') {
+      const account = useUserAccount();
+      if (account?.isLoggedIn && !account.isLoggedIn.value) {
+        return;
+      }
+    }
+
     if (inFlightStatsRequest && !force) {
       return inFlightStatsRequest;
     }

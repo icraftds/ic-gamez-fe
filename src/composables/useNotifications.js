@@ -19,8 +19,8 @@ let expiryTimer = null
 let listenersAttached = false
 
 const LIST_CACHE_TTL_MS = 10000
-const ACTIVE_POLL_INTERVAL_MS = 4000 // 4s active polling for real-time notification badge
-const BACKGROUND_POLL_INTERVAL_MS = 25000 // 25s when browser tab is inactive / minimized
+const ACTIVE_POLL_INTERVAL_MS = 30000 // 30s active polling for real-time notification badge
+const BACKGROUND_POLL_INTERVAL_MS = 60000 // 60s when browser tab is inactive / minimized
 const MIN_FETCH_GAP_MS = 1500 // 1.5s debounce to prevent duplicate network spam
 
 // Cross-tab synchronization via BroadcastChannel & localStorage
@@ -302,16 +302,19 @@ export function useNotifications() {
     if (typeof window !== 'undefined' && !listenersAttached) {
       document.addEventListener('visibilitychange', handleVisibilityChange)
       window.addEventListener('focus', handleWindowFocus)
-      window.addEventListener('gamez-session-loaded', () => {
-        lastSummaryFetchedAt = 0
-        fetchUnreadSummary({ force: true })
-      })
-      window.addEventListener('gamez-profile-updated', () => {
-        lastSummaryFetchedAt = 0
-        fetchUnreadSummary({ force: true })
-      })
+      window.addEventListener('gamez-session-loaded', onSessionLoaded)
+      window.addEventListener('gamez-profile-updated', onProfileUpdated)
       listenersAttached = true
     }
+  }
+
+  const onSessionLoaded = () => {
+    lastSummaryFetchedAt = 0
+    fetchUnreadSummary({ force: true })
+  }
+  const onProfileUpdated = () => {
+    lastSummaryFetchedAt = 0
+    fetchUnreadSummary({ force: true })
   }
 
   const stopPolling = (resetState = false) => {
@@ -326,6 +329,8 @@ export function useNotifications() {
     if (typeof window !== 'undefined' && listenersAttached) {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('focus', handleWindowFocus)
+      window.removeEventListener('gamez-session-loaded', onSessionLoaded)
+      window.removeEventListener('gamez-profile-updated', onProfileUpdated)
       listenersAttached = false
     }
     if (resetState) {

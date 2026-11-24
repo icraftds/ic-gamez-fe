@@ -147,7 +147,7 @@ import { useUserAccount } from '../composables/useUserAccount'
 
 const router = useRouter()
 const { paths, fetchPaths, fetchPathDetails, isLoading, isPreparingLesson, hasFetchedAllPaths } = useLearningPaths()
-const { ownedPathIds, loadUser, isLoggedIn } = useUserAccount()
+const { ownedPathIds, fetchUser, isLoggedIn } = useUserAccount()
 
 const searchQuery = ref('')
 const selectedCategory = ref('all')
@@ -296,11 +296,14 @@ const resetFilters = () => {
 }
 
 onMounted(async () => {
-  if (isLoggedIn.value && (!ownedPathIds.value || ownedPathIds.value.length === 0)) {
-    loadUser(true)
+  try {
+    if (isLoggedIn.value && (!ownedPathIds.value || ownedPathIds.value.length === 0)) {
+      fetchUser(true)
+    }
+    await fetchPaths(true)
+  } finally {
+    isPreparingLesson.value = false
   }
-  await fetchPaths(true)
-  isPreparingLesson.value = false
 })
 
 const filteredPaths = computed(() => {

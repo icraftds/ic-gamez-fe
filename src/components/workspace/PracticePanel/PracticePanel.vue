@@ -296,7 +296,7 @@
             :srcdoc="code"
             class="html-preview-iframe"
             :style="{ pointerEvents: isResizing ? 'none' : 'auto' }"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts"
           ></iframe>
         </div>
       </div>

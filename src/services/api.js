@@ -42,7 +42,8 @@ api.interceptors.request.use(async config => {
     if (!path.startsWith('/') || path.startsWith('//') || path.includes('://')) return Promise.reject(new Error('Invalid product path'));
     config.headers.delete('Authorization');
     const method = (config.method || 'get').toUpperCase();
-    const privatePath = /^\/(?:auth\/me|user|payments|subscription|coupons|notifications)(?:\/|$)/.test(path);
+    const isPublicUserProfile = /^\/user\/[^/]+\/profile$/.test(path);
+    const privatePath = !isPublicUserProfile && /^\/(?:auth\/me|user|payments|subscription|coupons|notifications)(?:\/|$)/.test(path);
     if (ssoState.user.value || privatePath || !['GET', 'HEAD'].includes(method)) {
       config.baseURL = '/api/bff';
       config.withCredentials = true;
@@ -78,7 +79,9 @@ api.interceptors.response.use(
       error.retryAfter = retrySeconds(error.response.headers?.['retry-after']);
       cooldowns.set(error.config?.url, Date.now() + error.retryAfter * 1000);
       rateLimitUntil.value = Date.now() + error.retryAfter * 1000;
-      error.response.data.message = `Terlalu banyak permintaan. Tunggu ${error.retryAfter} detik.`;
+      if (error.response?.data && typeof error.response.data === 'object') {
+        error.response.data.message = `Terlalu banyak permintaan. Tunggu ${error.retryAfter} detik.`;
+      }
     }
     // 1. Cek apakah ini fitur yang belum jadi / belum di-push (404 Not Found, 501 Not Implemented, atau Server Mati)
     const isNetworkError = !error.response;
@@ -97,6 +100,7 @@ api.interceptors.response.use(
         error.config.url.includes('/challenges') ||
         error.config.url.includes('/materials') ||
         error.config.url.includes('/user/statistics') ||
+        error.config.url.includes('/user/') ||
         error.config.url.includes('/progress') ||
         error.config.url.includes('/banners')
       )) {
@@ -130,10 +134,24 @@ api.interceptors.response.use(
 
     // Tangani error 401 Unauthorized secara global
     if (error.response && error.response.status === 401 && !['/auth/login', '/auth/register', '/auth/verify-otp', '/auth/resend-otp'].includes(error.config?.url)) {
-      if (ssoEnabled) clearSsoSession('expired');
       // Jika error 401 berasal dari '/auth/me', abaikan redirect karena wajar saat init App.vue
       if (error.config && error.config.url === '/auth/me') {
         return Promise.reject(error);
+      }
+
+      // Jangan trigger modal sesi berakhir untuk endpoint publik/guest
+      const reqUrl = error.config?.url || '';
+      const isPublicPath = reqUrl.includes('/paths') ||
+        reqUrl.includes('/materials') ||
+        reqUrl.includes('/challenges/stats') ||
+        reqUrl.includes('/banners') ||
+        reqUrl.includes('/system/public-config') ||
+        /^\/user\/[^/]+\/profile$/.test(reqUrl);
+
+      const hasActiveSession = Boolean(localStorage.getItem('auth_token') || ssoState.user.value);
+
+      if (ssoEnabled && !isPublicPath && hasActiveSession) {
+        clearSsoSession('expired');
       }
 
       // Bersihkan token yang tidak valid

@@ -245,9 +245,10 @@ function scheduleSyncOutbox(delayMs = SYNC_DELAY_MS) {
 }
 
 export function useScoring() {
-  const { addXpLocal, addCoinzLocal } = useUserAccount()
+  const { addXpLocal, addCoinzLocal, isLoggedIn } = useUserAccount()
 
   const loadProgress = async () => {
+    if (!isLoggedIn.value) return
     if (isProgressLoaded.value) return
     if (progressLoadPromise) {
       await progressLoadPromise

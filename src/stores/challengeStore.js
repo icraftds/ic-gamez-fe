@@ -281,13 +281,20 @@ export const useChallengeStore = defineStore('challenge', {
           
           if (!isPassed) allPassed = false;
 
+          const escapeHtml = (val) => String(val ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
           outputHtml += `
             <div style="margin-bottom: 10px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; border-left: 3px solid ${isPassed ? '#10b981' : '#ef4444'};">
               <strong>Test Case ${index + 1}:</strong> <span style="color: ${isPassed ? '#10b981' : '#ef4444'}">${isPassed ? 'Passed' : 'Failed'}</span><br>
               <div style="font-family: monospace; font-size: 0.85rem; margin-top: 5px; color: #94a3b8;">
-                Input: ${JSON.stringify(tc.input)}<br>
-                Expected: ${JSON.stringify(tc.expected)}<br>
-                Output: ${JSON.stringify(result)}
+                Input: ${escapeHtml(JSON.stringify(tc.input))}<br>
+                Expected: ${escapeHtml(JSON.stringify(tc.expected))}<br>
+                Output: ${escapeHtml(JSON.stringify(result))}
               </div>
             </div>
           `;
@@ -295,10 +302,17 @@ export const useChallengeStore = defineStore('challenge', {
 
       } catch (error) {
         allPassed = false;
+        const escapeHtml = (val) => String(val ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+
         outputHtml = `
           <div style="padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 3px solid #ef4444; color: #fca5a5;">
             <strong>Runtime Error:</strong><br>
-            <span style="font-family: monospace;">${error.message}</span>
+            <span style="font-family: monospace;">${escapeHtml(error.message)}</span>
           </div>
         `;
       }

@@ -35,7 +35,7 @@
 
                     <!-- Tombol Add Friend sejajar dengan username di pojok kanan atas -->
                     <div class="vp-hero-actions">
-                      <template v-if="loggedInUser && loggedInUser.id !== userProfile.id && !isAlreadyFriend">
+                      <template v-if="isLoggedIn && loggedInUser?.id && loggedInUser.id !== userProfile.id && !isAlreadyFriend">
                         <button v-if="hasIncomingRequest" @click="handleAcceptFriend" class="add-friend-btn vp-add-friend-hero" :disabled="isAddingFriend">
                           <TerminalLoader v-if="isAddingFriend" variant="inline" />
                           <i v-else class="fa-solid fa-check"></i>
@@ -48,11 +48,11 @@
                           <span class="btn-text">{{ isPendingFriend ? 'Menunggu Persetujuan' : 'Add Friend' }}</span>
                         </button>
                       </template>
-                      <div v-else-if="loggedInUser && loggedInUser.id !== userProfile.id && isAlreadyFriend" class="add-friend-btn vp-add-friend-hero vp-friend-badge">
+                      <div v-else-if="isLoggedIn && loggedInUser?.id && loggedInUser.id !== userProfile.id && isAlreadyFriend" class="add-friend-btn vp-add-friend-hero vp-friend-badge">
                         <i class="fa-solid fa-user-check"></i>
                         <span class="btn-text">Berteman</span>
                       </div>
-                      <div v-else-if="loggedInUser && loggedInUser.id === userProfile.id" class="add-friend-btn vp-add-friend-hero vp-self-badge">
+                      <div v-else-if="isLoggedIn && loggedInUser?.id && loggedInUser.id === userProfile.id" class="add-friend-btn vp-add-friend-hero vp-self-badge">
                         <i class="fa-solid fa-user"></i>
                         <span class="btn-text">Profil Anda</span>
                       </div>
@@ -249,7 +249,7 @@ import { useToast } from '../composables/useToast'
 
 const route = useRoute()
 const router = useRouter()
-const { userProfile: loggedInUser } = useUserAccount()
+const { userProfile: loggedInUser, isLoggedIn } = useUserAccount()
 const { friends, fetchFriends } = useFriends()
 const { showToast } = useToast()
 

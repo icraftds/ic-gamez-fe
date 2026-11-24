@@ -178,14 +178,20 @@ const canAccessCurrentPath = computed(() =>
 const currentLesson = computed(() => getLessonById(pathId.value, chapterId.value, lessonId.value))
 const currentChapter = computed(() => getChapterById(pathId.value, chapterId.value))
 
+const isReady = ref(false)
+
 onMounted(async () => {
-  // Pastikan detail (termasuk quizzes) dimuat. Endpoint index tidak me-load quizzes.
-  const hasQuizzesLoaded = path.value?.chapters?.[0]?.lessons?.[0]?.quizzes !== undefined;
-  
-  if (!path.value || !path.value.chapters || !hasQuizzesLoaded) {
-    await fetchPathDetails(pathId.value)
+  try {
+    // Pastikan detail (termasuk quizzes) dimuat. Endpoint index tidak me-load quizzes.
+    const hasQuizzesLoaded = path.value?.chapters?.[0]?.lessons?.[0]?.quizzes !== undefined;
+    
+    if (!path.value || !path.value.chapters || !hasQuizzesLoaded) {
+      await fetchPathDetails(pathId.value)
+    }
+  } finally {
+    isPreparingLesson.value = false
+    isReady.value = true
   }
-  isPreparingLesson.value = false
 
   // Proses pending outbox dari sesi sebelumnya (jika ada)
   scoring.processPendingFromPreviousSession()
@@ -529,8 +535,8 @@ const onPracticeFinish = async () => {
 }
 
 // Lesson berubah → reset semua state
-watch(currentLesson, (newLesson) => {
-  if (newLesson && newLesson.is_premium && !canAccessCurrentPath.value && !isFirstLesson.value) {
+watch([currentLesson, isReady], ([newLesson, ready]) => {
+  if (ready && newLesson && newLesson.is_premium && !canAccessCurrentPath.value && !isFirstLesson.value) {
     showPremiumModal.value = true
     router.replace(`/learning/${pathId.value}`)
     return
