@@ -34,6 +34,7 @@ export async function getSqlInstance() {
         SQL = instance
         return SQL
       } catch (cdnErr) {
+        sqlInitPromise = null
         console.error('[sqlEngine] Gagal memuat SQLite WASM dari semua sumber:', cdnErr)
         throw new Error('Gagal memuat mesin SQLite WebAssembly. Periksa koneksi internet atau asset lokal.')
       }
@@ -101,7 +102,7 @@ export async function executeSqlQuery(sqlQuery, options = {}) {
       success: true,
       tables,
       rowsModified,
-      db,
+      db: reuseDb ? db : null,
     }
   } catch (error) {
     let errorMsg = error.message || 'Terjadi kesalahan sintaks SQL.'
@@ -116,7 +117,13 @@ export async function executeSqlQuery(sqlQuery, options = {}) {
       tables: [],
       rowsModified: 0,
       error: errorMsg,
-      db,
+      db: reuseDb ? db : null,
+    }
+  } finally {
+    if (!reuseDb && db && typeof db.close === 'function') {
+      try {
+        db.close()
+      } catch {}
     }
   }
 }

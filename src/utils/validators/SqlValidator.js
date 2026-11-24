@@ -40,22 +40,31 @@ export async function validateSqlResult(actualOutputArray, expectedOutput, userC
   }
 
   // Jika expectedOutput adalah query SQL referensi (dimulai dengan SELECT, WITH, SHOW, PRAGMA)
+  let hadExpectedSqlQuery = false;
   if (typeof targetExpected === 'string' && /^(SELECT|WITH|SHOW|PRAGMA)/i.test(targetExpected.trim())) {
+    hadExpectedSqlQuery = true;
     try {
       const { executeSqlQuery } = await import('../sql/sqlEngine.js');
       const customInitSql = context?.setup_code || null;
       const refResult = await executeSqlQuery(targetExpected, { customInitSql });
       if (refResult.success && refResult.tables.length > 0) {
         targetExpected = refResult.tables[refResult.tables.length - 1].data;
+      } else {
+        return false;
       }
     } catch (e) {
       console.warn('[SqlValidator] Gagal mengeksekusi expected SQL query:', e);
+      return false;
     }
   }
 
   // 4. Jika targetExpected adalah array of objects (baris data yang diharapkan):
   if (Array.isArray(targetExpected)) {
     return compareTableRows(actualRows, targetExpected, userCode);
+  }
+
+  if (hadExpectedSqlQuery) {
+    return false;
   }
 
   // Fallback jika tidak ada expectedOutput khusus: selama tabel memiliki baris data dan tidak error -> true

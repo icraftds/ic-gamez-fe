@@ -17,6 +17,19 @@ let inFlightFriends = null
 let inFlightRequests = null
 let lastRequestsFetchedAt = 0
 
+if (typeof window !== 'undefined') {
+  window.addEventListener('gamez-user-logout', () => {
+    isFriendsSidebarOpen.value = false
+    friends.value = []
+    friendRequests.value = []
+    searchResults.value = []
+    hasUnreadRequests.value = false
+    inFlightFriends = null
+    inFlightRequests = null
+    lastRequestsFetchedAt = 0
+  })
+}
+
 export function useFriends() {
   const { isLoggedIn } = useUserAccount()
 

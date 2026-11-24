@@ -118,8 +118,8 @@ const unlockedTiers = computed(() => {
 
 const isBorderEarned = (tierId) => {
   if (tierId === 'D_FREE') return true;
-  if (tierId === 'D_PRO') return currentPlan.value === 'pro' || currentPlan.value === 'expert';
-  if (tierId === 'D_EXPERT') return currentPlan.value === 'expert';
+  if (tierId === 'D_PRO') return ['pro', 'expert', 'lifetime'].includes(currentPlan.value);
+  if (tierId === 'D_EXPERT') return ['expert', 'lifetime'].includes(currentPlan.value);
   
   if (typeof tierId === 'number' && tierId >= 1 && tierId <= 7) {
     return unlockedTiers.value[tierId] || false;

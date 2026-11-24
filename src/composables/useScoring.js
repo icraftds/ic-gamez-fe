@@ -28,6 +28,15 @@ const scoredActivities = ref(new Set())
 const isProgressLoaded = ref(false)
 let progressLoadPromise = null
 
+if (typeof window !== 'undefined') {
+  window.addEventListener('gamez-user-logout', () => {
+    scoredActivities.value = new Set()
+    isProgressLoaded.value = false
+    progressLoadPromise = null
+    try { localStorage.removeItem('xp_outbox') } catch {}
+  })
+}
+
 // ── Outbox Queue: pending sync yang akan dikirim ke backend ─────────────────
 const OUTBOX_KEY = 'xp_outbox'
 const MAX_ATTEMPTS = 3

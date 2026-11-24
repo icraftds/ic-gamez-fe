@@ -140,6 +140,7 @@ watch(() => props.modelValue, (val) => {
 onUnmounted(() => clearTimers())
 
 const planName = computed(() => {
+  if (props.plan === 'lifetime') return 'Lifetime'
   if (props.plan === 'expert') return 'Expert'
   if (props.plan === 'topup')  return 'Top Up'
   if (props.plan === 'gift')   return 'Gift Box'
@@ -147,11 +148,11 @@ const planName = computed(() => {
 })
 const planBadgeClass = computed(() => ({
   'badge-pro':    props.plan === 'pro' || props.plan === 'gift',
-  'badge-expert': props.plan === 'expert',
+  'badge-expert': props.plan === 'expert' || props.plan === 'lifetime',
   'badge-topup':  props.plan === 'topup',
 }))
 const planIcon = computed(() => {
-  if (props.plan === 'expert') return 'fa-solid fa-crown'
+  if (props.plan === 'expert' || props.plan === 'lifetime') return 'fa-solid fa-crown'
   if (props.plan === 'topup')  return 'fa-solid fa-plus'
   if (props.plan === 'gift')   return 'fa-solid fa-gift'
   return 'fa-solid fa-bolt'

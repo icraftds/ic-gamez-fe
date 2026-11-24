@@ -11,7 +11,7 @@ const DEFAULT_BANNERS = [
     title: 'iCraftDS — Design System & UI Kit Next-Gen',
     desc: 'Ubah prototipe desain menjadi komponen Vue & React siap produksi dalam hitungan detik.',
     ctaText: 'Jelajahi iCraftDS',
-    link: 'https://icraft.id',
+    link: 'https://icraftds.id',
     accent: '#38bdf8',
     icon: 'fa-solid fa-layer-group',
     placements: ['all', 'landing', 'dashboard', 'learning'],
@@ -24,37 +24,11 @@ const DEFAULT_BANNERS = [
     title: 'Bangun Sistem Digital & AI Bersama iCraft',
     desc: 'Solusi pengembangan web, aplikasi enterprise, dan integrasi AI custom untuk bisnis Anda.',
     ctaText: 'Pelajari Layanan',
-    link: 'https://icraft.id',
+    link: 'https://icraftds.id',
     accent: '#a855f7',
     icon: 'fa-solid fa-rocket',
     placements: ['all', 'landing', 'dashboard', 'learning'],
     priority: 2,
-    isActive: true
-  },
-  {
-    id: 'partner-cloud',
-    typeLabel: 'Partner Spotlight',
-    title: 'Orbital Cloud AI — Kredit GPU Gratis $200',
-    desc: 'Latih model Deep Learning & LLM lebih cepat di cluster GPU khusus member Game-Z.',
-    ctaText: 'Klaim Kredit',
-    link: 'https://developer.nvidia.com',
-    accent: '#10b981',
-    icon: 'fa-solid fa-microchip',
-    placements: ['all', 'landing', 'dashboard', 'learning'],
-    priority: 3,
-    isActive: true
-  },
-  {
-    id: 'partner-hackathon',
-    typeLabel: 'Sponsored Event',
-    title: 'Cyber-Zero Hackathon 2026 — Hadiah $50,000',
-    desc: 'Ajang coding 48 jam se-Asia Tenggara dengan jalur rekrutmen ke perusahaan teknologi.',
-    ctaText: 'Daftar Event',
-    link: 'https://devpost.com',
-    accent: '#f59e0b',
-    icon: 'fa-solid fa-trophy',
-    placements: ['all', 'landing', 'dashboard', 'learning'],
-    priority: 4,
     isActive: true
   }
 ]

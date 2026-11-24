@@ -257,6 +257,13 @@ export const useChallengeStore = defineStore('challenge', {
       const userCode = this.codeContent;
       const testCases = this.stageData.testCases;
       const funcName = this.stageData.funcName;
+
+      if (!Array.isArray(testCases) || testCases.length === 0) {
+        return {
+          success: false,
+          html: '<div style="padding: 10px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border-left: 3px solid #ef4444; color: #fca5a5;"><strong>Test Case Tidak Tersedia:</strong><br>Soal ini belum memiliki test case validasi.</div>'
+        };
+      }
       
       let consoleLogs = [];
       let allPassed = true;

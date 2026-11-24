@@ -63,6 +63,7 @@ const firstName = computed(() => {
 });
 
 const currentBadgeStatus = computed(() => {
+  if (currentPlan.value === 'lifetime') return 'LIFETIME';
   if (currentPlan.value === 'expert') return 'EXPERT';
   if (currentPlan.value === 'pro' || isPremiumUser.value) return 'PRO';
   return 'FREE';
@@ -70,7 +71,7 @@ const currentBadgeStatus = computed(() => {
 
 const borderId = computed(() => {
   if (activeBorderId.value) return activeBorderId.value;
-  if (currentPlan.value === 'expert') return 'D_EXPERT';
+  if (currentPlan.value === 'expert' || currentPlan.value === 'lifetime') return 'D_EXPERT';
   if (currentPlan.value === 'pro' || isPremiumUser.value) return 'D_PRO';
   return 'D_FREE';
 });
