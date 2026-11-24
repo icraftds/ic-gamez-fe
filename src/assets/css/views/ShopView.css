@@ -4,6 +4,7 @@
 
 .shop-view-wrapper {
   min-height: 100vh;
+  padding-top: 84px;
   padding-bottom: 80px;
   background: var(--bg-main-hex);
 }
@@ -39,11 +40,11 @@
 .shop-compact-header {
   display: flex;
   flex-direction: column;
-  margin-top: 36px;
-  margin-bottom: 30px;
-  padding: 22px 30px;
+  margin-top: 12px;
+  margin-bottom: 24px;
+  padding: 22px 28px;
   background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
@@ -138,54 +139,225 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 14px;
+  position: relative;
+  z-index: 40;
 }
 
 .shop-tabs {
   display: flex;
-  gap: 15px;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.shop-sort .sort-select {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #fff;
-  padding: 12px 20px;
+.shop-sort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Custom Themed Cyberpunk Dropdown */
+.cyber-dropdown {
+  position: relative;
+  min-width: 175px;
+}
+
+.cyber-dropdown-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 16px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 12px;
+  color: #f1f5f9;
   font-family: "Poppins", sans-serif;
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 600;
   cursor: pointer;
-  outline: none;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
 }
 
-.shop-sort .sort-select:hover, .shop-sort .sort-select:focus {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: rgba(245, 158, 11, 0.4);
+.cyber-dropdown-trigger:hover,
+.cyber-dropdown.is-open .cyber-dropdown-trigger {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
 }
 
-.shop-sort .sort-select option {
-  background: #1e293b;
-  color: #fff;
+.cyber-dropdown-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cyber-dropdown-icon {
+  color: #38bdf8;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.cyber-dropdown-chevron {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.cyber-dropdown.is-open .cyber-dropdown-chevron {
+  transform: rotate(180deg);
+  color: #38bdf8;
+}
+
+.cyber-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 100%;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 24px rgba(56, 189, 248, 0.08);
+  backdrop-filter: blur(18px);
+  z-index: 60;
+}
+
+.cyber-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #cbd5e1;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.cyber-dropdown-item-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.cyber-dropdown-item-left i {
+  width: 15px;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.cyber-dropdown-item:hover {
+  background: rgba(56, 189, 248, 0.12);
+  color: #ffffff;
+}
+
+.cyber-dropdown-item:hover .cyber-dropdown-item-left i {
+  color: #38bdf8;
+}
+
+.cyber-dropdown-item.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.24), rgba(56, 189, 248, 0.16));
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.cyber-dropdown-item.active .cyber-dropdown-item-left i,
+.cyber-dropdown-check {
+  color: #38bdf8;
+}
+
+.dropdown-pop-enter-active,
+.dropdown-pop-leave-active {
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.dropdown-pop-enter-from,
+.dropdown-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+}
+
+/* Light Mode Dropdown Overrides */
+body.light-mode .cyber-dropdown-trigger {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(15, 23, 42, 0.14);
+  color: #0f172a;
+}
+
+body.light-mode .cyber-dropdown-trigger:hover,
+body.light-mode .cyber-dropdown.is-open .cyber-dropdown-trigger {
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+body.light-mode .cyber-dropdown-icon,
+body.light-mode .cyber-dropdown.is-open .cyber-dropdown-chevron,
+body.light-mode .cyber-dropdown-check {
+  color: #2563eb;
+}
+
+body.light-mode .cyber-dropdown-menu {
+  background: #ffffff;
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
+}
+
+body.light-mode .cyber-dropdown-item {
+  color: #334155;
+}
+
+body.light-mode .cyber-dropdown-item:hover {
+  background: rgba(37, 99, 235, 0.08);
+  color: #0f172a;
+}
+
+body.light-mode .cyber-dropdown-item.active {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+body.light-mode .cyber-dropdown-item.active .cyber-dropdown-item-left i {
+  color: #2563eb;
 }
 
 .shop-tab {
   background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: #94A3B8;
-  padding: 12px 30px;
+  padding: 11px 20px;
   border-radius: 12px;
   font-family: "Poppins", sans-serif;
-  font-size: 1.1rem;
+  font-size: 0.96rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.25s ease;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .shop-tab:hover {
@@ -1419,13 +1591,38 @@ body.light-mode .transition-progress-track {
 /* ─── Tablet Landscape & Medium Desktops (<= 1024px) ─── */
 @media (max-width: 1024px) {
   .shop-compact-header {
-    padding: 18px 24px;
-    margin: 30px 0 25px 0;
+    padding: 18px 22px;
+    margin: 12px 0 20px 0;
+  }
+
+  .shop-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .shop-tabs {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
   }
 
   .shop-tab {
-    padding: 10px 22px;
-    font-size: 0.98rem;
+    padding: 10px 12px;
+    font-size: 0.92rem;
+    justify-content: center;
+  }
+
+  .shop-sort {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+  }
+
+  .cyber-dropdown {
+    flex: 1;
+    min-width: 0;
   }
 
   .module-cards-grid {
@@ -1442,6 +1639,7 @@ body.light-mode .transition-progress-track {
 /* ─── Tablets & Mobile Devices (<= 768px) ─── */
 @media (max-width: 768px) {
   .shop-view-wrapper {
+    padding-top: 72px;
     padding-bottom: 120px;
   }
 
@@ -1582,13 +1780,26 @@ body.light-mode .transition-progress-track {
     width: 100%;
   }
 
-  .shop-sort .sort-select {
+  .cyber-dropdown {
     flex: 1;
     min-width: 0;
-    padding: 8px 10px;
+  }
+
+  .cyber-dropdown-trigger {
+    padding: 8px 11px;
     font-size: 0.8rem;
     border-radius: 10px;
     height: 38px;
+  }
+
+  .cyber-dropdown-menu {
+    left: 0;
+    right: 0;
+  }
+
+  .cyber-dropdown-item {
+    padding: 9px 10px;
+    font-size: 0.82rem;
   }
 
   /* Module Promo Banner */

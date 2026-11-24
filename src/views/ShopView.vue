@@ -57,17 +57,83 @@
             </button>
           </div>
 
-          <div class="shop-sort">
-            <select v-if="activeTab === 'border' || activeTab === 'module'" v-model="filterOwnership" class="sort-select filter-select">
-              <option value="all">Semua Status</option>
-              <option value="not_owned">Belum Dimiliki</option>
-              <option value="owned">Dimiliki</option>
-            </select>
-            <select v-model="sortOrder" class="sort-select order-select">
-              <option value="default">Urutan Default</option>
-              <option value="asc">Paling Murah</option>
-              <option value="desc">Paling Mahal</option>
-            </select>
+          <div class="shop-sort" ref="shopSortRef">
+            <!-- Custom Themed Dropdown: Filter Ownership -->
+            <div
+              v-if="activeTab === 'border' || activeTab === 'module'"
+              class="cyber-dropdown"
+              :class="{ 'is-open': openDropdown === 'ownership' }"
+            >
+              <button
+                type="button"
+                class="cyber-dropdown-trigger"
+                aria-haspopup="listbox"
+                :aria-expanded="openDropdown === 'ownership'"
+                @click.stop="toggleDropdown('ownership')"
+              >
+                <span class="cyber-dropdown-label">
+                  <i :class="currentOwnershipOption.icon" class="cyber-dropdown-icon"></i>
+                  <span>{{ currentOwnershipOption.label }}</span>
+                </span>
+                <i class="fa-solid fa-chevron-down cyber-dropdown-chevron"></i>
+              </button>
+              <transition name="dropdown-pop">
+                <ul v-if="openDropdown === 'ownership'" class="cyber-dropdown-menu" role="listbox">
+                  <li v-for="opt in ownershipOptions" :key="opt.value" role="option" :aria-selected="filterOwnership === opt.value">
+                    <button
+                      type="button"
+                      class="cyber-dropdown-item"
+                      :class="{ active: filterOwnership === opt.value }"
+                      @click="selectOwnership(opt.value)"
+                    >
+                      <span class="cyber-dropdown-item-left">
+                        <i :class="opt.icon"></i>
+                        <span>{{ opt.label }}</span>
+                      </span>
+                      <i v-if="filterOwnership === opt.value" class="fa-solid fa-check cyber-dropdown-check"></i>
+                    </button>
+                  </li>
+                </ul>
+              </transition>
+            </div>
+
+            <!-- Custom Themed Dropdown: Sort Order -->
+            <div
+              class="cyber-dropdown"
+              :class="{ 'is-open': openDropdown === 'sort' }"
+            >
+              <button
+                type="button"
+                class="cyber-dropdown-trigger"
+                aria-haspopup="listbox"
+                :aria-expanded="openDropdown === 'sort'"
+                @click.stop="toggleDropdown('sort')"
+              >
+                <span class="cyber-dropdown-label">
+                  <i :class="currentSortOption.icon" class="cyber-dropdown-icon"></i>
+                  <span>{{ currentSortOption.label }}</span>
+                </span>
+                <i class="fa-solid fa-chevron-down cyber-dropdown-chevron"></i>
+              </button>
+              <transition name="dropdown-pop">
+                <ul v-if="openDropdown === 'sort'" class="cyber-dropdown-menu" role="listbox">
+                  <li v-for="opt in sortOptions" :key="opt.value" role="option" :aria-selected="sortOrder === opt.value">
+                    <button
+                      type="button"
+                      class="cyber-dropdown-item"
+                      :class="{ active: sortOrder === opt.value }"
+                      @click="selectSortOrder(opt.value)"
+                    >
+                      <span class="cyber-dropdown-item-left">
+                        <i :class="opt.icon"></i>
+                        <span>{{ opt.label }}</span>
+                      </span>
+                      <i v-if="sortOrder === opt.value" class="fa-solid fa-check cyber-dropdown-check"></i>
+                    </button>
+                  </li>
+                </ul>
+              </transition>
+            </div>
           </div>
         </div>
 
@@ -441,7 +507,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import api from '../services/api'
 import { useUserAccount } from '../composables/useUserAccount'
@@ -689,14 +755,74 @@ const loadBoughtBorders = async () => {
   }
 }
 
+const shopSortRef = ref(null)
+const openDropdown = ref(null)
+
+const ownershipOptions = [
+  { value: 'all', label: 'Semua Status', icon: 'fa-solid fa-sliders' },
+  { value: 'not_owned', label: 'Belum Dimiliki', icon: 'fa-solid fa-lock' },
+  { value: 'owned', label: 'Dimiliki', icon: 'fa-solid fa-circle-check' }
+]
+
+const sortOptions = [
+  { value: 'default', label: 'Urutan Default', icon: 'fa-solid fa-arrow-down-short-wide' },
+  { value: 'asc', label: 'Paling Murah', icon: 'fa-solid fa-arrow-up-1-9' },
+  { value: 'desc', label: 'Paling Mahal', icon: 'fa-solid fa-arrow-down-9-1' }
+]
+
+const currentOwnershipOption = computed(() =>
+  ownershipOptions.find(o => o.value === filterOwnership.value) || ownershipOptions[0]
+)
+
+const currentSortOption = computed(() =>
+  sortOptions.find(o => o.value === sortOrder.value) || sortOptions[0]
+)
+
+const toggleDropdown = (name) => {
+  openDropdown.value = openDropdown.value === name ? null : name
+}
+
+const selectOwnership = (value) => {
+  filterOwnership.value = value
+  openDropdown.value = null
+}
+
+const selectSortOrder = (value) => {
+  sortOrder.value = value
+  openDropdown.value = null
+}
+
+const handleDropdownOutsideClick = (event) => {
+  if (shopSortRef.value && !shopSortRef.value.contains(event.target)) {
+    openDropdown.value = null
+  }
+}
+
+const handleDropdownEscape = (event) => {
+  if (event.key === 'Escape') {
+    openDropdown.value = null
+  }
+}
+
 onMounted(() => {
   if (['module', 'energy', 'border', 'item'].includes(route.query.tab)) {
     activeTab.value = route.query.tab
+  }
+  if (typeof window !== 'undefined') {
+    document.addEventListener('click', handleDropdownOutsideClick)
+    document.addEventListener('keydown', handleDropdownEscape)
   }
   fetchPublicConfig()
   fetchPackages()
   fetchWallet()
   loadBoughtBorders()
+})
+
+onUnmounted(() => {
+  if (typeof window !== 'undefined') {
+    document.removeEventListener('click', handleDropdownOutsideClick)
+    document.removeEventListener('keydown', handleDropdownEscape)
+  }
 })
 
 const formatPrice = (price) => {
