@@ -219,7 +219,7 @@
             <div class="module-card-footer">
               <div class="module-price-strip">
                 <span class="price-label">
-                  {{ isPermanentlyOwned(mod) ? 'Status Akses' : 'Harga Modul (Lifetime)' }}
+                  {{ isPermanentlyOwned(mod) ? 'Status Akses' : (mod.is_unlocked ? 'Beli Akses Lifetime' : 'Harga Modul (Lifetime)') }}
                 </span>
                 <div v-if="isPermanentlyOwned(mod)" class="price-unlocked-label">
                   <i class="fa-solid fa-unlock-keyhole"></i> Dimiliki Permanen
@@ -687,6 +687,8 @@ const hydrateShopFromCache = () => {
     if (!raw) return false
     const parsed = JSON.parse(raw)
     if (!parsed || Date.now() - Number(parsed.ts || 0) > SHOP_CACHE_TTL_MS) return false
+    const currentIdentity = `${userProfile.value?.id || 'guest'}:${currentPlan.value || 'free'}:${(ownedPathIds.value || []).join(',')}`
+    if (parsed.identity && parsed.identity !== currentIdentity) return false
     if (Array.isArray(parsed.packages)) packages.value = parsed.packages
     if (Array.isArray(parsed.items)) items.value = parsed.items
     if (Array.isArray(parsed.modules)) modules.value = parsed.modules
@@ -699,8 +701,10 @@ const hydrateShopFromCache = () => {
 
 const persistShopCache = () => {
   try {
+    const currentIdentity = `${userProfile.value?.id || 'guest'}:${currentPlan.value || 'free'}:${(ownedPathIds.value || []).join(',')}`
     sessionStorage.setItem(SHOP_CACHE_KEY, JSON.stringify({
       ts: Date.now(),
+      identity: currentIdentity,
       packages: packages.value,
       items: items.value,
       modules: modules.value,
@@ -732,7 +736,7 @@ const fetchPackages = async () => {
       }
       const preselectId = Number(route.query.select)
       if (preselectId && !selectedModuleIds.value.includes(preselectId)) {
-        const target = modules.value.find(m => Number(m.id) === preselectId && !m.is_unlocked)
+        const target = modules.value.find(m => Number(m.id) === preselectId && !isPermanentlyOwned(m))
         if (target) selectedModuleIds.value.push(target.id)
       }
       if (activeTab.value === 'module') isLoading.value = false

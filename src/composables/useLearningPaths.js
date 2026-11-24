@@ -174,6 +174,9 @@ export function useLearningPaths() {
       const params = mode === 'challenge' ? { mode: 'challenge' } : undefined
       const response = await api.get(`/paths/${slug}`, { params })
       const detailedPath = response.data.data
+      if (mode === 'challenge') {
+        detailedPath._challengeModeOnly = true
+      }
 
       const { loadProgress, hasBeenScored } = (await import('./useScoring')).useScoring()
       await loadProgress()
@@ -182,7 +185,13 @@ export function useLearningPaths() {
 
       const index = paths.value.findIndex(p => p.slug === slug || String(p.id) === String(slug))
       if (index !== -1) {
-        paths.value[index] = detailedPath
+        // Jangan timpa path kurikulum yang sudah lengkap dengan payload khusus mode=challenge
+        const existingHasFullCurriculum = Array.isArray(paths.value[index]?.chapters) &&
+          paths.value[index].chapters.length > 0 &&
+          !paths.value[index]._challengeModeOnly
+        if (!(mode === 'challenge' && existingHasFullCurriculum)) {
+          paths.value[index] = detailedPath
+        }
       } else {
         paths.value.push(detailedPath)
         if (paths.value.length <= 1) {

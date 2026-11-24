@@ -273,6 +273,7 @@ const processPayment = async () => {
       try {
         sessionStorage.removeItem('ic_learning_paths_cache_v3')
         localStorage.removeItem('ic_learning_paths_cache_v3')
+        sessionStorage.removeItem('ic_shop_catalog_v1')
       } catch {}
     } else if (type === 'border') {
       const response = await api.post('/shop/purchase/border', { border_id: pkgId }, { headers })

@@ -181,7 +181,10 @@ export function clearUserAccount() {
   ownedPathIds.value = []
   activeBorderId.value = null
   try {
-    if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('ic_user_display_v1')
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('ic_user_display_v1')
+      sessionStorage.removeItem('ic_shop_catalog_v1')
+    }
   } catch {}
 }
 

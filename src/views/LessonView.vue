@@ -186,7 +186,7 @@ onMounted(async () => {
     const hasQuizzesLoaded = path.value?.chapters?.[0]?.lessons?.[0]?.quizzes !== undefined;
     const isChallengeMode = route.query.mode === 'challenge';
     
-    if (!path.value || !path.value.chapters || !hasQuizzesLoaded || isChallengeMode) {
+    if (!path.value || !path.value.chapters || !hasQuizzesLoaded || isChallengeMode || path.value._challengeModeOnly) {
       await fetchPathDetails(pathId.value, false, isChallengeMode ? 'challenge' : null)
     }
   } finally {

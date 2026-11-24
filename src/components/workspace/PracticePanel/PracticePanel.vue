@@ -401,7 +401,9 @@ const openHint = async () => {
   if (!props.lesson || !props.lesson.id) return
   isHintLoading.value = true
   try {
-    const res = await api.post(`/hints/lesson/${props.lesson.id}`)
+    const res = await api.post(`/hints/lesson/${props.lesson.id}`, {
+      mode: props.isChallenge ? 'challenge' : undefined
+    })
     
     // Perbaikan struktur dari res.data.data.hint_text menjadi res.data.hint
     if (res.data && res.data.hint) {
