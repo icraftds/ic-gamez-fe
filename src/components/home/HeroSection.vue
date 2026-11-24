@@ -1,6 +1,6 @@
 <template>
   <section class="hero reveal active">
-    <template v-if="!isLoggedIn">
+    <template v-if="!showLoggedInHero">
       <h1>
         IC Game-Z <br /><span class="gradient-text">Level up your Skill!</span>
       </h1>
@@ -27,15 +27,15 @@
             <CyberBorder
               :tierId="borderId"
               :accountBadge="currentBadgeStatus"
-              :avatarUrl="userProfile.avatar"
-              :imageUrl="userProfile.active_border_url"
+              :avatarUrl="displayProfile.avatar"
+              :imageUrl="displayProfile.active_border_url"
             />
           </div>
         </div>
         <div class="welcome-text">
           <h1 class="welcome-heading">
             Selamat datang kembali,<br /><span class="gradient-text"
-              >{{ userProfile.name }}!</span
+              >{{ displayProfile.name }}!</span
             >
           </h1>
           <p class="welcome-sub">Lanjutkan perjalanan belajarmu hari ini.</p>
@@ -56,22 +56,49 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useUserAccount } from "../../composables/useUserAccount";
 import CyberBorder from '../ui/CyberBorder.vue';
 
-const { isLoggedIn, userProfile, currentPlan, isPremiumUser, activeBorderId } = useUserAccount();
+const { isLoggedIn, isBootstrapping, userProfile, currentPlan, isPremiumUser, activeBorderId } = useUserAccount();
+const cachedDisplay = ref(null);
+
+onMounted(() => {
+  try {
+    const raw = sessionStorage.getItem('ic_user_display_v1');
+    if (raw) cachedDisplay.value = JSON.parse(raw);
+  } catch {}
+});
+
+const showLoggedInHero = computed(() =>
+  isLoggedIn.value || (isBootstrapping.value && Boolean(cachedDisplay.value?.name))
+);
+
+const displayProfile = computed(() => {
+  if (isLoggedIn.value) return userProfile.value;
+  return cachedDisplay.value || userProfile.value;
+});
+
+const resolvedPlan = computed(() =>
+  isLoggedIn.value ? currentPlan.value : (cachedDisplay.value?.currentPlan || 'free')
+);
+
+const resolvedPremium = computed(() =>
+  isLoggedIn.value ? isPremiumUser.value : Boolean(cachedDisplay.value?.isPremiumUser)
+);
 
 const currentBadgeStatus = computed(() => {
-  if (currentPlan.value === 'expert') return 'EXPERT';
-  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'PRO';
+  if (resolvedPlan.value === 'lifetime') return 'LIFETIME';
+  if (resolvedPlan.value === 'expert') return 'EXPERT';
+  if (resolvedPlan.value === 'pro' || resolvedPremium.value) return 'PRO';
   return 'FREE';
 });
 
 const borderId = computed(() => {
-  if (activeBorderId.value) return activeBorderId.value;
-  if (currentPlan.value === 'expert') return 'D_EXPERT';
-  if (currentPlan.value === 'pro' || isPremiumUser.value) return 'D_PRO';
+  const bId = isLoggedIn.value ? activeBorderId.value : cachedDisplay.value?.activeBorderId;
+  if (bId) return bId;
+  if (resolvedPlan.value === 'expert' || resolvedPlan.value === 'lifetime') return 'D_EXPERT';
+  if (resolvedPlan.value === 'pro' || resolvedPremium.value) return 'D_PRO';
   return 'D_FREE';
 });
 </script>

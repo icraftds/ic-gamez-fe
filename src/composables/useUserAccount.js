@@ -180,6 +180,9 @@ export function clearUserAccount() {
   unlockedPathIds.value = []
   ownedPathIds.value = []
   activeBorderId.value = null
+  try {
+    if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('ic_user_display_v1')
+  } catch {}
 }
 
 export function useUserAccount() {
@@ -233,6 +236,20 @@ export function useUserAccount() {
       ownedPathIds.value = Array.isArray(data.owned_path_ids) ? data.owned_path_ids.map(Number) : []
 
       if (data.active_border_id) activeBorderId.value = data.active_border_id;
+
+      // Simpan display snapshot non-sensitif untuk instant LCP pada kunjungan berikutnya
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem('ic_user_display_v1', JSON.stringify({
+            name: userProfile.value.name,
+            avatar: userProfile.value.avatar,
+            currentPlan: currentPlan.value,
+            isPremiumUser: Boolean(isPremiumUser.value),
+            activeBorderId: activeBorderId.value,
+            active_border_url: data.active_border_url || null,
+          }))
+        }
+      } catch {}
 
       return data
     } catch (error) {
@@ -440,30 +457,30 @@ export function useUserAccount() {
    * Perform logout
    */
   const logout = async () => {
-    if (ssoEnabled) await logoutSso()
     try {
       isLoading.value = true
-      if (!ssoEnabled) await api.post('/auth/logout')
-    } catch (error) {
-      console.error('Logout error:', error.response?.status || 'request_failed')
-    } finally {
-      // Hapus token dari localStorage saat logout
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('sso_token')
-      
-      isLoggedIn.value = false
-      userProfile.value = {
-        id: null, name: '', username: '', tag_id: '', last_username_change_at: null, email: '', phone: '', avatar: '',
-        level: 1, xp: 0, totalXp: 0, nextLevelXp: 100, streak: 0, longest_streak: 0, is_admin: false, showcase_medals: null, joinDate: ''
+      if (ssoEnabled) {
+        await logoutSso()
+      } else {
+        await api.post('/auth/logout')
       }
-      coinz.value = null
-      walletStatus.value = 'unavailable'
-      walletInitializationPending.value = false
-      initializedToken = null
-      currentPlan.value = 'free'
-      credits.value = 10
-      isPremiumUser.value = false
+    } catch (error) {
+      console.error('Logout error:', error?.response?.status || 'request_failed')
+    } finally {
+      // Hapus token & seluruh state akun dari localStorage saat logout
+      try {
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('sso_token')
+        localStorage.removeItem('xp_outbox')
+        localStorage.removeItem('ic_pending_checkout')
+      } catch {}
+
+      clearUserAccount()
       isLoading.value = false
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('gamez-user-logout'))
+      }
     }
   }
 

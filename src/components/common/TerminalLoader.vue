@@ -133,11 +133,11 @@ const message = computed(() => props.text || (props.label ? `Memuat ${props.labe
   animation: tl-glow 2.4s ease-in-out infinite;
 }
 
-/* Efek mengetik per karakter */
+/* Efek mengetik per karakter (GPU-composited clip-path, 0 layout shift) */
 .tl-text {
   display: inline-block;
   overflow: hidden;
-  width: 0;
+  clip-path: inset(0 100% 0 0);
   font-weight: 500;
   letter-spacing: 0.01em;
   animation: tl-type calc(var(--chars) * var(--tl-type-speed)) steps(var(--chars), end) 0.15s forwards;
@@ -218,7 +218,8 @@ const message = computed(() => props.text || (props.label ? `Memuat ${props.labe
 
 /* ───────── Keyframes ───────── */
 @keyframes tl-type {
-  to { width: calc(var(--chars) * 1ch + 0.02em * var(--chars)); }
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
 }
 @keyframes tl-blink {
   0%, 45% { opacity: 1; }
@@ -246,7 +247,7 @@ const message = computed(() => props.text || (props.label ? `Memuat ${props.labe
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tl-text { width: auto; animation: none; }
+  .tl-text { clip-path: none; animation: none; }
   .tl-dots i { opacity: 1; animation: none; }
   .tl-cursor, .tl-prompt, .tl-shell, .tl--overlay { animation: none; }
   .tl-bar span { animation: none; width: 100%; opacity: 0.5; }

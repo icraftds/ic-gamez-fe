@@ -609,28 +609,70 @@ const getBorderPrice = (id) => borderPrices[id] || 99999
 
 const isBought = (id) => boughtBorders.value.includes(id)
 
-const fetchPackages = async () => {
-  try {
-    isLoading.value = true
-    const [resPackages, resItems, resModules] = await Promise.all([
-      api.get('/shop/packages'),
-      api.get('/shop/items'),
-      api.get('/shop/modules').catch(() => ({ data: { data: [], meta: null } }))
-    ])
-    packages.value = resPackages.data.data || []
-    items.value = resItems.data.data || []
-    modules.value = resModules.data?.data || []
-    if (resModules.data?.meta) {
-      moduleMeta.value = { ...moduleMeta.value, ...resModules.data.meta }
-    }
+const SHOP_CACHE_KEY = 'ic_shop_catalog_v1'
+const SHOP_CACHE_TTL_MS = 5 * 60 * 1000
 
-    const preselectId = Number(route.query.select)
-    if (preselectId && !selectedModuleIds.value.includes(preselectId)) {
-      const target = modules.value.find(m => Number(m.id) === preselectId && !m.is_unlocked)
-      if (target) selectedModuleIds.value.push(target.id)
-    }
+const hydrateShopFromCache = () => {
+  try {
+    const raw = sessionStorage.getItem(SHOP_CACHE_KEY)
+    if (!raw) return false
+    const parsed = JSON.parse(raw)
+    if (!parsed || Date.now() - Number(parsed.ts || 0) > SHOP_CACHE_TTL_MS) return false
+    if (Array.isArray(parsed.packages)) packages.value = parsed.packages
+    if (Array.isArray(parsed.items)) items.value = parsed.items
+    if (Array.isArray(parsed.modules)) modules.value = parsed.modules
+    if (parsed.moduleMeta) moduleMeta.value = { ...moduleMeta.value, ...parsed.moduleMeta }
+    return packages.value.length > 0 || modules.value.length > 0
+  } catch {
+    return false
+  }
+}
+
+const persistShopCache = () => {
+  try {
+    sessionStorage.setItem(SHOP_CACHE_KEY, JSON.stringify({
+      ts: Date.now(),
+      packages: packages.value,
+      items: items.value,
+      modules: modules.value,
+      moduleMeta: moduleMeta.value,
+    }))
+  } catch {}
+}
+
+const fetchPackages = async () => {
+  const hasWarmCache = hydrateShopFromCache()
+  isLoading.value = !hasWarmCache
+
+  try {
+    // Jalankan paralel dan render tiap tab segera saat datanya datang (jangan tunggu yang paling lambat)
+    const pPackages = api.get('/shop/packages').then((res) => {
+      packages.value = res.data?.data || []
+      if (activeTab.value === 'energy') isLoading.value = false
+    }).catch(() => {})
+
+    const pItems = api.get('/shop/items').then((res) => {
+      items.value = res.data?.data || []
+      if (activeTab.value === 'item') isLoading.value = false
+    }).catch(() => {})
+
+    const pModules = api.get('/shop/modules').then((res) => {
+      modules.value = res.data?.data || []
+      if (res.data?.meta) {
+        moduleMeta.value = { ...moduleMeta.value, ...res.data.meta }
+      }
+      const preselectId = Number(route.query.select)
+      if (preselectId && !selectedModuleIds.value.includes(preselectId)) {
+        const target = modules.value.find(m => Number(m.id) === preselectId && !m.is_unlocked)
+        if (target) selectedModuleIds.value.push(target.id)
+      }
+      if (activeTab.value === 'module') isLoading.value = false
+    }).catch(() => {})
+
+    await Promise.allSettled([pPackages, pItems, pModules])
+    persistShopCache()
   } catch (error) {
-    console.error('Failed to fetch packages:', error.response?.status || 'request_failed')
+    console.error('Failed to fetch packages:', error?.response?.status || 'request_failed')
   } finally {
     isLoading.value = false
   }

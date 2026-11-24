@@ -1,3 +1,7 @@
+.hero {
+  min-height: 360px;
+}
+
 .btn-hero {
   padding: 16px 36px;
   font-size: 1.15rem;
