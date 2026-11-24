@@ -181,6 +181,7 @@ import CyberCrown from '../ui/CyberCrown.vue';
 import api from '../../services/api';
 
 const getUserBadgeStatus = (user) => {
+  if (user?.current_plan === 'lifetime') return 'LIFETIME';
   if (user?.current_plan === 'expert') return 'EXPERT';
   if (user?.current_plan === 'pro' || user?.is_premium) return 'PRO';
   return 'FREE';
@@ -188,14 +189,14 @@ const getUserBadgeStatus = (user) => {
 
 const getLevelBadgeClass = (user) => {
   const status = getUserBadgeStatus(user);
-  if (status === 'EXPERT') return 'badge-expert';
+  if (status === 'EXPERT' || status === 'LIFETIME') return 'badge-expert';
   if (status === 'PRO') return 'badge-pro';
   return '';
 };
 
 const getUserBorderId = (user) => {
   if (user?.active_border_id) return user.active_border_id;
-  if (user?.current_plan === 'expert') return 'D_EXPERT';
+  if (user?.current_plan === 'expert' || user?.current_plan === 'lifetime') return 'D_EXPERT';
   if (user?.current_plan === 'pro' || user?.is_premium) return 'D_PRO';
   return 'D_FREE';
 };
@@ -231,13 +232,14 @@ const topUsers = computed(() => {
 });
 
 const tableUsers = computed(() => {
+  const validUsers = currentRanking.value.filter(u => Number(u.xp) > 0);
   if (props.isFullView) {
-    return currentRanking.value.slice(3).map((user, index) => ({
+    return validUsers.slice(3, 13).map((user, index) => ({
       ...user,
       rank: index + 4
     }));
   }
-  return allTimeRanking.value.slice(0, 5).map((user, index) => ({
+  return allTimeRanking.value.filter(u => Number(u.xp) > 0).slice(0, 5).map((user, index) => ({
     ...user,
     rank: index + 1
   }));
