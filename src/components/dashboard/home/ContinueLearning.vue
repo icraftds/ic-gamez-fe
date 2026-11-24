@@ -1,5 +1,5 @@
 <template>
-  <div class="section-card">
+  <div class="section-card" style="min-height: 360px;">
     <div class="cl-header">
       <div class="cl-title-wrap">
         <h2>Teruskan Perjalanan Belajarmu</h2>

@@ -403,6 +403,7 @@ body.light-mode .cyber-dropdown-item.active .cyber-dropdown-item-left i {
 /* Section wrapper (container utility handles max-width/padding) */
 .shop-content-section {
   padding-top: 10px;
+  min-height: 560px;
 }
 
 /* Grids */

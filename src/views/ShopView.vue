@@ -184,7 +184,7 @@
             class="module-shop-card"
             :style="{ '--mod-color': getPathThemeColor(mod, idx) }"
             :class="{
-              'is-owned': mod.is_unlocked,
+              'is-owned': isPermanentlyOwned(mod),
               'is-selected': isModuleSelected(mod.id),
               'is-shaking': shakeKey === `mod-${mod.id}`,
               'is-buying': activeBuyingKey === `mod-${mod.id}`
@@ -219,10 +219,10 @@
             <div class="module-card-footer">
               <div class="module-price-strip">
                 <span class="price-label">
-                  {{ mod.is_unlocked ? 'Status Akses' : 'Harga Modul' }}
+                  {{ isPermanentlyOwned(mod) ? 'Status Akses' : 'Harga Modul (Lifetime)' }}
                 </span>
-                <div v-if="mod.is_unlocked" class="price-unlocked-label">
-                  <i class="fa-solid fa-unlock-keyhole"></i> Terbuka
+                <div v-if="isPermanentlyOwned(mod)" class="price-unlocked-label">
+                  <i class="fa-solid fa-unlock-keyhole"></i> Dimiliki Permanen
                 </div>
                 <div v-else class="module-price-values">
                   <span
@@ -250,7 +250,7 @@
                 </div>
               </div>
 
-              <div v-if="mod.is_unlocked" class="module-card-actions">
+              <div v-if="isPermanentlyOwned(mod)" class="module-card-actions">
                 <router-link :to="`/learning/${mod.slug || mod.id}`" class="btn-open-module">
                   <i class="fa-solid fa-play"></i> Buka Modul
                 </router-link>
@@ -587,12 +587,15 @@ const sortedPackages = computed(() => {
   return pkgs
 })
 
+const isPermanentlyOwned = (mod) =>
+  Boolean(mod?.is_directly_owned || mod?.access_status === 'owned' || mod?.access_status === 'lifetime_plan')
+
 const sortedModules = computed(() => {
   let list = [...modules.value]
   if (filterOwnership.value === 'owned') {
-    list = list.filter(m => m.is_unlocked)
+    list = list.filter(m => isPermanentlyOwned(m))
   } else if (filterOwnership.value === 'not_owned') {
-    list = list.filter(m => !m.is_unlocked)
+    list = list.filter(m => !isPermanentlyOwned(m))
   }
 
   if (sortOrder.value === 'asc') {
@@ -604,7 +607,7 @@ const sortedModules = computed(() => {
 })
 
 const selectedModuleObjects = computed(() =>
-  modules.value.filter(m => selectedModuleIds.value.includes(m.id) && !m.is_unlocked)
+  modules.value.filter(m => selectedModuleIds.value.includes(m.id) && !isPermanentlyOwned(m))
 )
 
 const moduleSubtotal = computed(() =>

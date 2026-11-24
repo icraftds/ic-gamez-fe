@@ -167,11 +167,12 @@ export function useLearningPaths() {
   }
 
   // To get detailed info including chapters and lessons for a specific path
-  const fetchPathDetails = async (slug, skipLoadingState = false) => {
+  const fetchPathDetails = async (slug, skipLoadingState = false, mode = null) => {
     if (!slug || slug === 'null' || slug === 'undefined') return null
     try {
       if (!skipLoadingState) isLoading.value = true
-      const response = await api.get(`/paths/${slug}`)
+      const params = mode === 'challenge' ? { mode: 'challenge' } : undefined
+      const response = await api.get(`/paths/${slug}`, { params })
       const detailedPath = response.data.data
 
       const { loadProgress, hasBeenScored } = (await import('./useScoring')).useScoring()

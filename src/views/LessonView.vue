@@ -184,9 +184,10 @@ onMounted(async () => {
   try {
     // Pastikan detail (termasuk quizzes) dimuat. Endpoint index tidak me-load quizzes.
     const hasQuizzesLoaded = path.value?.chapters?.[0]?.lessons?.[0]?.quizzes !== undefined;
+    const isChallengeMode = route.query.mode === 'challenge';
     
-    if (!path.value || !path.value.chapters || !hasQuizzesLoaded) {
-      await fetchPathDetails(pathId.value)
+    if (!path.value || !path.value.chapters || !hasQuizzesLoaded || isChallengeMode) {
+      await fetchPathDetails(pathId.value, false, isChallengeMode ? 'challenge' : null)
     }
   } finally {
     isPreparingLesson.value = false

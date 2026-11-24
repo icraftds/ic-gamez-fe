@@ -212,6 +212,7 @@ onUnmounted(() => {
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  min-height: 88px;
   margin: 1.25rem 0 1.5rem 0;
   font-family: 'Poppins', sans-serif;
   contain: layout inline-size style;
