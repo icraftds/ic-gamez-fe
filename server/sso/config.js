@@ -1,7 +1,7 @@
 import { SsoError } from './security.js'
 
 export const GAMEZ_CONTRACT = Object.freeze({
-    issuer: 'https://auth.icraftds.id',
+    issuer: 'https://ic-auth.unikom.my.id',
     clientId: '01a113e2-6f4c-709e-bbc1-7be88648c0d7',
     redirectUri: 'https://gamez.icraftds.id/auth/callback',
     appOrigin: 'https://gamez.icraftds.id',

@@ -116,7 +116,7 @@ const goToMarket = () => {
 };
 
 const goToGlobalLogout = () => {
-  window.location.assign('https://auth.icraftds.id/logout');
+  window.location.assign('https://ic-auth.unikom.my.id/logout');
 };
 </script>
 
