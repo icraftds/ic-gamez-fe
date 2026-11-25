@@ -181,7 +181,7 @@ test('Local logout retires durable session and retains encrypted retry if centra
     assert.equal(loggedOut.revoked, false); assert.equal(loggedOut.revocationPending, true)
     await assert.rejects(fixture.sessions.authorize(result.id), error => error.status === 401)
     assert.equal(fixture.store.retries.length, 1)
-    assert.equal(fixture.store.retries[0].ciphertext.includes('a1'), false)
+    assert.equal(fixture.store.retries[0].ciphertext.includes('test-access-rev-1'), false)
 })
 
 test('BFF HTTP boundary rejects CSRF before transport and never replays a mutating 401', async () => {
