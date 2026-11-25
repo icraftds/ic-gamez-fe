@@ -140,11 +140,18 @@ export function useLearningPaths() {
     const request = (async () => {
       try {
         isLoading.value = true
-        const response = await api.get('/paths')
+        const scoringPromise = import('./useScoring')
+          .then(({ useScoring }) => {
+            const s = useScoring()
+            return s.loadProgress().catch(() => {}).then(() => s.hasBeenScored)
+          })
+          .catch(() => null)
+        const [response, hasBeenScored] = await Promise.all([
+          api.get('/paths'),
+          scoringPromise,
+        ])
         if (response.data && Array.isArray(response.data.data)) {
           const freshPaths = response.data.data
-          const { loadProgress, hasBeenScored } = (await import('./useScoring')).useScoring()
-          await loadProgress().catch(() => {})
 
           paths.value = mergeFreshPathsWithCache(freshPaths, paths.value, hasBeenScored)
 

@@ -30,7 +30,7 @@ const setThemeMode = (light) => {
 import { onUnmounted } from 'vue'
 const { fetchPaths, isLoading: isPathsLoading } = useLearningPaths()
 const { fetchStats } = useDashboardStats()
-const isDataFetching = computed(() => isPathsLoading.value || isUserLoading.value)
+const isDataFetching = computed(() => isUserLoading.value && !userProfile.value?.id)
 const route = useRoute()
 const router = useRouter()
 

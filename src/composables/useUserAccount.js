@@ -346,6 +346,7 @@ export function useUserAccount() {
         user = await fetchUser(true)
       }
       if (!user) return false
+      if (!silent) isBootstrapping.value = false
       if (!ssoEnabled) {
         await initializeWallet()
         await fetchWallet()
