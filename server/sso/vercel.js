@@ -50,7 +50,7 @@ export default async function handler(req, res) {
             clientSecret: process.env.SSO_CLIENT_SECRET || '',
             encryptionKey: process.env.BFF_SESSION_ENCRYPTION_KEY || '',
             redisUrl: process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL || (process.env.SSO_CLIENT_SECRET ? `${(process.env.PRODUCT_BACKEND_URL || GAMEZ_CONTRACT.backendOrigin).replace(/\/+$/, '')}/api/internal/sso-redis` : ''),
-            redisToken: process.env.REDIS_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.SSO_CLIENT_SECRET || '',
+            redisToken: process.env.REDIS_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.INTERNAL_API_KEY || 'KunciRahasia_iCraft2026',
             environment: process.env.VERCEL_ENV || 'development',
         }
         const requestHeaders = new Headers()
