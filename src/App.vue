@@ -4,8 +4,7 @@
     
     <template v-if="!showSessionBootstrapLoader">
       <HomeNavbar v-if="showHomeNavbar" />
-      <p v-if="ssoEnabled && ssoState.status.value === 'unavailable'" role="status">Layanan sesi belum tersedia. Coba kembali sebentar lagi.</p>
-      <div v-if="!ssoEnabled || ssoState.status.value !== 'guest' || !route.meta.requiresAuth" class="app-content">
+      <div v-if="!ssoEnabled || (ssoState.status.value !== 'guest' && ssoState.status.value !== 'unavailable') || !route.meta.requiresAuth" class="app-content">
         <router-view v-slot="{ Component, route }">
           <transition name="page-fade" mode="out-in">
             <div :key="route.meta.stableKey ? route.name : route.path" class="route-wrapper">
@@ -13,6 +12,21 @@
             </div>
           </transition>
         </router-view>
+      </div>
+      <div v-else-if="ssoState.status.value === 'unavailable' && route.meta.requiresAuth" class="app-content session-recovery-shell">
+        <div class="session-recovery-card" role="status" aria-live="polite">
+          <span class="session-recovery-badge">Sinkronisasi Sesi</span>
+          <h2>Menghubungkan Kembali Sesi Anda</h2>
+          <p>Koneksi ke server sesi sedang sibuk. Silakan coba muat ulang sesi atau kembali ke beranda.</p>
+          <div class="session-recovery-actions">
+            <button type="button" class="session-recovery-btn primary" @click="bootstrapSession()">
+              Coba Lagi
+            </button>
+            <button type="button" class="session-recovery-btn secondary" @click="router.push('/')">
+              Kembali ke Beranda
+            </button>
+          </div>
+        </div>
       </div>
       <div v-else class="app-content session-recovery-shell">
         <div class="session-recovery-card" role="status" aria-live="polite">
