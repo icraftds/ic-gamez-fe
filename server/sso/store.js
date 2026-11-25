@@ -156,12 +156,17 @@ export function createLocalRedisClient(connectionUrl, password = '') {
         set: (key, value, options = {}) => {
             const cmd = ['SET', key, value]
             if (options.nx) cmd.push('NX')
-            if (options.pxat) cmd.push('PXAT', String(options.pxat))
+            if (options.pxat) cmd.push('PX', String(Math.max(1, Number(options.pxat) - Date.now())))
             else if (options.px) cmd.push('PX', String(options.px))
             return sendCommand(cmd)
         },
-        eval: (script, keys = [], args = []) =>
-            sendCommand(['EVAL', script, String(keys.length), ...keys.map(String), ...args.map(String)]),
+        eval: (script, keys = [], args = []) => {
+            const compatScript = String(script).replace(
+                /redis\.call\('SET',\s*(KEYS\[\d+\]),\s*(ARGV\[\d+\]),\s*'PXAT',\s*(ARGV\[\d+\])\)/g,
+                "redis.call('SET',$1,$2); redis.call('PEXPIREAT',$1,tonumber($3))",
+            )
+            return sendCommand(['EVAL', compatScript, String(keys.length), ...keys.map(String), ...args.map(String)])
+        },
         zrange: (key, min, max, options = {}) => {
             const cmd = ['ZRANGE', key, String(min), String(max)]
             if (options.byScore) {
