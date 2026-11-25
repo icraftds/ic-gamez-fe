@@ -25,6 +25,18 @@ export function functionRequestUrl(requestUrl, query = {}) {
     return url
 }
 
+let cachedRuntimeKey = ''
+let cachedRuntimeInstance = null
+
+function resolveRuntime(configuration) {
+    const key = JSON.stringify(configuration)
+    if (!cachedRuntimeInstance || cachedRuntimeKey !== key) {
+        cachedRuntimeInstance = gamezRuntime(configuration)
+        cachedRuntimeKey = key
+    }
+    return cachedRuntimeInstance
+}
+
 export default async function handler(req, res) {
     let response
     try {
@@ -49,7 +61,7 @@ export default async function handler(req, res) {
         const url = functionRequestUrl(req.url, req.query)
         const body = ['GET', 'HEAD'].includes(req.method) ? undefined : req
         const request = new Request(url, { method: req.method, headers: requestHeaders, ...(body ? { body, duplex: 'half' } : {}) })
-        response = await handleSso(request, gamezRuntime(configuration))
+        response = await handleSso(request, resolveRuntime(configuration))
     } catch (error) {
         const safe = error instanceof SsoError ? error : new SsoError(503, 'SSO service is unavailable.')
         const rawRoute = Array.isArray(req.query?.__sso_route) ? req.query.__sso_route[0] : req.query?.__sso_route
