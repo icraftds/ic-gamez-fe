@@ -12,7 +12,8 @@ const state = 'a'.repeat(43)
 
 test('GameZ production configuration is exact and fails closed without secrets or rollout', () => {
     assert.equal(gamezConfiguration(configuration).clientId, GAMEZ_CONTRACT.clientId)
-    for (const invalid of [{ enabled: false }, { clientSecret: '' }, { encryptionKey: '' }, { clientId: 'gamez' }, { appOrigin: 'https://evil.test' }, { redirectUri: 'http://localhost/auth/callback' }]) {
+    assert.equal(gamezConfiguration({ ...configuration, issuer: 'https://ic-auth.unikom.my.id' }).issuer, 'https://auth.icraftds.id')
+    for (const invalid of [{ enabled: false }, { clientSecret: '' }, { encryptionKey: '' }, { clientId: 'gamez' }, { appOrigin: 'https://evil.test' }, { redirectUri: 'http://localhost/auth/callback' }, { issuer: 'https://evil.test' }]) {
         assert.throws(() => gamezConfiguration({ ...configuration, ...invalid }), error => error.status === 503)
     }
 })
