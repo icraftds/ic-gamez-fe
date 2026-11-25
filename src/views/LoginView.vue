@@ -59,6 +59,8 @@
               <a href="#" class="forgot-password" @click.prevent="openWipModal">Lupa Password?</a>
             </div>
 
+            <RecaptchaV2 ref="recaptchaRef" v-model="recaptchaToken" />
+
             <button type="submit" class="btn-submit" :disabled="isLoading || authCooldown > 0">
               <TerminalLoader v-if="isLoading" variant="inline" label="masuk" />
               <span v-else>Masuk ke Akun</span>
@@ -128,6 +130,7 @@ import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useWipModal } from '../composables/useWipModal'
 import { useToast } from '../composables/useToast'
+import RecaptchaV2 from '../components/common/RecaptchaV2.vue'
 
 const { login, verifyOtp, resendOtp, isLoading, finishAuthLoading } = useUserAccount()
 
@@ -155,6 +158,8 @@ const loginForm = ref({
   email: '',
   password: ''
 })
+const recaptchaToken = ref('')
+const recaptchaRef = ref(null)
 
 const getPostAuthTarget = () => {
   const raw = router.currentRoute.value?.query?.redirect
@@ -163,18 +168,23 @@ const getPostAuthTarget = () => {
 
 const handleLogin = async () => {
   errorMessage.value = ''
+  if (recaptchaRef.value?.isEnabled && !recaptchaToken.value) {
+    errorMessage.value = 'Silakan centang verifikasi CAPTCHA (Saya bukan robot) terlebih dahulu.'
+    return
+  }
   
-  const result = await login(loginForm.value.email, loginForm.value.password)
+  const result = await login(loginForm.value.email, loginForm.value.password, recaptchaToken.value)
   if (result.success) {
     sessionStorage.setItem('just_logged_in', 'true')
     router.push(getPostAuthTarget())
   } else {
+    recaptchaRef.value?.reset?.()
     // Check if error is because user is unverified
     if (result.data?.errors?.is_unverified) {
       step.value = 2
       showToast('Silakan verifikasi email Anda terlebih dahulu.', 'info')
     } else {
-      errorMessage.value = result.message
+      errorMessage.value = result.data?.errors?.captcha?.[0] || result.message
     }
   }
 }

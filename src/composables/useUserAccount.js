@@ -354,13 +354,18 @@ export function useUserAccount() {
    * Perform login via Laravel Sanctum
    * For testing, defaults to seeded user if no credentials provided.
    */
-  const login = async (email = 'admin@example.com', password = 'password') => {
+  const login = async (email = 'admin@example.com', password = 'password', recaptchaToken = '') => {
     if (ssoEnabled) { window.location.assign('/auth/start?return_to=%2Fdashboard'); return { success: false } }
     if (isLoading.value) return { success: false, message: 'Permintaan sedang diproses.' }
     try {
       isLoading.value = true
       await initCsrf()
-      const response = await api.post('/auth/login', { email, password })
+      const payload = { email, password }
+      if (recaptchaToken) {
+        payload['g-recaptcha-response'] = recaptchaToken
+        payload.recaptcha_token = recaptchaToken
+      }
+      const response = await api.post('/auth/login', payload)
       
       // Simpan token bawaan SSO ke localStorage
       const token = response.data?.data?.token || response.data?.token
@@ -385,13 +390,18 @@ export function useUserAccount() {
   /**
    * Register a new user
    */
-  const register = async (name, email, phone, password, password_confirmation) => {
+  const register = async (name, email, phone, password, password_confirmation, recaptchaToken = '') => {
     if (ssoEnabled) return login()
     if (isLoading.value) return { success: false, message: 'Permintaan sedang diproses.' }
     try {
       isLoading.value = true
       await initCsrf()
-      const response = await api.post('/auth/register', { name, email, phone, password, password_confirmation })
+      const payload = { name, email, phone, password, password_confirmation }
+      if (recaptchaToken) {
+        payload['g-recaptcha-response'] = recaptchaToken
+        payload.recaptcha_token = recaptchaToken
+      }
+      const response = await api.post('/auth/register', payload)
       
       // Jangan login otomatis & jangan simpan token karena butuh OTP
       

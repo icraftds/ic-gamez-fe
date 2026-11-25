@@ -80,6 +80,8 @@
               <span v-if="validationErrors.password_confirmation" class="error-text text-danger">{{ validationErrors.password_confirmation[0] }}</span>
             </div>
 
+            <RecaptchaV2 ref="recaptchaRef" v-model="recaptchaToken" />
+
             <button type="submit" class="btn-submit btn-register-submit" :disabled="isLoading || authCooldown > 0">
               <TerminalLoader v-if="isLoading" variant="inline" label="pendaftaran" />
               <span v-else>Daftar Akun</span>
@@ -147,6 +149,7 @@ import { rateLimitUntil } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useToast } from '../composables/useToast'
+import RecaptchaV2 from '../components/common/RecaptchaV2.vue'
 
 const { register, verifyOtp, resendOtp, isLoading, finishAuthLoading } = useUserAccount()
 
@@ -177,24 +180,32 @@ const registerForm = ref({
   password: '',
   password_confirmation: ''
 })
+const recaptchaToken = ref('')
+const recaptchaRef = ref(null)
 
 const handleRegister = async () => {
   errorMessage.value = ''
   validationErrors.value = {}
+  if (recaptchaRef.value?.isEnabled && !recaptchaToken.value) {
+    errorMessage.value = 'Silakan centang verifikasi CAPTCHA (Saya bukan robot) terlebih dahulu.'
+    return
+  }
   
   const result = await register(
     registerForm.value.name, 
     registerForm.value.email, 
     registerForm.value.phone,
     registerForm.value.password, 
-    registerForm.value.password_confirmation
+    registerForm.value.password_confirmation,
+    recaptchaToken.value
   )
   
   if (result.success) {
     step.value = 2 // Move to OTP step
     showToast('Silakan periksa email Anda untuk kode OTP.', 'success')
   } else {
-    errorMessage.value = result.message
+    recaptchaRef.value?.reset?.()
+    errorMessage.value = result.errors?.captcha?.[0] || result.message
     if (result.errors) {
       validationErrors.value = result.errors
     }
