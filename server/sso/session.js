@@ -104,6 +104,7 @@ export function gamezSessions({ store, encryption, oauth, configuration, product
             const session = {
                 ...tokens, expiresAt: Math.min(tokens.expiresAt, profile.expiresAt, absoluteDeadline), absoluteDeadline,
                 status: 'active', csrf: generateRandomState(), identityId: profile.identity.id, user,
+                userVerifiedAt: clock(),
                 walletInitializationPending: !walletInit.ok,
             }
             if (!walletInit.ok && (walletInit.error?.status === 401 || walletInit.error?.status === 403)) {
@@ -135,10 +136,18 @@ export function gamezSessions({ store, encryption, oauth, configuration, product
         async verify(id) {
             // Always verify central authorization; there is no extra 30-second authorization cache.
             const session = await this.authorize(id)
-            const productUserPromise = productProfile(session.accessToken).then(
-                value => ({ ok: true, value }),
-                error => ({ ok: false, error }),
+            const hasFreshProductUser = Boolean(
+                session.user &&
+                typeof session.userVerifiedAt === 'number' &&
+                (clock() - session.userVerifiedAt) >= 0 &&
+                (clock() - session.userVerifiedAt) < 15000,
             )
+            const productUserPromise = hasFreshProductUser
+                ? Promise.resolve({ ok: true, value: session.user })
+                : productProfile(session.accessToken).then(
+                    value => ({ ok: true, value }),
+                    error => ({ ok: false, error }),
+                )
             let profile
             try { profile = await oauth.profile(session.accessToken) }
             catch (error) {

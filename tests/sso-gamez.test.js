@@ -354,3 +354,77 @@ test('Browser auth routes render HTML recovery page instead of raw JSON on expir
     assert.match(expiredStartOutage.headers.get('set-cookie'), /__Host-gamez_session=; Path=\/; Secure; HttpOnly; SameSite=Lax; Max-Age=0/)
     assert.match(await expiredStartOutage.text(), /Layanan Autentikasi Sedang Tidak Tersedia/)
 })
+
+test('Local Redis TCP client (redis://127.0.0.1) executes RESP2 session operations without Upstash', async t => {
+    const net = await import('node:net')
+    const { upstashSessionStore } = await import('../server/sso/store.js')
+    const kv = new Map()
+
+    const redisServer = net.createServer(socket => {
+        socket.on('data', chunk => {
+            const text = chunk.toString('utf8')
+            const lines = text.split('\r\n')
+            const args = []
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].startsWith('$')) {
+                    args.push(lines[i + 1] ?? '')
+                    i++
+                }
+            }
+            const cmd = (args[0] || '').toUpperCase()
+            if (cmd === 'SET') {
+                const key = args[1]
+                const val = args[2]
+                const isNx = args.includes('NX')
+                if (isNx && kv.has(key)) {
+                    socket.write('$-1\r\n')
+                } else {
+                    kv.set(key, val)
+                    socket.write('+OK\r\n')
+                }
+            } else if (cmd === 'GET') {
+                const val = kv.get(args[1])
+                if (val === undefined) socket.write('$-1\r\n')
+                else socket.write(`$${Buffer.byteLength(val, 'utf8')}\r\n${val}\r\n`)
+            } else if (cmd === 'EVAL') {
+                const key = args[3]
+                const rev = Number(args[4])
+                const raw = kv.get(key)
+                if (!raw) {
+                    socket.write(':0\r\n')
+                } else {
+                    const row = JSON.parse(raw)
+                    if (row.status === 'revoked' || row.revision !== rev) {
+                        socket.write(':0\r\n')
+                    } else {
+                        kv.delete(key)
+                        socket.write(':1\r\n')
+                    }
+                }
+            } else {
+                socket.write('+OK\r\n')
+            }
+        })
+    })
+
+    await new Promise(resolve => redisServer.listen(0, '127.0.0.1', resolve))
+    t.after(() => redisServer.close())
+    const port = redisServer.address().port
+
+    const store = upstashSessionStore({
+        url: `redis://127.0.0.1:${port}`,
+        token: '',
+        product: 'gamez',
+        environment: 'production',
+    })
+
+    const expiresAt = Date.now() + 60000
+    assert.equal(await store.create('transaction:local', 'jwe-local-cipher', expiresAt), true)
+    assert.equal(await store.create('transaction:local', 'jwe-local-cipher', expiresAt), false)
+    const readBack = await store.read('transaction:local')
+    assert.equal(readBack.ciphertext, 'jwe-local-cipher')
+    assert.equal(readBack.revision, 1)
+    assert.equal(await store.consume('transaction:local', 1), true)
+    assert.equal(await store.consume('transaction:local', 1), false)
+    assert.equal(await store.read('transaction:local'), null)
+})

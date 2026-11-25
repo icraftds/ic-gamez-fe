@@ -58,7 +58,7 @@ export async function handleSso(request, runtime) {
         }
         if (url.pathname === '/api/session' && request.method === 'GET') {
             const verified = await sessions.verify(id)
-            if (runtime.retryRevocations) { try { await runtime.retryRevocations() } catch { /* Retry storage remains durable. */ } }
+            if (runtime.retryRevocations) { Promise.resolve().then(() => runtime.retryRevocations()).catch(() => { /* Retry storage remains durable. */ }) }
             return json(verified)
         }
         if (url.pathname === '/api/auth/logout' && request.method === 'POST') {
