@@ -91,16 +91,24 @@ export function gamezSessions({ store, encryption, oauth, configuration, product
             if (!await store.consume(transactionKey, record.revision)) throw new SsoError(400, 'Authorization transaction was already used.', 'invalid_callback')
             const tokens = await oauth.exchange(transaction, params)
             if (!tokens) return { guest: true, returnTo: transaction.returnTo }
-            const profile = await oauth.profile(tokens.accessToken)
-            const user = await productProfile(tokens.accessToken)
+            const walletInitPromise = initializeWallet(tokens.accessToken).then(
+                () => ({ ok: true }),
+                error => ({ ok: false, error }),
+            )
+            const [profile, user, walletInit] = await Promise.all([
+                oauth.profile(tokens.accessToken),
+                productProfile(tokens.accessToken),
+                walletInitPromise,
+            ])
             const absoluteDeadline = Math.min(profile.absoluteDeadline, clock() + 8 * 60 * 60 * 1000)
             const session = {
                 ...tokens, expiresAt: Math.min(tokens.expiresAt, profile.expiresAt, absoluteDeadline), absoluteDeadline,
                 status: 'active', csrf: generateRandomState(), identityId: profile.identity.id, user,
-                walletInitializationPending: true,
+                walletInitializationPending: !walletInit.ok,
             }
-            try { await initializeWallet(tokens.accessToken); session.walletInitializationPending = false }
-            catch (error) { if (error.status === 401 || error.status === 403) throw error }
+            if (!walletInit.ok && (walletInit.error?.status === 401 || walletInit.error?.status === 403)) {
+                throw walletInit.error
+            }
             const id = generateRandomState()
             if (!await store.create(key('session', id), await encryption.seal(session), absoluteDeadline)) {
                 await store.revocationRetry(await encryption.seal({ ...tokens, absoluteDeadline }), absoluteDeadline)
@@ -127,6 +135,10 @@ export function gamezSessions({ store, encryption, oauth, configuration, product
         async verify(id) {
             // Always verify central authorization; there is no extra 30-second authorization cache.
             const session = await this.authorize(id)
+            const productUserPromise = productProfile(session.accessToken).then(
+                value => ({ ok: true, value }),
+                error => ({ ok: false, error }),
+            )
             let profile
             try { profile = await oauth.profile(session.accessToken) }
             catch (error) {
@@ -138,7 +150,9 @@ export function gamezSessions({ store, encryption, oauth, configuration, product
             if (profile.identity.id !== session.identityId || profile.absoluteDeadline < session.absoluteDeadline) {
                 throw new SsoError(401, 'SSO identity or deadline changed.', 'session_revoked')
             }
-            const user = await productProfile(session.accessToken)
+            const productResult = await productUserPromise
+            if (!productResult.ok) throw productResult.error
+            const user = productResult.value
             const latest = await readSession(id)
             if (latest.revision !== session.revision) throw new SsoError(503, 'Session changed during verification. Recheck the session.', 'session_busy')
             return { user, csrf: session.csrf, wallet_initialization_pending: session.walletInitializationPending, expires_at: new Date(session.expiresAt).toISOString(), session_expires_at: new Date(session.absoluteDeadline).toISOString() }

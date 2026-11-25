@@ -189,6 +189,60 @@ export function clearUserAccount() {
 }
 
 export function useUserAccount() {
+  const applyUserData = (data) => {
+    if (!data) return null
+    if (userProfile.value.id !== data.id) { coinz.value = null; walletStatus.value = 'unavailable' }
+    isLoggedIn.value = true
+    userProfile.value = {
+      id: data.id,
+      name: data.name,
+      username: data.username,
+      tag_id: data.tag_id,
+      last_username_change_at: data.last_username_change_at,
+      email: data.email,
+      phone: data.phone || '',
+      avatar: sanitizeAvatarUrl(data.avatar_url, data.name),
+      level: Number(data.level) || 1,
+      xp: Number(data.xp) || 0,
+      monthlyXp: Number(data.monthly_xp) || 0,
+      totalXp: Number(data.total_xp ?? data.xp) || 0,
+      nextLevelXp: Number(data.next_level_xp) || 100,
+      streak: data.current_streak,
+      longest_streak: data.longest_streak,
+      is_admin: data.is_admin || false,
+      showcase_medals: data.showcase_medals || null,
+      friends_count: data.friends_count || 0,
+      joinDate: data.created_at ? new Date(data.created_at).toLocaleDateString() : ''
+    }
+    credits.value = data.credits
+    isPremiumUser.value = data.is_premium
+    currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
+      ? data.current_plan.slug 
+      : (data.current_plan || 'free')
+    subscriptionInfo.value = data.subscription_status || null
+    proQuota.value = data.pro_quota || { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
+    unlockedPathIds.value = Array.isArray(data.unlocked_path_ids) ? data.unlocked_path_ids.map(Number) : []
+    ownedPathIds.value = Array.isArray(data.owned_path_ids) ? data.owned_path_ids.map(Number) : []
+
+    if (data.active_border_id) activeBorderId.value = data.active_border_id;
+
+    // Simpan display snapshot non-sensitif untuk instant LCP pada kunjungan berikutnya
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('ic_user_display_v1', JSON.stringify({
+          name: userProfile.value.name,
+          avatar: userProfile.value.avatar,
+          currentPlan: currentPlan.value,
+          isPremiumUser: Boolean(isPremiumUser.value),
+          activeBorderId: activeBorderId.value,
+          active_border_url: data.active_border_url || null,
+        }))
+      }
+    } catch {}
+
+    return data
+  }
+
   /**
    * Fetch current user data from the backend
    */
@@ -203,58 +257,7 @@ export function useUserAccount() {
       if (!silent) isLoading.value = true
       const response = await api.get('/auth/me')
       if (token !== authIdentity()) return null
-      const data = response.data.data
-      
-      if (userProfile.value.id !== data.id) { coinz.value = null; walletStatus.value = 'unavailable' }
-      isLoggedIn.value = true
-      userProfile.value = {
-        id: data.id,
-        name: data.name,
-        username: data.username,
-        tag_id: data.tag_id,
-        last_username_change_at: data.last_username_change_at,
-        email: data.email,
-        phone: data.phone || '',
-        avatar: sanitizeAvatarUrl(data.avatar_url, data.name),
-        level: Number(data.level) || 1,
-        xp: Number(data.xp) || 0,
-        monthlyXp: Number(data.monthly_xp) || 0,
-        totalXp: Number(data.total_xp ?? data.xp) || 0,
-        nextLevelXp: Number(data.next_level_xp) || 100,
-        streak: data.current_streak,
-        longest_streak: data.longest_streak,
-        is_admin: data.is_admin || false,
-        showcase_medals: data.showcase_medals || null,
-        friends_count: data.friends_count || 0,
-        joinDate: new Date(data.created_at).toLocaleDateString()
-      }
-      credits.value = data.credits
-      isPremiumUser.value = data.is_premium
-      currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
-        ? data.current_plan.slug 
-        : (data.current_plan || 'free')
-      subscriptionInfo.value = data.subscription_status || null
-      proQuota.value = data.pro_quota || { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
-      unlockedPathIds.value = Array.isArray(data.unlocked_path_ids) ? data.unlocked_path_ids.map(Number) : []
-      ownedPathIds.value = Array.isArray(data.owned_path_ids) ? data.owned_path_ids.map(Number) : []
-
-      if (data.active_border_id) activeBorderId.value = data.active_border_id;
-
-      // Simpan display snapshot non-sensitif untuk instant LCP pada kunjungan berikutnya
-      try {
-        if (typeof sessionStorage !== 'undefined') {
-          sessionStorage.setItem('ic_user_display_v1', JSON.stringify({
-            name: userProfile.value.name,
-            avatar: userProfile.value.avatar,
-            currentPlan: currentPlan.value,
-            isPremiumUser: Boolean(isPremiumUser.value),
-            activeBorderId: activeBorderId.value,
-            active_border_url: data.active_border_url || null,
-          }))
-        }
-      } catch {}
-
-      return data
+      return applyUserData(response.data.data)
     } catch (error) {
       if (token === authIdentity() && error.response?.status === 401) {
         localStorage.removeItem('auth_token')
@@ -327,20 +330,33 @@ export function useUserAccount() {
     if (!silent) isBootstrapping.value = true
     try {
       fetchPublicConfig()
+      let user = null
       if (ssoEnabled) {
-        try { if (!await loadSsoSession()) return false } catch { return false }
+        try {
+          const ssoUser = await loadSsoSession()
+          if (!ssoUser) return false
+          // Gunakan langsung payload UserResource dari /api/session tanpa menembak /api/bff/auth/me kedua kalinya
+          user = ssoUser.id && ssoUser.current_plan !== undefined
+            ? applyUserData(ssoUser)
+            : await fetchUser(true)
+        } catch {
+          return false
+        }
+      } else {
+        user = await fetchUser(true)
       }
-      const user = await fetchUser(true)
       if (!user) return false
       if (!ssoEnabled) {
         await initializeWallet()
+        await fetchWallet()
       } else {
         walletInitializationPending.value = ssoState.walletPending.value
         if (walletInitializationPending.value) {
-          await initializeWallet()
+          await Promise.all([initializeWallet(), fetchWallet()])
+        } else {
+          await fetchWallet()
         }
       }
-      await fetchWallet()
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('gamez-session-loaded'))
       }
