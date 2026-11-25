@@ -89,8 +89,12 @@
           </form>
 
           <form v-else @submit.prevent="handleVerifyOtp">
-            <p style="margin-bottom: 20px; color: var(--text-sub-hex); text-align: center;">
+            <p style="margin-bottom: 8px; color: var(--text-sub-hex); text-align: center;">
               Kode OTP 6-digit telah dikirim ke email <strong>{{ registerForm.email }}</strong>.
+            </p>
+            <p style="margin-bottom: 20px; font-size: 0.82rem; color: var(--text-muted, #94a3b8); text-align: center;">
+              <i class="fa-solid fa-circle-info" style="margin-right: 4px; color: #38bdf8;"></i>
+              Periksa folder <strong>Spam</strong> atau <strong>Promosi</strong> jika email belum masuk.
             </p>
             
             <div class="form-group">
