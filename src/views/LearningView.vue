@@ -300,7 +300,8 @@ onMounted(async () => {
     if (isLoggedIn.value && (!ownedPathIds.value || ownedPathIds.value.length === 0)) {
       fetchUser(true)
     }
-    await fetchPaths(true)
+    // If prerendered or cached paths are already present, revalidate in background without forcing a blocking spinner
+    await fetchPaths(paths.value.length <= 1)
   } finally {
     isPreparingLesson.value = false
   }

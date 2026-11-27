@@ -5,8 +5,8 @@
         <!-- Column 1: Brand & Description -->
         <div class="footer-col brand-col">
           <div class="footer-logo">
-            <img src="/images/logo-gamez-dark.webp" alt="iC Game-Z" class="footer-logo-img logo-dark" />
-            <img src="/images/logo-gamez-light.webp" alt="iC Game-Z" class="footer-logo-img logo-light" />
+            <img src="/images/logo-gamez-dark.webp" alt="iC Game-Z" width="832" height="200" class="footer-logo-img logo-dark" />
+            <img src="/images/logo-gamez-light.webp" alt="iC Game-Z" width="735" height="200" class="footer-logo-img logo-light" />
           </div>
           <p class="footer-desc">
             Platform gamifikasi edukasi coding dan pemrograman. iC Game-Z Level up Your Skill !!

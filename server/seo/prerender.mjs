@@ -88,6 +88,50 @@ function pageList(content) {
   ]
 }
 
+/** Compact path list summary (~3-4 KB) embedded into prerendered pages to prevent hydration flash & CLS 0.51 */
+function summarizePathsForHydration(paths = []) {
+  return (paths || []).map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    description: p.description,
+    icon: p.icon,
+    is_premium: Boolean(p.is_premium || p.isPremium),
+    is_locked: Boolean(p.is_locked || p.isLocked),
+    price_icoinz: p.price_icoinz,
+    duration_days: p.duration_days,
+    is_shop_visible: p.is_shop_visible,
+    is_unlocked: Boolean(p.is_unlocked),
+    access_status: p.access_status || (p.is_premium ? 'locked' : 'free'),
+    sort_order: p.sort_order,
+    chapters_count: Array.isArray(p.chapters) ? p.chapters.length : Number(p.chapters_count || 0),
+    chapters: Array.isArray(p.chapters)
+      ? p.chapters.map((c) => ({ id: c.id, slug: c.slug, title: c.title, sort_order: c.sort_order }))
+      : [],
+  }))
+}
+
+function buildHydrationScript(seed, pageUrl) {
+  const payload = {}
+  if (pageUrl === '/' || pageUrl === '/learning' || pageUrl.startsWith('/learning/')) {
+    payload.paths = summarizePathsForHydration(seed.paths)
+  }
+  if (pageUrl === '/pricing') {
+    payload.plans = seed.plans || []
+  }
+  if (pageUrl === '/encyclopedia' || pageUrl.startsWith('/encyclopedia/')) {
+    if (Array.isArray(seed.encyclopedia)) {
+      payload.encyclopedia = seed.encyclopedia
+    }
+    if (seed.topic) {
+      payload.topic = seed.topic
+    }
+  }
+  if (Object.keys(payload).length === 0) return ''
+  const safeJson = JSON.stringify(payload).replace(/</g, '\\u003c')
+  return `<script id="__PRERENDER_DATA__" type="application/json">${safeJson}</script>`
+}
+
 /** Vite SSR manifest -> stylesheet/modulepreload tags for the modules a page actually used. */
 function preloadLinks(modules, manifest) {
   const seen = new Set()
@@ -137,9 +181,11 @@ async function main() {
       const { html, modules, matched } = await render(page.url, seed)
       if (!matched) throw new Error('route did not match')
       const head = buildHead(page, { origin: ORIGIN })
+      const hydration = buildHydrationScript(seed, page.url)
+      const preload = [preloadLinks(modules, manifest), hydration].filter(Boolean).join('\n    ')
       const file = outputFile(page.url)
       await mkdir(dirname(file), { recursive: true })
-      await writeFile(file, injectPage(template, { head, appHtml: html, preload: preloadLinks(modules, manifest) }))
+      await writeFile(file, injectPage(template, { head, appHtml: html, preload }))
       written++
     } catch (error) {
       failures.push(`${page.url}: ${error.message}`)

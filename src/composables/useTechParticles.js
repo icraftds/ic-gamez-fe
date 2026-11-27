@@ -13,6 +13,7 @@ export function useTechParticles(containerRef) {
   const particles = []
   let mouseX = -1000
   let mouseY = -1000
+  let lastMouseMoveAt = 0
   let animationId = null
   let winW = typeof window !== 'undefined' ? window.innerWidth : 1280
   let winH = typeof window !== 'undefined' ? window.innerHeight : 800
@@ -20,6 +21,7 @@ export function useTechParticles(containerRef) {
   const handleMouseMove = (e) => {
     mouseX = e.clientX
     mouseY = e.clientY
+    lastMouseMoveAt = performance.now()
   }
 
   const handleResize = () => {
@@ -33,6 +35,14 @@ export function useTechParticles(containerRef) {
       return
     }
 
+    // Skip repel math when mouse has been idle for >350ms or user is typing in an input/textarea
+    const activeTag = document.activeElement?.tagName
+    if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') {
+      animationId = requestAnimationFrame(animate)
+      return
+    }
+
+    const checkMouseRepel = (performance.now() - lastMouseMoveAt) < 350
     const maxDist = 200
     const maxDistSq = maxDist * maxDist
 
@@ -46,17 +56,18 @@ export function useTechParticles(containerRef) {
       if (p.y < -100) p.y = winH + 100
       else if (p.y > winH + 100) p.y = -100
 
-      const dx = p.x - mouseX
-      const dy = p.y - mouseY
-      const distSq = dx * dx + dy * dy
-
       let repelX = 0
       let repelY = 0
-      if (distSq < maxDistSq && distSq > 0) {
-        const dist = Math.sqrt(distSq)
-        const force = (maxDist - dist) / maxDist
-        repelX = (dx / dist) * force * 40
-        repelY = (dy / dist) * force * 40
+      if (checkMouseRepel) {
+        const dx = p.x - mouseX
+        const dy = p.y - mouseY
+        const distSq = dx * dx + dy * dy
+        if (distSq < maxDistSq && distSq > 0) {
+          const dist = Math.sqrt(distSq)
+          const force = (maxDist - dist) / maxDist
+          repelX = (dx / dist) * force * 40
+          repelY = (dy / dist) * force * 40
+        }
       }
 
       p.el.style.transform = `translate3d(${(p.x + repelX).toFixed(1)}px, ${(p.y + repelY).toFixed(1)}px, 0)`

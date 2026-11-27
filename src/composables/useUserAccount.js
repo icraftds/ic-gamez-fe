@@ -353,9 +353,9 @@ export function useUserAccount() {
       } else {
         walletInitializationPending.value = ssoState.walletPending.value
         if (walletInitializationPending.value) {
-          await Promise.all([initializeWallet(), fetchWallet()])
+          Promise.all([initializeWallet(), fetchWallet()]).catch(() => {})
         } else {
-          await fetchWallet()
+          fetchWallet().catch(() => {})
         }
       }
       if (typeof window !== 'undefined') {

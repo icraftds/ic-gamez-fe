@@ -80,17 +80,29 @@ export function useCodeRunner() {
   const currentLessonSlug = ref(null)
   const currentLessonLanguage = ref('javascript')
 
+  let saveDebounceTimer = null
+
+  const flushSaveToStorage = () => {
+    if (saveDebounceTimer !== null) {
+      clearTimeout(saveDebounceTimer)
+      saveDebounceTimer = null
+    }
+    saveToStorage()
+  }
+
   /**
    * Jalankan `code.value` berdasarkan bahasa yang dipilih melalui runner engine terisolasi.
    * @param {string} language - 'javascript', 'html', 'css', 'sql', 'python', 'php'
    * @param {object|null} context - Objek materi aktif
    */
   const run = async (language = 'javascript', context = null) => {
+    flushSaveToStorage()
     try {
       output.value = await executeCode(language, code.value, context)
     } catch (error) {
       output.value = [{ type: 'error', text: error.message }]
     }
+    flushSaveToStorage()
   }
 
   const isChallengeMode = () => {
@@ -217,14 +229,25 @@ export function useCodeRunner() {
     resetCode(initialPractice)
   }
 
-  // Watch for changes to persist
+  // Watch for changes to persist (debounced 250ms to prevent main-thread INP spikes on every keystroke)
   watch([code, output, status], () => {
-    saveToStorage()
+    if (saveDebounceTimer !== null) {
+      clearTimeout(saveDebounceTimer)
+    }
+    saveDebounceTimer = setTimeout(() => {
+      saveDebounceTimer = null
+      saveToStorage()
+    }, 250)
   }, { deep: true })
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', flushSaveToStorage)
+  }
 
   const clearOutput = () => {
     output.value = []
     status.value = 'idle'
+    flushSaveToStorage()
   }
 
   const resetCode = (initialPractice = null) => {

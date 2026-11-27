@@ -241,3 +241,11 @@ body.light-mode {
   box-shadow: 0 2px 5px rgba(124, 58, 237, 0.5);
   border: 1px solid #d946ef;
 }
+
+/* Reserve 1em horizontal box for Font Awesome icons before async font stylesheet finishes loading to prevent CLS */
+i[class*="fa-"] {
+  display: inline-block;
+  min-width: 1em;
+  text-align: center;
+}
+

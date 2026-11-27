@@ -1,7 +1,56 @@
 import { ref, computed } from 'vue'
 import api from '../services/api'
+import { prerenderData } from '../services/prerenderData'
 
 const CACHE_KEY = 'ic_learning_paths_cache_v3'
+
+/**
+ * Snapshot index satu kali jalan (single-pass) untuk key localStorage
+ * (`quiz_state_*`, `practice_state_*`, `theory_completed_*`) sehingga
+ * normalizePathProgress tidak memanggil localStorage.getItem() 6.294 kali di main thread.
+ */
+function buildLocalProgressSnapshot() {
+  const quizPassedSet = new Set()
+  const practiceDoneSet = new Set()
+  const theoryDoneSet = new Set()
+
+  if (typeof localStorage === 'undefined') {
+    return { quizPassedSet, practiceDoneSet, theoryDoneSet }
+  }
+
+  try {
+    const len = typeof localStorage.length === 'number' ? localStorage.length : 0
+    if (len > 0 && typeof localStorage.key === 'function') {
+      for (let i = 0; i < len; i++) {
+        const k = localStorage.key(i)
+        if (!k) continue
+        if (k.startsWith('quiz_state_')) {
+          const id = k.slice('quiz_state_'.length)
+          const raw = localStorage.getItem(k)
+          if (raw) {
+            try { if (JSON.parse(raw)?.isCorrect) quizPassedSet.add(String(id)) } catch {}
+          }
+        } else if (k.startsWith('practice_state_')) {
+          const id = k.slice('practice_state_'.length)
+          const raw = localStorage.getItem(k)
+          if (raw) {
+            try { if (JSON.parse(raw)?.status === 'success') practiceDoneSet.add(String(id)) } catch {}
+          }
+        } else if (k.startsWith('theory_completed_')) {
+          const id = k.slice('theory_completed_'.length)
+          if (localStorage.getItem(k) === 'true') {
+            theoryDoneSet.add(String(id))
+          }
+        }
+      }
+      return { quizPassedSet, practiceDoneSet, theoryDoneSet, indexed: true }
+    }
+  } catch {
+    // Fallback below if storage enumeration is restricted
+  }
+
+  return { quizPassedSet, practiceDoneSet, theoryDoneSet, indexed: false }
+}
 
 function readLocalFlag(key) {
   if (typeof localStorage === 'undefined') return null
@@ -16,8 +65,10 @@ function readLocalFlag(key) {
  * Normalisasi progres lesson dari payload backend (`progress`) dan state lokal,
  * digunakan konsisten di fetchPaths, fetchPathDetails, maupun cache sessionStorage.
  */
-function normalizePathProgress(path, hasBeenScoredFn = null) {
+function normalizePathProgress(path, hasBeenScoredFn = null, snapshot = null) {
   if (!path || !Array.isArray(path.chapters)) return path
+  const snap = snapshot || buildLocalProgressSnapshot()
+  const scoredFn = typeof hasBeenScoredFn === 'function' ? hasBeenScoredFn : () => false
 
   for (const chapter of path.chapters) {
     if (!Array.isArray(chapter.lessons)) continue
@@ -27,20 +78,26 @@ function normalizePathProgress(path, hasBeenScoredFn = null) {
         prog = prog.length > 0 ? prog[0] : null
       }
 
-      const lsQuizStr = readLocalFlag(`quiz_state_${lesson.id}`)
+      const idKey = String(lesson.id)
       let localQuizPassed = false
-      if (lsQuizStr) {
-        try { localQuizPassed = Boolean(JSON.parse(lsQuizStr).isCorrect) } catch {}
-      }
-
-      const lsPracticeStr = readLocalFlag(`practice_state_${lesson.id}`)
       let localPracticeDone = false
-      if (lsPracticeStr) {
-        try { localPracticeDone = JSON.parse(lsPracticeStr).status === 'success' } catch {}
-      }
+      let localTheoryDone = false
 
-      const localTheoryDone = readLocalFlag(`theory_completed_${lesson.id}`) === 'true'
-      const scoredFn = typeof hasBeenScoredFn === 'function' ? hasBeenScoredFn : () => false
+      if (snap.indexed) {
+        localQuizPassed = snap.quizPassedSet.has(idKey)
+        localPracticeDone = snap.practiceDoneSet.has(idKey)
+        localTheoryDone = snap.theoryDoneSet.has(idKey)
+      } else {
+        const lsQuizStr = readLocalFlag(`quiz_state_${lesson.id}`)
+        if (lsQuizStr) {
+          try { localQuizPassed = Boolean(JSON.parse(lsQuizStr).isCorrect) } catch {}
+        }
+        const lsPracticeStr = readLocalFlag(`practice_state_${lesson.id}`)
+        if (lsPracticeStr) {
+          try { localPracticeDone = JSON.parse(lsPracticeStr).status === 'success' } catch {}
+        }
+        localTheoryDone = readLocalFlag(`theory_completed_${lesson.id}`) === 'true'
+      }
 
       if (prog && Object.keys(prog).length > 0) {
         lesson.isCompleted = Boolean(prog.is_completed || localTheoryDone)
@@ -58,15 +115,20 @@ function normalizePathProgress(path, hasBeenScoredFn = null) {
 }
 
 function loadCachedPaths() {
+  const snap = buildLocalProgressSnapshot()
   try {
     const raw = sessionStorage.getItem(CACHE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed) && parsed.length > 1) {
-        return parsed.map((p) => normalizePathProgress(p))
+        return parsed.map((p) => normalizePathProgress(p, null, snap))
       }
     }
   } catch (e) {}
+  const seededPaths = typeof prerenderData !== 'undefined' ? prerenderData?.paths : null
+  if (Array.isArray(seededPaths) && seededPaths.length > 1) {
+    return seededPaths.map((p) => normalizePathProgress({ ...p }, null, snap))
+  }
   return []
 }
 
@@ -82,6 +144,7 @@ let inFlightPathsRequest = null
  * sambil tetap meremajakan status progres lesson (`progress`, `saved_code`).
  */
 export function mergeFreshPathsWithCache(freshPaths, cachedPaths, hasBeenScoredFn = null) {
+  const snap = buildLocalProgressSnapshot()
   const detailedMap = new Map()
   ;(cachedPaths || []).forEach(p => {
     if (Array.isArray(p.chapters) && p.chapters.some(c => c.lessons?.some(l => l.quizzes !== undefined))) {
@@ -93,7 +156,7 @@ export function mergeFreshPathsWithCache(freshPaths, cachedPaths, hasBeenScoredF
     const key = newPath.slug || String(newPath.id)
     const existingChapters = detailedMap.get(key)
     if (!existingChapters) {
-      return normalizePathProgress(newPath, hasBeenScoredFn)
+      return normalizePathProgress(newPath, hasBeenScoredFn, snap)
     }
 
     const freshLessonMap = new Map()
@@ -116,7 +179,7 @@ export function mergeFreshPathsWithCache(freshPaths, cachedPaths, hasBeenScoredF
       })
     }))
 
-    return normalizePathProgress({ ...newPath, chapters: syncedChapters }, hasBeenScoredFn)
+    return normalizePathProgress({ ...newPath, chapters: syncedChapters }, hasBeenScoredFn, snap)
   })
 }
 

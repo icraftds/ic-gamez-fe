@@ -26,7 +26,7 @@
       <div class="path-footer">
         <div class="path-stats">
           <div class="stat-item">
-            <i class="fa-solid fa-book-open"></i> {{ path.chapters?.length || 0 }} Modul
+            <i class="fa-solid fa-book-open"></i> {{ path.chapters?.length || path.chapters_count || 0 }} Modul
           </div>
         </div>
         <div class="action-btn" :style="{ color: (path.isLocked || path.is_locked) ? '#64748b' : themeColor }">

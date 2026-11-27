@@ -237,6 +237,13 @@ router.beforeEach(async (to, from, next) => {
 
   if (ssoEnabled) {
     if (to.meta.requiresAuth) {
+      // Preload route component chunk in parallel with session check so /dashboard renders immediately after loader
+      for (const record of to.matched) {
+        const comp = record.components?.default
+        if (typeof comp === 'function') {
+          try { Promise.resolve(comp()).catch(() => {}) } catch { /* Ignore preload errors */ }
+        }
+      }
       try {
         if (!await loadSsoSession()) {
           if (canAutoRedirectToSso(from)) {

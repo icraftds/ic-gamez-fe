@@ -111,10 +111,22 @@ const route = useRoute();
 const { paths, fetchPaths } = useLearningPaths();
 const { isPremiumUser, deductCredit, isLoggedIn } = useUserAccount();
 
+const CHAL_CACHE_KEY = 'ic_challenges_page1_cache_v1';
+function readCachedChallenges() {
+  if (typeof sessionStorage === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(CHAL_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+const initialChalCache = (!route.query.category) ? readCachedChallenges() : null;
 const selectedCategory = ref(route.query.category || "");
 const currentPage = ref(1);
-const totalPages = ref(1);
-const challenges = ref([]);
+const totalPages = ref(initialChalCache?.totalPages || 1);
+const challenges = ref(initialChalCache?.items || []);
 const isLoading = ref(false);
 
 const isDropdownOpen = ref(false);
@@ -163,19 +175,24 @@ const uniqueCategories = computed(() => {
 
 const fetchChallenges = async () => {
   try {
-    isLoading.value = true;
-    
-    // Muat daftar path ringkas jika belum ada (hindari burst fetchAllPathsDetails ke semua path sekaligus)
-    if (paths.value.length === 0 && typeof fetchPaths === 'function') {
-      await fetchPaths();
+    if (challenges.value.length === 0) {
+      isLoading.value = true;
     }
     
-    const response = await api.get('/challenges', {
-      params: {
-        page: currentPage.value,
-        category: selectedCategory.value
-      }
-    });
+    // Muat daftar path ringkas secara paralel dengan /challenges (jangan menahan request /challenges!)
+    const pathsPromise = (paths.value.length === 0 && typeof fetchPaths === 'function')
+      ? fetchPaths().catch(() => {})
+      : Promise.resolve();
+    
+    const [response] = await Promise.all([
+      api.get('/challenges', {
+        params: {
+          page: currentPage.value,
+          category: selectedCategory.value
+        }
+      }),
+      pathsPromise,
+    ]);
     
     totalPages.value = response.data.meta ? response.data.meta.last_page : 1;
     
@@ -218,6 +235,14 @@ const fetchChallenges = async () => {
 
     // Hilangkan kartu soal yang sudah selesai dari layar
     challenges.value = list.filter(item => !item.isCompleted);
+    if (currentPage.value === 1 && !selectedCategory.value) {
+      try {
+        sessionStorage.setItem(CHAL_CACHE_KEY, JSON.stringify({
+          totalPages: totalPages.value,
+          items: challenges.value,
+        }));
+      } catch {}
+    }
     
   } catch (error) {
     console.error('Failed to fetch challenges:', error);

@@ -116,7 +116,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="currentAd" class="gz-ad-wrapper">
+  <div v-if="currentAd" class="gz-ad-wrapper" :class="{ 'is-minimized': isMinimized }">
     <!-- State 1: Minimized Bar (1-click restore without refresh) -->
     <div v-if="isMinimized" class="gz-ad-minimized">
       <div class="gz-ad-min-info">
@@ -212,10 +212,20 @@ onUnmounted(() => {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  min-height: 88px;
+  min-height: 106px;
   margin: 1.25rem 0 1.5rem 0;
   font-family: 'Poppins', sans-serif;
   contain: layout inline-size style;
+}
+
+.gz-ad-wrapper.is-minimized {
+  min-height: 40px;
+}
+
+@media (max-width: 768px) {
+  .gz-ad-wrapper:not(.is-minimized) {
+    min-height: 156px;
+  }
 }
 
 /* 1. Minimized Restore Bar */

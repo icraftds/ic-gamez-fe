@@ -4,8 +4,8 @@
       <!-- 1. Floating Logo Capsule (Left) -->
       <div class="nav-capsule nav-logo-capsule">
         <router-link to="/" class="logo-link">
-          <img src="/images/logo-gamez-light.webp" alt="IC Game Z" class="logo-text-img logo-light" />
-          <img src="/images/logo-gamez-dark.webp" alt="IC Game Z" class="logo-text-img logo-dark" />
+          <img src="/images/logo-gamez-light.webp" alt="IC Game Z" width="735" height="200" class="logo-text-img logo-light" />
+          <img src="/images/logo-gamez-dark.webp" alt="IC Game Z" width="832" height="200" class="logo-text-img logo-dark" />
         </router-link>
       </div>
 
@@ -97,7 +97,7 @@
 
             <!-- iCoinz Display -->
             <div class="nav-coinz-pill" @click="$router.push('/shop')" :aria-label="`Saldo: ${fullCoinzFormatted} iCoinZ`">
-              <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
+              <img src="/images/icoinz.svg" alt="iCoinZ" width="18" height="18" class="nav-coinz-icon" />
               <TerminalLoader v-if="isLoading" variant="inline" size="sm" />
               <span v-else class="nav-coinz-val">{{ shortCoinz }}</span>
               <span class="nav-tooltip">{{ fullCoinzFormatted }} iCoinZ</span>
@@ -130,7 +130,7 @@
       <!-- Mobile Actions (Profile + Hamburger) -->
       <div class="mobile-nav-actions">
         <div v-if="isLoggedIn" class="mobile-coinz-pill" @click="$router.push('/shop')" :title="`Saldo: ${fullCoinzFormatted} iCoinZ`">
-          <img src="/images/icoinz.svg" alt="iCoinZ" class="nav-coinz-icon" />
+          <img src="/images/icoinz.svg" alt="iCoinZ" width="18" height="18" class="nav-coinz-icon" />
           <span class="nav-coinz-val">{{ shortCoinz }}</span>
         </div>
         <UserProfileDropdown v-if="isLoggedIn" class="mobile-only-profile" />

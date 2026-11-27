@@ -131,7 +131,9 @@ const filteredSections = computed(() => {
 
 const fetchEncyclopedia = async () => {
   try {
-    isLoading.value = true
+    if (!encyclopediaData.value || encyclopediaData.value.length === 0) {
+      isLoading.value = true
+    }
     const response = await api.get('/encyclopedia')
     encyclopediaData.value = response.data.data || []
     
@@ -149,7 +151,9 @@ const fetchEncyclopedia = async () => {
 const fetchTopicDetails = async (slug) => {
   if (!slug) return
   try {
-    isTopicLoading.value = true
+    if (!selectedTopic.value || selectedTopic.value.slug !== slug) {
+      isTopicLoading.value = true
+    }
     const response = await api.get(`/encyclopedia/${slug}`)
     selectedTopic.value = response.data.data
   } catch (error) {

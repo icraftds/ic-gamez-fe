@@ -91,10 +91,13 @@ export function gamezSessions({ store, encryption, oauth, configuration, product
             if (!await store.consume(transactionKey, record.revision)) throw new SsoError(400, 'Authorization transaction was already used.', 'invalid_callback')
             const tokens = await oauth.exchange(transaction, params)
             if (!tokens) return { guest: true, returnTo: transaction.returnTo }
-            const walletInitPromise = initializeWallet(tokens.accessToken).then(
-                () => ({ ok: true }),
-                error => ({ ok: false, error }),
-            )
+            const walletInitPromise = Promise.race([
+                initializeWallet(tokens.accessToken).then(
+                    () => ({ ok: true }),
+                    error => ({ ok: false, error }),
+                ),
+                new Promise(resolve => setTimeout(() => resolve({ ok: false, timedOut: true }), 350)),
+            ])
             const [profile, user, walletInit] = await Promise.all([
                 oauth.profile(tokens.accessToken),
                 productProfile(tokens.accessToken),
@@ -116,9 +119,10 @@ export function gamezSessions({ store, encryption, oauth, configuration, product
                 throw new SsoError(503, 'Local session could not be saved.', 'session_storage')
             }
             if (priorId && priorId !== id) {
-                try {
-                    await lock(priorId, async (storeKey, owner) => { const previous = await readSession(priorId); await retire(storeKey, owner, previous) })
-                } catch (error) { if (error.status !== 401) throw error }
+                Promise.resolve().then(() => lock(priorId, async (storeKey, owner) => {
+                    const previous = await readSession(priorId)
+                    await retire(storeKey, owner, previous)
+                })).catch(() => { /* Previous session retirement is best-effort after new session is persisted. */ })
             }
             return { id, returnTo: transaction.returnTo, absoluteDeadline }
         },
@@ -162,8 +166,10 @@ export function gamezSessions({ store, encryption, oauth, configuration, product
             const productResult = await productUserPromise
             if (!productResult.ok) throw productResult.error
             const user = productResult.value
-            const latest = await readSession(id)
-            if (latest.revision !== session.revision) throw new SsoError(503, 'Session changed during verification. Recheck the session.', 'session_busy')
+            if (!hasFreshProductUser) {
+                const latest = await readSession(id)
+                if (latest.revision !== session.revision) throw new SsoError(503, 'Session changed during verification. Recheck the session.', 'session_busy')
+            }
             return { user, csrf: session.csrf, wallet_initialization_pending: session.walletInitializationPending, expires_at: new Date(session.expiresAt).toISOString(), session_expires_at: new Date(session.absoluteDeadline).toISOString() }
         },
         async logout(id) {

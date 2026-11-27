@@ -210,13 +210,25 @@ const props = defineProps({
 
 const { isLoggedIn } = useUserAccount();
 
-const monthlyRanking = ref([]);
-const allTimeRanking = ref([]);
+const LB_CACHE_KEY = 'ic_leaderboard_cache_v1';
+function readCachedLeaderboard() {
+  if (typeof sessionStorage === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(LB_CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+const initialLbCache = readCachedLeaderboard();
+const monthlyRanking = ref(initialLbCache?.monthly || []);
+const allTimeRanking = ref(initialLbCache?.allTime || []);
 const myRankMonthly = ref("—");
 const myRankGlobal = ref("—");
 const myXpMonthly = ref(0);
 const myXpGlobal = ref(0);
-const isLoading = ref(true);
+const isLoading = ref(!initialLbCache);
 const activeTab = ref('monthly');
 
 const currentRanking = computed(() => {
@@ -247,7 +259,9 @@ const tableUsers = computed(() => {
 
 const fetchLeaderboard = async () => {
   try {
-    isLoading.value = true;
+    if (monthlyRanking.value.length === 0 && allTimeRanking.value.length === 0) {
+      isLoading.value = true;
+    }
 
     const [monthlyRes, allTimeRes] = await Promise.all([
       api.get("/leaderboard/monthly"),
@@ -264,6 +278,13 @@ const fetchLeaderboard = async () => {
     )
       .map((u) => ({ ...u, xp: Number(u.xp || 0) }))
       .filter((u) => u.xp > 0);
+
+    try {
+      sessionStorage.setItem(LB_CACHE_KEY, JSON.stringify({
+        monthly: monthlyRanking.value,
+        allTime: allTimeRanking.value,
+      }));
+    } catch {}
 
     if (isLoggedIn.value) {
       const myRankRes = await api.get("/leaderboard/my-rank");
