@@ -81,7 +81,7 @@
             <i :class="isQuizCorrect(activeQuestion.id) ? 'fa-solid fa-circle-check' : 'fa-solid fa-triangle-exclamation'"></i>
             <div class="feedback-body">
               <strong class="feedback-title">{{ isQuizCorrect(activeQuestion.id) ? 'Jawaban Benar!' : 'Jawaban Belum Tepat' }}</strong>
-              <p class="feedback-text">{{ isQuizCorrect(activeQuestion.id) ? activeExplanation : (errorMessage || 'Periksa kembali opsi pilihanmu untuk soal ini.') }}</p>
+              <p class="feedback-text" v-html="formatQuizText(isQuizCorrect(activeQuestion.id) ? activeExplanation : (errorMessage || 'Periksa kembali opsi pilihanmu untuk soal ini.'))"></p>
             </div>
           </div>
         </div>

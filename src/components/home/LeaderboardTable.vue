@@ -224,10 +224,10 @@ function readCachedLeaderboard() {
 const initialLbCache = readCachedLeaderboard();
 const monthlyRanking = ref(initialLbCache?.monthly || []);
 const allTimeRanking = ref(initialLbCache?.allTime || []);
-const myRankMonthly = ref("—");
-const myRankGlobal = ref("—");
-const myXpMonthly = ref(0);
-const myXpGlobal = ref(0);
+const myRankMonthly = ref(initialLbCache?.myRankMonthly || "—");
+const myRankGlobal = ref(initialLbCache?.myRankGlobal || "—");
+const myXpMonthly = ref(Number(initialLbCache?.myXpMonthly ?? 0));
+const myXpGlobal = ref(Number(initialLbCache?.myXpGlobal ?? 0));
 const isLoading = ref(!initialLbCache);
 const activeTab = ref('monthly');
 
@@ -263,9 +263,14 @@ const fetchLeaderboard = async () => {
       isLoading.value = true;
     }
 
-    const [monthlyRes, allTimeRes] = await Promise.all([
+    const myRankPromise = isLoggedIn.value
+      ? api.get("/leaderboard/my-rank").catch(() => null)
+      : Promise.resolve(null);
+
+    const [monthlyRes, allTimeRes, myRankRes] = await Promise.all([
       api.get("/leaderboard/monthly"),
       api.get("/leaderboard/all-time"),
+      myRankPromise,
     ]);
 
     monthlyRanking.value = (
@@ -279,21 +284,24 @@ const fetchLeaderboard = async () => {
       .map((u) => ({ ...u, xp: Number(u.xp || 0) }))
       .filter((u) => u.xp > 0);
 
-    try {
-      sessionStorage.setItem(LB_CACHE_KEY, JSON.stringify({
-        monthly: monthlyRanking.value,
-        allTime: allTimeRanking.value,
-      }));
-    } catch {}
-
-    if (isLoggedIn.value) {
-      const myRankRes = await api.get("/leaderboard/my-rank");
-      const rankData = myRankRes.data?.data || {};
+    if (myRankRes?.data?.data) {
+      const rankData = myRankRes.data.data;
       myRankMonthly.value = rankData.monthly_rank || "—";
       myRankGlobal.value = rankData.all_time_rank || "—";
       myXpMonthly.value = Number(rankData.monthly_xp ?? 0);
       myXpGlobal.value = Number(rankData.all_time_xp ?? rankData.xp ?? 0);
     }
+
+    try {
+      sessionStorage.setItem(LB_CACHE_KEY, JSON.stringify({
+        monthly: monthlyRanking.value,
+        allTime: allTimeRanking.value,
+        myRankMonthly: myRankMonthly.value,
+        myRankGlobal: myRankGlobal.value,
+        myXpMonthly: myXpMonthly.value,
+        myXpGlobal: myXpGlobal.value,
+      }));
+    } catch {}
   } catch (error) {
     console.error("Failed to load leaderboard", error);
   } finally {

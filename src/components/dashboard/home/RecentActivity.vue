@@ -2,7 +2,10 @@
   <div class="recent-activity-wrapper">
     <div class="section-card">
       <h2 class="section-title" style="margin-top: 0; margin-bottom: 20px;">Jejak Aktivitasmu</h2>
-      <div class="activity-empty" v-if="recentActivity.length === 0">
+      <div class="activity-empty" v-if="isLoadingStats && !statsData">
+        <TerminalLoader size="sm" label="jejak aktivitas" />
+      </div>
+      <div class="activity-empty" v-else-if="recentActivity.length === 0">
         <CyberEnergy :pkgId="1" :isAnimated="false" />
         <p><strong>Belum Ada Riwayat Aktivitas</strong></p>
         <p class="sub-text">Aktivitas belajarmu akan tercatat secara otomatis di sini.</p>
@@ -26,7 +29,7 @@
 import { computed, onMounted } from 'vue'
 import { useDashboardStats } from '../../../composables/useDashboardStats'
 
-const { statsData, fetchStats } = useDashboardStats()
+const { statsData, isLoadingStats, fetchStats } = useDashboardStats()
 
 onMounted(() => {
   if (!statsData.value) {
