@@ -29,10 +29,19 @@
 
       <main class="workspace-main">
         <transition name="fade-slide" mode="out-in">
+          <!-- Loading State (tahan render panel jika detail explanation/quizzes sedang dimuat) -->
+          <div
+            key="loading"
+            v-if="!path?.chapters || (isLoading && (!currentLesson || (!isChallengeMode && (currentLesson.explanation === null || currentLesson.quizzes === undefined))))"
+            class="loading-state"
+          >
+            <TerminalLoader size="lg" label="materi belajar" />
+          </div>
+
           <!-- Step 1: Materi -->
           <TheoryPanel
             key="theory"
-            v-if="activeStep === STEP.THEORY && currentLesson"
+            v-else-if="activeStep === STEP.THEORY && currentLesson"
             :lesson="currentLesson"
             :is-first-lesson="isFirstLesson"
             @prev="goToPrevLesson"
@@ -80,11 +89,6 @@
             @back="isChallengeMode ? router.push('/challenges') : (activeStep = STEP.QUIZ)"
             @finish="onPracticeFinish"
           />
-
-          <!-- Loading State -->
-          <div key="loading" v-else-if="isLoading || !path?.chapters" class="loading-state">
-            <TerminalLoader size="lg" label="materi belajar" />
-          </div>
 
           <!-- Fallback: lesson tidak ditemukan -->
           <div key="notfound" v-else class="not-found">
@@ -540,8 +544,16 @@ const onPracticeFinish = async () => {
       sessionStorage.removeItem('ic_challenges_page1_cache_v1')
     } catch (e) {}
 
-    // 2. Segera flush outbox ke backend dan tunggu hingga request selesai
+    // 2. Segera flush outbox dan pastikan status challenge_completed tersimpan di backend
     await scoring.flushOutboxNow().catch(() => {})
+    if (currentLesson.value?.id) {
+      await api.post('/progress/practice-complete', {
+        lesson_id: currentLesson.value.id,
+        mode: 'challenge',
+        code: runner.code.value,
+        saved_code: runner.code.value
+      }).catch(() => {})
+    }
     await fetchChallengeStats(true).catch(() => {})
 
     // 3. Kembali ke halaman tantangan

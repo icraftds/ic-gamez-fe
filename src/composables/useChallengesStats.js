@@ -15,13 +15,6 @@ let inFlightStatsRequest = null;
 
 export function useChallengesStats() {
   const fetchChallengeStats = async (force = false) => {
-    if (typeof useUserAccount === 'function') {
-      const account = useUserAccount();
-      if (account?.isLoggedIn && !account.isLoggedIn.value) {
-        return;
-      }
-    }
-
     if (inFlightStatsRequest && !force) {
       return inFlightStatsRequest;
     }
@@ -90,4 +83,11 @@ export function useChallengesStats() {
     totalSulit,
     completedSulit,
   };
+}
+
+if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+  window.addEventListener("gamez-session-loaded", () => {
+    const { fetchChallengeStats } = useChallengesStats();
+    fetchChallengeStats(true).catch(() => {});
+  });
 }

@@ -19,6 +19,20 @@ export function sanitizeAvatarUrl(url, name = 'User') {
 
 const authIdentity = () => ssoEnabled ? ssoState.user.value?.id ?? null : localStorage.getItem('auth_token')
 
+function readCachedDisplaySnapshot() {
+  if (typeof window === 'undefined' || globalThis.__PRERENDER__ || typeof sessionStorage === 'undefined') {
+    return null
+  }
+  try {
+    const raw = sessionStorage.getItem('ic_user_display_v1')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+const initialDisplaySnapshot = readCachedDisplaySnapshot()
+
 const credits = ref(10)
 const coinz = ref(null)
 const walletStatus = ref('unavailable')
@@ -27,13 +41,13 @@ let userRequest = null
 let walletRequest = null
 let initializeRequest = null
 let initializedToken = null
-const isPremiumUser = ref(false)
+const isPremiumUser = ref(Boolean(initialDisplaySnapshot?.isPremiumUser))
 const maxCredits = computed(() => {
   if (currentPlan.value === 'expert' || currentPlan.value === 'lifetime') return 25
   if (currentPlan.value === 'pro') return 20
   return 10
 })
-const currentPlan = ref('free')
+const currentPlan = ref(initialDisplaySnapshot?.currentPlan || 'free')
 const subscriptionInfo = ref(null)
 const proQuota = ref({ total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] })
 const unlockedPathIds = ref([])
@@ -47,7 +61,7 @@ const systemConfig = ref({
   pro_max_selectable_modules: 12
 })
 let configRequest = null
-const isLoggedIn = ref(!!authIdentity())
+const isLoggedIn = ref(!!authIdentity() || Boolean(initialDisplaySnapshot?.name))
 const isLoading = ref(false)
 // Prerendered HTML must show page content, not the session loader
 // (globalThis.__PRERENDER__ is set by server/seo/prerender.mjs before the app loads).
@@ -56,7 +70,7 @@ const isAuthLoading = ref(false)
 export const isRedirectingToSso = ref(false)
 const authLoadingLabel = ref('autentikasi')
 const authLoadingText = ref('')
-const activeBorderId = ref(null)
+const activeBorderId = ref(initialDisplaySnapshot?.activeBorderId || null)
 let authLoadingStartedAt = 0
 
 if (typeof window !== 'undefined') {
@@ -166,13 +180,14 @@ export function finishAuthLoading(minDuration = 450) {
 
 const userProfile = ref({
   id: null,
-  name: '',
+  name: initialDisplaySnapshot?.name || '',
   username: '',
   tag_id: '',
   last_username_change_at: null,
   email: '',
   phone: '',
-  avatar: '',
+  avatar: initialDisplaySnapshot?.avatar || '',
+  active_border_url: initialDisplaySnapshot?.active_border_url || null,
   level: 1,
   xp: 0,
   nextLevelXp: 100,
