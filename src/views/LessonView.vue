@@ -9,7 +9,7 @@
       :previous-lesson-title="previousLessonTitle"
       :active-step="activeStep"
       :lesson="currentLesson"
-      @back="route.query.mode === 'challenge' ? router.push('/challenges') : router.push({ path: `/learning/${path?.slug || pathId}`, query: { chapter: currentChapter?.slug || currentChapter?.id } })"
+      @back="isChallengeMode ? router.push('/challenges') : router.push({ path: `/learning/${path?.slug || pathId}`, query: { chapter: currentChapter?.slug || currentChapter?.id } })"
       @prev-lesson="goToPrevLesson"
     />
 
@@ -72,12 +72,12 @@
             :code="runner.code.value"
             :output="runner.output.value"
             :is-last-lesson="isLastLesson"
-            :is-challenge="route.query.mode === 'challenge'"
+            :is-challenge="isChallengeMode"
             @update:code="runner.code.value = $event; runner.status.value = 'idle'"
             @run="onPracticeRun"
             @reset="onResetPractice"
             @clear-output="runner.clearOutput()"
-            @back="route.query.mode === 'challenge' ? router.push('/challenges') : (activeStep = STEP.QUIZ)"
+            @back="isChallengeMode ? router.push('/challenges') : (activeStep = STEP.QUIZ)"
             @finish="onPracticeFinish"
           />
 
@@ -139,6 +139,7 @@ import { useQuiz } from '../composables/useQuiz'
 import { useCodeRunner } from '../composables/useCodeRunner'
 import { useUserAccount } from '../composables/useUserAccount'
 import { useScoring } from '../composables/useScoring'
+import { useChallengesStats } from '../composables/useChallengesStats'
 import api from '../services/api'
 import { checkOutputMatch } from '../utils/codeChecker'
 
@@ -165,29 +166,45 @@ const STEP_LABEL = {
 const route = useRoute()
 const router = useRouter()
 const { getPathById, getLessonById, getChapterById, fetchPathDetails, isLoading, isPreparingLesson } = useLearningPaths()
-const { isLoggedIn, isPremiumUser, hasModuleAccess } = useUserAccount()
+const { isLoggedIn, isBootstrapping, isPremiumUser, hasModuleAccess } = useUserAccount()
+const { fetchChallengeStats } = useChallengesStats()
 
 const pathId = computed(() => route.params.pathId)
 const chapterId = computed(() => route.params.chapterId)
 const lessonId = computed(() => route.params.lessonId)
 
 const path = computed(() => getPathById(pathId.value))
+const isChallengeMode = computed(() =>
+  route.query.mode === 'challenge' ||
+  pathId.value === 'global-challenges' ||
+  path.value?.slug === 'global-challenges'
+)
 const canAccessCurrentPath = computed(() =>
-  route.query.mode === 'challenge' ? isPremiumUser.value : hasModuleAccess(path.value)
+  isChallengeMode.value
+    ? (pathId.value === 'global-challenges' || path.value?.slug === 'global-challenges' || isPremiumUser.value)
+    : hasModuleAccess(path.value)
 )
 const currentLesson = computed(() => getLessonById(pathId.value, chapterId.value, lessonId.value))
 const currentChapter = computed(() => getChapterById(pathId.value, chapterId.value))
 
 const isReady = ref(false)
 
+const isCurrentLessonIncomplete = () => {
+  const l = currentLesson.value
+  if (!l) return true
+  if (l.explanation === null && !isChallengeMode.value) return true
+  if (l.quizzes === undefined && !isChallengeMode.value) return true
+  if (l.can_access === false && canAccessCurrentPath.value) return true
+  return false
+}
+
 onMounted(async () => {
   try {
-    // Pastikan detail (termasuk quizzes) dimuat. Endpoint index tidak me-load quizzes.
+    // Pastikan detail (termasuk quizzes & konten lesson) dimuat. Endpoint index tidak me-load quizzes/explanation.
     const hasQuizzesLoaded = path.value?.chapters?.[0]?.lessons?.[0]?.quizzes !== undefined;
-    const isChallengeMode = route.query.mode === 'challenge';
     
-    if (!path.value || !path.value.chapters || !hasQuizzesLoaded || isChallengeMode || path.value._challengeModeOnly) {
-      await fetchPathDetails(pathId.value, false, isChallengeMode ? 'challenge' : null)
+    if (!path.value || !path.value.chapters || !hasQuizzesLoaded || isCurrentLessonIncomplete() || isChallengeMode.value || path.value._challengeModeOnly) {
+      await fetchPathDetails(pathId.value, false, isChallengeMode.value ? 'challenge' : null)
     }
   } finally {
     isPreparingLesson.value = false
@@ -196,6 +213,12 @@ onMounted(async () => {
 
   // Proses pending outbox dari sesi sebelumnya (jika ada)
   scoring.processPendingFromPreviousSession()
+})
+
+watch(canAccessCurrentPath, async (canAccess) => {
+  if (canAccess && isReady.value && isCurrentLessonIncomplete()) {
+    await fetchPathDetails(pathId.value, true, isChallengeMode.value ? 'challenge' : null)
+  }
 })
 
 onBeforeUnmount(() => {
@@ -271,24 +294,26 @@ const pendingStepLabel = ref('Tes Pertanyaan')
 const initStepFromQuery = () => {
   const stepParam = route.query.step
   const lesson = currentLesson.value
+  const isDirectPracticeLesson = isChallengeMode.value || lesson?.type === 'code' || (Array.isArray(lesson?.quizzes) && lesson.quizzes.length === 0)
+
   if (stepParam === 'quiz') {
-    if (!isLoggedIn.value) {
+    if (!isLoggedIn.value && !isBootstrapping.value) {
       activeStep.value = STEP.THEORY
       requireAuth(STEP.QUIZ)
       return
     }
-    if (lesson && !lesson.isCompleted) {
+    if (lesson && !lesson.isCompleted && !isChallengeMode.value) {
       activeStep.value = STEP.THEORY
       return
     }
     activeStep.value = STEP.QUIZ
-  } else if (stepParam === 'practice') {
-    if (!isLoggedIn.value) {
+  } else if (stepParam === 'practice' || isChallengeMode.value) {
+    if (!isLoggedIn.value && !isBootstrapping.value) {
       activeStep.value = STEP.THEORY
       requireAuth(STEP.PRACTICE)
       return
     }
-    if (lesson && !lesson.quizPassed) {
+    if (!isDirectPracticeLesson && lesson && !lesson.quizPassed) {
       activeStep.value = lesson.isCompleted ? STEP.QUIZ : STEP.THEORY
       return
     }
@@ -463,7 +488,7 @@ const onPracticeRun = async () => {
         if (scoring.hasBeenScored('practice', currentLesson.value.id)) return
 
         // Hanya tandai practiceDone jika BUKAN mode challenge agar alur belajar tidak terpengaruh
-        if (route.query.mode !== 'challenge') {
+        if (!isChallengeMode.value) {
           currentLesson.value.practiceDone = true
         }
 
@@ -481,14 +506,15 @@ const onPracticeRun = async () => {
         })
 
         // ② Tampilkan TOAST segera (XP & iCoinZ langsung muncul instan di Toast, 0 delay, no blocking popup!)
-        showRewardToast(xp, route.query.mode === 'challenge' ? 'Tantangan Selesai!' : 'Praktik Berhasil!', 'practice', coinz)
+        showRewardToast(xp, isChallengeMode.value ? 'Tantangan Selesai!' : 'Praktik Berhasil!', 'practice', coinz)
 
         // ③ BACKGROUND SYNC: Kirim ke server dengan delay 3 detik
         const extraData = {
           saved_code: runner.code.value,
           code: runner.code.value
         }
-        if (route.query.mode) extraData.mode = route.query.mode
+        if (isChallengeMode.value) extraData.mode = 'challenge'
+        else if (route.query.mode) extraData.mode = route.query.mode
 
         scoring.enqueueSyncToServer('practice', currentLesson.value.id, extraData, xp, coinz)
       }
@@ -501,18 +527,22 @@ const onPracticeRun = async () => {
 
 /** Selesai & Lanjut dari practice. */
 const onPracticeFinish = async () => {
-  if (route.query.mode === 'challenge') {
+  if (isChallengeMode.value) {
     // 1. Catat tantangan selesai ke localStorage agar langsung terupdate di sisi client
     try {
       const completed = JSON.parse(localStorage.getItem('completed_challenges') || '[]')
-      if (currentLesson.value?.id && !completed.includes(currentLesson.value.id)) {
-        completed.push(currentLesson.value.id)
+      const idNum = Number(currentLesson.value?.id)
+      const idStr = String(currentLesson.value?.id || '')
+      if (idStr && !completed.map(String).includes(idStr)) {
+        completed.push(Number.isFinite(idNum) ? idNum : idStr)
         localStorage.setItem('completed_challenges', JSON.stringify(completed))
       }
+      sessionStorage.removeItem('ic_challenges_page1_cache_v1')
     } catch (e) {}
 
-    // 2. Segera flush outbox ke backend
+    // 2. Segera flush outbox ke backend dan tunggu hingga request selesai
     await scoring.flushOutboxNow().catch(() => {})
+    await fetchChallengeStats(true).catch(() => {})
 
     // 3. Kembali ke halaman tantangan
     router.push('/challenges')

@@ -53,7 +53,7 @@
             <!-- Useful Context Note if not generic filler -->
             <div class="p-card context-card" v-if="practiceSections.info && !isGenericInfo(practiceSections.info)">
               <div class="context-icon"><i class="fa-solid fa-circle-info"></i></div>
-              <div class="context-text">{{ practiceSections.info }}</div>
+              <div class="context-text" v-html="renderInlineMarkdown(practiceSections.info)"></div>
             </div>
 
             <!-- Main Task Card with parsed rich Markdown -->
@@ -70,7 +70,7 @@
               <div class="guideline-badge">
                 <i class="fa-solid fa-lightbulb"></i> Tips & Ketentuan
               </div>
-              <p class="guideline-text">{{ parsedTaskData.guideline }}</p>
+              <p class="guideline-text" v-html="renderInlineMarkdown(parsedTaskData.guideline)"></p>
             </div>
 
             <!-- Example / Input Format -->
@@ -82,7 +82,7 @@
               <pre class="code-preview"><code>{{ practiceSections.example }}</code></pre>
             </div>
 
-            <!-- Expected Output: Visual Table Preview for SQL vs STDOUT for others -->
+            <!-- Expected Output: Visual Table Preview for SQL vs DOM CHECK for HTML vs STDOUT for others -->
             <div class="terminal-preview-card" :class="{ 'is-sql-table': isSqlMode && parsedExpectedSqlTable }" v-if="practiceSections.output">
               <div class="terminal-bar">
                 <div class="terminal-dots">
@@ -91,11 +91,11 @@
                   <span class="dot green"></span>
                 </div>
                 <div class="terminal-label">
-                  <i :class="isSqlMode && parsedExpectedSqlTable ? 'fa-solid fa-table-list text-cyan' : 'fa-solid fa-terminal'"></i>
-                  {{ isSqlMode && parsedExpectedSqlTable ? 'HASIL TABEL YANG DIHARAPKAN' : 'OUTPUT YANG DIHARAPKAN' }}
+                  <i :class="isSqlMode && parsedExpectedSqlTable ? 'fa-solid fa-table-list text-cyan' : (isDomCheckMode ? 'fa-solid fa-code text-cyan' : 'fa-solid fa-terminal')"></i>
+                  {{ isSqlMode && parsedExpectedSqlTable ? 'HASIL TABEL YANG DIHARAPKAN' : (isDomCheckMode ? 'ELEMEN DOM YANG DIHARAPKAN' : 'OUTPUT YANG DIHARAPKAN') }}
                 </div>
-                <div class="terminal-badge" :class="{ 'sql-badge': isSqlMode && parsedExpectedSqlTable }">
-                  {{ isSqlMode && parsedExpectedSqlTable ? 'SQL RESULT' : 'STDOUT' }}
+                <div class="terminal-badge" :class="{ 'sql-badge': (isSqlMode && parsedExpectedSqlTable) || isDomCheckMode }">
+                  {{ isSqlMode && parsedExpectedSqlTable ? 'SQL RESULT' : (isDomCheckMode ? 'DOM CHECK' : 'STDOUT') }}
                 </div>
               </div>
               <div class="terminal-body">
@@ -339,10 +339,20 @@ const emit = defineEmits(['back', 'finish', 'run', 'clear-output', 'update:code'
 const activeOutputTab = ref('console')
 const activeInstructionTab = ref('task') // 'task' | 'schema'
 const isHtmlMode = computed(() => props.language === 'html' || props.language === 'css')
+const isDomCheckMode = computed(() => isHtmlMode.value || props.lesson?.validation_type === 'dom_check')
 const isSqlMode = computed(() => {
   const lang = (props.language || props.lesson?.language || '').toLowerCase()
   return lang === 'sql' || lang.includes('sql') || lang.includes('database')
 })
+
+const renderInlineMarkdown = (str) => {
+  if (!str) return ''
+  try {
+    return typeof marked.parseInline === 'function' ? marked.parseInline(String(str)) : marked.parse(String(str))
+  } catch {
+    return String(str)
+  }
+}
 
 watch(() => props.lesson?.id, () => {
   activeInstructionTab.value = 'task'
@@ -449,10 +459,11 @@ const practiceSections = computed(() => {
   const text = props.lesson.practice
   
   if (!text) {
+    const langLabel = formatLanguage(props.language) || 'pemrograman'
     return {
       title: 'Latihan Bebas',
       info: 'Tidak ada tugas spesifik untuk materi ini. Silakan bereksperimen menggunakan editor di samping!',
-      task: 'Tulis dan jalankan kode JavaScript apa saja untuk menguji pemahaman Anda.',
+      task: `Tulis dan jalankan kode ${langLabel} apa saja untuk menguji pemahaman Anda.`,
       example: '',
       output: ''
     }

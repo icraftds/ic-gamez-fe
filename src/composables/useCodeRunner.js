@@ -7,10 +7,29 @@ import { executeCode } from '../utils/runners'
 
 /** @typedef {{ type: 'log' | 'error' | 'warn' | 'table', text?: string, data?: any, columns?: any }} ConsoleEntry */
 
-/**
- * Ekstraksi kode awal (initial_code atau initial_query) secara aman
- * dari objek practice atau JSON string.
- */
+function getDefaultCodePlaceholder(lang) {
+  const l = (lang || 'javascript').toLowerCase()
+  if (l === 'python') return '# Ketik kode Anda di sini\n'
+  if (l === 'sql') return '-- Ketik query SQL Anda di sini\n'
+  if (l === 'html') return '<!-- Ketik kode HTML Anda di sini -->\n'
+  if (l === 'php') return '<?php\n// Ketik kode PHP Anda di sini\n'
+  return '// Ketik kode Anda di sini\n'
+}
+
+function extractChallengeHeaderTitle(codeStr) {
+  if (!codeStr || typeof codeStr !== 'string') return null
+  const match = codeStr.match(/🎯\s*TANTANGAN:\s*([^\r\n]+)/i)
+  return match ? match[1].trim().toLowerCase() : null
+}
+
+function hasMismatchedChallengeHeader(savedCode, defaultCode) {
+  const savedTitle = extractChallengeHeaderTitle(savedCode)
+  const defaultTitle = extractChallengeHeaderTitle(defaultCode)
+  if (savedTitle && defaultTitle && savedTitle !== defaultTitle) {
+    return true
+  }
+  return false
+}
 function extractInitialCode(practice) {
   if (!practice) return ''
   if (typeof practice === 'object') {
@@ -146,21 +165,21 @@ export function useCodeRunner() {
     currentLessonSlug.value = lessonSlug
     currentLessonLanguage.value = lessonLang || 'javascript'
 
-    const defaultCode = extractInitialCode(initialPractice) || '// Ketik kode Anda di sini\n'
+    const defaultCode = extractInitialCode(initialPractice) || getDefaultCodePlaceholder(currentLessonLanguage.value)
 
     // Coba storage key berbasis slug dulu untuk menghindari tabrakan ID antar materi/seeder
     const primaryKey = lessonSlug ? getStorageKey(lessonSlug) : (lessonId ? getStorageKey(`id_${lessonId}`) : null)
     let dataStr = primaryKey ? localStorage.getItem(primaryKey) : null
 
-    // Fallback ke legacy integer ID key HANYA jika valid dan cocok bahasanya
+    // Fallback ke legacy integer ID key HANYA jika memiliki slug yang sama dan cocok bahasanya
     if (!dataStr && lessonId) {
       const legacyKey = getStorageKey(lessonId)
       const legacyDataStr = localStorage.getItem(legacyKey)
       if (legacyDataStr) {
         try {
           const parsed = JSON.parse(legacyDataStr)
-          // Jika slug tersimpan dan berbeda, atau bahasa tidak kompatibel, buang legacy key yang korup!
-          if ((parsed.slug && lessonSlug && parsed.slug !== lessonSlug) || !isCodeLanguageCompatible(lessonLang, parsed.code)) {
+          // Jika lessonSlug diketahui namun legacy entry tidak punya slug atau berbeda slug, buang legacy key yang korup!
+          if ((lessonSlug && (!parsed.slug || parsed.slug !== lessonSlug)) || !isCodeLanguageCompatible(lessonLang, parsed.code) || hasMismatchedChallengeHeader(parsed.code, defaultCode)) {
             localStorage.removeItem(legacyKey)
           } else {
             dataStr = legacyDataStr
@@ -174,8 +193,8 @@ export function useCodeRunner() {
     if (dataStr) {
       try {
         const data = JSON.parse(dataStr)
-        // Cegah kontaminasi: jika data di storage tersimpan dengan slug lain, abaikan
-        if (data.slug && lessonSlug && data.slug !== lessonSlug) {
+        // Cegah kontaminasi: jika data di storage tersimpan dengan slug lain atau header tantangan berbeda, abaikan
+        if ((data.slug && lessonSlug && data.slug !== lessonSlug) || hasMismatchedChallengeHeader(data.code, defaultCode)) {
           resetCode(initialPractice)
           return
         }
@@ -251,7 +270,7 @@ export function useCodeRunner() {
   }
 
   const resetCode = (initialPractice = null) => {
-    const defaultCode = extractInitialCode(initialPractice) || '// Ketik kode Anda di sini\n'
+    const defaultCode = extractInitialCode(initialPractice) || getDefaultCodePlaceholder(currentLessonLanguage.value)
     code.value = defaultCode
     output.value = []
     status.value = 'idle'

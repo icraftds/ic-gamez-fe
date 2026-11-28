@@ -29,6 +29,9 @@ export function loadSsoSession(force = false) {
         ssoState.user.value = data.user; ssoState.csrf.value = data.csrf
         ssoState.walletPending.value = data.wallet_initialization_pending
         ssoState.status.value = 'authenticated'
+        if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+            window.dispatchEvent(new CustomEvent('gamez-sso-user-hydrated', { detail: { user: data.user } }))
+        }
         return data.user
     }).catch(error => {
         if ([401, 403].includes(error.response?.status)) { clearSsoSession('expired'); return null }

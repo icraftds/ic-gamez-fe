@@ -66,6 +66,18 @@ if (typeof window !== 'undefined') {
       stopAuthLoading(true)
     }
   })
+  window.addEventListener('gamez-sso-user-hydrated', (event) => {
+    const hydratedUser = event?.detail?.user
+    if (hydratedUser && hydratedUser.id && hydratedUser.current_plan !== undefined) {
+      applyUserData(hydratedUser)
+      if (typeof window.dispatchEvent === 'function') {
+        window.dispatchEvent(new CustomEvent('gamez-session-loaded'))
+      }
+    }
+  })
+  window.addEventListener('gamez-session-cleared', () => {
+    clearUserAccount()
+  })
 }
 
 export function startAuthLoading(options = {}) {
@@ -188,60 +200,61 @@ export function clearUserAccount() {
   } catch {}
 }
 
-export function useUserAccount() {
-  const applyUserData = (data) => {
-    if (!data) return null
-    if (userProfile.value.id !== data.id) { coinz.value = null; walletStatus.value = 'unavailable' }
-    isLoggedIn.value = true
-    userProfile.value = {
-      id: data.id,
-      name: data.name,
-      username: data.username,
-      tag_id: data.tag_id,
-      last_username_change_at: data.last_username_change_at,
-      email: data.email,
-      phone: data.phone || '',
-      avatar: sanitizeAvatarUrl(data.avatar_url, data.name),
-      level: Number(data.level) || 1,
-      xp: Number(data.xp) || 0,
-      monthlyXp: Number(data.monthly_xp) || 0,
-      totalXp: Number(data.total_xp ?? data.xp) || 0,
-      nextLevelXp: Number(data.next_level_xp) || 100,
-      streak: data.current_streak,
-      longest_streak: data.longest_streak,
-      is_admin: data.is_admin || false,
-      showcase_medals: data.showcase_medals || null,
-      friends_count: data.friends_count || 0,
-      joinDate: data.created_at ? new Date(data.created_at).toLocaleDateString() : ''
-    }
-    credits.value = data.credits
-    isPremiumUser.value = data.is_premium
-    currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
-      ? data.current_plan.slug 
-      : (data.current_plan || 'free')
-    subscriptionInfo.value = data.subscription_status || null
-    proQuota.value = data.pro_quota || { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
-    unlockedPathIds.value = Array.isArray(data.unlocked_path_ids) ? data.unlocked_path_ids.map(Number) : []
-    ownedPathIds.value = Array.isArray(data.owned_path_ids) ? data.owned_path_ids.map(Number) : []
-
-    if (data.active_border_id) activeBorderId.value = data.active_border_id;
-
-    // Simpan display snapshot non-sensitif untuk instant LCP pada kunjungan berikutnya
-    try {
-      if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.setItem('ic_user_display_v1', JSON.stringify({
-          name: userProfile.value.name,
-          avatar: userProfile.value.avatar,
-          currentPlan: currentPlan.value,
-          isPremiumUser: Boolean(isPremiumUser.value),
-          activeBorderId: activeBorderId.value,
-          active_border_url: data.active_border_url || null,
-        }))
-      }
-    } catch {}
-
-    return data
+export function applyUserData(data) {
+  if (!data) return null
+  if (userProfile.value.id !== data.id) { coinz.value = null; walletStatus.value = 'unavailable' }
+  isLoggedIn.value = true
+  userProfile.value = {
+    id: data.id,
+    name: data.name,
+    username: data.username,
+    tag_id: data.tag_id,
+    last_username_change_at: data.last_username_change_at,
+    email: data.email,
+    phone: data.phone || '',
+    avatar: sanitizeAvatarUrl(data.avatar_url, data.name),
+    level: Number(data.level) || 1,
+    xp: Number(data.xp) || 0,
+    monthlyXp: Number(data.monthly_xp) || 0,
+    totalXp: Number(data.total_xp ?? data.xp) || 0,
+    nextLevelXp: Number(data.next_level_xp) || 100,
+    streak: data.current_streak,
+    longest_streak: data.longest_streak,
+    is_admin: data.is_admin || false,
+    showcase_medals: data.showcase_medals || null,
+    friends_count: data.friends_count || 0,
+    joinDate: data.created_at ? new Date(data.created_at).toLocaleDateString() : ''
   }
+  credits.value = data.credits
+  isPremiumUser.value = data.is_premium
+  currentPlan.value = typeof data.current_plan === 'object' && data.current_plan !== null 
+    ? data.current_plan.slug 
+    : (data.current_plan || 'free')
+  subscriptionInfo.value = data.subscription_status || null
+  proQuota.value = data.pro_quota || { total_quota: 0, used_quota: 0, remaining_quota: 0, selected_path_ids: [] }
+  unlockedPathIds.value = Array.isArray(data.unlocked_path_ids) ? data.unlocked_path_ids.map(Number) : []
+  ownedPathIds.value = Array.isArray(data.owned_path_ids) ? data.owned_path_ids.map(Number) : []
+
+  if (data.active_border_id) activeBorderId.value = data.active_border_id;
+
+  // Simpan display snapshot non-sensitif untuk instant LCP pada kunjungan berikutnya
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('ic_user_display_v1', JSON.stringify({
+        name: userProfile.value.name,
+        avatar: userProfile.value.avatar,
+        currentPlan: currentPlan.value,
+        isPremiumUser: Boolean(isPremiumUser.value),
+        activeBorderId: activeBorderId.value,
+        active_border_url: data.active_border_url || null,
+      }))
+    }
+  } catch {}
+
+  return data
+}
+
+export function useUserAccount() {
 
   /**
    * Fetch current user data from the backend

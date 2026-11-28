@@ -169,8 +169,13 @@ export function mergeFreshPathsWithCache(freshPaths, cachedPaths, hasBeenScoredF
       lessons: ch.lessons?.map(l => {
         const fresh = freshLessonMap.get(l.id)
         if (!fresh) return l
+        const wasLocked = l.can_access === false || l.explanation === null
+        const nowUnlocked = Boolean(fresh.can_access ?? newPath.is_unlocked)
         return {
           ...l,
+          can_access: fresh.can_access ?? l.can_access,
+          is_premium: fresh.is_premium ?? l.is_premium,
+          quizzes: (wasLocked && nowUnlocked) ? undefined : l.quizzes,
           is_completed: fresh.is_completed ?? l.is_completed,
           quiz_passed: fresh.quiz_passed ?? l.quiz_passed,
           saved_code: fresh.saved_code ?? l.saved_code,
@@ -180,6 +185,16 @@ export function mergeFreshPathsWithCache(freshPaths, cachedPaths, hasBeenScoredF
     }))
 
     return normalizePathProgress({ ...newPath, chapters: syncedChapters }, hasBeenScoredFn, snap)
+  })
+}
+
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('gamez-session-loaded', () => {
+    const hasLockedPremiumPaths = globalPaths.value.some(p => p.is_premium && !p.is_unlocked)
+    if (hasLockedPremiumPaths) {
+      const { fetchPaths } = useLearningPaths()
+      fetchPaths(true).catch(() => {})
+    }
   })
 }
 

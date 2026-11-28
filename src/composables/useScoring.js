@@ -44,7 +44,7 @@ const SYNC_DELAY_MS = 3000   // Delay sebelum kirim ke progress endpoint
 const WALLET_DELAY_MS = 2000 // Delay sebelum sync wallet (setelah progress)
 
 let outboxTimer = null // Prevent concurrent processing
-let isProcessingOutbox = false // Concurrency lock
+let activeOutboxPromise = null // Concurrency lock returning active promise so flushOutboxNow awaits completion
 
 /**
  * Hitung XP lokal berdasarkan type, difficulty, dan chapter order.
@@ -159,13 +159,15 @@ async function syncWalletBackground() {
  * Dipanggil dengan delay dari scheduleSyncOutbox().
  */
 async function processOutbox() {
-  if (isProcessingOutbox) return
-  isProcessingOutbox = true
-  try {
-    await doProcessOutbox()
-  } finally {
-    isProcessingOutbox = false
-  }
+  if (activeOutboxPromise) return activeOutboxPromise
+  activeOutboxPromise = (async () => {
+    try {
+      await doProcessOutbox()
+    } finally {
+      activeOutboxPromise = null
+    }
+  })()
+  return activeOutboxPromise
 }
 
 async function doProcessOutbox() {

@@ -219,7 +219,10 @@ const fetchChallenges = async () => {
       
       let p = challenge.progress;
       if (Array.isArray(p)) p = p.length > 0 ? p[0] : null;
-      const isChallengeCompleted = Boolean((p && p.challenge_completed) || completedLocal.includes(challenge.id));
+      const isChallengeCompleted = Boolean(
+        (p && p.challenge_completed) ||
+        completedLocal.map(String).includes(String(challenge.id))
+      );
 
       return {
         ...challenge,

@@ -37,6 +37,9 @@ api.interceptors.request.use(async config => {
     return Promise.reject({ retryAfter, response: { status: 429, data: { message: `Tunggu ${retryAfter} detik sebelum mencoba kembali.` } }, config });
   }
   if (ssoEnabled) {
+    if (ssoState.status.value === 'idle' && typeof window !== 'undefined' && !globalThis.__PRERENDER__) {
+      try { await loadSsoSession() } catch {}
+    }
     config.ssoGeneration = ssoState.generation;
     const path = config.url || '';
     if (!path.startsWith('/') || path.startsWith('//') || path.includes('://')) return Promise.reject(new Error('Invalid product path'));

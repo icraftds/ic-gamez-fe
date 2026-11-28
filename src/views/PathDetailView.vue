@@ -547,12 +547,25 @@ const goToNextChapter = () => {
   }
 }
 
+const hasIncompletePremiumLessons = () => {
+  if (!path.value?.chapters || !canAccessPath.value) return false
+  return path.value.chapters.some(ch =>
+    ch.lessons?.some((l, idx) => idx > 0 && (l.can_access === false || l.explanation === null || l.quizzes === undefined))
+  )
+}
+
 onMounted(async () => {
   const hasQuizzesLoaded = path.value?.chapters?.[0]?.lessons?.[0]?.quizzes !== undefined;
-  if (!path.value || !path.value.chapters || !hasQuizzesLoaded || path.value._challengeModeOnly) {
+  if (!path.value || !path.value.chapters || !hasQuizzesLoaded || hasIncompletePremiumLessons() || path.value._challengeModeOnly) {
     await fetchPathDetails(pathId.value)
   }
   isPreparingLesson.value = false
+})
+
+watch(canAccessPath, async (canAccess) => {
+  if (canAccess && hasIncompletePremiumLessons()) {
+    await fetchPathDetails(pathId.value)
+  }
 })
 
 const isLessonCompleted = (lesson) => {
